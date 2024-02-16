@@ -18,7 +18,8 @@ public class ExitApplication implements ExitInterface {
      * @throws ExitException
      */
     @Override
-    public void run(String[] args, InputStream stdin, OutputStream stdout) throws AbstractApplicationException {
+    public void run(final String[] args, final InputStream stdin, final OutputStream stdout)
+            throws AbstractApplicationException {
         // Format: exit
         terminateExecution();
     }
