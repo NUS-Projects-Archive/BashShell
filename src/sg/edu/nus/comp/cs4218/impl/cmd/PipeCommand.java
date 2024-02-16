@@ -20,12 +20,12 @@ import java.util.List;
 public class PipeCommand implements Command {
     private final List<CallCommand> callCommands;
 
-    public PipeCommand(List<CallCommand> callCommands) {
+    public PipeCommand(final List<CallCommand> callCommands) {
         this.callCommands = callCommands;
     }
 
     @Override
-    public void evaluate(InputStream stdin, OutputStream stdout)
+    public void evaluate(final InputStream stdin, final OutputStream stdout)
             throws AbstractApplicationException, ShellException, FileNotFoundException {
         AbstractApplicationException absAppException = null;
         ShellException shellException = null;
@@ -34,7 +34,7 @@ public class PipeCommand implements Command {
         OutputStream nextOutputStream;
 
         for (int i = 0; i < callCommands.size(); i++) {
-            CallCommand callCommand = callCommands.get(i);
+            final CallCommand callCommand = callCommands.get(i);
 
             if (absAppException != null || shellException != null) {
                 callCommand.terminate();
