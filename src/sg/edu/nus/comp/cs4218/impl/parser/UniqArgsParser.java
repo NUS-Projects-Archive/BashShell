@@ -1,12 +1,10 @@
 package sg.edu.nus.comp.cs4218.impl.parser;
 
-import java.util.List;
-
 public class UniqArgsParser extends ArgsParser {
     public static final char FLAG_IS_COUNT_OCCUR = 'c';
     public static final char FLAG_IS_DUPLICATE_GRP = 'd';
     public static final char FLAG_IS_DUPLICATE = 'D';
-    public static final char INPUT_IS_STDIN = '-';
+    public static final char NO_IN_FILE = '-';
 
     public UniqArgsParser() {
         super();
@@ -38,7 +36,7 @@ public class UniqArgsParser extends ArgsParser {
             return inputFile;
         }
 
-        if (inputFile.charAt(0) == INPUT_IS_STDIN) {
+        if (inputFile.charAt(0) == NO_IN_FILE) {
             return null;
         }
         else {
@@ -47,6 +45,6 @@ public class UniqArgsParser extends ArgsParser {
     }
 
     public String getOutputFileName() {
-        return nonFlagArgs.size() != 2 ? null : nonFlagArgs.get(1);
+        return nonFlagArgs.size() == 2 ? nonFlagArgs.get(1) : null;
     }
 }
