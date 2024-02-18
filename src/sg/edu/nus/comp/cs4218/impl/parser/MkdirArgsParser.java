@@ -4,15 +4,15 @@ import java.util.List;
 
 public class MkdirArgsParser extends ArgsParser {
 
-    private final static char FLAG_IS_CREATE_PARENT_FOLDER = 'p';
+    private final static char FLAG_IS_CREATE_PARENT = 'p';
 
     public MkdirArgsParser() {
         super();
-        legalFlags.add(FLAG_IS_CREATE_PARENT_FOLDER);
+        legalFlags.add(FLAG_IS_CREATE_PARENT);
     }
 
-    public boolean isCreateParentFolder() {
-        return flags.contains(FLAG_IS_CREATE_PARENT_FOLDER);
+    public boolean isCreateParent() {
+        return flags.contains(FLAG_IS_CREATE_PARENT);
     }
 
     public List<String> getDirectories() {
