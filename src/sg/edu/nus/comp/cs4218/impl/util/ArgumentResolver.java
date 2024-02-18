@@ -147,6 +147,11 @@ public class ArgumentResolver {
             }
         }
 
+        // should not have unmatched quotes after iterating through the entire arg
+        if (!unmatchedQuotes.isEmpty()) {
+            throw new ShellException("Unmatched quote in argument: " + arg);
+        }
+
         if (!parsedArg.isEmpty()) {
             appendParsedArgIntoSegment(parsedArgsSegment, parsedArg);
         }
