@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 
 import sg.edu.nus.comp.cs4218.exception.UniqException;
 
-public class UniqApplicationTest {
+class UniqApplicationTest {
 
     @Test
     void run_removeAdjacentDuplicates_onlyUniqueAdjacent() {
@@ -19,10 +19,10 @@ public class UniqApplicationTest {
         String[] args = { "uniq-1.txt" };
         String expected =
                 "Hello World" + STRING_NEWLINE +
-                        "Alice" + STRING_NEWLINE +
-                        "Bob" + STRING_NEWLINE +
-                        "Alice" + STRING_NEWLINE +
-                        "Bob" + STRING_NEWLINE;
+                "Alice" + STRING_NEWLINE +
+                "Bob" + STRING_NEWLINE +
+                "Alice" + STRING_NEWLINE +
+                "Bob" + STRING_NEWLINE;
         ByteArrayOutputStream out = new ByteArrayOutputStream();
 
         // When
@@ -42,10 +42,10 @@ public class UniqApplicationTest {
         String[] args = { "-c", "uniq-1.txt" };
         String expected =
                 "2 Hello World" + STRING_NEWLINE +
-                        "2 Alice" + STRING_NEWLINE +
-                        "1 Bob" + STRING_NEWLINE +
-                        "1 Alice" + STRING_NEWLINE +
-                        "1 Bob" + STRING_NEWLINE;
+                "2 Alice" + STRING_NEWLINE +
+                "1 Bob" + STRING_NEWLINE +
+                "1 Alice" + STRING_NEWLINE +
+                "1 Bob" + STRING_NEWLINE;
         ByteArrayOutputStream out = new ByteArrayOutputStream();
 
         // When
@@ -65,7 +65,7 @@ public class UniqApplicationTest {
         String[] args = { "-d", "uniq-1.txt" };
         String expected =
                 "Hello World" + STRING_NEWLINE +
-                        "Alice" + STRING_NEWLINE;
+                "Alice" + STRING_NEWLINE;
         ByteArrayOutputStream out = new ByteArrayOutputStream();
 
         // When
@@ -85,9 +85,9 @@ public class UniqApplicationTest {
         String[] args = { "-D", "uniq-1.txt" };
         String expected =
                 "Hello World" + STRING_NEWLINE +
-                        "Hello World" + STRING_NEWLINE +
-                        "Alice" + STRING_NEWLINE +
-                        "Alice" + STRING_NEWLINE;
+                "Hello World" + STRING_NEWLINE +
+                "Alice" + STRING_NEWLINE +
+                "Alice" + STRING_NEWLINE;
         ByteArrayOutputStream out = new ByteArrayOutputStream();
 
         // When
@@ -107,7 +107,7 @@ public class UniqApplicationTest {
         String[] args = { "-cd", "uniq-1.txt" };
         String expected =
                 "2 Hello World" + STRING_NEWLINE +
-                        "2 Alice" + STRING_NEWLINE;
+                "2 Alice" + STRING_NEWLINE;
         ByteArrayOutputStream out = new ByteArrayOutputStream();
 
         // When
