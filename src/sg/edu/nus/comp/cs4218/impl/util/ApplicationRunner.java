@@ -21,6 +21,7 @@ public class ApplicationRunner {
     public final static String APP_CD = "cd";
     public final static String APP_CAT = "cat";
     public final static String APP_UNIQ = "uniq";
+    public final static String APP_MKDIR = "mkdir";
 
     /**
      * Run the application as specified by the application command keyword and arguments.
@@ -63,6 +64,9 @@ public class ApplicationRunner {
                 break;
             case APP_UNIQ:
                 application = new UniqApplication();
+                break;
+            case APP_MKDIR:
+                application = new MkdirApplication();
                 break;
             default:
                 throw new ShellException(app + ": " + ERR_INVALID_APP);
