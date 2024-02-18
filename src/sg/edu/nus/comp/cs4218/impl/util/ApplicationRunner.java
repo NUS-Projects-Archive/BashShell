@@ -20,6 +20,7 @@ public class ApplicationRunner {
     public final static String APP_PASTE = "paste";
     public final static String APP_CD = "cd";
     public final static String APP_CAT = "cat";
+    public final static String APP_UNIQ = "uniq";
     public final static String APP_MKDIR = "mkdir";
 
     /**
@@ -60,6 +61,9 @@ public class ApplicationRunner {
                 break;
             case APP_CAT:
                 application = new CatApplication();
+                break;
+            case APP_UNIQ:
+                application = new UniqApplication();
                 break;
             case APP_MKDIR:
                 application = new MkdirApplication();
