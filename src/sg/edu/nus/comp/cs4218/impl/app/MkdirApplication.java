@@ -51,8 +51,7 @@ public class MkdirApplication implements MkdirInterface {
 
         for (String folder : directories) {
             File file = new File(folder);
-            if ((isCreateParent && isRootDirectory(file)) ||
-                    (!isCreateParent && (isAnyTopLevelFolderMissing(file) || isRootDirectory(file)))) {
+            if ((!isCreateParent && isAnyTopLevelFolderMissing(file)) || isStartFromRoot(file)) {
                 throw new MkdirException(ERR_TOP_LEVEL_MISSING);
             }
             createFolder(folder);
@@ -84,13 +83,11 @@ public class MkdirApplication implements MkdirInterface {
      * Checks if any top-level folder in the parent hierarchy of the given file is missing.
      *
      * @param file The file to start the check from.
-     * @return true if any top-level folder is missing (including starting with the root symbol). Otherwise, false.
+     * @return true if any top-level folder is missing; Otherwise, false.
      */
     private boolean isAnyTopLevelFolderMissing(File file) {
         File parentFile = file.getParentFile();
-        System.out.println("parentFile: " + parentFile);
         while (parentFile != null) {
-            System.out.println("isFileMissing Parent: " + isFileMissing(parentFile));
             if (isFileMissing(parentFile)) {
                 return true;
             }
@@ -99,19 +96,18 @@ public class MkdirApplication implements MkdirInterface {
         return false;
     }
 
-    private boolean isFileMissing(File file) {
-        return !file.exists();
+    /**
+     * Checks if the given file starts from the root directory.
+     *
+     * @param file The file to check.
+     * @return true if the file paths starts with the root symbol ("/"); Otherwise, false.
+     */
+    private boolean isStartFromRoot(File file) {
+        String filePath = file.getPath();
+        return filePath.startsWith(File.separator);
     }
 
-    private boolean isRootDirectory(File file) {
-        File parentFile = file.getParentFile();
-        while (parentFile != null) {
-            if (parentFile.getPath().equals(File.separator)) {
-                return true;
-            }
-            parentFile = parentFile.getParentFile();
-        }
-        return false;
-        // return directory != null && directory.getPath().equals(File.separator);
+    private boolean isFileMissing(File file) {
+        return !file.exists();
     }
 }
