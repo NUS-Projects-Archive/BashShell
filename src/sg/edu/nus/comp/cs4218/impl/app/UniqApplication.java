@@ -138,9 +138,8 @@ public class UniqApplication implements UniqInterface {
             throw new UniqException(MEANINGLESS_COUNT_ALL_DUP);
         }
 
-        int count = 0;
-        String line = null;
-        String prevLine = null;
+        int prevCount, count = 0;
+        String prevLine, line = null;
         StringBuilder stringBuilder = new StringBuilder();
 
         do {
@@ -156,40 +155,32 @@ public class UniqApplication implements UniqInterface {
 
             // Duplicate line -> track line -> check next line
             if (line != null && line.compareTo(prevLine) == 0) {
-                prevLine = line;
                 count += 1;
                 continue;
             }
 
             // New unique line -> output line
+            prevCount = count;
+            count = 1;
 
             // isAllRepeated overrides isRepeated
             if (isAllRepeated) {
-                if (count >= 2) {
-                    for (int i = 0; i < count; i++) {
+                if (prevCount >= 2) {
+                    for (int i = 0; i < prevCount; i++) {
                         stringBuilder.append(prevLine).append(STRING_NEWLINE);
                     }
                 }
-                count = 1;
                 continue;
-            } else if (isRepeated) {
-                if (count < 2) {
-                    count = 1;
-                    continue;
-                }
+            } else if (isRepeated && prevCount < 2) {
+                continue;
             }
 
             if (isCount) {
-                stringBuilder.append(count).append(" ");
+                stringBuilder.append(prevCount).append(" ");
             }
 
             stringBuilder.append(prevLine).append(STRING_NEWLINE);
-            count = 1;
 
-            // Last line
-            if (line == null) {
-                break;
-            }
         } while (prevLine != null && line != null);
 
         return stringBuilder.toString().trim();
