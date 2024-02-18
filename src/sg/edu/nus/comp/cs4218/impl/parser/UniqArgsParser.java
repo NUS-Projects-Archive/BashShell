@@ -25,6 +25,12 @@ public class UniqArgsParser extends ArgsParser {
         return flags.contains(FLAG_IS_DUPLICATE);
     }
 
+    /**
+     * Returns input file name
+     *
+     * @return [String|null] name of input file if valid, otherwise return null
+     * File is invalid if (1) file name is not specified or (2) file name is given as '-'
+     */
     public String getInputFileName() {
         if (nonFlagArgs.isEmpty()) {
             return null;
@@ -38,13 +44,18 @@ public class UniqArgsParser extends ArgsParser {
 
         if (inputFile.charAt(0) == NO_IN_FILE) {
             return null;
-        }
-        else {
+        } else {
             return inputFile;
         }
     }
 
+    /**
+     * Returns output file name
+     *
+     * @return [String|null] name of output file if specified, otherwise return null
+     */
     public String getOutputFileName() {
-        return nonFlagArgs.size() == 2 ? nonFlagArgs.get(1) : null;
+        // Only consider the 2nd non-flag argument as output file, even if more arguments are provided
+        return nonFlagArgs.size() >= 2 ? nonFlagArgs.get(1) : null;
     }
 }
