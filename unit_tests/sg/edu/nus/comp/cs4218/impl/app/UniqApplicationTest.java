@@ -10,13 +10,14 @@ import java.io.ByteArrayOutputStream;
 import org.junit.jupiter.api.Test;
 
 import sg.edu.nus.comp.cs4218.exception.UniqException;
+import sg.edu.nus.comp.cs4218.impl.app.UniqApplication;
 
 class UniqApplicationTest {
 
     @Test
     void run_removeAdjacentDuplicates_onlyUniqueAdjacent() {
         //Given
-        String[] args = { "uniq-1.txt" };
+        String[] args = { "resources/uniq-1.txt" };
         String expected =
                 "Hello World" + STRING_NEWLINE +
                 "Alice" + STRING_NEWLINE +
@@ -39,7 +40,7 @@ class UniqApplicationTest {
     @Test
     void run_countOccurrences_correctCounts() {
         //Given
-        String[] args = { "-c", "uniq-1.txt" };
+        String[] args = { "-c", "resources/uniq-1.txt" };
         String expected =
                 "2 Hello World" + STRING_NEWLINE +
                 "2 Alice" + STRING_NEWLINE +
@@ -62,7 +63,7 @@ class UniqApplicationTest {
     @Test
     void run_duplicatesPerGroup_onlyOnePerDuplicateGroup() {
         //Given
-        String[] args = { "-d", "uniq-1.txt" };
+        String[] args = { "-d", "resources/uniq-1.txt" };
         String expected =
                 "Hello World" + STRING_NEWLINE +
                 "Alice" + STRING_NEWLINE;
@@ -82,7 +83,7 @@ class UniqApplicationTest {
     @Test
     void run_AllDuplicates_AllDuplicateLines() {
         //Given
-        String[] args = { "-D", "uniq-1.txt" };
+        String[] args = { "-D", "resources/uniq-1.txt" };
         String expected =
                 "Hello World" + STRING_NEWLINE +
                 "Hello World" + STRING_NEWLINE +
@@ -104,7 +105,7 @@ class UniqApplicationTest {
     @Test
     void run_countAndGroupDuplicate_correctCountAndLines() {
         //Given
-        String[] args = { "-cd", "uniq-1.txt" };
+        String[] args = { "-cd", "resources/uniq-1.txt" };
         String expected =
                 "2 Hello World" + STRING_NEWLINE +
                 "2 Alice" + STRING_NEWLINE;
@@ -124,7 +125,7 @@ class UniqApplicationTest {
     @Test
     void run_countAndAllDuplicates_throwsUniqException() {
         //Given
-        String[] args = { "-cD", "uniq-1.txt" };
+        String[] args = { "-cD", "resources/uniq-1.txt" };
         String expectedMessage = "uniq: printing all duplicated lines and repeat counts is meaningless";
 
         // When
