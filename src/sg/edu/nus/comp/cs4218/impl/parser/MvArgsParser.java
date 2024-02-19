@@ -12,7 +12,7 @@ public class MvArgsParser extends ArgsParser {
     }
 
     public Boolean isOverwrite() {
-        return flags.contains(FLAG_NO_OVERWRITE);
+        return !flags.contains(FLAG_NO_OVERWRITE);
     }
 
     /**
