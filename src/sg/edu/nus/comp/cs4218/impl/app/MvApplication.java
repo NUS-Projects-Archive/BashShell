@@ -18,9 +18,9 @@ import static sg.edu.nus.comp.cs4218.exception.MvException.PROB_MV_FOLDER;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_NOT_FOUND;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IO_EXCEPTION;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IS_DIR;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_MISSING_ARG;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_ARGS;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_PERM;
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NULL_ARGS;
 
 public class MvApplication implements MvInterface {
 
@@ -38,7 +38,7 @@ public class MvApplication implements MvInterface {
         //         mv [Option] SOURCE … DIRECTORY
 
         if (args == null || args.length == 0) {
-            throw new MvException(ERR_NULL_ARGS);
+            throw new MvException(ERR_MISSING_ARG);
         }
 
         if (args.length < 2) {
