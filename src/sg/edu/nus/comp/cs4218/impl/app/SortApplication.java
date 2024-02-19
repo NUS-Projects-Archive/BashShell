@@ -54,9 +54,19 @@ public class SortApplication implements SortInterface {
         }
         StringBuilder output = new StringBuilder();
         if (sortArgsParser.getFileNames().isEmpty()) {
-            output.append(sortFromStdin(sortArgsParser.isFirstWordNumber(), sortArgsParser.isReverseOrder(), sortArgsParser.isCaseIndependent(), stdin));
+            output.append(
+                    sortFromStdin(
+                            sortArgsParser.isFirstWordNumber(),
+                            sortArgsParser.isReverseOrder(),
+                            sortArgsParser.isCaseIndependent(),
+                            stdin));
         } else {
-            output.append(sortFromFiles(sortArgsParser.isFirstWordNumber(), sortArgsParser.isReverseOrder(), sortArgsParser.isCaseIndependent(), sortArgsParser.getFileNames().toArray(new String[0])));
+            output.append(
+                    sortFromFiles(
+                            sortArgsParser.isFirstWordNumber(),
+                            sortArgsParser.isReverseOrder(),
+                            sortArgsParser.isCaseIndependent(),
+                            sortArgsParser.getFileNames().toArray(new String[0])));
         }
 
         try {
