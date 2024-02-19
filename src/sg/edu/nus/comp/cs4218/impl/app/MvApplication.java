@@ -24,6 +24,14 @@ import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NULL_ARGS;
 
 public class MvApplication implements MvInterface {
 
+    /**
+     * Runs the mv application with the specified arguments.
+     *
+     * @param args   Array of arguments for the application. Each array element is the path to a file.
+     * @param stdin  An InputStream, not used.
+     * @param stdout An OutputStream. The output of the command is written to this OutputStream.
+     * @throws MvException
+     */
     @Override
     public void run(String[] args, InputStream stdin, OutputStream stdout) throws MvException {
         // Format: mv [Option] SOURCE TARGET
@@ -57,6 +65,15 @@ public class MvApplication implements MvInterface {
         }
     }
 
+    /**
+     * Moves a source file to a destination file with the option to overwrite.
+     *
+     * @param isOverwrite Boolean option to perform overwriting.
+     * @param srcFile     String representing the path to the source file.
+     * @param destFile    String representing the path to the destination file.
+     * @return null.
+     * @throws MvException
+     */
     @Override
     public String mvSrcFileToDestFile(Boolean isOverwrite, String srcFile, String destFile) throws MvException {
         Path srcPath = IOUtils.resolveFilePath(srcFile);
@@ -89,6 +106,15 @@ public class MvApplication implements MvInterface {
         return null;
     }
 
+    /**
+     * Moves multiple source files to a destination folder with option to overwrite.
+     *
+     * @param isOverwrite Boolean option to perform overwriting
+     * @param destFolder  String representing the path to the destination folder
+     * @param fileName    Array of String representing the file names.
+     * @return null.
+     * @throws MvException
+     */
     @Override
     public String mvFilesToFolder(Boolean isOverwrite, String destFolder, String... fileName) throws MvException {
         Path destFolderPath = IOUtils.resolveFilePath(destFolder);
