@@ -1,7 +1,6 @@
 package sg.edu.nus.comp.cs4218.impl.app;
 
 import sg.edu.nus.comp.cs4218.app.SortInterface;
-import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
 import sg.edu.nus.comp.cs4218.exception.InvalidArgsException;
 import sg.edu.nus.comp.cs4218.exception.ShellException;
 import sg.edu.nus.comp.cs4218.exception.SortException;
@@ -18,6 +17,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import static sg.edu.nus.comp.cs4218.exception.SortException.PROB_SORT_FILE;
+import static sg.edu.nus.comp.cs4218.exception.SortException.PROB_SORT_STDIN;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_NOT_FOUND;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IO_EXCEPTION;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IS_DIR;
@@ -52,15 +53,12 @@ public class SortApplication implements SortInterface {
             throw new SortException(e.getMessage());
         }
         StringBuilder output = new StringBuilder();
-        try {
-            if (sortArgsParser.getFileNames().isEmpty()) {
-                output.append(sortFromStdin(sortArgsParser.isFirstWordNumber(), sortArgsParser.isReverseOrder(), sortArgsParser.isCaseIndependent(), stdin));
-            } else {
-                output.append(sortFromFiles(sortArgsParser.isFirstWordNumber(), sortArgsParser.isReverseOrder(), sortArgsParser.isCaseIndependent(), sortArgsParser.getFileNames().toArray(new String[0])));
-            }
-        } catch (Exception e) {
-            throw new SortException(e.getMessage());//NOPMD
+        if (sortArgsParser.getFileNames().isEmpty()) {
+            output.append(sortFromStdin(sortArgsParser.isFirstWordNumber(), sortArgsParser.isReverseOrder(), sortArgsParser.isCaseIndependent(), stdin));
+        } else {
+            output.append(sortFromFiles(sortArgsParser.isFirstWordNumber(), sortArgsParser.isReverseOrder(), sortArgsParser.isCaseIndependent(), sortArgsParser.getFileNames().toArray(new String[0])));
         }
+
         try {
             if (!output.toString().isEmpty()) {
                 stdout.write(output.toString().getBytes());
@@ -82,38 +80,38 @@ public class SortApplication implements SortInterface {
      */
     @Override
     public String sortFromFiles(Boolean isFirstWordNumber, Boolean isReverseOrder, Boolean isCaseIndependent,
-                                String... fileNames) throws AbstractApplicationException {
+                                String... fileNames) throws SortException {
         if (fileNames == null) {
-            throw new SortException(ERR_NULL_ARGS);
+            throw new SortException(PROB_SORT_FILE + ERR_NULL_ARGS);
         }
         List<String> lines = new ArrayList<>();
         for (String file : fileNames) {
             File node = IOUtils.resolveFilePath(file).toFile();
             if (!node.exists()) {
-                throw new SortException(ERR_FILE_NOT_FOUND);
+                throw new SortException(PROB_SORT_FILE + ERR_FILE_NOT_FOUND);
             }
             if (node.isDirectory()) {
-                throw new SortException(ERR_IS_DIR);
+                throw new SortException(PROB_SORT_FILE + ERR_IS_DIR);
             }
             if (!node.canRead()) {
-                throw new SortException(ERR_NO_PERM);
+                throw new SortException(PROB_SORT_FILE + ERR_NO_PERM);
             }
             InputStream input = null;
 
             try {
                 input = IOUtils.openInputStream(file);
             } catch (ShellException e) {
-                throw new SortException(e.getMessage());
+                throw new SortException(PROB_SORT_FILE + e.getMessage());
             }
             try {
                 lines.addAll(IOUtils.getLinesFromInputStream(input));
             } catch (IOException e) {
-                throw new SortException(ERR_IO_EXCEPTION);
+                throw new SortException(PROB_SORT_FILE + ERR_IO_EXCEPTION);
             }
             try {
                 IOUtils.closeInputStream(input);
             } catch (ShellException e) {
-                throw new SortException(e.getMessage());
+                throw new SortException(PROB_SORT_FILE + e.getMessage());
             }
 
         }
@@ -132,18 +130,18 @@ public class SortApplication implements SortInterface {
      */
     @Override
     public String sortFromStdin(Boolean isFirstWordNumber, Boolean isReverseOrder, Boolean isCaseIndependent,
-                                InputStream stdin) throws AbstractApplicationException {
+                                InputStream stdin) throws SortException {
         if (stdin == null) {
-            throw new SortException(ERR_NULL_STREAMS);
+            throw new SortException(PROB_SORT_STDIN + ERR_NULL_STREAMS);
         }
         List<String> lines = null;
         try {
             lines = IOUtils.getLinesFromInputStream(stdin);
         } catch (Exception e) {
-            throw new SortException(ERR_IO_EXCEPTION);
+            throw new SortException(PROB_SORT_STDIN + ERR_IO_EXCEPTION);
         }
         sortInputString(isFirstWordNumber, isReverseOrder, isCaseIndependent, lines);
-        return String.join(STRING_NEWLINE, lines);
+        return String.join(PROB_SORT_STDIN + STRING_NEWLINE, lines);
     }
 
     /**
