@@ -13,6 +13,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 
+import static sg.edu.nus.comp.cs4218.exception.MvException.PROB_MV_DEST_FILE;
+import static sg.edu.nus.comp.cs4218.exception.MvException.PROB_MV_FOLDER;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_NOT_FOUND;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IO_EXCEPTION;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IS_DIR;
@@ -62,26 +64,26 @@ public class MvApplication implements MvInterface {
 
         // Ensure that source file exist
         if (!Files.exists(srcPath)) {
-            throw new MvException(ERR_FILE_NOT_FOUND);
+            throw new MvException(PROB_MV_DEST_FILE + ERR_FILE_NOT_FOUND);
         }
 
-        // Ensure that destination is not a directory
-        if (Files.isDirectory(destPath)) {
-            throw new MvException(ERR_IS_DIR);
-        }
-
-        // Ensure that the files have the required permissions
+        // Ensure that files have the required permissions
         if (!Files.isReadable(srcPath) || (Files.exists(destPath) && !Files.isWritable(destPath))) {
-            throw new MvException(ERR_NO_PERM);
+            throw new MvException(PROB_MV_DEST_FILE + ERR_NO_PERM);
+        }
+
+        // Append file name to destination directory if destination is a directory
+        if (Files.isDirectory(destPath)) {
+            destPath = destPath.resolve(srcPath.getFileName());
         }
 
         try {
-            // Overwrite an existing file only if flag is given or file do not exist
+            // Overwrite an existing file only if either it do not exist or overwrite flag is given
             if (!Files.exists(destPath) || isOverwrite) {
                 Files.move(srcPath, destPath, StandardCopyOption.REPLACE_EXISTING);
             }
         } catch (IOException e) {
-            throw new MvException(ERR_IO_EXCEPTION + e.getMessage());
+            throw new MvException(PROB_MV_DEST_FILE + ERR_IO_EXCEPTION);
         }
 
         return null;
@@ -89,6 +91,47 @@ public class MvApplication implements MvInterface {
 
     @Override
     public String mvFilesToFolder(Boolean isOverwrite, String destFolder, String... fileName) throws MvException {
+        Path destFolderPath = IOUtils.resolveFilePath(destFolder);
+
+        // Ensure that destination folder exist
+        if (!Files.exists(destFolderPath)) {
+            throw new MvException(PROB_MV_FOLDER + ERR_FILE_NOT_FOUND);
+        }
+
+        // Ensure that destination folder is a directory
+        if (!Files.isDirectory(destFolderPath)) {
+            throw new MvException(PROB_MV_FOLDER + ERR_IS_DIR);
+        }
+
+        // Ensure that destination folder have the required write permission
+        if (!Files.isWritable(destFolderPath)) {
+            throw new MvException(PROB_MV_FOLDER + ERR_NO_PERM);
+        }
+
+        for (String srcFile : fileName) {
+            Path srcPath = IOUtils.resolveFilePath(srcFile);
+            Path destPath = destFolderPath.resolve(srcPath.getFileName());
+
+            // Ensure that source file exist
+            if (!Files.exists(srcPath)) {
+                throw new MvException(PROB_MV_FOLDER + ERR_FILE_NOT_FOUND);
+            }
+
+            // Ensure that source file have the required read permission
+            if (!Files.isReadable(srcPath)) {
+                throw new MvException(PROB_MV_FOLDER + ERR_NO_PERM);
+            }
+
+            try {
+                // Overwrite an existing file only if either it do not exist or overwrite flag is given
+                if (!Files.exists(destPath) || isOverwrite) {
+                    Files.move(srcPath, destPath, StandardCopyOption.REPLACE_EXISTING);
+                }
+            } catch (IOException e) {
+                throw new MvException(PROB_MV_FOLDER + ERR_IO_EXCEPTION);
+            }
+        }
+
         return null;
     }
 }
