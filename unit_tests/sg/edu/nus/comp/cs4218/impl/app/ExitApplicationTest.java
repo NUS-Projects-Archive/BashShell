@@ -27,7 +27,7 @@ class ExitApplicationTest {
     private SecurityManager securityManager;
 
     @BeforeEach
-    void setUp() {
+    void init() {
         System.setSecurityManager(new NoExitSecurityManager());
         securityManager = System.getSecurityManager();
     }
