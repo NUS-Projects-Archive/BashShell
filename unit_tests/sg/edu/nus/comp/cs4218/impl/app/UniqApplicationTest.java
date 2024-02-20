@@ -10,7 +10,6 @@ import java.io.ByteArrayOutputStream;
 import org.junit.jupiter.api.Test;
 
 import sg.edu.nus.comp.cs4218.exception.UniqException;
-import sg.edu.nus.comp.cs4218.impl.app.UniqApplication;
 
 class UniqApplicationTest {
 
@@ -129,7 +128,7 @@ class UniqApplicationTest {
         String expectedMessage = "uniq: printing all duplicated lines and repeat counts is meaningless";
 
         // When
-        UniqException exception = assertThrows(UniqException.class,() -> {
+        UniqException exception = assertThrows(UniqException.class, () -> {
             new UniqApplication().run(args, null, null);
         });
 
