@@ -18,7 +18,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.*;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_OSTREAM;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NULL_ARGS;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_WRITE_STREAM;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_FILE_SEP;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_CURR_DIR;
 
@@ -98,8 +100,8 @@ public class LsApplication implements LsInterface {
      * <p>
      * NOTE: This is recursively called if user wants recursive mode.
      *
-     * @param paths         - list of java.nio.Path objects to list
-     * @param isRecursive   - recursive mode, repeatedly ls the child directories
+     * @param paths       - list of java.nio.Path objects to list
+     * @param isRecursive - recursive mode, repeatedly ls the child directories
      * @param isSortByExt - sorts folder contents alphabetically by file extension (characters after the last ‘.’ (without quotes)). Files with no extension are sorted first.
      * @return String to be written to output stream.
      */
@@ -149,7 +151,6 @@ public class LsApplication implements LsInterface {
      * @return
      */
     private String formatContents(List<Path> contents, Boolean isSortByExt) {
-        // TODO: To implement sorting by extension
         List<String> fileNames = new ArrayList<>();
         for (Path path : contents) {
             fileNames.add(path.getFileName().toString());
