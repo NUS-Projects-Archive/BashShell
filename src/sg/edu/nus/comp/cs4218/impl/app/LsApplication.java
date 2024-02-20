@@ -16,6 +16,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_OSTREAM;
@@ -156,6 +157,10 @@ public class LsApplication implements LsInterface {
             fileNames.add(path.getFileName().toString());
         }
 
+        if (isSortByExt) {
+            fileNames.sort(getFileExtensionComparator());
+        }
+
         StringBuilder result = new StringBuilder();
         for (String fileName : fileNames) {
             result.append(fileName);
@@ -233,6 +238,30 @@ public class LsApplication implements LsInterface {
      */
     private Path getRelativeToCwd(Path path) {
         return Paths.get(Environment.currentDirectory).relativize(path);
+    }
+
+    /**
+     * Comparator for sorting files alphabetically by file extension.
+     * Files with no extension are sorted first.
+     * <p>
+     * The comparator first compares files alphabetically based on their file extension,
+     * followed by comparing based on their full string representation.
+     *
+     * @return A comparator for sorting files by file extension.
+     */
+    private Comparator<String> getFileExtensionComparator() {
+        return Comparator.comparing(this::getFileExtension).thenComparing(String::toString);
+    }
+
+    /**
+     * Returns the file extension from a given file name.
+     *
+     * @param file The file name to extract the extension.
+     * @return The file extension if it exists; Otherwise, an empty string.
+     */
+    private String getFileExtension(String file) {
+        int lastDotIndex = file.lastIndexOf('.');
+        return lastDotIndex == -1 ? "" : file.substring(lastDotIndex + 1);
     }
 
     private class InvalidDirectoryException extends Exception {
