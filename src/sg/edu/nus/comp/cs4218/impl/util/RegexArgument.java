@@ -11,12 +11,11 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_ASTERISK;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_FILE_SEP;
 
 @SuppressWarnings("PMD.AvoidStringBufferField")
 public final class RegexArgument {
-    private StringBuilder plaintext;
-    private StringBuilder regex;
+    private final StringBuilder plaintext;
+    private final StringBuilder regex;
     private boolean isRegex;
 
     public RegexArgument() {
@@ -74,15 +73,15 @@ public final class RegexArgument {
         if (isRegex) {
             Pattern regexPattern = Pattern.compile(regex.toString());
             String dir = "";
-            String tokens[] = plaintext.toString().replaceAll("\\\\", "/").split("/");
+            String[] tokens = plaintext.toString().replaceAll("\\\\", "/").split("/");
             for (int i = 0; i < tokens.length - 1; i++) {
-                dir += tokens[i] + "/";
+                dir += tokens[i] + File.separator;
             }
 
             File currentDir = Paths.get(Environment.currentDirectory + File.separator + dir).toFile();
 
             for (String candidate : currentDir.list()) {
-                candidate = dir + candidate;
+                candidate = (dir + candidate).replace(File.separator, "/");
                 if (regexPattern.matcher(candidate).matches()) {
                     globbedFiles.add(candidate);
                 }
