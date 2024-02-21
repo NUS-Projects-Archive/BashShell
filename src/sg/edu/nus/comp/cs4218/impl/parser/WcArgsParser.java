@@ -18,15 +18,20 @@ public class WcArgsParser extends ArgsParser {
     }
 
     public Boolean isByteCount() {
-        return flags.contains(FLAG_IS_BYTE_COUNT);
+        return hasNoFlags() || flags.contains(FLAG_IS_BYTE_COUNT);
     }
 
     public Boolean isLineCount() {
-        return flags.contains(FLAG_IS_LINE_COUNT);
+        return hasNoFlags() || flags.contains(FLAG_IS_LINE_COUNT);
     }
 
     public Boolean isWordCount() {
-        return flags.contains(FLAG_IS_WORD_COUNT);
+        return hasNoFlags() || flags.contains(FLAG_IS_WORD_COUNT);
+    }
+
+    public Boolean hasNoFlags() {
+        return !flags.contains(FLAG_IS_BYTE_COUNT) && !flags.contains(FLAG_IS_LINE_COUNT)
+                && !flags.contains(FLAG_IS_WORD_COUNT);
     }
 
     public List<String> getFileNames() {
