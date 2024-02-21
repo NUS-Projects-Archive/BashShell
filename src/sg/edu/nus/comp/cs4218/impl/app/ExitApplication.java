@@ -1,7 +1,6 @@
 package sg.edu.nus.comp.cs4218.impl.app;
 
 import sg.edu.nus.comp.cs4218.app.ExitInterface;
-import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
 import sg.edu.nus.comp.cs4218.exception.ExitException;
 
 import java.io.InputStream;
@@ -18,8 +17,7 @@ public class ExitApplication implements ExitInterface {
      * @throws ExitException
      */
     @Override
-    public void run(final String[] args, final InputStream stdin, final OutputStream stdout)
-            throws AbstractApplicationException {
+    public void run(String[] args, InputStream stdin, OutputStream stdout) throws ExitException {
         // Format: exit
         terminateExecution();
     }
@@ -30,7 +28,7 @@ public class ExitApplication implements ExitInterface {
      * @throws Exception
      */
     @Override
-    public void terminateExecution() throws AbstractApplicationException {
+    public void terminateExecution() throws ExitException {
         System.exit(0);
     }
 }
