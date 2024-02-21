@@ -1,7 +1,7 @@
 package sg.edu.nus.comp.cs4218.impl.app;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.security.Permission;
 
@@ -9,21 +9,12 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import sg.edu.nus.comp.cs4218.exception.ExitException;
-
-/**
- * Unit test for {@link ExitApplication}.
- */
 class ExitApplicationTest {
 
     // Issue faced: How to unit test a method that terminates the program
     // before it can return a result for assertion
     // Reference: https://www.baeldung.com/junit-system-exit
 
-    /**
-     * Instance of {@code SecurityManager} prior each test.
-     * Used to restore to original after each test.
-     */
     private SecurityManager securityManager;
 
     @BeforeEach
@@ -33,15 +24,17 @@ class ExitApplicationTest {
     }
 
     @Test
-    @SuppressWarnings("PMD.MethodNamingConventions")
     void run_noArgs_exitCodeZero() {
-        try {
+        // Given
+        final String expected = "0"; // Expects exit code 0
+
+        // When
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
             new ExitApplication().run(null, null, null);
-        }  catch (RuntimeException exception) { //NOPMD Catch RuntimeException throw by SecurityManager.checkExit
-            assertEquals("0", exception.getMessage(), "Expected exit code 0");
-        } catch (ExitException e) {
-            fail("Should not throw ExitException");
-        }
+        });
+
+        // Then
+        assertEquals(expected, exception.getMessage(), "Expected exit code 0");
     }
 
     @AfterEach
@@ -59,10 +52,11 @@ class ExitApplicationTest {
         public void checkPermission(final Permission perm) {
             // Empty body; Override to stop exception being thrown upon System.exit()
         }
+
         @Override
         public void checkExit(final int status) {
             super.checkExit(status);
-            throw new RuntimeException(String.valueOf(status)); //NOPMD Can only throw RuntimeException since inherited
+            throw new RuntimeException(String.valueOf(status));
         }
     }
 }
