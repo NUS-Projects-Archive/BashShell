@@ -45,7 +45,8 @@ public class LsApplication implements LsInterface {
             paths = resolvePaths(folderName);
         }
 
-        return buildResult(paths, isRecursive, isSortByExt);
+        // End of output should not have newline
+        return buildResult(paths, isRecursive, isSortByExt).trim();
     }
 
     @Override
@@ -81,7 +82,8 @@ public class LsApplication implements LsInterface {
     }
 
     /**
-     * Lists only the current directory's content and RETURNS. This does not account for recursive
+     * Lists only the current directory's content and RETURNS. This does not account
+     * for recursive
      * mode in cwd.
      *
      * @param isSortByExt
@@ -103,7 +105,9 @@ public class LsApplication implements LsInterface {
      *
      * @param paths       - list of java.nio.Path objects to list
      * @param isRecursive - recursive mode, repeatedly ls the child directories
-     * @param isSortByExt - sorts folder contents alphabetically by file extension (characters after the last ‘.’ (without quotes)). Files with no extension are sorted first.
+     * @param isSortByExt - sorts folder contents alphabetically by file extension
+     *                    (characters after the last ‘.’ (without quotes)). Files
+     *                    with no extension are sorted first.
      * @return String to be written to output stream.
      */
     private String buildResult(List<Path> paths, Boolean isRecursive, Boolean isSortByExt) {
@@ -130,10 +134,12 @@ public class LsApplication implements LsInterface {
                 }
             } catch (InvalidDirectoryException e) {
                 // NOTE: This is pretty hackish IMO - we should find a way to change this
-                // If the user is in recursive mode, and if we resolve a file that isn't a directory
+                // If the user is in recursive mode, and if we resolve a file that isn't a
+                // directory
                 // we should not spew the error message.
                 //
-                // However the user might have written a command like `ls invalid1 valid1 -R`, what
+                // However the user might have written a command like `ls invalid1 valid1 -R`,
+                // what
                 // do we do then?
                 if (!isRecursive) {
                     result.append(e.getMessage());
@@ -142,14 +148,16 @@ public class LsApplication implements LsInterface {
             }
         }
 
-        return result.toString().trim();
+        return result.toString();
     }
 
     /**
      * Formats the contents of a directory into a single string.
      *
      * @param contents    - list of items in a directory
-     * @param isSortByExt - sorts folder contents alphabetically by file extension (characters after the last ‘.’ (without quotes)). Files with no extension are sorted first.
+     * @param isSortByExt - sorts folder contents alphabetically by file extension
+     *                    (characters after the last ‘.’ (without quotes)). Files
+     *                    with no extension are sorted first.
      * @return
      */
     private String formatContents(List<Path> contents, Boolean isSortByExt) {
@@ -201,7 +209,8 @@ public class LsApplication implements LsInterface {
     }
 
     /**
-     * Resolve all paths given as arguments into a list of Path objects for easy path management.
+     * Resolve all paths given as arguments into a list of Path objects for easy
+     * path management.
      *
      * @param directories
      * @return List of java.nio.Path objects
@@ -216,7 +225,8 @@ public class LsApplication implements LsInterface {
     }
 
     /**
-     * Converts a String into a java.nio.Path objects. Also resolves if the current path provided
+     * Converts a String into a java.nio.Path objects. Also resolves if the current
+     * path provided
      * is an absolute path.
      *
      * @param directory
@@ -245,7 +255,8 @@ public class LsApplication implements LsInterface {
      * Comparator for sorting files alphabetically by file extension.
      * Files with no extension are sorted first.
      * <p>
-     * The comparator first compares files alphabetically based on their file extension,
+     * The comparator first compares files alphabetically based on their file
+     * extension,
      * followed by comparing based on their full string representation.
      *
      * @return A comparator for sorting files by file extension.
