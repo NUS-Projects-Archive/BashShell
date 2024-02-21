@@ -81,6 +81,8 @@ public final class RegexArgument {
             File currentDir = Paths.get(Environment.currentDirectory + File.separator + dir).toFile();
 
             for (String candidate : currentDir.list()) {
+                // Replace any platform-specific File.separator with forward slash '/'
+                // Ensure compatibility with regexPattern, which matches directory separators using forward slash '/'
                 candidate = (dir + candidate).replace(File.separator, "/");
                 if (regexPattern.matcher(candidate).matches()) {
                     globbedFiles.add(candidate);
