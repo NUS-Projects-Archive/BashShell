@@ -25,13 +25,14 @@ import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_WRITE_STREAM;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_FILE_SEP;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_CURR_DIR;
 
+@SuppressWarnings("PMD.PreserveStackTrace")
 public class LsApplication implements LsInterface {
 
     private final static String PATH_CURR_DIR = STRING_CURR_DIR + CHAR_FILE_SEP;
 
     @Override
     public String listFolderContent(Boolean isRecursive, Boolean isSortByExt,
-                                    String... folderName) throws AbstractApplicationException {
+            String... folderName) throws AbstractApplicationException {
         if (folderName.length == 0 && !isRecursive) {
             return listCwdContent(isSortByExt);
         }
@@ -115,6 +116,11 @@ public class LsApplication implements LsInterface {
         for (Path path : paths) {
             try {
                 List<Path> contents = getContents(path);
+                if (contents == null) {
+                    // Path is non-folder, don't need to list anything
+                    continue;
+                }
+
                 String formatted = formatContents(contents, isSortByExt);
                 String relativePath = getRelativeToCwd(path).toString();
                 String colonNewLine = ":" + StringUtils.STRING_NEWLINE;
@@ -133,15 +139,6 @@ public class LsApplication implements LsInterface {
                     result.append(buildResult(contents, isRecursive, isSortByExt));
                 }
             } catch (InvalidDirectoryException e) {
-                // NOTE: This is pretty hackish IMO - we should find a way to change this
-                // If the user is in recursive mode, and if we resolve a file that isn't a
-                // directory
-                // we should not spew the error message.
-                //
-                // However the user might have written a command like `ls invalid1 valid1 -R`,
-                // what
-                // do we do then?
-                // Throws exception regardless recursive or not
                 result.append(e.getMessage());
                 result.append(StringUtils.STRING_NEWLINE);
             }
@@ -187,11 +184,13 @@ public class LsApplication implements LsInterface {
     private List<Path> getContents(Path directory)
             throws InvalidDirectoryException {
         if (!Files.exists(directory)) {
+            // Path does not exist
             throw new InvalidDirectoryException(getRelativeToCwd(directory).toString());
         }
 
         if (!Files.isDirectory(directory)) {
-            throw new InvalidDirectoryException(getRelativeToCwd(directory).toString());
+            // Path is a non-folder
+            return null;
         }
 
         List<Path> result = new ArrayList<>();
@@ -275,6 +274,10 @@ public class LsApplication implements LsInterface {
         return lastDotIndex == -1 ? "" : file.substring(lastDotIndex + 1);
     }
 
+    /**
+     * This exception is thrown only when the directory passed as an argument is invalid.
+     * It is considered invalid if it does not exist.
+     */
     private class InvalidDirectoryException extends Exception {
         InvalidDirectoryException(String directory) {
             super(String.format("ls: cannot access '%s': No such file or directory", directory));
