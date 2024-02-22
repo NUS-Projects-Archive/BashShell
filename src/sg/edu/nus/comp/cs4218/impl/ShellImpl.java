@@ -33,7 +33,7 @@ public class ShellImpl implements Shell {
             try {
                 String currentDirectory = Environment.currentDirectory;
                 String commandString;
-                System.out.print("> ");
+                System.out.print("$ ");
 
                 // Read inout from user
                 try {
