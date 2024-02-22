@@ -54,8 +54,8 @@ class UniqApplicationTest {
     void run_duplicatesPerGroup_onlyOnePerDuplicateGroup() {
         //Given
         final String[] args = {"-d", TEST_FILE_ONE};
-        final String expected = "Hello World" + STRING_NEWLINE +
-                "Alice" + STRING_NEWLINE;
+        final String expected = STR_HELLO_WORLD + STRING_NEWLINE +
+                STR_ALICE + STRING_NEWLINE;
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         UniqApplication app = new UniqApplication();
 
@@ -67,10 +67,10 @@ class UniqApplicationTest {
     void run_AllDuplicates_AllDuplicateLines() {
         //Given
         final String[] args = {"-D", TEST_FILE_ONE};
-        final String expected = "Hello World" + STRING_NEWLINE +
-                "Hello World" + STRING_NEWLINE +
-                "Alice" + STRING_NEWLINE +
-                "Alice" + STRING_NEWLINE;
+        final String expected = STR_HELLO_WORLD + STRING_NEWLINE +
+                STR_HELLO_WORLD + STRING_NEWLINE +
+                STR_ALICE + STRING_NEWLINE +
+                STR_ALICE + STRING_NEWLINE;
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         UniqApplication app = new UniqApplication();
 
