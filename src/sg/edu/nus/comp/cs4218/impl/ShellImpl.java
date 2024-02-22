@@ -4,7 +4,6 @@ import sg.edu.nus.comp.cs4218.Command;
 import sg.edu.nus.comp.cs4218.Environment;
 import sg.edu.nus.comp.cs4218.Shell;
 import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
-import sg.edu.nus.comp.cs4218.exception.ExitException;
 import sg.edu.nus.comp.cs4218.exception.ShellException;
 import sg.edu.nus.comp.cs4218.impl.util.ApplicationRunner;
 import sg.edu.nus.comp.cs4218.impl.util.CommandBuilder;
@@ -33,11 +32,16 @@ public class ShellImpl implements Shell {
             try {
                 String currentDirectory = Environment.currentDirectory;
                 String commandString;
-                System.out.print("> ");
+                System.out.print(currentDirectory + "$ ");
 
-                // Read inout from user
+                // Read input from user
                 try {
                     commandString = reader.readLine();
+
+                    // End the loop if Ctrl+D or EOF is encountered
+                    if (commandString == null) {
+                        break;
+                    }
                 } catch (IOException e) {
                     System.exit(1); // Streams are closed, terminate process with non-zero exit code
                     return;
