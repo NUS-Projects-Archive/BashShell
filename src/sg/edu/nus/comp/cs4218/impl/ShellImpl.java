@@ -34,7 +34,7 @@ public class ShellImpl implements Shell {
                 String commandString;
                 System.out.print(currentDirectory + "$ ");
 
-                // Read inout from user
+                // Read input from user
                 try {
                     commandString = reader.readLine();
 
