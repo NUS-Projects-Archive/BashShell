@@ -113,8 +113,9 @@ public class LsApplication implements LsInterface {
                 List<Path> contents = getContents(path);
                 String formatted = formatContents(contents, isSortByExt);
                 String relativePath = getRelativeToCwd(path).toString();
+                String colonNewLine = ":" + StringUtils.STRING_NEWLINE;
                 result.append(StringUtils.isBlank(relativePath) ? PATH_CURR_DIR : relativePath);
-                result.append(":\n");
+                result.append(colonNewLine);
                 result.append(formatted);
 
                 if (!formatted.isEmpty()) {
@@ -136,7 +137,7 @@ public class LsApplication implements LsInterface {
                 // do we do then?
                 if (!isRecursive) {
                     result.append(e.getMessage());
-                    result.append('\n');
+                    result.append(StringUtils.STRING_NEWLINE);
                 }
             }
         }
@@ -164,7 +165,7 @@ public class LsApplication implements LsInterface {
         StringBuilder result = new StringBuilder();
         for (String fileName : fileNames) {
             result.append(fileName);
-            result.append('\n');
+            result.append(StringUtils.STRING_NEWLINE);
         }
 
         return result.toString().trim();

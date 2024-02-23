@@ -37,6 +37,11 @@ public class ShellImpl implements Shell {
                 // Read input from user
                 try {
                     commandString = reader.readLine();
+
+                    // End the loop if Ctrl+D or EOF is encountered
+                    if (commandString == null) {
+                        break;
+                    }
                 } catch (IOException e) {
                     System.out.println(e.getMessage());
                     System.exit(1); // Streams are closed, terminate process with non-zero exit code
