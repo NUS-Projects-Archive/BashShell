@@ -230,8 +230,7 @@ public class LsApplication implements LsInterface {
      * @return
      */
     private Path resolvePath(String directory) {
-        if (directory.charAt(0) == '/') {
-//        if (directory.charAt(0) == '/' || directory.equals(Environment.currentDirectory)) {
+        if (directory.charAt(0) == '/' || directory.equals(Environment.currentDirectory)) {
             return Paths.get(directory).normalize();
         }
 
