@@ -1,11 +1,10 @@
 package sg.edu.nus.comp.cs4218.impl.app;
 
-import sg.edu.nus.comp.cs4218.app.ExitInterface;
-import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
-import sg.edu.nus.comp.cs4218.exception.ExitException;
-
 import java.io.InputStream;
 import java.io.OutputStream;
+
+import sg.edu.nus.comp.cs4218.app.ExitInterface;
+import sg.edu.nus.comp.cs4218.exception.ExitException;
 
 public class ExitApplication implements ExitInterface {
 
@@ -15,10 +14,10 @@ public class ExitApplication implements ExitInterface {
      * @param args   Array of arguments for the application, not used.
      * @param stdin  An InputStream, not used.
      * @param stdout An OutputStream, not used.
-     * @throws ExitException
+     * @throws ExitException Not used.
      */
     @Override
-    public void run(String[] args, InputStream stdin, OutputStream stdout) throws AbstractApplicationException {
+    public void run(String[] args, InputStream stdin, OutputStream stdout) throws ExitException {
         // Format: exit
         terminateExecution();
     }
@@ -26,10 +25,10 @@ public class ExitApplication implements ExitInterface {
     /**
      * Terminate shell.
      *
-     * @throws Exception
+     * @throws ExitException Not used.
      */
     @Override
-    public void terminateExecution() throws AbstractApplicationException {
+    public void terminateExecution() throws ExitException {
         System.exit(0);
     }
 }

@@ -5,6 +5,7 @@ import sg.edu.nus.comp.cs4218.Environment;
 import sg.edu.nus.comp.cs4218.Shell;
 import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
 import sg.edu.nus.comp.cs4218.exception.ShellException;
+import sg.edu.nus.comp.cs4218.impl.app.ExitApplication;
 import sg.edu.nus.comp.cs4218.impl.util.ApplicationRunner;
 import sg.edu.nus.comp.cs4218.impl.util.CommandBuilder;
 import sg.edu.nus.comp.cs4218.impl.util.StringUtils;
@@ -23,6 +24,7 @@ public class ShellImpl implements Shell {
      * @param args List of strings arguments, unused.
      */
     public static void main(String... args) {
+        String commandString;
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
         Shell shell = new ShellImpl();
 
@@ -30,9 +32,7 @@ public class ShellImpl implements Shell {
         while (true) {
 
             try {
-                String currentDirectory = Environment.currentDirectory;
-                String commandString;
-                System.out.print(currentDirectory + "$ ");
+                System.out.print(Environment.currentDirectory + "$ ");
 
                 // Read input from user
                 try {
@@ -43,8 +43,14 @@ public class ShellImpl implements Shell {
                         break;
                     }
                 } catch (IOException e) {
+                    System.out.println(e.getMessage());
                     System.exit(1); // Streams are closed, terminate process with non-zero exit code
                     return;
+                }
+
+                // Exit loop if Ctrl+D or EOF is encountered
+                if (commandString == null) {
+                    new ExitApplication().terminateExecution(); // Let ExitApplication terminate gracefully
                 }
 
                 // Process given input
