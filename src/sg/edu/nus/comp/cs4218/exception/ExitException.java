@@ -8,7 +8,7 @@ public class ExitException extends AbstractApplicationException {
      *
      * @param message exit code
      */
-    public ExitException(final String message) {
+    public ExitException(String message) {
         super("exit: " + message);
     }
 }
