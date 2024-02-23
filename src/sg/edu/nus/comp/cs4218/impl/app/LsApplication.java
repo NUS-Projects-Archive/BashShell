@@ -141,6 +141,7 @@ public class LsApplication implements LsInterface {
             } catch (InvalidDirectoryException e) {
                 result.append(e.getMessage());
                 result.append(StringUtils.STRING_NEWLINE);
+                result.append(StringUtils.STRING_NEWLINE);
             }
         }
 
