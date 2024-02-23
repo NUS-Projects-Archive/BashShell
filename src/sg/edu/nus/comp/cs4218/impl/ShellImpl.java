@@ -32,19 +32,13 @@ public class ShellImpl implements Shell {
         while (true) {
 
             try {
-                String currentDirectory = Environment.currentDirectory;
-                String commandString;
-                System.out.print(currentDirectory + "$ ");
+                System.out.print(Environment.currentDirectory + "$ ");
 
                 // Read input from user
                 try {
                     commandString = reader.readLine();
-
-                    // End the loop if Ctrl+D or EOF is encountered
-                    if (commandString == null) {
-                        break;
-                    }
                 } catch (IOException e) {
+                    System.out.println(e.getMessage());
                     System.exit(1); // Streams are closed, terminate process with non-zero exit code
                     return;
                 }
