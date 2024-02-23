@@ -37,4 +37,8 @@ public class WcArgsParser extends ArgsParser {
     public List<String> getFileNames() {
         return nonFlagArgs;
     }
+
+    public Boolean isStdinOnly() {
+        return nonFlagArgs.isEmpty();
+    }
 }
