@@ -224,18 +224,18 @@ public class LsApplication implements LsInterface {
 
     /**
      * Converts a String into a java.nio.Path objects. Also resolves if the current
-     * path provided
-     * is an absolute path.
+     * path provided is an absolute path or already the current directory.
      *
      * @param directory
      * @return
      */
     private Path resolvePath(String directory) {
         if (directory.charAt(0) == '/') {
-            // This is an absolute path
+//        if (directory.charAt(0) == '/' || directory.equals(Environment.currentDirectory)) {
             return Paths.get(directory).normalize();
         }
 
+        // Construct path relative to current directory
         return Paths.get(Environment.currentDirectory, directory).normalize();
     }
 
