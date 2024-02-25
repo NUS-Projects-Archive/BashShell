@@ -25,21 +25,6 @@ class MkdirApplicationTest {
 
     private MkdirApplication app;
 
-    @BeforeEach
-    void setUp() throws IOException {
-        this.app = new MkdirApplication();
-        createFile(EXISTING_FILE);
-        deleteFile(NON_EXISTING_FILE);
-        deleteFile(NON_EXISTING_DIRECTORY);
-    }
-
-    @AfterEach
-    void tearDown() {
-        deleteFile(EXISTING_FILE);
-        deleteFile(NON_EXISTING_FILE);
-        deleteFile(NON_EXISTING_DIRECTORY);
-    }
-
     private void createFile(String fileName) throws IOException {
         File file = new File(fileName);
         file.createNewFile();
@@ -62,6 +47,21 @@ class MkdirApplicationTest {
             directory.delete();
             deleteDirectory(directory.getParentFile());
         }
+    }
+    
+    @BeforeEach
+    void setUp() throws IOException {
+        this.app = new MkdirApplication();
+        createFile(EXISTING_FILE);
+        deleteFile(NON_EXISTING_FILE);
+        deleteFile(NON_EXISTING_DIRECTORY);
+    }
+
+    @AfterEach
+    void tearDown() {
+        deleteFile(EXISTING_FILE);
+        deleteFile(NON_EXISTING_FILE);
+        deleteFile(NON_EXISTING_DIRECTORY);
     }
 
     @Test
