@@ -35,24 +35,17 @@ class MkdirApplicationTest {
 
     @AfterEach
     void tearDown() {
-        deleteIfExists(EXISTING_FILE);
-        deleteIfExists(NON_EXISTING_FILE);
-        deleteIfExists(NON_EXISTING_FILE_AND_TOP_LEVEL);
-    }
+        File existingFile = new File(EXISTING_FILE);
+        existingFile.delete();
 
-    private void deleteIfExists(String filePath) {
-        File file = new File(filePath);
-        if (file.exists()) {
-            if (file.isFile()) {
-                file.delete();
-            } else {
-                // For directories, delete recursively
-                File parentDirectory = file.getParentFile();
-                if (parentDirectory != null) {
-                    deleteIfExists(parentDirectory.getPath());
-                }
-            }
-        }
+        File nonExistingFile = new File(NON_EXISTING_FILE);
+        nonExistingFile.delete();
+
+        File nonExistingFileAndTopLevel = new File(NON_EXISTING_FILE_AND_TOP_LEVEL);
+        nonExistingFileAndTopLevel.delete();
+
+        File parentDirectory = nonExistingFileAndTopLevel.getParentFile();
+        parentDirectory.delete();
     }
 
     @Test
