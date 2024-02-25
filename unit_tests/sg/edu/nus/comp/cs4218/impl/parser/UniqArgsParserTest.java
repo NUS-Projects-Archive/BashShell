@@ -37,7 +37,7 @@ class UniqArgsParserTest {
 
     @ParameterizedTest
     @MethodSource("validFlags")
-    void parse_ValidFlags_CorrectMatchingFlags(String args, boolean[] expectedResults) {
+    void parse_ValidFlags_CorrectMatchingFlags(String args, boolean... expectedResults) {
         assertDoesNotThrow(() -> parser.parse(args));
         assertArrayEquals(expectedResults, new boolean[]{
                 parser.isPrefixWithOccurrencesCount(),
