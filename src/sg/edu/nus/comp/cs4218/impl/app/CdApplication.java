@@ -39,14 +39,14 @@ public class CdApplication implements CdInterface {
         if (args == null) {
             throw new CdException(ERR_NULL_ARGS);
         }
-        changeToDirectory(args[0]);
+        if (args.length == 1) {
+            changeToDirectory(args[0]);
+        } else if (args.length > 1) {
+            throw new CdException(ERR_TOO_MANY_ARGS);
+        }
     }
 
     private String getNormalizedAbsolutePath(String pathStr) throws AbstractApplicationException {
-        if (StringUtils.isBlank(pathStr)) {
-            throw new CdException(ERR_NO_ARGS);
-        }
-
         Path path = new File(pathStr).toPath();
         if (!path.isAbsolute()) {
             path = Paths.get(Environment.currentDirectory, pathStr);
@@ -54,15 +54,15 @@ public class CdApplication implements CdInterface {
 
         if (Files.isDirectory(path) && !Files.isExecutable(path)) {
             // Is directory but cannot be executed (i.e. cannot cd into)
-            throw new CdException(String.format(ERR_NO_PERM, pathStr));
+            throw new CdException(String.format("%s: %s", pathStr, ERR_NO_PERM));
         }
 
         if (!Files.exists(path)) {
-            throw new CdException(String.format(ERR_FILE_NOT_FOUND, pathStr));
+            throw new CdException(String.format("%s: %s", pathStr, ERR_FILE_NOT_FOUND));
         }
 
         if (!Files.isDirectory(path)) {
-            throw new CdException(String.format(ERR_IS_NOT_DIR, pathStr));
+            throw new CdException(String.format("%s: %s", pathStr, ERR_IS_NOT_DIR));
         }
 
         return path.normalize().toString();
