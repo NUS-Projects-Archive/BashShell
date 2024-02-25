@@ -278,11 +278,7 @@ public class PasteApplication implements PasteInterface {
         for (int i = 0; i < maxFileLength; i++) {
             List<String> currLstToAdd = new ArrayList<>();
             for (List<String> currLst : listResult) {
-                if (i < currLst.size()) {
-                    currLstToAdd.add(currLst.get(i));
-                } else {
-                    currLstToAdd.add("");
-                }
+                currLstToAdd.add(i < currLst.size() ? currLst.get(i) : "");
             }
             res.add(currLstToAdd);
         }
