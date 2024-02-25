@@ -1,7 +1,6 @@
 package sg.edu.nus.comp.cs4218.impl.app.helper;
 
 import sg.edu.nus.comp.cs4218.Environment;
-import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
 import sg.edu.nus.comp.cs4218.exception.LsException;
 import sg.edu.nus.comp.cs4218.impl.util.StringUtils;
 
@@ -13,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_FILE_SEP;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_CURR_DIR;
@@ -20,21 +20,24 @@ import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_CURR_DIR;
 @SuppressWarnings("PMD.PreserveStackTrace")
 public class LsApplicationHelper {
     private final static String PATH_CURR_DIR = STRING_CURR_DIR + CHAR_FILE_SEP;
+    private final static String colonNewLine = ":" + StringUtils.STRING_NEWLINE;
 
     /**
      * Lists only the current directory's content and RETURNS. This does not account
      * for recursive
      * mode in cwd.
      *
-     * @param isSortByExt
+     * @param isSortByExt Sorts folder contents alphabetically by file extension
+     *                    (characters after the last ‘.’ (without quotes)). Files
+     *                    with no extension are sorted first.
      * @return
      */
-    public String listCwdContent(Boolean isSortByExt) throws AbstractApplicationException {
-        String cwd = Environment.currentDirectory;
+    public static String listCwdContent(Boolean isSortByExt) throws LsException {
+        final String cwd = Environment.currentDirectory;
         try {
             return formatContents(getContents(Paths.get(cwd)), isSortByExt);
         } catch (InvalidDirectoryException | DirectoryAccessDeniedException e) {
-            throw new LsException("Unexpected error occurred!");
+            throw new LsException(e.getMessage());
         }
     }
 
@@ -43,14 +46,16 @@ public class LsApplicationHelper {
      * <p>
      * NOTE: This is recursively called if user wants recursive mode.
      *
-     * @param paths       - list of java.nio.Path objects to list
-     * @param isRecursive - recursive mode, repeatedly ls the child directories
-     * @param isSortByExt - sorts folder contents alphabetically by file extension
-     *                    (characters after the last ‘.’ (without quotes)). Files
-     *                    with no extension are sorted first.
+     * @param paths                 List of java.nio.Path objects to list.
+     * @param isRecursive           Recursive mode, repeatedly ls the child directories.
+     * @param isSortByExt           Sorts folder contents alphabetically by file extension
+     *                              (characters after the last ‘.’ (without quotes)). Files
+ *                                  with no extension are sorted first.
+     * @param isFolderNameSpecified Boolean to indicate if folder name is specified.
      * @return String to be written to output stream.
      */
-    public String buildResult(List<Path> paths, Boolean isRecursive, Boolean isSortByExt) {
+    public static String buildResult(List<Path> paths, Boolean isRecursive, Boolean isSortByExt,
+                                     boolean isFolderNameSpecified) {
         StringBuilder result = new StringBuilder();
         StringBuilder error = new StringBuilder();
         for (Path path : paths) {
@@ -61,10 +66,13 @@ public class LsApplicationHelper {
                     continue;
                 }
 
-                String formatted = formatContents(contents, isSortByExt);
-                String relativePath = getRelativeToCwd(path).toString();
-                String colonNewLine = ":" + StringUtils.STRING_NEWLINE;
-                result.append(StringUtils.isBlank(relativePath) ? STRING_CURR_DIR : PATH_CURR_DIR + relativePath);
+                final String formatted = formatContents(contents, isSortByExt);
+                final String relativePath = getRelativeToCwd(path).toString();
+                result.append(StringUtils.isBlank(relativePath)
+                        ? STRING_CURR_DIR
+                        : isFolderNameSpecified
+                        ? relativePath
+                        : PATH_CURR_DIR + relativePath);
                 result.append(colonNewLine);
                 result.append(formatted);
 
@@ -76,7 +84,7 @@ public class LsApplicationHelper {
 
                 // RECURSE!
                 if (isRecursive) {
-                    result.append(buildResult(contents, isRecursive, isSortByExt));
+                    result.append(buildResult(contents, isRecursive, isSortByExt, isFolderNameSpecified));
                 }
             } catch (InvalidDirectoryException e) {
                 // If the directory is invalid, print the errors at the top
@@ -87,32 +95,29 @@ public class LsApplicationHelper {
                 // Trim the last newline
                 result.deleteCharAt(result.length() - 1);
                 result.append(e.getMessage());
-                result.append(StringUtils.STRING_NEWLINE);
-                result.append(StringUtils.STRING_NEWLINE);
+                result.append(StringUtils.STRING_NEWLINE + StringUtils.STRING_NEWLINE);
             }
         }
 
-        if (error.length() == 0) {
-            return result.toString();
-        } else {
-            return error.toString() + result.toString();
-        }
+        return error.toString() + result.toString();
     }
 
     /**
      * Formats the contents of a directory into a single string.
      *
-     * @param contents    - list of items in a directory
-     * @param isSortByExt - sorts folder contents alphabetically by file extension
+     * @param contents    List of items in a directory.
+     * @param isSortByExt Sorts folder contents alphabetically by file extension
      *                    (characters after the last ‘.’ (without quotes)). Files
      *                    with no extension are sorted first.
      * @return
      */
-    private String formatContents(List<Path> contents, Boolean isSortByExt) {
-        List<String> fileNames = new ArrayList<>();
-        for (Path path : contents) {
-            fileNames.add(path.getFileName().toString());
-        }
+    private static String formatContents(List<Path> contents, Boolean isSortByExt) {
+        StringBuilder result = new StringBuilder();
+
+        List<String> fileNames = contents.stream()
+                .map(Path::getFileName)
+                .map(Path::toString)
+                .collect(Collectors.toList());
 
         // Sort file names
         Collections.sort(fileNames);
@@ -121,7 +126,6 @@ public class LsApplicationHelper {
             fileNames.sort(getFileExtensionComparator());
         }
 
-        StringBuilder result = new StringBuilder();
         for (String fileName : fileNames) {
             result.append(fileName);
             result.append(StringUtils.STRING_NEWLINE);
@@ -133,24 +137,15 @@ public class LsApplicationHelper {
     /**
      * Gets the contents in a single specified directory.
      *
-     * @param directory
+     * @param directory Directory to get contents from.
      * @return List of files + directories in the passed directory.
      */
-    private List<Path> getContents(Path directory)
+    private static List<Path> getContents(Path directory)
             throws InvalidDirectoryException, DirectoryAccessDeniedException {
         if (Files.isDirectory(directory)) {
             if (Files.isReadable(directory)) {
                 // Get contents from directory
-                List<Path> result = new ArrayList<>();
-                File pwd = directory.toFile();
-                for (File f : pwd.listFiles()) {
-                    if (!f.isHidden()) {
-                        result.add(f.toPath());
-                    }
-                }
-
-                Collections.sort(result);
-                return result;
+                return getContentsFromReadableDirectory(directory);
             } else {
                 // Directory has no read access
                 throw new DirectoryAccessDeniedException(getRelativeToCwd(directory).toString());
@@ -165,13 +160,32 @@ public class LsApplicationHelper {
     }
 
     /**
+     * Gets the contents of a directory that is readable.
+     *
+     * @param directory Directory to get contents from.
+     * @return List of files and directories in the passed directory.
+     */
+    private static List<Path> getContentsFromReadableDirectory(Path directory) {
+        List<Path> result = new ArrayList<>();
+        File pwd = directory.toFile();
+        for (File f : pwd.listFiles()) {
+            if (!f.isHidden()) {
+                result.add(f.toPath());
+            }
+        }
+
+        Collections.sort(result);
+        return result;
+    }
+
+    /**
      * Resolve all paths given as arguments into a list of Path objects for easy
      * path management.
      *
-     * @param directories
+     * @param directories List of directories to be resolved into Path objects.
      * @return List of java.nio.Path objects
      */
-    public List<Path> resolvePaths(String... directories) {
+    public static List<Path> resolvePaths(String... directories) {
         List<Path> paths = new ArrayList<>();
         for (int i = 0; i < directories.length; i++) {
             paths.add(resolvePath(directories[i]));
@@ -184,10 +198,10 @@ public class LsApplicationHelper {
      * Converts a String into a java.nio.Path objects. Also resolves if the current
      * path provided is an absolute path or already the current directory.
      *
-     * @param directory
+     * @param directory Directory to be converted into a Path object.
      * @return
      */
-    private Path resolvePath(String directory) {
+    private static Path resolvePath(String directory) {
         if (directory.charAt(0) == '/' || directory.equals(Environment.currentDirectory)) {
             return Paths.get(directory).normalize();
         }
@@ -199,10 +213,10 @@ public class LsApplicationHelper {
     /**
      * Converts a path to a relative path to the current directory.
      *
-     * @param path
+     * @param path Path to be converted.
      * @return
      */
-    private Path getRelativeToCwd(Path path) {
+    private static Path getRelativeToCwd(Path path) {
         return Paths.get(Environment.currentDirectory).relativize(path);
     }
 
@@ -216,7 +230,7 @@ public class LsApplicationHelper {
      *
      * @return A comparator for sorting files by file extension.
      */
-    private Comparator<String> getFileExtensionComparator() {
+    private static Comparator<String> getFileExtensionComparator() {
         return Comparator.comparing((String s) -> getFileExtension(s)).thenComparing(String::toString);
     }
 
@@ -226,7 +240,7 @@ public class LsApplicationHelper {
      * @param file The file name to extract the extension.
      * @return The file extension if it exists; Otherwise, an empty string.
      */
-    private String getFileExtension(String file) {
+    private static String getFileExtension(String file) {
         int lastDotIndex = file.lastIndexOf('.');
         return lastDotIndex == -1 ? "" : file.substring(lastDotIndex + 1);
     }
@@ -236,14 +250,9 @@ public class LsApplicationHelper {
      * invalid.
      * It is considered invalid if it does not exist.
      */
-    private class InvalidDirectoryException extends Exception {
+    private static class InvalidDirectoryException extends Exception {
         InvalidDirectoryException(String directory) {
             super(String.format("ls: cannot access '%s': No such file or directory", directory));
-        }
-
-        InvalidDirectoryException(String directory, Throwable cause) {
-            super(String.format("ls: cannot access '%s': No such file or directory", directory),
-                    cause);
         }
     }
 
@@ -251,7 +260,7 @@ public class LsApplicationHelper {
      * This exception is thrown only when the directory passed as an argument is
      * valid but the user does not have permission to access it.
      */
-    private class DirectoryAccessDeniedException extends Exception {
+    private static class DirectoryAccessDeniedException extends Exception {
         DirectoryAccessDeniedException(String directory) {
             super(String.format("ls: cannot open directory '%s': Permission denied", directory));
         }

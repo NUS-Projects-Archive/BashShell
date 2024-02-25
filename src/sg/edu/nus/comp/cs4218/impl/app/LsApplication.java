@@ -2,10 +2,8 @@ package sg.edu.nus.comp.cs4218.impl.app;
 
 import sg.edu.nus.comp.cs4218.Environment;
 import sg.edu.nus.comp.cs4218.app.LsInterface;
-import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
 import sg.edu.nus.comp.cs4218.exception.InvalidArgsException;
 import sg.edu.nus.comp.cs4218.exception.LsException;
-import sg.edu.nus.comp.cs4218.impl.app.helper.LsApplicationHelper;
 import sg.edu.nus.comp.cs4218.impl.parser.LsArgsParser;
 import sg.edu.nus.comp.cs4218.impl.util.StringUtils;
 
@@ -14,40 +12,38 @@ import java.io.OutputStream;
 import java.nio.file.Path;
 import java.util.List;
 
+import static sg.edu.nus.comp.cs4218.impl.app.helper.LsApplicationHelper.*;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_OSTREAM;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NULL_ARGS;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_WRITE_STREAM;
 
 @SuppressWarnings("PMD.PreserveStackTrace")
 public class LsApplication implements LsInterface {
-
-    LsApplicationHelper lsHelper;
-
     @Override
     public String listFolderContent(Boolean isRecursive, Boolean isSortByExt,
-            String... folderName) throws AbstractApplicationException {
+            String... folderName) throws LsException {
+        boolean isFolderNameSpecified = folderName.length > 0;
+
         if (folderName.length == 0 && !isRecursive) {
-            return lsHelper.listCwdContent(isSortByExt);
+            return listCwdContent(isSortByExt);
         }
 
         List<Path> paths;
         if (folderName.length == 0 && isRecursive) {
             String[] directories = new String[1];
             directories[0] = Environment.currentDirectory;
-            paths = lsHelper.resolvePaths(directories);
+            paths = resolvePaths(directories);
         } else {
-            paths = lsHelper.resolvePaths(folderName);
+            paths = resolvePaths(folderName);
         }
 
         // End of output should not have newline
-        return lsHelper.buildResult(paths, isRecursive, isSortByExt).trim();
+        return buildResult(paths, isRecursive, isSortByExt, isFolderNameSpecified).trim();
     }
 
     @Override
     public void run(String[] args, InputStream stdin, OutputStream stdout)
-            throws AbstractApplicationException {
-        lsHelper = new LsApplicationHelper();
-
+            throws LsException {
         if (args == null) {
             throw new LsException(ERR_NULL_ARGS);
         }
