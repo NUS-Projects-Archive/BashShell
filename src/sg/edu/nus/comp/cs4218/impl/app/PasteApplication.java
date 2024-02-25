@@ -61,15 +61,16 @@ public class PasteApplication implements PasteInterface {
         List<String> nonFlagArgs = pasteArgsParser.getNonFlagArgs();
         boolean noInputs = nonFlagArgs.isEmpty();
         boolean isRedirect = nonFlagArgs.contains(">") || nonFlagArgs.contains("<");
+        boolean isSerial = pasteArgsParser.isSerial();
         String result = null;
 
         if (noInputs) {
-            result = mergeStdin(pasteArgsParser.isSerial(), stdin);
+            result = mergeStdin(isSerial, stdin);
         } else if (!isRedirect) {
             if (!nonFlagArgs.contains("-")) {
-                result = mergeFile(pasteArgsParser.isSerial(), nonFlagArgs.toArray(new String[0]));
+                result = mergeFile(isSerial, nonFlagArgs.toArray(new String[0]));
             } else {
-                result = mergeFileAndStdin(pasteArgsParser.isSerial(), stdin, nonFlagArgs.toArray(new String[0]));
+                result = mergeFileAndStdin(isSerial, stdin, nonFlagArgs.toArray(new String[0]));
             }
         }
 
@@ -93,12 +94,12 @@ public class PasteApplication implements PasteInterface {
             List<String> noRedirectionArgsList = redirectionHandler.getNoRedirArgsList();
             if (noRedirectionArgsList.size() > 0) {
                 if (!nonFlagArgs.contains("-")) {
-                    result = mergeFile(pasteArgsParser.isSerial(), noRedirectionArgsList.toArray(new String[0]));
+                    result = mergeFile(isSerial, noRedirectionArgsList.toArray(new String[0]));
                 } else {
-                    result = mergeFileAndStdin(pasteArgsParser.isSerial(), stdin, noRedirectionArgsList.toArray(new String[0]));
+                    result = mergeFileAndStdin(isSerial, stdin, noRedirectionArgsList.toArray(new String[0]));
                 }
             } else {
-                result = mergeStdin(pasteArgsParser.isSerial(), redirectionHandler.getInputStream());
+                result = mergeStdin(isSerial, redirectionHandler.getInputStream());
             }
 
             try {
