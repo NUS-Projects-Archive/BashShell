@@ -29,7 +29,7 @@ public class LsApplicationHelper {
      *
      * @param isSortByExt Sorts folder contents alphabetically by file extension
      *                    (characters after the last ‘.’ (without quotes)). Files
-     *                    with no extension are sorted first.
+     *                    with no extension are sorted first
      * @return
      */
     public static String listCwdContent(Boolean isSortByExt) throws LsException {
@@ -46,13 +46,13 @@ public class LsApplicationHelper {
      * <p>
      * NOTE: This is recursively called if user wants recursive mode.
      *
-     * @param paths                 List of java.nio.Path objects to list.
-     * @param isRecursive           Recursive mode, repeatedly ls the child directories.
+     * @param paths                 List of java.nio.Path objects to list
+     * @param isRecursive           Recursive mode, repeatedly ls the child directories
      * @param isSortByExt           Sorts folder contents alphabetically by file extension
      *                              (characters after the last ‘.’ (without quotes)). Files
- *                                  with no extension are sorted first.
-     * @param isFolderNameSpecified Boolean to indicate if folder name is specified.
-     * @return String to be written to output stream.
+ *                                  with no extension are sorted first
+     * @param isFolderNameSpecified Boolean to indicate if folder name is specified
+     * @return String to be written to output stream
      */
     public static String buildResult(List<Path> paths, Boolean isRecursive, Boolean isSortByExt,
                                      boolean isFolderNameSpecified) {
@@ -105,10 +105,10 @@ public class LsApplicationHelper {
     /**
      * Formats the contents of a directory into a single string.
      *
-     * @param contents    List of items in a directory.
+     * @param contents    List of items in a directory
      * @param isSortByExt Sorts folder contents alphabetically by file extension
      *                    (characters after the last ‘.’ (without quotes)). Files
-     *                    with no extension are sorted first.
+     *                    with no extension are sorted first
      * @return
      */
     private static String formatContents(List<Path> contents, Boolean isSortByExt) {
@@ -137,8 +137,8 @@ public class LsApplicationHelper {
     /**
      * Gets the contents in a single specified directory.
      *
-     * @param directory Directory to get contents from.
-     * @return List of files + directories in the passed directory.
+     * @param directory Directory to get contents from
+     * @return List of files + directories in the passed directory
      */
     private static List<Path> getContents(Path directory)
             throws InvalidDirectoryException, DirectoryAccessDeniedException {
@@ -162,8 +162,8 @@ public class LsApplicationHelper {
     /**
      * Gets the contents of a directory that is readable.
      *
-     * @param directory Directory to get contents from.
-     * @return List of files and directories in the passed directory.
+     * @param directory Directory to get contents from
+     * @return List of files and directories in the passed directory
      */
     private static List<Path> getContentsFromReadableDirectory(Path directory) {
         List<Path> result = new ArrayList<>();
@@ -182,7 +182,7 @@ public class LsApplicationHelper {
      * Resolve all paths given as arguments into a list of Path objects for easy
      * path management.
      *
-     * @param directories List of directories to be resolved into Path objects.
+     * @param directories List of directories to be resolved into Path objects
      * @return List of java.nio.Path objects
      */
     public static List<Path> resolvePaths(String... directories) {
@@ -198,7 +198,7 @@ public class LsApplicationHelper {
      * Converts a String into a java.nio.Path objects. Also resolves if the current
      * path provided is an absolute path or already the current directory.
      *
-     * @param directory Directory to be converted into a Path object.
+     * @param directory Directory to be converted into a Path object
      * @return
      */
     private static Path resolvePath(String directory) {
@@ -213,7 +213,7 @@ public class LsApplicationHelper {
     /**
      * Converts a path to a relative path to the current directory.
      *
-     * @param path Path to be converted.
+     * @param path Path to be converted
      * @return
      */
     private static Path getRelativeToCwd(Path path) {
@@ -228,7 +228,7 @@ public class LsApplicationHelper {
      * extension,
      * followed by comparing based on their full string representation.
      *
-     * @return A comparator for sorting files by file extension.
+     * @return A comparator for sorting files by file extension
      */
     private static Comparator<String> getFileExtensionComparator() {
         return Comparator.comparing((String s) -> getFileExtension(s)).thenComparing(String::toString);
@@ -237,8 +237,8 @@ public class LsApplicationHelper {
     /**
      * Returns the file extension from a given file name.
      *
-     * @param file The file name to extract the extension.
-     * @return The file extension if it exists; Otherwise, an empty string.
+     * @param file The file name to extract the extension
+     * @return The file extension if it exists; Otherwise, an empty string
      */
     private static String getFileExtension(String file) {
         int lastDotIndex = file.lastIndexOf('.');
