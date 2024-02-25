@@ -1,18 +1,27 @@
 package sg.edu.nus.comp.cs4218.impl.app;
 
-import sg.edu.nus.comp.cs4218.Shell;
 import sg.edu.nus.comp.cs4218.app.PasteInterface;
-import sg.edu.nus.comp.cs4218.exception.*;
+import sg.edu.nus.comp.cs4218.exception.InvalidArgsException;
+import sg.edu.nus.comp.cs4218.exception.PasteException;
+import sg.edu.nus.comp.cs4218.exception.ShellException;
 import sg.edu.nus.comp.cs4218.impl.parser.PasteArgsParser;
 import sg.edu.nus.comp.cs4218.impl.util.ArgumentResolver;
 import sg.edu.nus.comp.cs4218.impl.util.IORedirectionHandler;
 import sg.edu.nus.comp.cs4218.impl.util.IOUtils;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.*;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NULL_STREAMS;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_WRITE_STREAM;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_GENERAL;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_NOT_FOUND;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IS_DIR;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_PERM;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_TAB;
 
@@ -118,7 +127,7 @@ public class PasteApplication implements PasteInterface {
             throw new PasteException(ERR_NULL_STREAMS);
         }
 
-        List<String> data = null;
+        List<String> data;
         try {
             data = IOUtils.getLinesFromInputStream(stdin);
             tempListResult.add(data);
@@ -161,7 +170,7 @@ public class PasteApplication implements PasteInterface {
             }
 
             List<String> fileData;
-            InputStream input = null;
+            InputStream input;
             try {
                 input = IOUtils.openInputStream(file);
             } catch (ShellException e) {
@@ -204,7 +213,7 @@ public class PasteApplication implements PasteInterface {
             throw new PasteException(ERR_GENERAL);
         }
 
-        List<String> data = null;
+        List<String> data;
         try {
             data = IOUtils.getLinesFromInputStream(stdin);
         } catch (IOException e) {
