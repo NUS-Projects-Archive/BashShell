@@ -9,22 +9,36 @@ import sg.edu.nus.comp.cs4218.exception.ShellException;
 import sg.edu.nus.comp.cs4218.impl.parser.CatArgsParser;
 import sg.edu.nus.comp.cs4218.impl.util.ArgumentResolver;
 import sg.edu.nus.comp.cs4218.impl.util.IORedirectionHandler;
+import sg.edu.nus.comp.cs4218.impl.util.StringUtils;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.nio.file.FileSystem;
-import java.nio.file.*;
+import java.nio.file.FileSystems;
+import java.nio.file.FileVisitResult;
+import java.nio.file.FileVisitor;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.PathMatcher;
+import java.nio.file.Paths;
+import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.List;
 
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.*;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_NOT_FOUND;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_INVALID_FLAG;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IO_EXCEPTION;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_PERM;
 
 public class CatApplication implements CatInterface {
-    public static final String ERR_IS_DIR = "This is a directory";
-    public static final String ERR_READING_FILE = "Could not read file";
     public static final String ERR_WRITE_STREAM = "Could not write to output stream";
-    public static final String ERR_NULL_STREAMS = "Null Pointer Exception";
-    public static final String ERR_GENERAL = "Exception Caught";
 
     /**
      * Runs the cat application with the specified arguments.
@@ -37,8 +51,7 @@ public class CatApplication implements CatInterface {
      * @throws CatException If the file(s) specified do not exist or are unreadable.
      */
     @Override
-    public void run(String[] args, InputStream stdin, OutputStream stdout) throws AbstractApplicationException {
-        // TODO: To implement
+    public void run(String[] args, InputStream stdin, OutputStream stdout) throws CatException {
         final CatArgsParser parser = new CatArgsParser();
         try {
             parser.parse(args);
@@ -56,28 +69,12 @@ public class CatApplication implements CatInterface {
             } catch (IOException e) {
                 throw new CatException(ERR_WRITE_STREAM + " " + e.getMessage());
             }
-        }  else if (!nonFlagArgs.contains("<") && !nonFlagArgs.contains(">")) {
-            if (!nonFlagArgs.contains("-")) {
-                output = catFiles(isLineNumber, parser.getNonFlagArgs().toArray(String[]::new));
-                try {
-                    stdout.write(output.getBytes());
-                } catch (IOException e) {
-                    throw new CatException(ERR_WRITE_STREAM + " " + e.getMessage());
-                }
-            } else {
-                output = catFileAndStdin(isLineNumber, stdin, parser.getNonFlagArgs().toArray(String[]::new));
-                try {
-                    stdout.write(output.getBytes());
-                } catch (IOException e) {
-                    throw new CatException(ERR_WRITE_STREAM + " " + e.getMessage());
-                }
-            }
-        } else {
+        }  else {
             IORedirectionHandler redirHandler = new IORedirectionHandler(nonFlagArgs, stdin,
                     stdout, new ArgumentResolver());
             try {
                 redirHandler.extractRedirOptions();
-            } catch (ShellException | FileNotFoundException e) {
+            } catch (ShellException | FileNotFoundException | AbstractApplicationException e) {
                 throw new CatException(e.getMessage());
             }
             List<String> noRedirArgsList = redirHandler.getNoRedirArgsList();
@@ -124,7 +121,7 @@ public class CatApplication implements CatInterface {
     }
 
     @Override
-    public String catFiles(Boolean isLineNumber, String... fileNames) throws AbstractApplicationException {
+    public String catFiles(Boolean isLineNumber, String... fileNames) throws CatException {
         SearchFileByWildcard sfbw = new SearchFileByWildcard();
         StringBuilder result = new StringBuilder();
         for (String fileName : fileNames) {
@@ -132,7 +129,7 @@ public class CatApplication implements CatInterface {
                 try {
                     List<String> globbedFiles = sfbw.searchWithWc(Paths.get(Environment.currentDirectory), fileName);
                     for (String globbedFile : globbedFiles) {
-                        result.append(readFile(isLineNumber, new File(globbedFile))).append(System.lineSeparator());
+                        result.append(readFile(isLineNumber, new File(globbedFile))).append(StringUtils.STRING_NEWLINE);
                     }
                 } catch (IOException e) {
                     throw new CatException(ERR_IO_EXCEPTION + " " + e.getMessage());
@@ -149,7 +146,7 @@ public class CatApplication implements CatInterface {
     }
 
     @Override
-    public String catStdin(Boolean isLineNumber, InputStream stdin) throws AbstractApplicationException {
+    public String catStdin(Boolean isLineNumber, InputStream stdin) throws CatException {
         try {
             BufferedReader br = new BufferedReader(new InputStreamReader(stdin));
             StringBuilder userInput = new StringBuilder();
@@ -161,7 +158,7 @@ public class CatApplication implements CatInterface {
                     userInput.append(String.valueOf(lineNumber)).append(" ");
                     lineNumber++;
                 }
-                userInput.append(line).append(System.lineSeparator());
+                userInput.append(line).append(StringUtils.STRING_NEWLINE);
             }
             return userInput.toString();
         } catch (IOException e) {
@@ -170,7 +167,7 @@ public class CatApplication implements CatInterface {
     }
 
     @Override
-    public String catFileAndStdin(Boolean isLineNumber, InputStream stdin, String... fileNames) throws AbstractApplicationException {
+    public String catFileAndStdin(Boolean isLineNumber, InputStream stdin, String... fileNames) throws CatException {
         SearchFileByWildcard sfbw = new SearchFileByWildcard();
         StringBuilder result = new StringBuilder();
         for (String fileName : fileNames) {
@@ -185,7 +182,7 @@ public class CatApplication implements CatInterface {
                             result.append(String.valueOf(lineNumber)).append(" ");
                             lineNumber++;
                         }
-                        result.append(line).append(System.lineSeparator());
+                        result.append(line).append(StringUtils.STRING_NEWLINE);
                     }
                 } catch (IOException e) {
                     throw new CatException(ERR_IO_EXCEPTION + " " + e.getMessage());
@@ -194,7 +191,7 @@ public class CatApplication implements CatInterface {
                 try {
                     List<String> globbedFiles = sfbw.searchWithWc(Paths.get(Environment.currentDirectory), fileName);
                     for (String globbedFile : globbedFiles) {
-                        result.append(readFile(isLineNumber, new File(globbedFile))).append(System.lineSeparator());
+                        result.append(readFile(isLineNumber, new File(globbedFile))).append(StringUtils.STRING_NEWLINE);
                     }
                 } catch (IOException e) {
                     throw new CatException(ERR_IO_EXCEPTION + " " + e.getMessage());
@@ -220,10 +217,7 @@ public class CatApplication implements CatInterface {
                     content.append(String.valueOf(lineNumber)).append(" ");
                     lineNumber++;
                 }
-                content.append(line);
-                if (line != null) {
-                    content.append(System.lineSeparator());
-                }
+                content.append(line).append(StringUtils.STRING_NEWLINE);
             }
         } catch (FileNotFoundException e) {
             throw new CatException(ERR_FILE_NOT_FOUND + " " + e.getMessage());

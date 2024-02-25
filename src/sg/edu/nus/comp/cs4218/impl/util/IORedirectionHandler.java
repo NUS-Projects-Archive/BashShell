@@ -69,15 +69,9 @@ public class IORedirectionHandler {
             // replace existing inputStream / outputStream
             if (arg.equals(String.valueOf(CHAR_REDIR_INPUT))) {
                 IOUtils.closeInputStream(inputStream);
-                //if (!inputStream.equals(origInputStream)) { // Already have a stream
-                //    throw new ShellException(ERR_MULTIPLE_STREAMS);
-                //}
                 inputStream = IOUtils.openInputStream(file);
             } else if (arg.equals(String.valueOf(CHAR_REDIR_OUTPUT))) {
                 IOUtils.closeOutputStream(outputStream);
-                //if (!outputStream.equals(origOutputStream)) { // Already have a stream
-                //    throw new ShellException(ERR_MULTIPLE_STREAMS);
-                //}
                 outputStream = IOUtils.openOutputStream(file);
             }
         }
