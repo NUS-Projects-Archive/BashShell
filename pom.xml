@@ -31,7 +31,7 @@
 
     <build>
         <sourceDirectory>src</sourceDirectory>
-        <testSourceDirectory>public_tests</testSourceDirectory>
+        <testSourceDirectory>unit_tests</testSourceDirectory>
         <testResources>
             <testResource>
                 <directory>resources</directory>

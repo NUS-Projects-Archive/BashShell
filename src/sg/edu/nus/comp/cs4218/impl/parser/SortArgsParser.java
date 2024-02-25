@@ -23,7 +23,7 @@ public class SortArgsParser extends ArgsParser {
         return flags.contains(FLAG_IS_REV_ORDER);
     }
 
-    public boolean isCaseIndependent() {
+    public Boolean isCaseIndependent() {
         return flags.contains(FLAG_IS_CASE_IGNORE);
     }
 
