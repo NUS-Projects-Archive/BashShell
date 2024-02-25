@@ -84,42 +84,23 @@ public class PasteApplication implements PasteInterface {
             if (noRedirectionArgsList.size() > 0) {
                 if (!nonFlagArgs.contains("-")) {
                     result = mergeFile(pasteArgsParser.isSerial(), noRedirectionArgsList.toArray(new String[0]));
-                    try {
-                        if (!nonFlagArgs.contains(">")) {
-                            stdout.write(result.getBytes());
-                        } else {
-                            byte[] bytes = result.getBytes();
-                            redirectionHandler.getOutputStream().write(bytes);
-                        }
-                    } catch (Exception e) {
-                        throw new PasteException(e.getMessage());
-                    }
-                    ;
                 } else {
                     result = mergeFileAndStdin(pasteArgsParser.isSerial(), stdin, noRedirectionArgsList.toArray(new String[0]));
-                    try {
-                        if (!nonFlagArgs.contains(">")) {
-                            stdout.write(result.getBytes());
-                        } else {
-                            byte[] bytes = result.getBytes();
-                            redirectionHandler.getOutputStream().write(bytes);
-                        }
-                    } catch (Exception e) {
-                        throw new PasteException(e.getMessage());
-                    }
                 }
             } else {
                 result = mergeStdin(pasteArgsParser.isSerial(), redirectionHandler.getInputStream());
-                try {
-                    if (!nonFlagArgs.contains(">")) {
-                        stdout.write(result.getBytes());
-                    } else {
-                        byte[] bytes = result.getBytes();
-                        redirectionHandler.getOutputStream().write(bytes);
-                    }
-                } catch (Exception e) {
-                    throw new PasteException(e.getMessage());
+            }
+
+            try {
+                if (!nonFlagArgs.contains(">")) {
+                    stdout.write(result.getBytes());
+                    stdout.write(STRING_NEWLINE.getBytes());
+                } else {
+                    byte[] bytes = result.getBytes();
+                    redirectionHandler.getOutputStream().write(bytes);
                 }
+            } catch (Exception e) {
+                throw new PasteException(e.getMessage());
             }
         }
     }
@@ -160,7 +141,7 @@ public class PasteApplication implements PasteInterface {
      *
      * @param isSerial Paste one file at a time instead of in parallel
      * @param fileName Array of file names to be read and merged (not including "-" for reading from stdin)
-     * @throws Exception
+     * @throws PasteException
      */
     public String mergeFile(Boolean isSerial, String... fileName) throws PasteException {
         if (fileName == null) {
@@ -216,7 +197,7 @@ public class PasteApplication implements PasteInterface {
      * @param isSerial Paste one file at a time instead of in parallel
      * @param stdin    InputStream containing arguments from Stdin
      * @param fileName Array of file names to be read and merged (including "-" for reading from stdin)
-     * @throws Exception
+     * @throws PasteException
      */
     public String mergeFileAndStdin(Boolean isSerial, InputStream stdin, String... fileName) throws PasteException {
         if (stdin == null && fileName == null) {
@@ -273,6 +254,14 @@ public class PasteApplication implements PasteInterface {
         }
     }
 
+    /**
+     * Takes in a List of Lists of Strings and merges lists in serial.
+     * Each inner list represents a row of data, and each element in the inner list represents a column.
+     * Columns within a row are separated by a tab character ('\t'), and rows are separated by a newline character ('\n')
+     *
+     * @param listResult List of Lists of Strings representing the data to be merged
+     * @return Merged data as a single String
+     */
     public String mergeInSerial(List<List<String>> listResult) {
         List<List<String>> res = new ArrayList<>();
         for (List<String> lst : listResult) {
@@ -288,6 +277,13 @@ public class PasteApplication implements PasteInterface {
         return String.join(STRING_NEWLINE, interRes);
     }
 
+    /**
+     * Merges lists in parallel, where each sublist corresponds to a column in the merged result.
+     * If a sublist does not have an element at a particular index, an empty string is inserted.
+     *
+     * @param listResult A List of Lists of Strings representing the data to be merged in parallel
+     * @return A String representing the merged data with elements separated by tabs and rows separated by newlines
+     */
     public String mergeInParallel(List<List<String>> listResult) {
         List<List<String>> res = new ArrayList<>();
 
