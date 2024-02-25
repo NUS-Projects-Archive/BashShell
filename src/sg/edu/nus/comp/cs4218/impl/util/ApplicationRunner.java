@@ -76,6 +76,10 @@ public class ApplicationRunner {
             case APP_MV:
                 application = new MvApplication();
                 break;
+            case APP_PASTE:
+                application = new PasteApplication();
+                break;
+
             default:
                 throw new ShellException(app + ": " + ERR_INVALID_APP);
         }

@@ -7,4 +7,8 @@ public class PasteException extends AbstractApplicationException {
     public PasteException(String message) {
         super("paste: " + message);
     }
+
+    public PasteException(Exception exception, String message) {
+        super("paste: " + message);
+    }
 }
