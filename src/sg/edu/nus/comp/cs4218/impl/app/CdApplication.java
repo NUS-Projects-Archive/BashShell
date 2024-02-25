@@ -52,6 +52,11 @@ public class CdApplication implements CdInterface {
             path = Paths.get(Environment.currentDirectory, pathStr);
         }
 
+        if (Files.isDirectory(path) && !Files.isExecutable(path)) {
+            // Is directory but cannot be executed (i.e. cannot cd into)
+            throw new CdException(String.format(ERR_NO_PERM, pathStr));
+        }
+
         if (!Files.exists(path)) {
             throw new CdException(String.format(ERR_FILE_NOT_FOUND, pathStr));
         }
