@@ -21,31 +21,47 @@ class MkdirApplicationTest {
     private final String MKDIR_EXCEPTION_MSG = "mkdir: ";
     private final String EXISTING_FILE = "existingFile";
     private final String NON_EXISTING_FILE = "nonExistingFile";
-    private final String NON_EXISTING_FILE_AND_TOP_LEVEL = "nonExistingTopLevel/nonExistingFile";
+    private final String NON_EXISTING_DIRECTORY = "nonExistingParent/nonExistingChild/nonExistingGrandchild";
 
     private MkdirApplication app;
 
     @BeforeEach
     void setUp() throws IOException {
         this.app = new MkdirApplication();
-
-        File existingFile = new File(EXISTING_FILE);
-        existingFile.createNewFile();
+        createFile(EXISTING_FILE);
+        deleteFile(NON_EXISTING_FILE);
+        deleteFile(NON_EXISTING_DIRECTORY);
     }
 
     @AfterEach
     void tearDown() {
-        File existingFile = new File(EXISTING_FILE);
-        existingFile.delete();
+        deleteFile(EXISTING_FILE);
+        deleteFile(NON_EXISTING_FILE);
+        deleteFile(NON_EXISTING_DIRECTORY);
+    }
 
-        File nonExistingFile = new File(NON_EXISTING_FILE);
-        nonExistingFile.delete();
+    private void createFile(String fileName) throws IOException {
+        File file = new File(fileName);
+        file.createNewFile();
+    }
 
-        File nonExistingFileAndTopLevel = new File(NON_EXISTING_FILE_AND_TOP_LEVEL);
-        nonExistingFileAndTopLevel.delete();
+    private void deleteFile(String filePath) {
+        File file = new File(filePath);
+        if (!file.exists()) {
+            return;
+        }
+        if (file.isDirectory()) {
+            deleteDirectory(file);
+        } else {
+            file.delete();
+        }
+    }
 
-        File parentDirectory = nonExistingFileAndTopLevel.getParentFile();
-        parentDirectory.delete();
+    private void deleteDirectory(File directory) {
+        if (directory != null && directory.exists()) {
+            directory.delete();
+            deleteDirectory(directory.getParentFile());
+        }
     }
 
     @Test
@@ -108,8 +124,8 @@ class MkdirApplicationTest {
 
     @Test
     void createFolder_FolderAndTopLevelDoNotExist_CreateFolderSuccessfully() throws MkdirException {
-        File file = new File(NON_EXISTING_FILE_AND_TOP_LEVEL);
-        app.createFolder(NON_EXISTING_FILE_AND_TOP_LEVEL);
+        File file = new File(NON_EXISTING_DIRECTORY);
+        app.createFolder(NON_EXISTING_DIRECTORY);
         assertTrue(file.exists());
     }
 }

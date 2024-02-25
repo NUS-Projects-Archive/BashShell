@@ -11,7 +11,7 @@ public class MkdirArgsParser extends ArgsParser {
         legalFlags.add(FLAG_IS_CREATE_PARENT);
     }
 
-    public boolean isCreateParent() {
+    public Boolean isCreateParent() {
         return flags.contains(FLAG_IS_CREATE_PARENT);
     }
 
