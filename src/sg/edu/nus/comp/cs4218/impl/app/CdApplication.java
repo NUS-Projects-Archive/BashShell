@@ -17,10 +17,8 @@ import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.*;
 
 public class CdApplication implements CdInterface {
 
-
-
     @Override
-    public void changeToDirectory(String path) throws AbstractApplicationException {
+    public void changeToDirectory(String path) throws CdException {
         Environment.currentDirectory = getNormalizedAbsolutePath(path);
     }
 
@@ -28,17 +26,17 @@ public class CdApplication implements CdInterface {
      * Runs the cd application with the specified arguments.
      * Assumption: The application must take in one arg. (cd without args is not supported)
      *
-     * @param args   Array of arguments for the application.
-     * @param stdin  An InputStream, not used.
-     * @param stdout An OutputStream, not used.
+     * @param args   Array of arguments for the application
+     * @param stdin  An InputStream, not used
+     * @param stdout An OutputStream, not used
      * @throws CdException
      */
     @Override
-    public void run(String[] args, InputStream stdin, OutputStream stdout)
-            throws AbstractApplicationException {
+    public void run(String[] args, InputStream stdin, OutputStream stdout) throws CdException {
         if (args == null) {
             throw new CdException(ERR_NULL_ARGS);
         }
+
         if (args.length == 1) {
             changeToDirectory(args[0]);
         } else if (args.length > 1) {
@@ -46,14 +44,14 @@ public class CdApplication implements CdInterface {
         }
     }
 
-    private String getNormalizedAbsolutePath(String pathStr) throws AbstractApplicationException {
+    private String getNormalizedAbsolutePath(String pathStr) throws CdException {
         Path path = new File(pathStr).toPath();
         if (!path.isAbsolute()) {
             path = Paths.get(Environment.currentDirectory, pathStr);
         }
 
         if (Files.isDirectory(path) && !Files.isExecutable(path)) {
-            // Is directory but cannot be executed (i.e. cannot cd into)
+            // Path is a directory but cannot be executed (i.e. cannot cd into)
             throw new CdException(String.format("%s: %s", pathStr, ERR_NO_PERM));
         }
 
