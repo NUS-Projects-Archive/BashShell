@@ -48,7 +48,7 @@ class MkdirApplicationTest {
             deleteDirectory(directory.getParentFile());
         }
     }
-    
+
     @BeforeEach
     void setUp() throws IOException {
         this.app = new MkdirApplication();
@@ -65,7 +65,7 @@ class MkdirApplicationTest {
     }
 
     @Test
-    void run_EmptyArgs_ThrowsNullArguments() {
+    void run_EmptyArgs_ThrowsMkdirException() {
         Throwable result = assertThrows(MkdirException.class, () -> {
             app.run(null, null, null);
         });
@@ -73,7 +73,7 @@ class MkdirApplicationTest {
     }
 
     @Test
-    void run_NoDirectoriesArgs_ThrowsNoFolderNamesSupplied() {
+    void run_NoDirectoriesArgs_ThrowsMkdirException() {
         String[] args = {"-p"};
         Throwable result = assertThrows(MkdirException.class, () -> {
             app.run(args, null, null);
@@ -82,7 +82,7 @@ class MkdirApplicationTest {
     }
 
     @Test
-    void run_MissingTopLevel_ThrowsTopLevelMissing() {
+    void run_MissingTopLevel_ThrowsMkdirException() {
         String[] args = {"missingTopLevel/" + NON_EXISTING_FILE};
         Throwable result = assertThrows(MkdirException.class, () -> {
             app.run(args, null, null);
@@ -91,7 +91,7 @@ class MkdirApplicationTest {
     }
 
     @Test
-    void run_RootDirectory_ThrowsTopLevelMissing() {
+    void run_RootDirectory_ThrowsMkdirException() {
         String[] args = {"-p", "/"};
         Throwable result = assertThrows(MkdirException.class, () -> {
             app.run(args, null, null);
@@ -108,7 +108,7 @@ class MkdirApplicationTest {
     }
 
     @Test
-    void createFolder_FolderExists_ThrowsFileAlreadyExists() {
+    void createFolder_FolderExists_ThrowsMkdirException() {
         Throwable result = assertThrows(MkdirException.class, () -> {
             app.createFolder(EXISTING_FILE);
         });
