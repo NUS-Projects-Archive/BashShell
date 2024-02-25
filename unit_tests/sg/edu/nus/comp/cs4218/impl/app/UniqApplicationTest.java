@@ -7,6 +7,7 @@ import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 
 import java.io.ByteArrayOutputStream;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import sg.edu.nus.comp.cs4218.exception.UniqException;
@@ -19,7 +20,7 @@ class UniqApplicationTest {
     static final String STR_BOB = "Bob";
 
     @Test
-    void run_removeAdjacentDuplicates_onlyUniqueAdjacent() {
+    void run_NoFlags_OnlyUniqueAdjacentLines() {
         //Given
         final String[] args = {TEST_FILE_ONE};
         final String expected = STR_HELLO_WORLD + STRING_NEWLINE +
@@ -35,7 +36,7 @@ class UniqApplicationTest {
     }
 
     @Test
-    void run_countOccurrences_correctCounts() {
+    void run_CountFlag_CorrectOccurrenceCounts() {
         //Given
         final String[] args = {"-c", TEST_FILE_ONE};
         final String expected = "2 Hello World" + STRING_NEWLINE +
@@ -51,7 +52,7 @@ class UniqApplicationTest {
     }
 
     @Test
-    void run_duplicatesPerGroup_onlyOnePerDuplicateGroup() {
+    void run_GroupDuplicatesFlag_OnlyOnePerDuplicateGroup() {
         //Given
         final String[] args = {"-d", TEST_FILE_ONE};
         final String expected = STR_HELLO_WORLD + STRING_NEWLINE +
@@ -64,7 +65,7 @@ class UniqApplicationTest {
     }
 
     @Test
-    void run_AllDuplicates_AllDuplicateLines() {
+    void run_AllDuplicatesFlag_AllDuplicateLines() {
         //Given
         final String[] args = {"-D", TEST_FILE_ONE};
         final String expected = STR_HELLO_WORLD + STRING_NEWLINE +
@@ -79,7 +80,23 @@ class UniqApplicationTest {
     }
 
     @Test
-    void run_countAndGroupDuplicate_correctCountAndLines() {
+    @DisplayName("Test D flag taking precedence over d flag")
+    void run_GroupDuplicatesAndAllDuplicatesFlag_AllDuplicateLines() {
+        //Given
+        final String[] args = {"-dD", TEST_FILE_ONE};
+        final String expected = STR_HELLO_WORLD + STRING_NEWLINE +
+                STR_HELLO_WORLD + STRING_NEWLINE +
+                STR_ALICE + STRING_NEWLINE +
+                STR_ALICE + STRING_NEWLINE;
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        UniqApplication app = new UniqApplication();
+
+        assertDoesNotThrow(() -> app.run(args, null, out)); // When
+        assertEquals(expected, out.toString()); // Then
+    }
+
+    @Test
+    void run_CountAndGroupDuplicateFlags_CorrectCountAndLines() {
         //Given
         final String[] args = {"-cd", TEST_FILE_ONE};
         final String expected = "2 Hello World" + STRING_NEWLINE +
@@ -92,18 +109,13 @@ class UniqApplicationTest {
     }
 
     @Test
-    void run_countAndAllDuplicates_throwsUniqException() {
+    void run_CountAndAllDuplicatesFlags_ThrowsUniqException() {
         //Given
         final String[] args = {"-cD", TEST_FILE_ONE};
         final String expectedMessage = "uniq: printing all duplicated lines and repeat counts is meaningless";
         UniqApplication app = new UniqApplication();
 
-        // When
-        UniqException exception = assertThrows(UniqException.class, () -> {
-            app.run(args, null, null);
-        });
-
-        // Then
-        assertEquals(expectedMessage, exception.getMessage());
+        Throwable thrown = assertThrows(UniqException.class, () -> app.run(args, null, null)); // When
+        assertEquals(expectedMessage, thrown.getMessage()); // Then
     }
 }
