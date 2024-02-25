@@ -78,44 +78,37 @@ public class CatApplication implements CatInterface {
                 throw new CatException(e.getMessage());
             }
             List<String> noRedirArgsList = redirHandler.getNoRedirArgsList();
-            if (noRedirArgsList.size() > 0) {
-                if (!nonFlagArgs.contains("-")) {
-                    output = catFiles(isLineNumber, noRedirArgsList.toArray(String[]::new));
-                    try {
+            String[] noRedirArgsArray = noRedirArgsList.toArray(String[]::new);
+            try {
+                if (noRedirArgsList.size() > 0) {
+                    if (!nonFlagArgs.contains("-")) {
+                        output = catFiles(isLineNumber, noRedirArgsArray);
                         if (!nonFlagArgs.contains(">")) {
                             stdout.write(output.getBytes());
                         } else {
                             byte[] bytes = output.getBytes();
                             redirHandler.getOutputStream().write(bytes);
                         }
-                    } catch (IOException e) {
-                        throw new CatException(ERR_WRITE_STREAM + " " + e.getMessage());
+                    } else {
+                        output = catFileAndStdin(isLineNumber, stdin, noRedirArgsArray);
+                        if (!nonFlagArgs.contains(">")) {
+                            stdout.write(output.getBytes());
+                        } else {
+                            byte[] bytes = output.getBytes();
+                            redirHandler.getOutputStream().write(bytes);
+                        }
                     }
                 } else {
-                    output = catFileAndStdin(isLineNumber, stdin, noRedirArgsList.toArray(String[]::new));
-                    try {
-                        if (!nonFlagArgs.contains(">")) {
-                            stdout.write(output.getBytes());
-                        } else {
-                            byte[] bytes = output.getBytes();
-                            redirHandler.getOutputStream().write(bytes);
-                        }
-                    } catch (IOException e) {
-                        throw new CatException(ERR_WRITE_STREAM + " " + e.getMessage());
-                    }
-                }
-            } else {
-                output = catStdin(isLineNumber, redirHandler.getInputStream());
-                try {
+                    output = catStdin(isLineNumber, redirHandler.getInputStream());
                     if (!nonFlagArgs.contains(">")) {
                         stdout.write(output.getBytes());
                     } else {
                         byte[] bytes = output.getBytes();
                         redirHandler.getOutputStream().write(bytes);
                     }
-                } catch (IOException e) {
-                    throw new CatException(ERR_WRITE_STREAM + " " + e.getMessage());
                 }
+            } catch (IOException e) {
+                throw new CatException(ERR_WRITE_STREAM + " " + e.getMessage());
             }
         }
     }
@@ -125,21 +118,17 @@ public class CatApplication implements CatInterface {
         SearchFileByWildcard sfbw = new SearchFileByWildcard();
         StringBuilder result = new StringBuilder();
         for (String fileName : fileNames) {
-            if (fileName.contains("*")) {
-                try {
+            try {
+                if (fileName.contains("*")) {
                     List<String> globbedFiles = sfbw.searchWithWc(Paths.get(Environment.currentDirectory), fileName);
                     for (String globbedFile : globbedFiles) {
                         result.append(readFile(isLineNumber, new File(globbedFile))).append(StringUtils.STRING_NEWLINE);
                     }
-                } catch (IOException e) {
-                    throw new CatException(ERR_IO_EXCEPTION + " " + e.getMessage());
-                }
-            } else {
-                try {
+                } else {
                     result.append(readFile(isLineNumber, new File(fileName)));
-                } catch (IOException e) {
-                    throw new CatException(ERR_IO_EXCEPTION + " " + e.getMessage());
                 }
+            } catch (IOException e) {
+                throw new CatException(ERR_IO_EXCEPTION + " " + e.getMessage());
             }
         }
         return result.toString();
@@ -171,8 +160,8 @@ public class CatApplication implements CatInterface {
         SearchFileByWildcard sfbw = new SearchFileByWildcard();
         StringBuilder result = new StringBuilder();
         for (String fileName : fileNames) {
-            if (fileName.equals("-")) {
-                try {
+            try {
+                if (fileName.equals("-")) {
                     BufferedReader br = new BufferedReader(new InputStreamReader(stdin));
                     String line;
                     int lineNumber = 1;
@@ -184,24 +173,16 @@ public class CatApplication implements CatInterface {
                         }
                         result.append(line).append(StringUtils.STRING_NEWLINE);
                     }
-                } catch (IOException e) {
-                    throw new CatException(ERR_IO_EXCEPTION + " " + e.getMessage());
-                }
-            } else if (fileName.contains("*")) {
-                try {
+                } else if (fileName.contains("*")) {
                     List<String> globbedFiles = sfbw.searchWithWc(Paths.get(Environment.currentDirectory), fileName);
                     for (String globbedFile : globbedFiles) {
                         result.append(readFile(isLineNumber, new File(globbedFile))).append(StringUtils.STRING_NEWLINE);
                     }
-                } catch (IOException e) {
-                    throw new CatException(ERR_IO_EXCEPTION + " " + e.getMessage());
-                }
-            } else {
-                try {
+                } else {
                     result.append(readFile(isLineNumber, new File(fileName)));
-                } catch (IOException e) {
-                    throw new CatException(ERR_IO_EXCEPTION + " " + e.getMessage());
                 }
+            } catch (IOException e) {
+                throw new CatException(ERR_IO_EXCEPTION + " " + e.getMessage());
             }
         }
         return result.toString();
