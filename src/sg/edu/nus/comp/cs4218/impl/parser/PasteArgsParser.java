@@ -16,7 +16,7 @@ public class PasteArgsParser extends ArgsParser {
         return flags.contains(FLAG_IS_SERIAL);
     }
 
-    public List<String> getFileNames() {
+    public List<String> getNonFlagArgs() {
         return nonFlagArgs;
     }
 }

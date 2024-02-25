@@ -4,6 +4,7 @@ import sg.edu.nus.comp.cs4218.Shell;
 import sg.edu.nus.comp.cs4218.app.PasteInterface;
 import sg.edu.nus.comp.cs4218.exception.*;
 import sg.edu.nus.comp.cs4218.impl.parser.PasteArgsParser;
+import sg.edu.nus.comp.cs4218.impl.util.ArgumentResolver;
 import sg.edu.nus.comp.cs4218.impl.util.IORedirectionHandler;
 import sg.edu.nus.comp.cs4218.impl.util.IOUtils;
 
@@ -47,26 +48,80 @@ public class PasteApplication implements PasteInterface {
             throw new PasteException(e.getMessage());
         }
 
-        String result;
-        try {
-            if (pasteArgsParser.getFileNames().isEmpty()) {
-                result = mergeStdin(pasteArgsParser.isSerial(), stdin);
-            } else if (!pasteArgsParser.getFileNames().contains("-")) {
-                result = mergeFile(pasteArgsParser.isSerial(), pasteArgsParser.getFileNames().toArray(new String[0]));
+        List<String> nonFlagArgs = pasteArgsParser.getNonFlagArgs();
+        boolean noInputs = nonFlagArgs.isEmpty();
+        boolean isRedirect = nonFlagArgs.contains(">") || nonFlagArgs.contains("<");
+        String result = null;
+
+        if (noInputs) {
+            result = mergeStdin(pasteArgsParser.isSerial(), stdin);
+        } else if (!isRedirect) {
+            if (!nonFlagArgs.contains("-")) {
+                result = mergeFile(pasteArgsParser.isSerial(), nonFlagArgs.toArray(new String[0]));
             } else {
-                result = mergeFileAndStdin(pasteArgsParser.isSerial(), stdin, pasteArgsParser.getFileNames().toArray(new String[0]));
+                result = mergeFileAndStdin(pasteArgsParser.isSerial(), stdin, nonFlagArgs.toArray(new String[0]));
             }
-        } catch (Exception e) {
-            throw new PasteException(e.getMessage());
         }
 
-        try {
-            stdout.write(result.getBytes());
-            stdout.write(STRING_NEWLINE.getBytes());
-        } catch (IOException e) {
-            throw new PasteException(ERR_WRITE_STREAM);
+        if (noInputs || !isRedirect) {
+            try {
+                stdout.write(result.getBytes());
+                stdout.write(STRING_NEWLINE.getBytes());
+            } catch (IOException e) {
+                throw new PasteException(ERR_WRITE_STREAM);
+            }
         }
 
+        if (isRedirect) {
+            IORedirectionHandler redirectionHandler = new IORedirectionHandler(nonFlagArgs, stdin, stdout, new ArgumentResolver());
+            try {
+                redirectionHandler.extractRedirOptions();
+            } catch (Exception e) {
+                throw new PasteException(e.getMessage());
+            }
+
+            List<String> noRedirectionArgsList = redirectionHandler.getNoRedirArgsList();
+            if (noRedirectionArgsList.size() > 0) {
+                if (!nonFlagArgs.contains("-")) {
+                    result = mergeFile(pasteArgsParser.isSerial(), noRedirectionArgsList.toArray(new String[0]));
+                    try {
+                        if (!nonFlagArgs.contains(">")) {
+                            stdout.write(result.getBytes());
+                        } else {
+                            byte[] bytes = result.getBytes();
+                            redirectionHandler.getOutputStream().write(bytes);
+                        }
+                    } catch (Exception e) {
+                        throw new PasteException(e.getMessage());
+                    }
+                    ;
+                } else {
+                    result = mergeFileAndStdin(pasteArgsParser.isSerial(), stdin, noRedirectionArgsList.toArray(new String[0]));
+                    try {
+                        if (!nonFlagArgs.contains(">")) {
+                            stdout.write(result.getBytes());
+                        } else {
+                            byte[] bytes = result.getBytes();
+                            redirectionHandler.getOutputStream().write(bytes);
+                        }
+                    } catch (Exception e) {
+                        throw new PasteException(e.getMessage());
+                    }
+                }
+            } else {
+                result = mergeStdin(pasteArgsParser.isSerial(), redirectionHandler.getInputStream());
+                try {
+                    if (!nonFlagArgs.contains(">")) {
+                        stdout.write(result.getBytes());
+                    } else {
+                        byte[] bytes = result.getBytes();
+                        redirectionHandler.getOutputStream().write(bytes);
+                    }
+                } catch (Exception e) {
+                    throw new PasteException(e.getMessage());
+                }
+            }
+        }
     }
 
     /**
