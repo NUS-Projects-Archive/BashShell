@@ -44,6 +44,7 @@ public class PasteApplication implements PasteInterface {
      *               files are specified.
      * @param stdout An OutputStream. The output of the command is written to this OutputStream.
      */
+    @Override
     public void run(String[] args, InputStream stdin, OutputStream stdout) throws PasteException {
         if (stdout == null) {
             throw new PasteException(ERR_NULL_STREAMS);
@@ -122,6 +123,7 @@ public class PasteApplication implements PasteInterface {
      * @param stdin    InputStream containing arguments from Stdin
      * @throws PasteException If fails to get stdin data
      */
+    @Override
     public String mergeStdin(Boolean isSerial, InputStream stdin) throws PasteException {
         if (stdin == null) {
             throw new PasteException(ERR_NULL_STREAMS);
@@ -152,6 +154,7 @@ public class PasteApplication implements PasteInterface {
      * @param fileName Array of file names to be read and merged (not including "-" for reading from stdin)
      * @throws PasteException
      */
+    @Override
     public String mergeFile(Boolean isSerial, String... fileName) throws PasteException {
         if (fileName == null) {
             throw new PasteException(ERR_GENERAL);
@@ -208,6 +211,7 @@ public class PasteApplication implements PasteInterface {
      * @param fileName Array of file names to be read and merged (including "-" for reading from stdin)
      * @throws PasteException
      */
+    @Override
     public String mergeFileAndStdin(Boolean isSerial, InputStream stdin, String... fileName) throws PasteException {
         if (stdin == null && fileName == null) {
             throw new PasteException(ERR_GENERAL);
