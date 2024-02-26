@@ -18,10 +18,10 @@ import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_TOP_LEVEL_MISS
 
 class MkdirApplicationTest {
 
-    private final String MKDIR_EXCEPTION_MSG = "mkdir: ";
-    private final String EXISTING_FILE = "existingFile";
-    private final String NON_EXISTING_FILE = "nonExistingFile";
-    private final String NON_EXISTING_DIRECTORY = "nonExistingParent/nonExistingChild/nonExistingGrandchild";
+    private static final String MKDIR_EX_MSG = "mkdir: ";
+    private static final String EXISTING_FILE = "existingFile";
+    private static final String NON_EXISTING_FILE = "nonExistingFile";
+    private static final String NON_EXISTING_DIR = "nonExistingParent/nonExistingChild/nonExistingGrandchild";
 
     private MkdirApplication app;
 
@@ -54,14 +54,14 @@ class MkdirApplicationTest {
         this.app = new MkdirApplication();
         createFile(EXISTING_FILE);
         deleteFile(NON_EXISTING_FILE);
-        deleteFile(NON_EXISTING_DIRECTORY);
+        deleteFile(NON_EXISTING_DIR);
     }
 
     @AfterEach
     void tearDown() {
         deleteFile(EXISTING_FILE);
         deleteFile(NON_EXISTING_FILE);
-        deleteFile(NON_EXISTING_DIRECTORY);
+        deleteFile(NON_EXISTING_DIR);
     }
 
     @Test
@@ -69,7 +69,7 @@ class MkdirApplicationTest {
         Throwable result = assertThrows(MkdirException.class, () -> {
             app.run(null, null, null);
         });
-        assertEquals(MKDIR_EXCEPTION_MSG + ERR_NULL_ARGS, result.getMessage());
+        assertEquals(MKDIR_EX_MSG + ERR_NULL_ARGS, result.getMessage());
     }
 
     @Test
@@ -78,7 +78,7 @@ class MkdirApplicationTest {
         Throwable result = assertThrows(MkdirException.class, () -> {
             app.run(args, null, null);
         });
-        assertEquals(MKDIR_EXCEPTION_MSG + ERR_NO_FOLDERS, result.getMessage());
+        assertEquals(MKDIR_EX_MSG + ERR_NO_FOLDERS, result.getMessage());
     }
 
     @Test
@@ -87,7 +87,7 @@ class MkdirApplicationTest {
         Throwable result = assertThrows(MkdirException.class, () -> {
             app.run(args, null, null);
         });
-        assertEquals(MKDIR_EXCEPTION_MSG + ERR_TOP_LEVEL_MISSING, result.getMessage());
+        assertEquals(MKDIR_EX_MSG + ERR_TOP_LEVEL_MISSING, result.getMessage());
     }
 
     @Test
@@ -96,7 +96,7 @@ class MkdirApplicationTest {
         Throwable result = assertThrows(MkdirException.class, () -> {
             app.run(args, null, null);
         });
-        assertEquals(MKDIR_EXCEPTION_MSG + ERR_TOP_LEVEL_MISSING, result.getMessage());
+        assertEquals(MKDIR_EX_MSG + ERR_TOP_LEVEL_MISSING, result.getMessage());
     }
 
     @Test
@@ -112,7 +112,7 @@ class MkdirApplicationTest {
         Throwable result = assertThrows(MkdirException.class, () -> {
             app.createFolder(EXISTING_FILE);
         });
-        assertEquals(MKDIR_EXCEPTION_MSG + ERR_FILE_EXISTS, result.getMessage());
+        assertEquals(MKDIR_EX_MSG + ERR_FILE_EXISTS, result.getMessage());
     }
 
     @Test
@@ -124,8 +124,8 @@ class MkdirApplicationTest {
 
     @Test
     void createFolder_FolderAndTopLevelDoNotExist_CreateFolderSuccessfully() throws MkdirException {
-        File file = new File(NON_EXISTING_DIRECTORY);
-        app.createFolder(NON_EXISTING_DIRECTORY);
+        File file = new File(NON_EXISTING_DIR);
+        app.createFolder(NON_EXISTING_DIR);
         assertTrue(file.exists());
     }
 }

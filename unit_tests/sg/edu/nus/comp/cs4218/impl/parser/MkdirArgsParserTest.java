@@ -19,6 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static sg.edu.nus.comp.cs4218.impl.parser.ArgsParser.ILLEGAL_FLAG_MSG;
 
+@SuppressWarnings("PMD.AvoidDuplicateLiterals")
 class MkdirArgsParserTest {
 
     private final Set<Character> VALID_FLAGS = Set.of('p');
