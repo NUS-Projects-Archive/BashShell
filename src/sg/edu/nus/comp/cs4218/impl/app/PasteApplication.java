@@ -21,6 +21,7 @@ import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_WRITE_STREAM;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_GENERAL;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_NOT_FOUND;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IS_DIR;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_ISTREAM;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_PERM;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_TAB;
@@ -48,6 +49,10 @@ public class PasteApplication implements PasteInterface {
     public void run(String[] args, InputStream stdin, OutputStream stdout) throws PasteException {
         if (stdout == null) {
             throw new PasteException(ERR_NULL_STREAMS);
+        }
+
+        if (stdin == null) {
+            throw new PasteException(ERR_NO_ISTREAM);
         }
 
         PasteArgsParser pasteArgsParser = new PasteArgsParser();
