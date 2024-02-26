@@ -21,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class PasteApplicationTest {
     private PasteApplication pasteApplication;
+
     @TempDir
     private Path pasteTestDir;
     private static final String FILE_NAME_A = "A.txt";
