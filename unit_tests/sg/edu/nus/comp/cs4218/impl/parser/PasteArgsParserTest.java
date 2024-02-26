@@ -44,7 +44,7 @@ public class PasteArgsParserTest {
     }
 
     @Test
-    void parse_Valid_Flag_ReturnsGivenMatchingFlag() throws InvalidArgsException {
+    void parse_ValidFlag_ReturnsGivenMatchingFlag() throws InvalidArgsException {
         pasteArgsParser.parse("-s");
         assertEquals(VALID_FLAGS, pasteArgsParser.flags, "Flags do not match");
     }

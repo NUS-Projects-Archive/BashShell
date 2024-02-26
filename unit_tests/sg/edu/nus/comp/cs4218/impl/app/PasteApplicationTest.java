@@ -24,13 +24,13 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class PasteApplicationTest {
     private PasteApplication pasteApplication;
-    private static final String root = Environment.currentDirectory;
-    private static final String testPath = root + File.separatorChar + "pasteTestFolder" + File.separatorChar;
+    private static final String ROOT_PATH = Environment.currentDirectory;
+    private static final String TEST_PATH = ROOT_PATH + File.separatorChar + "pasteTestFolder" + File.separatorChar;
 
     private static final String FILE_A = "A.txt";
-    private static final String FILE_PATH_A = testPath + FILE_A;
+    private static final String FILE_PATH_A = TEST_PATH + FILE_A;
     private static final String FILE_B = "B.txt";
-    private static final String FILE_PATH_B = testPath + FILE_B;
+    private static final String FILE_PATH_B = TEST_PATH + FILE_B;
     private static final String NON_EXISTENT_FILE = "nonExistent.txt";
 
     private static final String PASTE_EXCEPTION_MSG = "paste: ";
@@ -84,8 +84,8 @@ public class PasteApplicationTest {
 
     @BeforeAll
     static void setUp() throws IOException {
-        deleteDirectory(new File(testPath));
-        Files.createDirectories(Paths.get(testPath));
+        deleteDirectory(new File(TEST_PATH));
+        Files.createDirectories(Paths.get(TEST_PATH));
         String contentFileA = "A" + StringUtils.STRING_NEWLINE + "B" +
                 StringUtils.STRING_NEWLINE + "C" +
                 StringUtils.STRING_NEWLINE + "D" +
@@ -106,13 +106,13 @@ public class PasteApplicationTest {
     @BeforeEach
     void setUpEach() {
         pasteApplication = new PasteApplication();
-        Environment.currentDirectory = root;
+        Environment.currentDirectory = ROOT_PATH;
     }
 
     @AfterAll
     static void tearDown() {
-        Environment.currentDirectory = root;
-        deleteDirectory(new File(testPath));
+        Environment.currentDirectory = ROOT_PATH;
+        deleteDirectory(new File(TEST_PATH));
     }
 
     @Test
