@@ -28,8 +28,8 @@ public class PasteApplicationTest {
     private String filePathA;
     private static final String FILE_NAME_B = "B.txt";
     private String filePathB;
-    private static final String PASTE_EXCEPTION_MSG = "paste: ";
 
+    private static final String PASTE_EXCEPTION_MSG = "paste: ";
     private static final String STDIN = "-";
 
     @BeforeEach
