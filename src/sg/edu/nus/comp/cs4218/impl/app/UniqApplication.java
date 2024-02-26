@@ -1,6 +1,6 @@
 package sg.edu.nus.comp.cs4218.impl.app;
 
-import static sg.edu.nus.comp.cs4218.exception.UniqException.NO_POINT_COUNT_ALL_DUP;
+import static sg.edu.nus.comp.cs4218.exception.UniqException.COUNT_ALL_DUP_ERR;
 import static sg.edu.nus.comp.cs4218.exception.UniqException.PROB_UNIQ_FILE;
 import static sg.edu.nus.comp.cs4218.exception.UniqException.PROB_UNIQ_STDIN;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_READING_FILE;
@@ -174,7 +174,7 @@ public class UniqApplication implements UniqInterface {
     private String uniq(Boolean isCount, Boolean isRepeated, Boolean isAllRepeated, BufferedReader content)
             throws IOException, UniqException {
         if (isCount && isAllRepeated) {
-            throw new UniqException(NO_POINT_COUNT_ALL_DUP);
+            throw new UniqException(COUNT_ALL_DUP_ERR);
         }
 
         int prevCount, count = 0;
