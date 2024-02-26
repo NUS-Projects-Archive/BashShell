@@ -86,8 +86,11 @@ public class UniqApplication implements UniqInterface {
     @Override
     public String uniqFromFile(Boolean isCount, Boolean isRepeated, Boolean isAllRepeated, String inputFileName,
                                String outputFileName) throws UniqException {
+        BufferedReader reader = null;
+        BufferedWriter writer = null;
+
         try {
-            BufferedReader reader = new BufferedReader(new FileReader(inputFileName));
+            reader = new BufferedReader(new FileReader(inputFileName));
             String result = uniq(isCount, isRepeated, isAllRepeated, reader);
             reader.close();
 
@@ -97,16 +100,23 @@ public class UniqApplication implements UniqInterface {
             }
 
             // Write to file
-            BufferedWriter writer = new BufferedWriter(new FileWriter(outputFileName));
+            writer = new BufferedWriter(new FileWriter(outputFileName));
             writer.write(result);
             writer.close();
-
-            return null;
         } catch (FileNotFoundException e) {
             throw new UniqException(PROB_UNIQ_FILE + ERR_READING_FILE, e);
         } catch (IOException e) {
             throw new UniqException(PROB_UNIQ_FILE + e.getMessage(), e);
+        } finally {
+            try {
+                if (reader != null) { reader.close(); }
+                if (writer != null) { writer.close(); }
+            } catch (IOException e) {
+                throw new UniqException(PROB_UNIQ_FILE + e.getMessage(), e);
+            }
         }
+
+        return null;
     }
 
     /**
@@ -123,6 +133,8 @@ public class UniqApplication implements UniqInterface {
     @Override
     public String uniqFromStdin(Boolean isCount, Boolean isRepeated, Boolean isAllRepeated, InputStream stdin,
                                 String outputFileName) throws UniqException {
+        BufferedWriter writer = null;
+
         try {
             BufferedReader input = new BufferedReader(new InputStreamReader(stdin));
             String result = uniq(isCount, isRepeated, isAllRepeated, input);
@@ -133,13 +145,19 @@ public class UniqApplication implements UniqInterface {
             }
 
             // Write to file
-            BufferedWriter writer = new BufferedWriter(new FileWriter(outputFileName));
+            writer = new BufferedWriter(new FileWriter(outputFileName));
             writer.write(result);
             writer.close();
 
             return null;
         } catch (IOException e) {
             throw new UniqException(PROB_UNIQ_STDIN + e.getMessage(), e);
+        } finally {
+            try {
+                if (writer != null) { writer.close(); }
+            } catch (IOException e) {
+                throw new UniqException(PROB_UNIQ_FILE + e.getMessage(), e);
+            }
         }
     }
 
