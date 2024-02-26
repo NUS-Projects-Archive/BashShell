@@ -13,6 +13,7 @@ import java.util.Stack;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_SYNTAX;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.*;
 
 @SuppressWarnings("PMD.ExcessiveMethodLength")
@@ -31,9 +32,9 @@ public class ArgumentResolver {
     /**
      * Handle quoting + globing + command substitution for a list of arguments.
      *
-     * @param argsList The original list of arguments.
-     * @return The list of parsed arguments.
-     * @throws ShellException If any of the arguments have an invalid syntax.
+     * @param argsList The original list of arguments
+     * @return The list of parsed arguments
+     * @throws ShellException If any of the arguments have an invalid syntax
      */
     public List<String> parseArguments(List<String> argsList) throws AbstractApplicationException, ShellException, FileNotFoundException {
         List<String> parsedArgsList = new LinkedList<>();
@@ -51,8 +52,8 @@ public class ArgumentResolver {
      * Single quotes disable the interpretation of all special characters.
      * Double quotes disable the interpretation of all special characters, except for back quotes.
      *
-     * @param arg String containing one argument.
-     * @return A list containing one or more parsed args, depending on the outcome of the parsing.
+     * @param arg String containing one argument
+     * @return A list containing one or more parsed args, depending on the outcome of the parsing
      */
     public List<String> resolveOneArgument(String arg) throws AbstractApplicationException, ShellException, FileNotFoundException {
         Stack<Character> unmatchedQuotes = new Stack<>();
@@ -147,9 +148,9 @@ public class ArgumentResolver {
             }
         }
 
-        // should not have unmatched quotes after iterating through the entire arg
-        if (!unmatchedQuotes.isEmpty()) {
-            throw new ShellException("Unmatched quote in argument: " + arg);
+        // Should not have unmatched backquotes or double quotes within double quotes
+        if (!unmatchedQuotes.isEmpty() && unmatchedQuotes.peek() == CHAR_BACK_QUOTE) {
+            throw new ShellException(ERR_SYNTAX);
         }
 
         if (!parsedArg.isEmpty()) {
