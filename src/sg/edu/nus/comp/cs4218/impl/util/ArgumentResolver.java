@@ -14,7 +14,12 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_SYNTAX;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.*;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_ASTERISK;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_BACK_QUOTE;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_DOUBLE_QUOTE;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_SINGLE_QUOTE;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_SPACE;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 
 // Suppressed as subCommand is always reinitialised before use in resolveOneArgument
 @SuppressWarnings("PMD.AvoidStringBufferField")
@@ -132,8 +137,7 @@ public class ArgumentResolver {
 
             } else {
                 // don't tokenize subCommand output
-                appendParsedArgIntoSegment(parsedArgsSegment,
-                        makeRegexArgument(subCommandOutput));
+                appendParsedArgIntoSegment(parsedArgsSegment, makeRegexArgument(subCommandOutput));
             }
         } else {
             // ongoing single quote
