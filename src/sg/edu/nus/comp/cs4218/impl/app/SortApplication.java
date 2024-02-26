@@ -151,7 +151,7 @@ public class SortApplication implements SortInterface {
             throw new SortException(PROB_SORT_STDIN + ERR_IO_EXCEPTION);
         }
         sortInputString(isFirstWordNumber, isReverseOrder, isCaseIndependent, lines);
-        return String.join(PROB_SORT_STDIN + STRING_NEWLINE, lines);
+        return String.join(STRING_NEWLINE, lines);
     }
 
     /**
@@ -167,8 +167,8 @@ public class SortApplication implements SortInterface {
         Collections.sort(input, new Comparator<String>() {
             @Override
             public int compare(String str1, String str2) {
-                String temp1 = isCaseIndependent ? str1.toLowerCase() : str1;//NOPMD
-                String temp2 = isCaseIndependent ? str2.toLowerCase() : str2;//NOPMD
+                String temp1 = isCaseIndependent && !isFirstWordNumber ? str1.toLowerCase() : str1;//NOPMD
+                String temp2 = isCaseIndependent && !isFirstWordNumber ? str2.toLowerCase() : str2;//NOPMD
 
                 // Extract the first group of numbers if possible.
                 if (isFirstWordNumber && !temp1.isEmpty() && !temp2.isEmpty()) {
