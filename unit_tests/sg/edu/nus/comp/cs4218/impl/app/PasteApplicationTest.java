@@ -7,30 +7,27 @@ import sg.edu.nus.comp.cs4218.exception.PasteException;
 import sg.edu.nus.comp.cs4218.impl.util.IOUtils;
 import sg.edu.nus.comp.cs4218.impl.util.StringUtils;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_ISTREAM;
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NULL_STREAMS;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_ISTREAM;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NULL_STREAMS;
 
 public class PasteApplicationTest {
-    private PasteApplication pasteApplication;
-
-    @TempDir
-    private Path pasteTestDir;
     private static final String FILE_NAME_A = "A.txt";
-    private String filePathA;
     private static final String FILE_NAME_B = "B.txt";
-    private String filePathB;
-
     private static final String PASTE_EXCEPTION_MSG = "paste: ";
     private static final String STDIN = "-";
+    private PasteApplication pasteApplication;
+    @TempDir
+    private Path pasteTestDir;
+    private String filePathA;
+    private String filePathB;
 
     @BeforeEach
     void setUp() throws IOException {
