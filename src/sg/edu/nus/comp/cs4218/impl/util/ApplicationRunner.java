@@ -20,6 +20,10 @@ public class ApplicationRunner {
     public final static String APP_PASTE = "paste";
     public final static String APP_CD = "cd";
     public final static String APP_CAT = "cat";
+    public final static String APP_UNIQ = "uniq";
+    public final static String APP_MKDIR = "mkdir";
+    public final static String APP_SORT = "sort";
+    public final static String APP_MV = "mv";
 
     /**
      * Run the application as specified by the application command keyword and arguments.
@@ -60,6 +64,22 @@ public class ApplicationRunner {
             case APP_CAT:
                 application = new CatApplication();
                 break;
+            case APP_UNIQ:
+                application = new UniqApplication();
+                break;
+            case APP_MKDIR:
+                application = new MkdirApplication();
+                break;
+            case APP_SORT:
+                application = new SortApplication();
+                break;
+            case APP_MV:
+                application = new MvApplication();
+                break;
+            case APP_PASTE:
+                application = new PasteApplication();
+                break;
+
             default:
                 throw new ShellException(app + ": " + ERR_INVALID_APP);
         }

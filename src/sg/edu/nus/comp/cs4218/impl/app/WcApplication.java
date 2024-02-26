@@ -1,15 +1,27 @@
 package sg.edu.nus.comp.cs4218.impl.app;
 
 import sg.edu.nus.comp.cs4218.app.WcInterface;
-import sg.edu.nus.comp.cs4218.exception.*;
+import sg.edu.nus.comp.cs4218.exception.InvalidArgsException;
+import sg.edu.nus.comp.cs4218.exception.ShellException;
+import sg.edu.nus.comp.cs4218.exception.WcException;
 import sg.edu.nus.comp.cs4218.impl.parser.WcArgsParser;
 import sg.edu.nus.comp.cs4218.impl.util.IOUtils;
 
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.*;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_NOT_FOUND;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_GENERAL;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IO_EXCEPTION;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IS_DIR;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_PERM;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NULL_STREAMS;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_WRITE_STREAM;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 
 public class WcApplication implements WcInterface {
@@ -44,10 +56,19 @@ public class WcApplication implements WcInterface {
         }
         String result;
         try {
-            if (wcArgsParser.getFileNames().isEmpty()) {
-                result = countFromStdin(wcArgsParser.isByteCount(), wcArgsParser.isLineCount(), wcArgsParser.isWordCount(), stdin);
+            if (wcArgsParser.isStdinOnly()) {
+                result = countFromStdin(
+                        wcArgsParser.isByteCount(),
+                        wcArgsParser.isLineCount(),
+                        wcArgsParser.isWordCount(),
+                        stdin);
             } else {
-                result = countFromFiles(wcArgsParser.isByteCount(), wcArgsParser.isLineCount(), wcArgsParser.isWordCount(), wcArgsParser.getFileNames().toArray(new String[0]));
+                result = countFromFileAndStdin(
+                        wcArgsParser.isByteCount(),
+                        wcArgsParser.isLineCount(),
+                        wcArgsParser.isWordCount(),
+                        stdin,
+                        wcArgsParser.getFileNames().toArray(new String[0]));
             }
         } catch (Exception e) {
             // Will never happen
@@ -68,11 +89,11 @@ public class WcApplication implements WcInterface {
      * @param isLines  Boolean option to count the number of lines
      * @param isWords  Boolean option to count the number of words
      * @param fileName Array of String of file names
-     * @throws Exception
+     * @throws WcException
      */
     @Override
     public String countFromFiles(Boolean isBytes, Boolean isLines, Boolean isWords, //NOPMD
-                                 String... fileName) throws AbstractApplicationException {
+                                 String... fileName) throws WcException {
         if (fileName == null) {
             throw new WcException(ERR_GENERAL);
         }
@@ -152,11 +173,11 @@ public class WcApplication implements WcInterface {
      * @param isLines Boolean option to count the number of lines
      * @param isWords Boolean option to count the number of words
      * @param stdin   InputStream containing arguments from Stdin
-     * @throws Exception
+     * @throws WcException
      */
     @Override
-    public String countFromStdin(Boolean isBytes, Boolean isLines, Boolean isWords,
-                                 InputStream stdin) throws AbstractApplicationException {
+    public String countFromStdin(Boolean isBytes, Boolean isLines, Boolean isWords, InputStream stdin)
+            throws WcException {
         if (stdin == null) {
             throw new WcException(ERR_NULL_STREAMS);
         }
@@ -177,18 +198,56 @@ public class WcApplication implements WcInterface {
     }
 
     @Override
-    public String countFromFileAndStdin(Boolean isBytes, Boolean isLines, Boolean isWords, InputStream stdin, String... fileName) throws AbstractApplicationException {
-        // TODO: To implement
-        return null;
+    public String countFromFileAndStdin(Boolean isBytes, Boolean isLines, Boolean isWords,
+                                        InputStream stdin, String... fileName) throws WcException {
+        try {
+            List<String> result = new ArrayList<>();
+            long totalBytes = 0, totalLines = 0, totalWords = 0;
+
+            for (String file : fileName) {
+                if (file.equals("-")) {
+                    result.add(countFromStdin(isBytes, isLines, isWords, stdin) + " -");
+                } else {
+                    result.add(countFromFiles(isBytes, isLines, isWords, file));
+                }
+            }
+
+            if (fileName.length > 1) {
+                for (String res : result) {
+                    // Split the line based on whitespace
+                    String[] parts = res.trim().split("\\s+");
+                    totalLines = Long.parseLong(parts[0]);
+                    totalWords = Long.parseLong(parts[1]);
+                    totalBytes = Long.parseLong(parts[2]);
+                }
+
+                StringBuilder sb = new StringBuilder(); //NOPMD
+                if (isLines) {
+                    sb.append(String.format(NUMBER_FORMAT, totalLines));
+                }
+                if (isWords) {
+                    sb.append(String.format(NUMBER_FORMAT, totalWords));
+                }
+                if (isBytes) {
+                    sb.append(String.format(NUMBER_FORMAT, totalBytes));
+                }
+                sb.append(" total");
+                result.add(sb.toString());
+            }
+
+            return String.join(STRING_NEWLINE, result);
+        } catch (WcException e) {
+            throw new WcException(e.getMessage());
+        }
     }
 
     /**
      * Returns array containing the number of lines, words, and bytes based on data in InputStream.
      *
      * @param input An InputStream
-     * @throws IOException
+     * @throws WcException
      */
-    public long[] getCountReport(InputStream input) throws AbstractApplicationException {
+    public long[] getCountReport(InputStream input) throws WcException {
         if (input == null) {
             throw new WcException(ERR_NULL_STREAMS);
         }
@@ -223,7 +282,7 @@ public class WcApplication implements WcInterface {
                 ++result[WORDS_INDEX]; // To handle last word
             }
         } catch (IOException e) {
-            throw new SortException(ERR_IO_EXCEPTION);
+            throw new WcException(ERR_IO_EXCEPTION);
         }
 
         return result;

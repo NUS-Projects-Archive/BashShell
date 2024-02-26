@@ -10,7 +10,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_MULTIPLE_STREAMS;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_SYNTAX;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_REDIR_INPUT;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_REDIR_OUTPUT;
@@ -56,6 +55,7 @@ public class IORedirectionHandler {
             String file = argsIterator.next();
 
             if (isRedirOperator(file)) {
+                throw new ShellException(ERR_SYNTAX);
             }
 
             // handle quoting + globing + command substitution in file arg
@@ -69,15 +69,9 @@ public class IORedirectionHandler {
             // replace existing inputStream / outputStream
             if (arg.equals(String.valueOf(CHAR_REDIR_INPUT))) {
                 IOUtils.closeInputStream(inputStream);
-                if (!inputStream.equals(origInputStream)) { // Already have a stream
-                    throw new ShellException(ERR_MULTIPLE_STREAMS);
-                }
                 inputStream = IOUtils.openInputStream(file);
             } else if (arg.equals(String.valueOf(CHAR_REDIR_OUTPUT))) {
                 IOUtils.closeOutputStream(outputStream);
-                if (!outputStream.equals(origOutputStream)) { // Already have a stream
-                    throw new ShellException(ERR_MULTIPLE_STREAMS);
-                }
                 outputStream = IOUtils.openOutputStream(file);
             }
         }
@@ -96,6 +90,6 @@ public class IORedirectionHandler {
     }
 
     private boolean isRedirOperator(String str) {
-        return str.equals(String.valueOf(CHAR_REDIR_INPUT));
+        return str.equals(String.valueOf(CHAR_REDIR_INPUT)) || str.equals(String.valueOf(CHAR_REDIR_OUTPUT));
     }
 }
