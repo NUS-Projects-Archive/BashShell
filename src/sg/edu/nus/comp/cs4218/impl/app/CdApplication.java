@@ -35,12 +35,10 @@ public class CdApplication implements CdInterface {
     public void run(String[] args, InputStream stdin, OutputStream stdout) throws CdException {
         if (args == null) {
             throw new CdException(ERR_NULL_ARGS);
-        }
-
-        if (args.length == 1) {
-            changeToDirectory(args[0]);
         } else if (args.length > 1) {
             throw new CdException(ERR_TOO_MANY_ARGS);
+        } else if (args.length == 1) {
+            changeToDirectory(args[0]);
         }
     }
 
