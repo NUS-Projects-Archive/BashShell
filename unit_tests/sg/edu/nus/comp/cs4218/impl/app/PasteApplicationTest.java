@@ -37,17 +37,17 @@ public class PasteApplicationTest {
         this.pasteApplication = new PasteApplication();
         pasteTestDir = Files.createTempDirectory("pasteTestDir");
 
-        Path fileAPath = pasteTestDir.resolve(FILE_NAME_A);
-        Path fileBPath = pasteTestDir.resolve(FILE_NAME_B);
+        Path pathA = pasteTestDir.resolve(FILE_NAME_A);
+        Path pathB = pasteTestDir.resolve(FILE_NAME_B);
 
-        filePathA = fileAPath.toString();
-        filePathB = fileBPath.toString();
+        filePathA = pathA.toString();
+        filePathB = pathB.toString();
 
         String contentFileA = "A\nB\nC\nD\nE";
-        Files.write(fileAPath, Arrays.asList(contentFileA.split("\n")));
+        Files.write(pathA, Arrays.asList(contentFileA.split("\n")));
 
         String contentFileB = "1\n2\n3\n4\n5";
-        Files.write(fileBPath, Arrays.asList(contentFileB.split("\n")));
+        Files.write(pathB, Arrays.asList(contentFileB.split("\n")));
 
     }
 
