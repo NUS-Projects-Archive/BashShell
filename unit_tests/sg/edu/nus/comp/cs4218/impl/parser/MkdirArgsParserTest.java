@@ -48,6 +48,15 @@ class MkdirArgsParserTest {
         this.mkdirArgsParser = new MkdirArgsParser();
     }
 
+    @ParameterizedTest
+    @ValueSource(strings = {"", " ", "\n"})
+    void parse_EmptyString_ReturnsEmptyFlagsAndNonFlagArgsContainsInput(String args)
+            throws InvalidArgsException {
+        mkdirArgsParser.parse(args);
+        assertTrue(mkdirArgsParser.flags.isEmpty());
+        assertTrue(mkdirArgsParser.nonFlagArgs.contains(args));
+    }
+
     @Test
     void parse_ValidFlag_ReturnsGivenMatchingFlag() throws InvalidArgsException {
         mkdirArgsParser.parse("-p");
