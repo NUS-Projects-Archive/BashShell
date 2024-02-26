@@ -1,7 +1,7 @@
 package sg.edu.nus.comp.cs4218.impl.app;
 
 import static sg.edu.nus.comp.cs4218.exception.UniqException.MEANINGLESS_COUNT_ALL_DUP;
-import  static sg.edu.nus.comp.cs4218.exception.UniqException.PROB_UNIQ_FILE;
+import static sg.edu.nus.comp.cs4218.exception.UniqException.PROB_UNIQ_FILE;
 import static sg.edu.nus.comp.cs4218.exception.UniqException.PROB_UNIQ_STDIN;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_READING_FILE;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_WRITE_STREAM;
@@ -113,9 +113,7 @@ public class UniqApplication implements UniqInterface {
                                 final InputStream stdin, final String outputFileName) throws UniqException {
         try {
             BufferedReader in = new BufferedReader(new InputStreamReader(stdin));
-            String result = uniq(isCount, isRepeated, isAllRepeated, in);
-            in.close();
-            return result;
+            return uniq(isCount, isRepeated, isAllRepeated, in);
         } catch (IOException e) {
             throw new UniqException(PROB_UNIQ_STDIN + e.getMessage());
         }
