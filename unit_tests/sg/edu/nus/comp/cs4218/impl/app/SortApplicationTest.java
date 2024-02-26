@@ -30,9 +30,10 @@ import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NULL_STREAMS;
 
 class SortApplicationTest {
 
-    private static final String SORT_EXCEPTION_MSG = "sort: ";
-    private final String TEMP_FILE = "file.txt";
+    private static final String SORT_EX_MSG = "sort: ";
+    private static final String TEMP_FILE = "file.txt";
     private SortApplication app;
+
     @TempDir
     private Path tempDir;
     private Path tempFilePath;
@@ -55,7 +56,7 @@ class SortApplicationTest {
         Throwable result = assertThrows(SortException.class, () -> {
             app.run(null, null, null);
         });
-        assertEquals(SORT_EXCEPTION_MSG + ERR_NULL_STREAMS, result.getMessage());
+        assertEquals(SORT_EX_MSG + ERR_NULL_STREAMS, result.getMessage());
     }
 
     @Test
@@ -109,7 +110,8 @@ class SortApplicationTest {
         Files.write(tempFilePath, content.getBytes());
         String[] args = {"-n", "-f", tempFilePath.toString()};
         OutputStream stdout = new ByteArrayOutputStream();
-        String expected = joinStringsBySystemLineSeparator("1", "2", "3", "B", "C", "a") + System.lineSeparator();
+        String expected = joinStringsBySystemLineSeparator("1", "2", "3", "B", "C", "a")
+                + System.lineSeparator();
         app.run(args, null, stdout);
         assertEquals(expected, stdout.toString());
     }
@@ -119,7 +121,7 @@ class SortApplicationTest {
         Throwable result = assertThrows(SortException.class, () -> {
             app.sortFromFiles(false, false, false, null);
         });
-        assertEquals(SORT_EXCEPTION_MSG + PROB_SORT_FILE + ERR_NULL_ARGS, result.getMessage());
+        assertEquals(SORT_EX_MSG + PROB_SORT_FILE + ERR_NULL_ARGS, result.getMessage());
     }
 
     @Test
@@ -128,7 +130,7 @@ class SortApplicationTest {
         Throwable result = assertThrows(SortException.class, () -> {
             app.sortFromFiles(false, false, false, nonExistFilePath.toString());
         });
-        assertEquals(SORT_EXCEPTION_MSG + PROB_SORT_FILE + ERR_FILE_NOT_FOUND, result.getMessage());
+        assertEquals(SORT_EX_MSG + PROB_SORT_FILE + ERR_FILE_NOT_FOUND, result.getMessage());
     }
 
     @Test
@@ -136,17 +138,18 @@ class SortApplicationTest {
         Throwable result = assertThrows(SortException.class, () -> {
             app.sortFromFiles(false, false, false, tempDir.toString());
         });
-        assertEquals(SORT_EXCEPTION_MSG + PROB_SORT_FILE + ERR_IS_DIR, result.getMessage());
+        assertEquals(SORT_EX_MSG + PROB_SORT_FILE + ERR_IS_DIR, result.getMessage());
     }
 
     @Test
     @DisabledOnOs(value = OS.WINDOWS)
     void sortFromFiles_FileNoPermissionToRead_ThrowsSortException() throws IOException {
-        Files.setPosixFilePermissions(tempFilePath, new HashSet<>(Collections.singleton(PosixFilePermission.OWNER_READ)));
+        Files.setPosixFilePermissions(tempFilePath,
+                new HashSet<>(Collections.singleton(PosixFilePermission.OWNER_READ)));
         Throwable result = assertThrows(SortException.class, () -> {
             app.sortFromFiles(false, false, false, TEMP_FILE);
         });
-        assertEquals(SORT_EXCEPTION_MSG + PROB_SORT_FILE + ERR_NO_PERM, result.getMessage());
+        assertEquals(SORT_EX_MSG + PROB_SORT_FILE + ERR_NO_PERM, result.getMessage());
     }
 
     @Test
@@ -177,7 +180,8 @@ class SortApplicationTest {
     }
 
     @Test
-    void sortFromFiles_IsCaseIndependentFlag_ReturnsCaseIndependentSortedList() throws SortException, IOException {
+    void sortFromFiles_IsCaseIndependentFlag_ReturnsCaseIndependentSortedList()
+            throws SortException, IOException {
         String content = joinStringsBySystemLineSeparator("a", "c", "b", "A");
         Files.write(tempFilePath, content.getBytes());
         String expected = joinStringsBySystemLineSeparator("a", "A", "b", "c");
@@ -190,7 +194,7 @@ class SortApplicationTest {
         Throwable result = assertThrows(SortException.class, () -> {
             app.sortFromStdin(false, false, false, null);
         });
-        assertEquals(SORT_EXCEPTION_MSG + PROB_SORT_STDIN + ERR_NULL_STREAMS, result.getMessage());
+        assertEquals(SORT_EX_MSG + PROB_SORT_STDIN + ERR_NULL_STREAMS, result.getMessage());
     }
 
     @Test

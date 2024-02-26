@@ -19,6 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static sg.edu.nus.comp.cs4218.impl.parser.ArgsParser.ILLEGAL_FLAG_MSG;
 
+@SuppressWarnings("PMD.AvoidDuplicateLiterals")
 class SortArgsParserTest {
 
     private final Set<Character> VALID_FLAGS = Set.of('n', 'r', 'f');
@@ -62,7 +63,8 @@ class SortArgsParserTest {
 
     @ParameterizedTest
     @ValueSource(strings = {"", " ", "\n"})
-    void parse_EmptyString_ReturnsEmptyFlagsAndNonFlagArgsContainsInput(String args) throws InvalidArgsException {
+    void parse_EmptyString_ReturnsEmptyFlagsAndNonFlagArgsContainsInput(String args)
+            throws InvalidArgsException {
         sortArgsParser.parse(args);
         assertTrue(sortArgsParser.flags.isEmpty());
         assertTrue(sortArgsParser.nonFlagArgs.contains(args));
