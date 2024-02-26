@@ -5,6 +5,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import sg.edu.nus.comp.cs4218.exception.EchoException;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
@@ -24,17 +25,20 @@ class EchoApplicationTest {
     private EchoApplication app;
 
     private OutputStream exceptionThrowingOutputStream;
+    private OutputStream out;
 
     @BeforeEach
     public void setUp() throws IOException {
         this.app = new EchoApplication();
         this.exceptionThrowingOutputStream = mock(OutputStream.class);
         doThrow(new IOException()).when(exceptionThrowingOutputStream).write(any(byte[].class));
+        this.out = new ByteArrayOutputStream();
     }
 
     @AfterEach
     void tearDown() throws IOException {
         this.exceptionThrowingOutputStream.close();
+        this.out.close();
     }
 
     @Test
@@ -51,6 +55,16 @@ class EchoApplicationTest {
             app.run(new String[]{"A", "B", "C"}, null, this.exceptionThrowingOutputStream);
         });
         assertEquals(ECHO_EXCEPTION_MSG + ERR_IO_EXCEPTION, result.getMessage());
+    }
+
+    @Test
+    void run_ValidByteBuffers_PrintsCorrectValues() throws EchoException {
+        // Given
+        String[] tokens = new String[]{"Hello", "World!"};
+        // When
+        this.app.run(tokens, null, this.out);
+        // Then
+        assertEquals("Hello World!" + STRING_NEWLINE, this.out.toString());
     }
 
     @Test
