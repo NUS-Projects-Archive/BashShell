@@ -116,7 +116,7 @@ public class PasteApplicationTest {
     }
 
     @Test
-    void run_nullStdin_shouldThrowPasteException() {
+    void run_NullStdin_ShouldThrowPasteException() {
         Throwable result = assertThrows(PasteException.class, () -> {
             pasteApplication.run(new String[]{FILE_PATH_A}, null, System.out);
         });
@@ -124,7 +124,7 @@ public class PasteApplicationTest {
     }
 
     @Test
-    void run_nullStdout_shouldThrowPasteException() {
+    void run_NullStdout_ShouldThrowPasteException() {
         Throwable result = assertThrows(PasteException.class, () -> {
             pasteApplication.run(new String[]{FILE_PATH_A}, System.in, null);
         });
@@ -132,7 +132,7 @@ public class PasteApplicationTest {
     }
 
     @Test
-    void mergeStdin_stdinWithoutFlag_shouldMergeStdinInParallel() throws Exception {
+    void mergeStdin_StdinWithoutFlag_ShouldMergeStdinInParallel() throws Exception {
         InputStream inputStream = IOUtils.openInputStream(FILE_PATH_A);
         String result;
         try {
@@ -149,7 +149,7 @@ public class PasteApplicationTest {
     }
 
     @Test
-    void mergeStdin_stdinWithFlag_shouldMergeStdinInSerial() throws Exception {
+    void mergeStdin_StdinWithFlag_ShouldMergeStdinInSerial() throws Exception {
         InputStream inputStream = IOUtils.openInputStream(FILE_PATH_A);
         String result;
         try {
@@ -166,7 +166,7 @@ public class PasteApplicationTest {
     }
 
     @Test
-    void mergeFile_filesWithoutFlag_shouldMergeFilesInParallel() throws Exception {
+    void mergeFile_FilesWithoutFlag_ShouldMergeFilesInParallel() throws Exception {
         String result = pasteApplication.mergeFile(false, FILE_PATH_A, FILE_PATH_B);
         String expected = "A" + StringUtils.STRING_TAB + "1" +
                 StringUtils.STRING_NEWLINE + "B" + StringUtils.STRING_TAB + "2" +
@@ -178,7 +178,7 @@ public class PasteApplicationTest {
     }
 
     @Test
-    void mergeFile_filesWithFlag_shouldMergeFilesInSerial() throws Exception {
+    void mergeFile_FilesWithFlag_ShouldMergeFilesInSerial() throws Exception {
         String result = pasteApplication.mergeFile(true, FILE_PATH_A, FILE_PATH_B);
         String expected = "A" + StringUtils.STRING_TAB + "B" +
                 StringUtils.STRING_TAB + "C" + StringUtils.STRING_TAB + "D" +
@@ -190,7 +190,7 @@ public class PasteApplicationTest {
     }
 
     @Test
-    void mergeFileAndStdin_FileAndStdinWithoutFlag_shouldMergeFileAndStdinInParallel() throws Exception {
+    void mergeFileAndStdin_FileAndStdinWithoutFlag_ShouldMergeFileAndStdinInParallel() throws Exception {
         InputStream inputStream = IOUtils.openInputStream(FILE_PATH_A);
         String result;
         try {
@@ -210,7 +210,7 @@ public class PasteApplicationTest {
     }
 
     @Test
-    void mergeFileAndStdin_FileAndStdinWithFlag_shouldMergeFileAndStdinInSerial() throws Exception {
+    void mergeFileAndStdin_FileAndStdinWithFlag_ShouldMergeFileAndStdinInSerial() throws Exception {
         InputStream inputStream = IOUtils.openInputStream(FILE_PATH_A);
         String result;
         try {

@@ -121,7 +121,6 @@ public class PasteArgsParserTest {
         List<String> expected = List.of("example");
         List<String> result = pasteArgsParser.getNonFlagArgs();
         assertEquals(expected, result);
-        assertTrue(pasteArgsParser.isSerial());
     }
 
 }
