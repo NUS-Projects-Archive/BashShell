@@ -1,10 +1,8 @@
 package sg.edu.nus.comp.cs4218.impl.app;
 
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import sg.edu.nus.comp.cs4218.Environment;
+import org.junit.jupiter.api.io.TempDir;
 import sg.edu.nus.comp.cs4218.exception.PasteException;
 import sg.edu.nus.comp.cs4218.impl.util.IOUtils;
 import sg.edu.nus.comp.cs4218.impl.util.StringUtils;
@@ -13,106 +11,43 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_ISTREAM;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NULL_STREAMS;
 
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.nio.file.Path;
+import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class PasteApplicationTest {
     private PasteApplication pasteApplication;
-    private static final String ROOT_PATH = Environment.currentDirectory;
-    private static final String TEST_PATH = ROOT_PATH + File.separatorChar + "pasteTestFolder" + File.separatorChar;
-
-    private static final String FILE_A = "A.txt";
-    private static final String FILE_PATH_A = TEST_PATH + FILE_A;
-    private static final String FILE_B = "B.txt";
-    private static final String FILE_PATH_B = TEST_PATH + FILE_B;
-    private static final String NON_EXISTENT_FILE = "nonExistent.txt";
-
+    @TempDir
+    private Path pasteTestDir;
+    private static final String FILE_NAME_A = "A.txt";
+    private static String FILE_PATH_A;
+    private static final String FILE_NAME_B = "B.txt";
+    private static String FILE_PATH_B;
     private static final String PASTE_EXCEPTION_MSG = "paste: ";
 
     private static final String STDIN = "-";
 
-    private static void createFile(String filePath, String fileContent) throws IOException {
-        File file = new File(filePath);
-        FileWriter writer = null;
-
-        try {
-            boolean result = file.createNewFile();
-            if (result) {
-                writer = new FileWriter(file.getCanonicalPath());
-                writer.write(fileContent);
-            } else {
-                System.out.println("File already exists at location: " + file.getCanonicalPath());
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            if (writer != null) {
-                writer.close();
-            }
-        }
-    }
-
-    private static void deleteFile(String filePath) {
-        File file = new File(filePath);
-        if (!file.exists()) {
-            return;
-        }
-        if (file.isDirectory()) {
-            deleteDirectory(file);
-        } else {
-            file.delete();
-        }
-    }
-
-    private static void deleteDirectory(File directory) {
-        if (directory != null && directory.exists()) {
-            File[] contents = directory.listFiles();
-            if (contents != null) {
-                for (File f : contents) {
-                    deleteDirectory(f);
-                }
-            }
-            directory.delete();
-        }
-    }
-
-    @BeforeAll
-    static void setUp() throws IOException {
-        deleteDirectory(new File(TEST_PATH));
-        Files.createDirectories(Paths.get(TEST_PATH));
-        String contentFileA = "A" + StringUtils.STRING_NEWLINE + "B" +
-                StringUtils.STRING_NEWLINE + "C" +
-                StringUtils.STRING_NEWLINE + "D" +
-                StringUtils.STRING_NEWLINE + "E";
-
-        createFile(FILE_PATH_A, contentFileA);
-
-        String contentFileB = "1" + StringUtils.STRING_NEWLINE + "2" +
-                StringUtils.STRING_NEWLINE + "3" +
-                StringUtils.STRING_NEWLINE + "4" +
-                StringUtils.STRING_NEWLINE + "5";
-
-        createFile(FILE_PATH_B, contentFileB);
-        deleteFile(NON_EXISTENT_FILE);
-
-    }
-
     @BeforeEach
-    void setUpEach() {
-        pasteApplication = new PasteApplication();
-        Environment.currentDirectory = ROOT_PATH;
-    }
+    void setUp() throws IOException {
+        this.pasteApplication = new PasteApplication();
+        pasteTestDir = Files.createTempDirectory("pasteTestDir");
 
-    @AfterAll
-    static void tearDown() {
-        Environment.currentDirectory = ROOT_PATH;
-        deleteDirectory(new File(TEST_PATH));
+        Path fileAPath = pasteTestDir.resolve(FILE_NAME_A);
+        Path fileBPath = pasteTestDir.resolve(FILE_NAME_B);
+
+        FILE_PATH_A = fileAPath.toString();
+        FILE_PATH_B = fileBPath.toString();
+
+        String contentFileA = "A\nB\nC\nD\nE";
+        Files.write(fileAPath, Arrays.asList(contentFileA.split("\n")));
+
+        String contentFileB = "1\n2\n3\n4\n5";
+        Files.write(fileBPath, Arrays.asList(contentFileB.split("\n")));
+
     }
 
     @Test
