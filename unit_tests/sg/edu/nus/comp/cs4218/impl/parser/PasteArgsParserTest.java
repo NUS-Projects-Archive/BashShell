@@ -70,7 +70,7 @@ public class PasteArgsParserTest {
 
     @ParameterizedTest
     @MethodSource("invalidSyntax")
-    void parse_invalidSyntax_ThrowsInvalidArgsException(String... args) {
+    void parse_InvalidSyntax_ThrowsInvalidArgsException(String... args) {
         assertThrows(InvalidArgsException.class, () -> pasteArgsParser.parse(args));
     }
 
