@@ -1,6 +1,6 @@
 package sg.edu.nus.comp.cs4218.impl.app;
 
-import static sg.edu.nus.comp.cs4218.exception.UniqException.MEANINGLESS_COUNT_ALL_DUP;
+import static sg.edu.nus.comp.cs4218.exception.UniqException.NO_POINT_COUNT_ALL_DUP;
 import static sg.edu.nus.comp.cs4218.exception.UniqException.PROB_UNIQ_FILE;
 import static sg.edu.nus.comp.cs4218.exception.UniqException.PROB_UNIQ_STDIN;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_READING_FILE;
@@ -36,8 +36,7 @@ public class UniqApplication implements UniqInterface {
      * @throws UniqException
      */
     @Override
-    public void run(final String[] args, final InputStream stdin, final OutputStream stdout)
-            throws UniqException {
+    public void run(String[] args, InputStream stdin, OutputStream stdout) throws UniqException {
         // Format: uniq [Options] [INPUT_FILE [OUTPUT_FILE]]
 
         // Parse argument(s) provided
@@ -45,7 +44,7 @@ public class UniqApplication implements UniqInterface {
         try {
             parser.parse(args);
         } catch (InvalidArgsException e) {
-            throw new UniqException(e.getMessage());
+            throw new UniqException(e.getMessage(), e);
         }
 
         String output;
@@ -69,7 +68,7 @@ public class UniqApplication implements UniqInterface {
                 stdout.write(STRING_NEWLINE.getBytes());
             }
         } catch (IOException e) {
-            throw new UniqException(ERR_WRITE_STREAM);//NOPMD
+            throw new UniqException(ERR_WRITE_STREAM, e);
         }
     }
 
@@ -88,9 +87,9 @@ public class UniqApplication implements UniqInterface {
     public String uniqFromFile(Boolean isCount, Boolean isRepeated, Boolean isAllRepeated, String inputFileName,
                                String outputFileName) throws UniqException {
         try {
-            BufferedReader in = new BufferedReader(new FileReader(inputFileName));
-            String result = uniq(isCount, isRepeated, isAllRepeated, in);
-            in.close();
+            BufferedReader reader = new BufferedReader(new FileReader(inputFileName));
+            String result = uniq(isCount, isRepeated, isAllRepeated, reader);
+            reader.close();
 
             if (outputFileName == null) {
                 // No output file specified, return result.
@@ -104,9 +103,9 @@ public class UniqApplication implements UniqInterface {
 
             return null;
         } catch (FileNotFoundException e) {
-            throw new UniqException(PROB_UNIQ_FILE + ERR_READING_FILE);
+            throw new UniqException(PROB_UNIQ_FILE + ERR_READING_FILE, e);
         } catch (IOException e) {
-            throw new UniqException(PROB_UNIQ_FILE + e.getMessage());
+            throw new UniqException(PROB_UNIQ_FILE + e.getMessage(), e);
         }
     }
 
@@ -122,11 +121,11 @@ public class UniqApplication implements UniqInterface {
      * @throws UniqException
      */
     @Override
-    public String uniqFromStdin(final Boolean isCount, final Boolean isRepeated, final Boolean isAllRepeated,
-                                final InputStream stdin, final String outputFileName) throws UniqException {
+    public String uniqFromStdin(Boolean isCount, Boolean isRepeated, Boolean isAllRepeated, InputStream stdin,
+                                String outputFileName) throws UniqException {
         try {
-            BufferedReader in = new BufferedReader(new InputStreamReader(stdin));
-            String result = uniq(isCount, isRepeated, isAllRepeated, in);
+            BufferedReader input = new BufferedReader(new InputStreamReader(stdin));
+            String result = uniq(isCount, isRepeated, isAllRepeated, input);
 
             if (outputFileName == null) {
                 // No output file specified, return result.
@@ -140,7 +139,7 @@ public class UniqApplication implements UniqInterface {
 
             return null;
         } catch (IOException e) {
-            throw new UniqException(PROB_UNIQ_STDIN + e.getMessage());
+            throw new UniqException(PROB_UNIQ_STDIN + e.getMessage(), e);
         }
     }
 
@@ -151,14 +150,13 @@ public class UniqApplication implements UniqInterface {
      * @param isRepeated    Boolean option to print only duplicate lines, one for each group
      * @param isAllRepeated Boolean option to print all duplicate lines (takes precedence if isRepeated is true)
      * @param content       BufferedReader holding the content to be processed
-     * @return String of the results.
+     * @return String of the results
      * @throws IOException
      */
-    private String uniq(final Boolean isCount, final Boolean isRepeated, final Boolean isAllRepeated,
-                        final BufferedReader content) throws IOException, UniqException {
-
+    private String uniq(Boolean isCount, Boolean isRepeated, Boolean isAllRepeated, BufferedReader content)
+            throws IOException, UniqException {
         if (isCount && isAllRepeated) {
-            throw new UniqException(MEANINGLESS_COUNT_ALL_DUP);
+            throw new UniqException(NO_POINT_COUNT_ALL_DUP);
         }
 
         int prevCount, count = 0;
@@ -172,8 +170,6 @@ public class UniqApplication implements UniqInterface {
             // First line
             if (prevLine == null) {
                 prevLine = line;
-                count += 1;
-                continue;
             }
 
             // Duplicate line -> track line -> check next line
@@ -199,9 +195,8 @@ public class UniqApplication implements UniqInterface {
             }
 
             if (isCount) {
-                stringBuilder.append(prevCount).append(" ");
+                stringBuilder.append(prevCount).append(' ');
             }
-
             stringBuilder.append(prevLine).append(STRING_NEWLINE);
 
         } while (prevLine != null && line != null);
