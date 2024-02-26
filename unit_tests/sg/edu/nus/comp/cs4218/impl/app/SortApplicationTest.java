@@ -20,6 +20,9 @@ import java.util.HashSet;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
 import static sg.edu.nus.comp.cs4218.exception.SortException.PROB_SORT_FILE;
 import static sg.edu.nus.comp.cs4218.exception.SortException.PROB_SORT_STDIN;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_NOT_FOUND;
@@ -27,6 +30,7 @@ import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IS_DIR;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_PERM;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NULL_ARGS;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NULL_STREAMS;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_WRITE_STREAM;
 
 class SortApplicationTest {
 
@@ -57,6 +61,19 @@ class SortApplicationTest {
             app.run(null, null, null);
         });
         assertEquals(SORT_EX_MSG + ERR_NULL_STREAMS, result.getMessage());
+    }
+
+    @Test
+    void run_FailsToWriteToOutputStream_ThrowsSortException() throws IOException {
+        String content = joinStringsBySystemLineSeparator("a", "c", "b", "A");
+        Files.write(tempFilePath, content.getBytes());
+        String[] args = {tempFilePath.toString()};
+        OutputStream mockedStdout = mock(OutputStream.class);
+        doThrow(new IOException()).when(mockedStdout).write(any(byte[].class));
+        Throwable result = assertThrows(SortException.class, () -> {
+            app.run(args, null, mockedStdout);
+        });
+        assertEquals(SORT_EX_MSG + ERR_WRITE_STREAM, result.getMessage());
     }
 
     @Test
