@@ -1,12 +1,14 @@
 package sg.edu.nus.comp.cs4218.impl.app;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import sg.edu.nus.comp.cs4218.exception.MkdirException;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -19,49 +21,21 @@ import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_TOP_LEVEL_MISS
 class MkdirApplicationTest {
 
     private static final String MKDIR_EX_MSG = "mkdir: ";
-    private static final String EXISTING_FILE = "existingFile";
-    private static final String NON_EXISTING_FILE = "nonExistingFile";
-    private static final String NON_EXISTING_DIR = "nonExistingParent/nonExistingChild/nonExistingGrandchild";
-
+    private static final String TEMP_FILE = "file.txt";
+    private static final String NON_EXISTING_FILE = "nonExistingFile.txt";
     private MkdirApplication app;
 
-    private void createFile(String fileName) throws IOException {
-        File file = new File(fileName);
-        file.createNewFile();
-    }
-
-    private void deleteFile(String filePath) {
-        File file = new File(filePath);
-        if (!file.exists()) {
-            return;
-        }
-        if (file.isDirectory()) {
-            deleteDirectory(file);
-        } else {
-            file.delete();
-        }
-    }
-
-    private void deleteDirectory(File directory) {
-        if (directory != null && directory.exists()) {
-            directory.delete();
-            deleteDirectory(directory.getParentFile());
-        }
-    }
+    @TempDir
+    private Path tempDir;
+    private Path tempFilePath;
 
     @BeforeEach
     void setUp() throws IOException {
         this.app = new MkdirApplication();
-        createFile(EXISTING_FILE);
-        deleteFile(NON_EXISTING_FILE);
-        deleteFile(NON_EXISTING_DIR);
-    }
 
-    @AfterEach
-    void tearDown() {
-        deleteFile(EXISTING_FILE);
-        deleteFile(NON_EXISTING_FILE);
-        deleteFile(NON_EXISTING_DIR);
+        // Create temporary file
+        tempFilePath = tempDir.resolve(TEMP_FILE); // automatically deletes after test execution
+        Files.createFile(tempFilePath);
     }
 
     @Test
@@ -83,7 +57,8 @@ class MkdirApplicationTest {
 
     @Test
     void run_MissingTopLevel_ThrowsMkdirException() {
-        String[] args = {"missingTopLevel/" + NON_EXISTING_FILE};
+        Path missTopLevelPath = tempDir.resolve("missingTopLevel/" + TEMP_FILE);
+        String[] args = {missTopLevelPath.toString()};
         Throwable result = assertThrows(MkdirException.class, () -> {
             app.run(args, null, null);
         });
@@ -101,31 +76,34 @@ class MkdirApplicationTest {
 
     @Test
     void run_FolderDoNotExists_CreateFolderSuccessfully() throws MkdirException {
-        String[] args = {NON_EXISTING_FILE};
+        Path nonExistFilePath = tempDir.resolve(NON_EXISTING_FILE);
+        String[] args = {nonExistFilePath.toString()};
         app.run(args, null, null);
-        File file = new File(NON_EXISTING_FILE);
+        File file = new File(nonExistFilePath.toString());
         assertTrue(file.exists());
     }
 
     @Test
     void createFolder_FolderExists_ThrowsMkdirException() {
         Throwable result = assertThrows(MkdirException.class, () -> {
-            app.createFolder(EXISTING_FILE);
+            app.createFolder(tempFilePath.toString());
         });
         assertEquals(MKDIR_EX_MSG + ERR_FILE_EXISTS, result.getMessage());
     }
 
     @Test
     void createFolder_FolderDoNotExists_CreateFolderSuccessfully() throws MkdirException {
-        File file = new File(NON_EXISTING_FILE);
-        app.createFolder(NON_EXISTING_FILE);
-        assertTrue(file.exists());
+        Path nonExistFilePath = tempDir.resolve(NON_EXISTING_FILE);
+        File nonExistFile = nonExistFilePath.toFile();
+        app.createFolder(nonExistFile.toString());
+        assertTrue(nonExistFile.exists());
     }
 
     @Test
     void createFolder_FolderAndTopLevelDoNotExist_CreateFolderSuccessfully() throws MkdirException {
-        File file = new File(NON_EXISTING_DIR);
-        app.createFolder(NON_EXISTING_DIR);
-        assertTrue(file.exists());
+        Path nonExistFilePath = tempDir.resolve("missingTopLevel/" + NON_EXISTING_FILE);
+        File nonExistFile = nonExistFilePath.toFile();
+        app.createFolder(nonExistFile.toString());
+        assertTrue(nonExistFile.exists());
     }
 }
