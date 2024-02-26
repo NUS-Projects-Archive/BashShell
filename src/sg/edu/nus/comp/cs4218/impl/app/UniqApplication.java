@@ -153,13 +153,13 @@ public class UniqApplication implements UniqInterface {
                 continue;
             }
 
-            // Duplicate line -> track line -> check next line
+            // Duplicate line: track line -> check next line
             if (line != null && line.compareTo(prevLine) == 0) {
                 count += 1;
                 continue;
             }
 
-            // New unique line -> output line
+            // New unique line: track line -> check flags -> output line
             prevCount = count;
             count = 1;
 
