@@ -16,10 +16,15 @@ import java.util.stream.Stream;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_SYNTAX;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.*;
 
-@SuppressWarnings("PMD.ExcessiveMethodLength")
+// Suppressed as subCommand is always reinitialised before use in resolveOneArgument
+@SuppressWarnings("PMD.AvoidStringBufferField")
 public class ArgumentResolver {
 
     private final ApplicationRunner applicationRunner;
+    private Stack<Character> unmatchedQuotes;
+    private LinkedList<RegexArgument> parsedArgsSegment;
+    private RegexArgument parsedArg;
+    private StringBuilder subCommand;
 
     public ArgumentResolver() {
         applicationRunner = new ApplicationRunner();
@@ -36,7 +41,8 @@ public class ArgumentResolver {
      * @return The list of parsed arguments
      * @throws ShellException If any of the arguments have an invalid syntax
      */
-    public List<String> parseArguments(List<String> argsList) throws AbstractApplicationException, ShellException, FileNotFoundException {
+    public List<String> parseArguments(List<String> argsList) throws AbstractApplicationException, ShellException,
+            FileNotFoundException {
         List<String> parsedArgsList = new LinkedList<>();
         for (String arg : argsList) {
             parsedArgsList.addAll(resolveOneArgument(arg));
@@ -55,100 +61,28 @@ public class ArgumentResolver {
      * @param arg String containing one argument
      * @return A list containing one or more parsed args, depending on the outcome of the parsing
      */
-    public List<String> resolveOneArgument(String arg) throws AbstractApplicationException, ShellException, FileNotFoundException {
-        Stack<Character> unmatchedQuotes = new Stack<>();
-        LinkedList<RegexArgument> parsedArgsSegment = new LinkedList<>();
-        RegexArgument parsedArg = makeRegexArgument();
-        StringBuilder subCommand = new StringBuilder();
+    public List<String> resolveOneArgument(String arg) throws AbstractApplicationException, ShellException,
+            FileNotFoundException {
+        unmatchedQuotes = new Stack<>();
+        parsedArgsSegment = new LinkedList<>();
+        parsedArg = makeRegexArgument();
+        subCommand = new StringBuilder();
 
         for (int i = 0; i < arg.length(); i++) {
             char chr = arg.charAt(i);
 
             if (chr == CHAR_BACK_QUOTE) {
-                if (unmatchedQuotes.isEmpty() || unmatchedQuotes.peek() == CHAR_DOUBLE_QUOTE) {
-                    // start of command substitution
-                    if (!parsedArg.isEmpty()) {
-                        appendParsedArgIntoSegment(parsedArgsSegment, parsedArg);
-                        parsedArg = makeRegexArgument();
-                    }
-
-                    unmatchedQuotes.add(chr);
-
-                } else if (unmatchedQuotes.peek() == chr) {
-                    // end of command substitution
-                    unmatchedQuotes.pop();
-
-                    // evaluate subCommand and get the output
-                    String subCommandOutput = evaluateSubCommand(subCommand.toString());
-                    subCommand.setLength(0); // Clear the previous subCommand registered
-
-                    // check if back quotes are nested
-                    if (unmatchedQuotes.isEmpty()) {
-                        List<RegexArgument> subOutputSegment = Stream
-                                .of(StringUtils.tokenize(subCommandOutput))
-                                .map(str -> makeRegexArgument(str))
-                                .collect(Collectors.toList());
-
-                        // append the first token to the previous parsedArg
-                        // e.g. arg: abc`1 2 3`xyz`4 5 6` (contents in `` is after command sub)
-                        // expected: [abc1, 2, 3xyz4, 5, 6]
-                        if (!subOutputSegment.isEmpty()) {
-                            RegexArgument firstOutputArg = subOutputSegment.remove(0);
-                            appendParsedArgIntoSegment(parsedArgsSegment, firstOutputArg);
-                        }
-
-                    } else {
-                        // don't tokenize subCommand output
-                        appendParsedArgIntoSegment(parsedArgsSegment,
-                                makeRegexArgument(subCommandOutput));
-                    }
-                } else {
-                    // ongoing single quote
-                    parsedArg.append(chr);
-                }
+                handleBackQuote(chr);
             } else if (chr == CHAR_SINGLE_QUOTE || chr == CHAR_DOUBLE_QUOTE) {
-                if (unmatchedQuotes.isEmpty()) {
-                    // start of quote
-                    unmatchedQuotes.add(chr);
-                } else if (unmatchedQuotes.peek() == chr) {
-                    // end of quote
-                    unmatchedQuotes.pop();
-
-                    // make sure parsedArgsSegment is not empty
-                    appendParsedArgIntoSegment(parsedArgsSegment, makeRegexArgument());
-                } else if (unmatchedQuotes.peek() == CHAR_BACK_QUOTE) {
-                    // ongoing back quote: add chr to subCommand
-                    subCommand.append(chr);
-                } else {
-                    // ongoing single/double quote
-                    parsedArg.append(chr);
-                }
+                handleSingleAndDoubleQuote(chr);
             } else if (chr == CHAR_ASTERISK) {
-                if (unmatchedQuotes.isEmpty()) {
-                    // each unquoted * matches a (possibly empty) sequence of non-slash chars
-                    parsedArg.appendAsterisk();
-                } else if (unmatchedQuotes.peek() == CHAR_BACK_QUOTE) {
-                    // ongoing back quote: add chr to subCommand
-                    subCommand.append(chr);
-                } else {
-                    // ongoing single/double quote
-                    parsedArg.append(chr);
-                }
+                handleAsterisk(chr);
             } else {
-                if (unmatchedQuotes.isEmpty()) {
-                    // not a special character
-                    parsedArg.append(chr);
-                } else if (unmatchedQuotes.peek() == CHAR_BACK_QUOTE) {
-                    // ongoing back quote: add chr to subCommand
-                    subCommand.append(chr);
-                } else {
-                    // ongoing single/double quote
-                    parsedArg.append(chr);
-                }
+                handleOthers(chr);
             }
         }
 
-        // Should not have unmatched backquotes or double quotes within double quotes
+        // should not have unmatched backquotes or double quotes within double quotes
         if (!unmatchedQuotes.isEmpty() && unmatchedQuotes.peek() == CHAR_BACK_QUOTE) {
             throw new ShellException(ERR_SYNTAX);
         }
@@ -163,6 +97,95 @@ public class ArgumentResolver {
                 .collect(Collectors.toList());
     }
 
+    private void handleBackQuote(char chr) throws FileNotFoundException, AbstractApplicationException, ShellException {
+        if (unmatchedQuotes.isEmpty() || unmatchedQuotes.peek() == CHAR_DOUBLE_QUOTE) {
+            // start of command substitution
+            if (!parsedArg.isEmpty()) {
+                appendParsedArgIntoSegment(parsedArgsSegment, parsedArg);
+                parsedArg = makeRegexArgument();
+            }
+
+            unmatchedQuotes.add(chr);
+
+        } else if (unmatchedQuotes.peek() == chr) {
+            // end of command substitution
+            unmatchedQuotes.pop();
+
+            // evaluate subCommand and get the output
+            String subCommandOutput = evaluateSubCommand(subCommand.toString());
+            subCommand.setLength(0); // Clear the previous subCommand registered
+
+            // check if back quotes are nested
+            if (unmatchedQuotes.isEmpty()) {
+                List<RegexArgument> subOutputSegment = Stream
+                        .of(StringUtils.tokenize(subCommandOutput))
+                        .map(str -> makeRegexArgument(str))
+                        .collect(Collectors.toList());
+
+                // append the first token to the previous parsedArg
+                // e.g. arg: abc`1 2 3`xyz`4 5 6` (contents in `` is after command sub)
+                // expected: [abc1, 2, 3xyz4, 5, 6]
+                if (!subOutputSegment.isEmpty()) {
+                    RegexArgument firstOutputArg = subOutputSegment.remove(0);
+                    appendParsedArgIntoSegment(parsedArgsSegment, firstOutputArg);
+                }
+
+            } else {
+                // don't tokenize subCommand output
+                appendParsedArgIntoSegment(parsedArgsSegment,
+                        makeRegexArgument(subCommandOutput));
+            }
+        } else {
+            // ongoing single quote
+            parsedArg.append(chr);
+        }
+    }
+
+    private void handleSingleAndDoubleQuote(char chr) {
+        if (unmatchedQuotes.isEmpty()) {
+            // start of quote
+            unmatchedQuotes.add(chr);
+        } else if (unmatchedQuotes.peek() == chr) {
+            // end of quote
+            unmatchedQuotes.pop();
+
+            // make sure parsedArgsSegment is not empty
+            appendParsedArgIntoSegment(parsedArgsSegment, makeRegexArgument());
+        } else if (unmatchedQuotes.peek() == CHAR_BACK_QUOTE) {
+            // ongoing back quote: add chr to subCommand
+            subCommand.append(chr);
+        } else {
+            // ongoing single/double quote
+            parsedArg.append(chr);
+        }
+    }
+
+    private void handleAsterisk(char chr) {
+        if (unmatchedQuotes.isEmpty()) {
+            // each unquoted * matches a (possibly empty) sequence of non-slash chars
+            parsedArg.appendAsterisk();
+        } else if (unmatchedQuotes.peek() == CHAR_BACK_QUOTE) {
+            // ongoing back quote: add chr to subCommand
+            subCommand.append(chr);
+        } else {
+            // ongoing single/double quote
+            parsedArg.append(chr);
+        }
+    }
+
+    private void handleOthers(char chr) {
+        if (unmatchedQuotes.isEmpty()) {
+            // not a special character
+            parsedArg.append(chr);
+        } else if (unmatchedQuotes.peek() == CHAR_BACK_QUOTE) {
+            // ongoing back quote: add chr to subCommand
+            subCommand.append(chr);
+        } else {
+            // ongoing single/double quote
+            parsedArg.append(chr);
+        }
+    }
+
     public RegexArgument makeRegexArgument() {
         return new RegexArgument();
     }
@@ -171,7 +194,8 @@ public class ArgumentResolver {
         return new RegexArgument(str);
     }
 
-    private String evaluateSubCommand(String commandString) throws AbstractApplicationException, ShellException, FileNotFoundException {
+    private String evaluateSubCommand(String commandString) throws AbstractApplicationException, ShellException,
+            FileNotFoundException {
         if (StringUtils.isBlank(commandString)) {
             return "";
         }
