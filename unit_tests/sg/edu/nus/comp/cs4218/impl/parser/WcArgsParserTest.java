@@ -24,11 +24,24 @@ public class WcArgsParserTest {
     private WcArgsParser wcArgsParser;
 
     private static Stream<Arguments> validSyntax() {
-        return Stream.of(Arguments.of((Object) new String[]{}), Arguments.of((Object) new String[]{"-c"}), Arguments.of((Object) new String[]{"-c", "-l"}), Arguments.of((Object) new String[]{"-c", "-l", "w"}), Arguments.of((Object) new String[]{"example"}), Arguments.of((Object) new String[]{"-c", "example"}), Arguments.of((Object) new String[]{"-c", "-l", "example"}), Arguments.of((Object) new String[]{"example", "-l", "-w"}));
+        return Stream.of(
+                Arguments.of((Object) new String[]{}),
+                Arguments.of((Object) new String[]{"-c"}),
+                Arguments.of((Object) new String[]{"-c", "-l"}),
+                Arguments.of((Object) new String[]{"-c", "-l", "w"}),
+                Arguments.of((Object) new String[]{"example"}),
+                Arguments.of((Object) new String[]{"-c", "example"}),
+                Arguments.of((Object) new String[]{"-c", "-l", "example"}),
+                Arguments.of((Object) new String[]{"example", "-l", "-w"}));
     }
 
     private static Stream<Arguments> invalidSyntax() {
-        return Stream.of(Arguments.of((Object) new String[]{"-C"}), Arguments.of((Object) new String[]{"-C", "-L"}), Arguments.of((Object) new String[]{"-W"}), Arguments.of((Object) new String[]{"--"}), Arguments.of((Object) new String[]{"-a"}));
+        return Stream.of(
+                Arguments.of((Object) new String[]{"-C"}),
+                Arguments.of((Object) new String[]{"-C", "-L"}),
+                Arguments.of((Object) new String[]{"-W"}),
+                Arguments.of((Object) new String[]{"--"}),
+                Arguments.of((Object) new String[]{"-a"}));
     }
 
     @BeforeEach
@@ -76,7 +89,6 @@ public class WcArgsParserTest {
         wcArgsParser.parse();
         assertTrue(wcArgsParser.hasNoFlags());
     }
-
 
     @Test
     void isByteCount_NoFlag_ReturnsTrue() throws InvalidArgsException {
