@@ -19,6 +19,7 @@ import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_NOT_FOUND
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_GENERAL;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IO_EXCEPTION;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IS_DIR;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_ISTREAM;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_PERM;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NULL_STREAMS;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_WRITE_STREAM;
@@ -30,6 +31,7 @@ public class WcApplication implements WcInterface {
     private static final int LINES_INDEX = 0;
     private static final int WORDS_INDEX = 1;
     private static final int BYTES_INDEX = 2;
+    private long totalBytes = 0, totalLines = 0, totalWords = 0;
 
     /**
      * Runs the wc application with the specified arguments.
@@ -47,6 +49,9 @@ public class WcApplication implements WcInterface {
         // Format: wc [-clw] [FILES]
         if (stdout == null) {
             throw new WcException(ERR_NULL_STREAMS);
+        }
+        if (stdin == null) {
+            throw new WcException(ERR_NO_ISTREAM);
         }
         WcArgsParser wcArgsParser = new WcArgsParser();
         try {
@@ -98,7 +103,6 @@ public class WcApplication implements WcInterface {
             throw new WcException(ERR_GENERAL);
         }
         List<String> result = new ArrayList<>();
-        long totalBytes = 0, totalLines = 0, totalWords = 0;
         for (String file : fileName) {
             File node = IOUtils.resolveFilePath(file).toFile();
             if (!node.exists()) {
@@ -126,11 +130,6 @@ public class WcApplication implements WcInterface {
             } catch (ShellException e) {
                 throw new WcException(e.getMessage());
             }
-
-            // Update total count
-            totalLines += count[0];
-            totalWords += count[1];
-            totalBytes += count[2];
 
             // Format all output: " %7d %7d %7d %s"
             // Output in the following order: lines words bytes filename
@@ -202,7 +201,6 @@ public class WcApplication implements WcInterface {
                                         InputStream stdin, String... fileName) throws WcException {
         try {
             List<String> result = new ArrayList<>();
-            long totalBytes = 0, totalLines = 0, totalWords = 0;
 
             for (String file : fileName) {
                 if (file.equals("-")) {
@@ -211,16 +209,7 @@ public class WcApplication implements WcInterface {
                     result.add(countFromFiles(isBytes, isLines, isWords, file));
                 }
             }
-
             if (fileName.length > 1) {
-                for (String res : result) {
-                    // Split the line based on whitespace
-                    String[] parts = res.trim().split("\\s+");
-                    totalLines = Long.parseLong(parts[0]);
-                    totalWords = Long.parseLong(parts[1]);
-                    totalBytes = Long.parseLong(parts[2]);
-                }
-
                 StringBuilder sb = new StringBuilder(); //NOPMD
                 if (isLines) {
                     sb.append(String.format(NUMBER_FORMAT, totalLines));
@@ -284,7 +273,9 @@ public class WcApplication implements WcInterface {
         } catch (IOException e) {
             throw new WcException(ERR_IO_EXCEPTION);
         }
-
+        totalWords += result[WORDS_INDEX];
+        totalBytes += result[BYTES_INDEX];
+        totalLines += result[LINES_INDEX];
         return result;
     }
 }
