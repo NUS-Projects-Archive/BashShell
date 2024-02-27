@@ -2,7 +2,7 @@ package sg.edu.nus.comp.cs4218.exception;
 
 public class MvException extends AbstractApplicationException {
 
-    private static final long serialVersionUID = 123456789012345L;
+    private static final long serialVersionUID = -2890717950640280147L;
     public static final String PROB_MV_DEST_FILE = "Problem move to destination file: ";
     public static final String PROB_MV_FOLDER = "Problem move to folder: ";
 
