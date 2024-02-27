@@ -19,6 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static sg.edu.nus.comp.cs4218.impl.parser.ArgsParser.ILLEGAL_FLAG_MSG;
 
+@SuppressWarnings("PMD.AvoidDuplicateLiterals")
 class MkdirArgsParserTest {
 
     private final Set<Character> VALID_FLAGS = Set.of('p');
@@ -45,6 +46,15 @@ class MkdirArgsParserTest {
     @BeforeEach
     void setUp() {
         this.mkdirArgsParser = new MkdirArgsParser();
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"", " ", "\n"})
+    void parse_EmptyString_ReturnsEmptyFlagsAndNonFlagArgsContainsInput(String args)
+            throws InvalidArgsException {
+        mkdirArgsParser.parse(args);
+        assertTrue(mkdirArgsParser.flags.isEmpty());
+        assertTrue(mkdirArgsParser.nonFlagArgs.contains(args));
     }
 
     @Test
