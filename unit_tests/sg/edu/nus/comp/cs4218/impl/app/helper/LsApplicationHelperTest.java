@@ -27,7 +27,7 @@ class LsApplicationHelperTest {
     private static final String[] CWD_NON_FOLDERS = { "a.z", "z.a", "z" };
     private static final String FOLDER_A_NAME = "folderA";
     private static final String[] CWD_FOLDERS = { FOLDER_A_NAME };
-    private static final String UNSORTED_CWD_CONTENTS = joinStringsBySystemLineSeparator(getTempFolderContents());
+    private static final String UNSORTED_CWD_CONTENTS = joinStringsBySystemLineSeparator(getCwdContents());
     private static final String UNSORTED_CWD_CONTENTS_WITH_HEADER = joinStringsBySystemLineSeparator(".:",
             UNSORTED_CWD_CONTENTS);
     private final String SORTED_CWD_CONTENTS_STRING = joinStringsBySystemLineSeparator(
@@ -44,7 +44,7 @@ class LsApplicationHelperTest {
 
     private static final String TWO_LINE_SEPARATOR = System.lineSeparator() + System.lineSeparator();
 
-    static String getTempFolderContents() {
+    static String getCwdContents() {
         List<String> fileList = Stream.concat(Arrays.stream(CWD_NON_FOLDERS), Arrays.stream(CWD_FOLDERS))
                 .sorted()
                 .collect(Collectors.toList());
@@ -161,7 +161,7 @@ class LsApplicationHelperTest {
      * @throws LsException Error is thrown in listCwdContent.
      */
     @Test
-    void listCwdContent_IsSortByExtIsFalse_ReturnsUnsortedTempFolderContents() throws LsException {
+    void listCwdContent_IsSortByExtIsFalse_ReturnsUnsortedCwdContents() throws LsException {
         // Given
         String expected = String.join(System.lineSeparator(), UNSORTED_CWD_CONTENTS);
 
