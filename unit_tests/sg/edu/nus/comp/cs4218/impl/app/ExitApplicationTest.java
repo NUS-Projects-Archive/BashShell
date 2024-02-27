@@ -25,16 +25,11 @@ class ExitApplicationTest {
 
     @Test
     void run_noArgs_exitCodeZero() {
-        // Given
-        final String expected = "0"; // Expects exit code 0
-
-        // When
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
-            new ExitApplication().run(null, null, null);
+        ExitApplication exitApp = new ExitApplication(); // Given
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> { // When
+            exitApp.run(null, null, null);
         });
-
-        // Then
-        assertEquals(expected, exception.getMessage(), "Expected exit code 0");
+        assertEquals("0", exception.getMessage()); // Then
     }
 
     @AfterEach
@@ -49,12 +44,12 @@ class ExitApplicationTest {
      */
     private static class NoExitSecurityManager extends SecurityManager {
         @Override
-        public void checkPermission(final Permission perm) {
+        public void checkPermission(Permission perm) {
             // Empty body; Override to stop exception being thrown upon System.exit()
         }
 
         @Override
-        public void checkExit(final int status) {
+        public void checkExit(int status) {
             super.checkExit(status);
             throw new RuntimeException(String.valueOf(status));
         }
