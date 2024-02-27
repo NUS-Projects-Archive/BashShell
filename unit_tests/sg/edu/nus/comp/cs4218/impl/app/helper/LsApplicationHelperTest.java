@@ -44,18 +44,18 @@ class LsApplicationHelperTest {
 
     private static final String TWO_LINE_SEPARATOR = System.lineSeparator() + System.lineSeparator();
 
-    static String getCwdContents() {
+    private static String getCwdContents() {
         List<String> fileList = Stream.concat(Arrays.stream(CWD_NON_FOLDERS), Arrays.stream(CWD_FOLDERS))
                 .sorted()
                 .collect(Collectors.toList());
         return String.join(System.lineSeparator(), fileList);
     }
 
-    static String getFolderAContents() {
+    private static String getFolderAContents() {
         return String.join(System.lineSeparator(), FOLDER_A_NON_FOLDERS) + System.lineSeparator();
     }
 
-    static String joinStringsBySystemLineSeparator(String... strings) {
+    private static String joinStringsBySystemLineSeparator(String... strings) {
         return String.join(System.lineSeparator(), strings);
     }
 
