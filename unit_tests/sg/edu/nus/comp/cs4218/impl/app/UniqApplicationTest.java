@@ -4,15 +4,12 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
-import static org.junit.jupiter.api.Assertions.fail;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
+import static sg.edu.nus.comp.cs4218.impl.util.AssertUtils.assertFileMatch;
 
-import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.AfterEach;
@@ -53,35 +50,6 @@ class UniqApplicationTest {
                 Arguments.of(true, false, true),
                 Arguments.of(true, true, true)
         );
-    }
-
-    // https://www.baeldung.com/java-compare-files
-    private static long filesCompareByByte(Path path1, Path path2) {
-        int ch = 0;
-        long pos = 1;
-
-        try {
-            BufferedInputStream fis1 = new BufferedInputStream(new FileInputStream(path1.toFile()));
-            BufferedInputStream fis2 = new BufferedInputStream(new FileInputStream(path2.toFile()));
-
-            while ((ch = fis1.read()) != -1) {
-                if (ch != fis2.read()) {
-                    break;
-                }
-                pos++;
-            }
-
-            if (fis2.read() == -1) {
-                pos = -1;
-            }
-
-            fis1.close();
-            fis2.close();
-        } catch (IOException e) {
-            fail(e.getMessage());
-        }
-
-        return pos;
     }
 
     @BeforeEach
@@ -186,13 +154,13 @@ class UniqApplicationTest {
     @MethodSource("validFlagsNoErrors")
     void uniqFromFile_VariousNoErrorFlags_FilesWithCorrectOutput(
             boolean isCount, boolean isRepeated, boolean isAllRepeated,
-            String expectedOutputFile,
+            String expectedFile,
             @TempDir Path target) {
 
         String outputFile = target.resolve("test-output.txt").toString();
         assertDoesNotThrow(() -> app.uniqFromFile(isCount, isRepeated, isAllRepeated, TEST_FILE_ONE, outputFile));
 
-        assertEquals(-1L, filesCompareByByte(Paths.get(expectedOutputFile), Paths.get(outputFile)));
+        assertFileMatch(expectedFile, outputFile);
     }
 
     @ParameterizedTest
