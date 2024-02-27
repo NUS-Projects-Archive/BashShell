@@ -25,11 +25,11 @@ import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_PERM;
 public class MvApplication implements MvInterface {
 
     /**
-     * Runs the mv application with the specified arguments.
+     * Runs the mv application with the specified arguments
      *
-     * @param args   Array of arguments for the application. Each array element is the path to a file.
-     * @param stdin  An InputStream, not used.
-     * @param stdout An OutputStream. The output of the command is written to this OutputStream.
+     * @param args   Array of arguments for the application. Each array element is the path to a file
+     * @param stdin  An InputStream, not used
+     * @param stdout An OutputStream, not used
      * @throws MvException
      */
     @Override
@@ -50,7 +50,7 @@ public class MvApplication implements MvInterface {
         try {
             parser.parse(args);
         } catch (InvalidArgsException e) {
-            throw new MvException(e.getMessage());
+            throw new MvException(e.getMessage(), e);
         }
 
         final Boolean isOverwrite = parser.isOverwrite();
@@ -66,11 +66,11 @@ public class MvApplication implements MvInterface {
     }
 
     /**
-     * Moves a source file to a destination file with the option to overwrite.
+     * Moves a source file to a destination file with the option to overwrite
      *
-     * @param isOverwrite Boolean option to perform overwriting.
-     * @param srcFile     String representing the path to the source file.
-     * @param destFile    String representing the path to the destination file.
+     * @param isOverwrite Boolean option to perform overwriting
+     * @param srcFile     String representing the path to the source file
+     * @param destFile    String representing the path to the destination file
      * @return null.
      * @throws MvException
      */
@@ -100,18 +100,18 @@ public class MvApplication implements MvInterface {
                 Files.move(srcPath, destPath, StandardCopyOption.REPLACE_EXISTING);
             }
         } catch (IOException e) {
-            throw new MvException(PROB_MV_DEST_FILE + ERR_IO_EXCEPTION);
+            throw new MvException(PROB_MV_DEST_FILE + ERR_IO_EXCEPTION, e);
         }
 
         return null;
     }
 
     /**
-     * Moves multiple source files to a destination folder with option to overwrite.
+     * Moves multiple source files to a destination folder with option to overwrite
      *
      * @param isOverwrite Boolean option to perform overwriting
      * @param destFolder  String representing the path to the destination folder
-     * @param fileName    Array of String representing the file names.
+     * @param fileName    Array of String representing the file names
      * @return null.
      * @throws MvException
      */
@@ -154,7 +154,7 @@ public class MvApplication implements MvInterface {
                     Files.move(srcPath, destPath, StandardCopyOption.REPLACE_EXISTING);
                 }
             } catch (IOException e) {
-                throw new MvException(PROB_MV_FOLDER + ERR_IO_EXCEPTION);
+                throw new MvException(PROB_MV_FOLDER + ERR_IO_EXCEPTION, e);
             }
         }
 
