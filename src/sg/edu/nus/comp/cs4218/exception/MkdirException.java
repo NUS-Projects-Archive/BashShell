@@ -7,4 +7,8 @@ public class MkdirException extends AbstractApplicationException {
     public MkdirException(String message) {
         super("mkdir: " + message);
     }
+
+    public MkdirException(String message, Throwable cause) {
+        super("mkdir: " + message, cause);
+    }
 }
