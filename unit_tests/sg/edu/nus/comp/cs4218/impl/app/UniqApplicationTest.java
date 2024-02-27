@@ -3,18 +3,26 @@ package sg.edu.nus.comp.cs4218.impl.app;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
+import static org.junit.jupiter.api.Assertions.fail;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 
+import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import sg.edu.nus.comp.cs4218.exception.UniqException;
 
@@ -26,20 +34,55 @@ class UniqApplicationTest {
     static final String STR_ALICE = "Alice";
     static final String STR_BOB = "Bob";
 
+    UniqApplication app;
+    ByteArrayOutputStream outputStream;
+
     private static Stream<Arguments> validFlagsNoErrors() {
         return Stream.of(
-                Arguments.of("",     TEST_RESOURCES + "output.txt"),
-                Arguments.of("-c",   TEST_RESOURCES + "output-c.txt"),
-                Arguments.of("-d",   TEST_RESOURCES + "output-d.txt"),
-                Arguments.of("-D",   TEST_RESOURCES + "output-CapD.txt"),
-                Arguments.of("-cd",  TEST_RESOURCES + "output-cd.txt"),
-                Arguments.of("-dD",  TEST_RESOURCES + "output-dD.txt")
-                //Arguments.of("-cdD", TEST_RESOURCES + "")
+                Arguments.of(false, false, false, TEST_RESOURCES + "out.txt"),
+                Arguments.of(true, false, false, TEST_RESOURCES + "out-c.txt"),
+                Arguments.of(false, true, false, TEST_RESOURCES + "out-d.txt"),
+                Arguments.of(false, false, true, TEST_RESOURCES + "out-CapD.txt"),
+                Arguments.of(true, true, false, TEST_RESOURCES + "out-cd.txt"),
+                Arguments.of(false, true, true, TEST_RESOURCES + "out-dD.txt")
         );
     }
 
-    UniqApplication app;
-    ByteArrayOutputStream outputStream;
+    private static Stream<Arguments> validFlagsThrowsError() {
+        return Stream.of(
+                Arguments.of(true, false, true),
+                Arguments.of(true, true, true)
+        );
+    }
+
+    // https://www.baeldung.com/java-compare-files
+    private static long filesCompareByByte(Path path1, Path path2) {
+        int ch = 0;
+        long pos = 1;
+
+        try {
+            BufferedInputStream fis1 = new BufferedInputStream(new FileInputStream(path1.toFile()));
+            BufferedInputStream fis2 = new BufferedInputStream(new FileInputStream(path2.toFile()));
+
+            while ((ch = fis1.read()) != -1) {
+                if (ch != fis2.read()) {
+                    break;
+                }
+                pos++;
+            }
+
+            if (fis2.read() == -1) {
+                pos = -1;
+            }
+
+            fis1.close();
+            fis2.close();
+        } catch (IOException e) {
+            fail(e.getMessage());
+        }
+
+        return pos;
+    }
 
     @BeforeEach
     void setUp() {
@@ -137,5 +180,30 @@ class UniqApplicationTest {
 
         Throwable thrown = assertThrows(UniqException.class, () -> app.run(args, null, null)); // When
         assertEquals(expectedMessage, thrown.getMessage()); // Then
+    }
+
+    @ParameterizedTest
+    @MethodSource("validFlagsNoErrors")
+    void uniqFromFile_VariousNoErrorFlags_FilesWithCorrectOutput(
+            boolean isCount, boolean isRepeated, boolean isAllRepeated,
+            String expectedOutputFile,
+            @TempDir Path target) {
+
+        String outputFile = target.resolve("test-output.txt").toString();
+        assertDoesNotThrow(() -> app.uniqFromFile(isCount, isRepeated, isAllRepeated, TEST_FILE_ONE, outputFile));
+
+        assertEquals(-1L, filesCompareByByte(Paths.get(expectedOutputFile), Paths.get(outputFile)));
+    }
+
+    @ParameterizedTest
+    @MethodSource("validFlagsThrowsError")
+    void uniqFromFile_VariousThrowsErrorFlags_ThrowsUniqException(
+            boolean isCount, boolean isRepeated, boolean isAllRepeated,
+            @TempDir Path target) {
+
+        String outputFile = target.resolve("test-output.txt").toString();
+        assertThrowsExactly(UniqException.class, () ->
+                app.uniqFromFile(isCount, isRepeated, isAllRepeated, TEST_FILE_ONE, outputFile)
+        );
     }
 }
