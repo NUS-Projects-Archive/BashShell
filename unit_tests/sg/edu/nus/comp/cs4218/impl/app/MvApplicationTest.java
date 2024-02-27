@@ -130,13 +130,13 @@ class MvApplicationTest {
         Files.write(tempSrcFilePath, content.getBytes());
         List<String> expectedContent = Files.readAllLines(tempSrcFilePath);
 
-        Path nonExistDestFilePath = tempDir.resolve("nonExistFile.txt");
-        String nonExistDestFile = nonExistDestFilePath.toString();
+        Path nonExistDestPath = tempDir.resolve("nonExistFile.txt");
+        String nonExistDestFile = nonExistDestPath.toString();
 
         app.mvSrcFileToDestFile(false, tempSrcFile, nonExistDestFile);
-        List<String> actualContent = Files.readAllLines(nonExistDestFilePath);
+        List<String> actualContent = Files.readAllLines(nonExistDestPath);
 
-        File destFile = nonExistDestFilePath.toFile();
+        File destFile = nonExistDestPath.toFile();
         File srcFile = tempSrcFilePath.toFile();
 
         assertTrue(destFile.exists()); // assert that the dest file now exists
@@ -227,17 +227,17 @@ class MvApplicationTest {
         List<String> expectedContent = Files.readAllLines(tempSrcFilePath);
 
         String overwriteContent = "1 2 3";
-        Path srcFileInSubDirPath = tempDestDirPath.resolve(TEMP_SRC_FILE);
-        Files.createFile(srcFileInSubDirPath);
-        Files.write(srcFileInSubDirPath, overwriteContent.getBytes());
+        Path destFilePath = tempDestDirPath.resolve(TEMP_SRC_FILE);
+        Files.createFile(destFilePath);
+        Files.write(destFilePath, overwriteContent.getBytes());
 
         // assert that another src file of different content exist in subdirectory
-        assertTrue(srcFileInSubDirPath.toFile().exists());
+        assertTrue(destFilePath.toFile().exists());
 
         app.mvFilesToFolder(true, tempDestDir, tempSrcFile);
-        List<String> actualContent = Files.readAllLines(srcFileInSubDirPath);
+        List<String> actualContent = Files.readAllLines(destFilePath);
 
-        File destFile = srcFileInSubDirPath.toFile();
+        File destFile = destFilePath.toFile();
         File srcFile = tempSrcFilePath.toFile();
 
         assertTrue(destFile.exists()); // assert that the src file in subdirectory still exist
