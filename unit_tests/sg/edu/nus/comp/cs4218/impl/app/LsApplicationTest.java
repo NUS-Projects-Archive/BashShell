@@ -33,6 +33,8 @@ import static sg.edu.nus.comp.cs4218.impl.parser.ArgsParser.ILLEGAL_FLAG_MSG;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.*;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_FILE_SEP;
 
+// To give a meaningful variable name
+@SuppressWarnings("PMD.LongVariable")
 class LsApplicationTest {
     private LsApplication app;
 
@@ -117,7 +119,7 @@ class LsApplicationTest {
     @Test
     void run_EmptyArgs_PrintCwdContents() throws LsException {
         // Given
-        String expected = String.format("%s%s", getCwdContents(), System.lineSeparator());
+        String expected = String.format("%s%s", getCwdContents(), System.lineSeparator()); //NOPMD - suppressed AvoidDuplicateLiterals - Is not duplicating literals
 
         // When
         app.run(new String[0], System.in, System.out);
@@ -201,12 +203,11 @@ class LsApplicationTest {
         assertEquals(expected, actual);
     }
 
-    // TODO: Cant seem to mock the file to have no read permission or function
-    // isReadable to return false
-    @Disabled
-    @Test
-    void run_NoReadPermissionFolder_PrintPermDeniedError() {
-    }
+    // TODO: Cant seem to mock the file to have no read permission or function isReadable to return false
+//    @Disabled
+//    @Test
+//    void run_NoReadPermissionFolder_PrintPermDeniedError() {
+//    }
 
     /**
      * To test run to throw Ls exception when invalid flags are entered as arguments.
@@ -242,9 +243,11 @@ class LsApplicationTest {
     void run_FailsToWriteToOutputStream_ThrowsLsException() throws IOException {
         Path tempFile = Files.createTempFile(cwdPath, "temp", ".txt");
         Files.write(tempFile, getCwdContents().getBytes());
-        OutputStream mockedStdout = Mockito.mock(OutputStream.class);
-        doThrow(new IOException()).when(mockedStdout).write(Mockito.any(byte[].class));
-        Throwable result = assertThrows(LsException.class, () -> app.run(new String[0], null, mockedStdout));
+        Throwable result;
+        try (OutputStream mockedStdout = Mockito.mock(OutputStream.class)) {
+            doThrow(new IOException()).when(mockedStdout).write(Mockito.any(byte[].class));
+            result = assertThrows(LsException.class, () -> app.run(new String[0], null, mockedStdout));
+        }
         assertEquals(String.format("ls: %s", ERR_WRITE_STREAM), result.getMessage());
 
         Files.delete(tempFile);
