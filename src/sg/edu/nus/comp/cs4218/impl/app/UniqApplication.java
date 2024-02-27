@@ -1,15 +1,17 @@
 package sg.edu.nus.comp.cs4218.impl.app;
 
-import static sg.edu.nus.comp.cs4218.exception.UniqException.MEANINGLESS_COUNT_ALL_DUP;
-import  static sg.edu.nus.comp.cs4218.exception.UniqException.PROB_UNIQ_FILE;
+import static sg.edu.nus.comp.cs4218.exception.UniqException.COUNT_ALL_DUP_ERR;
+import static sg.edu.nus.comp.cs4218.exception.UniqException.PROB_UNIQ_FILE;
 import static sg.edu.nus.comp.cs4218.exception.UniqException.PROB_UNIQ_STDIN;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_READING_FILE;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_WRITE_STREAM;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -34,8 +36,7 @@ public class UniqApplication implements UniqInterface {
      * @throws UniqException
      */
     @Override
-    public void run(final String[] args, final InputStream stdin, final OutputStream stdout)
-            throws UniqException {
+    public void run(String[] args, InputStream stdin, OutputStream stdout) throws UniqException {
         // Format: uniq [Options] [INPUT_FILE [OUTPUT_FILE]]
 
         // Parse argument(s) provided
@@ -43,7 +44,7 @@ public class UniqApplication implements UniqInterface {
         try {
             parser.parse(args);
         } catch (InvalidArgsException e) {
-            throw new UniqException(e.getMessage());
+            throw new UniqException(e.getMessage(), e);
         }
 
         String output;
@@ -67,7 +68,7 @@ public class UniqApplication implements UniqInterface {
                 stdout.write(STRING_NEWLINE.getBytes());
             }
         } catch (IOException e) {
-            throw new UniqException(ERR_WRITE_STREAM);//NOPMD
+            throw new UniqException(ERR_WRITE_STREAM, e);
         }
     }
 
@@ -76,48 +77,87 @@ public class UniqApplication implements UniqInterface {
      *
      * @param isCount        Boolean option to prefix lines by the number of occurrences of adjacent duplicate lines
      * @param isRepeated     Boolean option to print only duplicate lines, one for each group
-     * @param isAllRepeated  Boolean option to print all duplicate lines (takes precedence if isRepeated is set to true)
-     * @param inputFileName  of path to input file
-     * @param outputFileName <NOT USED>
-     * @return
+     * @param isAllRepeated  Boolean option to print all duplicate lines (takes precedence if isRepeated is true)
+     * @param inputFileName  String of path to input file
+     * @param outputFileName String of path to output file
+     * @return String of the results. Null if {@code outputFile} is given.
      * @throws UniqException
      */
     @Override
-    public String uniqFromFile(final Boolean isCount, final Boolean isRepeated, final Boolean isAllRepeated,
-                               final String inputFileName, final String outputFileName) throws UniqException {
+    public String uniqFromFile(Boolean isCount, Boolean isRepeated, Boolean isAllRepeated, String inputFileName,
+                               String outputFileName) throws UniqException {
+        BufferedReader reader = null;
+        BufferedWriter writer = null;
+
         try {
-            BufferedReader in = new BufferedReader(new FileReader(inputFileName));
-            String result = uniq(isCount, isRepeated, isAllRepeated, in);
-            in.close();
-            return result;
+            reader = new BufferedReader(new FileReader(inputFileName));
+            String result = uniq(isCount, isRepeated, isAllRepeated, reader);
+            reader.close();
+
+            if (outputFileName == null) {
+                // No output file specified, return result.
+                return result;
+            }
+
+            // Write to file
+            writer = new BufferedWriter(new FileWriter(outputFileName));
+            writer.write(result);
+            writer.close();
         } catch (FileNotFoundException e) {
-            throw new UniqException(PROB_UNIQ_FILE + ERR_READING_FILE);
+            throw new UniqException(PROB_UNIQ_FILE + ERR_READING_FILE, e);
         } catch (IOException e) {
-            throw new UniqException(PROB_UNIQ_FILE + e.getMessage());
+            throw new UniqException(PROB_UNIQ_FILE + e.getMessage(), e);
+        } finally {
+            try {
+                if (reader != null) { reader.close(); }
+                if (writer != null) { writer.close(); }
+            } catch (IOException e) {
+                throw new UniqException(PROB_UNIQ_FILE + e.getMessage(), e);
+            }
         }
+
+        return null;
     }
 
     /**
      * Return filtered unique lines from the standard input
      *
-     * @param isCount       Boolean option to prefix lines by the number of occurrences of adjacent duplicate lines
-     * @param isRepeated    Boolean option to print only duplicate lines, one for each group
-     * @param isAllRepeated Boolean option to print all duplicate lines (takes precedence if isRepeated is set to true)
-     * @param stdin         InputStream containing arguments from Stdin
-     * @param outputFileName <NOT USED>
-     * @return
+     * @param isCount        Boolean option to prefix lines by the number of occurrences of adjacent duplicate lines
+     * @param isRepeated     Boolean option to print only duplicate lines, one for each group
+     * @param isAllRepeated  Boolean option to print all duplicate lines (takes precedence if isRepeated is true)
+     * @param stdin          InputStream containing arguments from Stdin
+     * @param outputFileName String of path to output file
+     * @return String of the results. Null if {@code outputFile} is given.
      * @throws UniqException
      */
     @Override
-    public String uniqFromStdin(final Boolean isCount, final Boolean isRepeated, final Boolean isAllRepeated,
-                                final InputStream stdin, final String outputFileName) throws UniqException {
+    public String uniqFromStdin(Boolean isCount, Boolean isRepeated, Boolean isAllRepeated, InputStream stdin,
+                                String outputFileName) throws UniqException {
+        BufferedWriter writer = null;
+
         try {
-            BufferedReader in = new BufferedReader(new InputStreamReader(stdin));
-            String result = uniq(isCount, isRepeated, isAllRepeated, in);
-            in.close();
-            return result;
+            BufferedReader input = new BufferedReader(new InputStreamReader(stdin));
+            String result = uniq(isCount, isRepeated, isAllRepeated, input);
+
+            if (outputFileName == null) {
+                // No output file specified, return result.
+                return result;
+            }
+
+            // Write to file
+            writer = new BufferedWriter(new FileWriter(outputFileName));
+            writer.write(result);
+            writer.close();
+
+            return null;
         } catch (IOException e) {
-            throw new UniqException(PROB_UNIQ_STDIN + e.getMessage());
+            throw new UniqException(PROB_UNIQ_STDIN + e.getMessage(), e);
+        } finally {
+            try {
+                if (writer != null) { writer.close(); }
+            } catch (IOException e) {
+                throw new UniqException(PROB_UNIQ_FILE + e.getMessage(), e);
+            }
         }
     }
 
@@ -126,16 +166,15 @@ public class UniqApplication implements UniqInterface {
      *
      * @param isCount       Boolean option to prefix lines by the number of occurrences of adjacent duplicate lines
      * @param isRepeated    Boolean option to print only duplicate lines, one for each group
-     * @param isAllRepeated Boolean option to print all duplicate lines (takes precedence if isRepeated is set to true)
+     * @param isAllRepeated Boolean option to print all duplicate lines (takes precedence if isRepeated is true)
      * @param content       BufferedReader holding the content to be processed
-     * @return
+     * @return String of the results
      * @throws IOException
      */
-    private String uniq(final Boolean isCount, final Boolean isRepeated, final Boolean isAllRepeated,
-                        final BufferedReader content) throws IOException, UniqException {
-
+    private String uniq(Boolean isCount, Boolean isRepeated, Boolean isAllRepeated, BufferedReader content)
+            throws IOException, UniqException {
         if (isCount && isAllRepeated) {
-            throw new UniqException(MEANINGLESS_COUNT_ALL_DUP);
+            throw new UniqException(COUNT_ALL_DUP_ERR);
         }
 
         int prevCount, count = 0;
@@ -149,17 +188,15 @@ public class UniqApplication implements UniqInterface {
             // First line
             if (prevLine == null) {
                 prevLine = line;
-                count += 1;
-                continue;
             }
 
-            // Duplicate line -> track line -> check next line
+            // Duplicate line: track line -> check next line
             if (line != null && line.compareTo(prevLine) == 0) {
                 count += 1;
                 continue;
             }
 
-            // New unique line -> output line
+            // New unique line: track line -> check flags -> output line
             prevCount = count;
             count = 1;
 
@@ -176,9 +213,8 @@ public class UniqApplication implements UniqInterface {
             }
 
             if (isCount) {
-                stringBuilder.append(prevCount).append(" ");
+                stringBuilder.append(prevCount).append(' ');
             }
-
             stringBuilder.append(prevLine).append(STRING_NEWLINE);
 
         } while (prevLine != null && line != null);
