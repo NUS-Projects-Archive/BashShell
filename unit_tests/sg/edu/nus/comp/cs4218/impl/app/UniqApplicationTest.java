@@ -6,7 +6,13 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.stream.Stream;
 
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -14,10 +20,37 @@ import sg.edu.nus.comp.cs4218.exception.UniqException;
 
 class UniqApplicationTest {
 
-    static final String TEST_FILE_ONE = "resources/uniq-1.txt";
+    static final String TEST_RESOURCES = "resources/uniq/";
+    static final String TEST_FILE_ONE = TEST_RESOURCES + "input.txt";
     static final String STR_HELLO_WORLD = "Hello World";
     static final String STR_ALICE = "Alice";
     static final String STR_BOB = "Bob";
+
+    private static Stream<Arguments> validFlagsNoErrors() {
+        return Stream.of(
+                Arguments.of("",     TEST_RESOURCES + "output.txt"),
+                Arguments.of("-c",   TEST_RESOURCES + "output-c.txt"),
+                Arguments.of("-d",   TEST_RESOURCES + "output-d.txt"),
+                Arguments.of("-D",   TEST_RESOURCES + "output-CapD.txt"),
+                Arguments.of("-cd",  TEST_RESOURCES + "output-cd.txt"),
+                Arguments.of("-dD",  TEST_RESOURCES + "output-dD.txt")
+                //Arguments.of("-cdD", TEST_RESOURCES + "")
+        );
+    }
+
+    UniqApplication app;
+    ByteArrayOutputStream outputStream;
+
+    @BeforeEach
+    void setUp() {
+        app = new UniqApplication();
+        outputStream = new ByteArrayOutputStream();
+    }
+
+    @AfterEach
+    void tearDown() throws IOException {
+        outputStream.close();
+    }
 
     @Test
     void run_NoFlags_OnlyUniqueAdjacentLines() {
@@ -28,11 +61,9 @@ class UniqApplicationTest {
                 STR_BOB + STRING_NEWLINE +
                 STR_ALICE + STRING_NEWLINE +
                 STR_BOB + STRING_NEWLINE;
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        UniqApplication app = new UniqApplication();
 
-        assertDoesNotThrow(() -> app.run(args, null, out)); // When
-        assertEquals(expected, out.toString()); // Then
+        assertDoesNotThrow(() -> app.run(args, null, outputStream)); // When
+        assertEquals(expected, outputStream.toString()); // Then
     }
 
     @Test
@@ -44,11 +75,9 @@ class UniqApplicationTest {
                 "1 Bob" + STRING_NEWLINE +
                 "1 Alice" + STRING_NEWLINE +
                 "1 Bob" + STRING_NEWLINE;
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        UniqApplication app = new UniqApplication();
 
-        assertDoesNotThrow(() -> app.run(args, null, out)); // When
-        assertEquals(expected, out.toString()); // Then
+        assertDoesNotThrow(() -> app.run(args, null, outputStream)); // When
+        assertEquals(expected, outputStream.toString()); // Then
     }
 
     @Test
@@ -57,11 +86,9 @@ class UniqApplicationTest {
         final String[] args = {"-d", TEST_FILE_ONE};
         final String expected = STR_HELLO_WORLD + STRING_NEWLINE +
                 STR_ALICE + STRING_NEWLINE;
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        UniqApplication app = new UniqApplication();
 
-        assertDoesNotThrow(() -> app.run(args, null, out)); // When
-        assertEquals(expected, out.toString()); // Then
+        assertDoesNotThrow(() -> app.run(args, null, outputStream)); // When
+        assertEquals(expected, outputStream.toString()); // Then
     }
 
     @Test
@@ -72,27 +99,23 @@ class UniqApplicationTest {
                 STR_HELLO_WORLD + STRING_NEWLINE +
                 STR_ALICE + STRING_NEWLINE +
                 STR_ALICE + STRING_NEWLINE;
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        UniqApplication app = new UniqApplication();
 
-        assertDoesNotThrow(() -> app.run(args, null, out)); // When
-        assertEquals(expected, out.toString()); // Then
+        assertDoesNotThrow(() -> app.run(args, null, outputStream)); // When
+        assertEquals(expected, outputStream.toString()); // Then
     }
 
     @Test
-    @DisplayName("Test D flag taking precedence over d flag")
-    void run_GroupDuplicatesAndAllDuplicatesFlag_AllDuplicateLines() {
+    @DisplayName("Test -D flag's precedence over -d flag")
+    void run_GroupDuplicatesAndAllDuplicatesFlags_AllDuplicateLines() {
         //Given
         final String[] args = {"-dD", TEST_FILE_ONE};
         final String expected = STR_HELLO_WORLD + STRING_NEWLINE +
                 STR_HELLO_WORLD + STRING_NEWLINE +
                 STR_ALICE + STRING_NEWLINE +
                 STR_ALICE + STRING_NEWLINE;
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        UniqApplication app = new UniqApplication();
 
-        assertDoesNotThrow(() -> app.run(args, null, out)); // When
-        assertEquals(expected, out.toString()); // Then
+        assertDoesNotThrow(() -> app.run(args, null, outputStream)); // When
+        assertEquals(expected, outputStream.toString()); // Then
     }
 
     @Test
@@ -101,11 +124,9 @@ class UniqApplicationTest {
         final String[] args = {"-cd", TEST_FILE_ONE};
         final String expected = "2 Hello World" + STRING_NEWLINE +
                 "2 Alice" + STRING_NEWLINE;
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        UniqApplication app = new UniqApplication();
 
-        assertDoesNotThrow(() -> app.run(args, null, out)); // When
-        assertEquals(expected, out.toString()); // Then
+        assertDoesNotThrow(() -> app.run(args, null, outputStream)); // When
+        assertEquals(expected, outputStream.toString()); // Then
     }
 
     @Test
@@ -113,7 +134,6 @@ class UniqApplicationTest {
         //Given
         final String[] args = {"-cD", TEST_FILE_ONE};
         final String expectedMessage = "uniq: printing all duplicated lines and repeat counts is meaningless";
-        UniqApplication app = new UniqApplication();
 
         Throwable thrown = assertThrows(UniqException.class, () -> app.run(args, null, null)); // When
         assertEquals(expectedMessage, thrown.getMessage()); // Then
