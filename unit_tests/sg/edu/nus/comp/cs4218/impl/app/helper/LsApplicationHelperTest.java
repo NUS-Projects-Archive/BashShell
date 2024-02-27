@@ -15,7 +15,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_FILE_SEP;
 
 // To give a meaningful variable name
@@ -80,7 +80,7 @@ class LsApplicationHelperTest {
     // isRecursive = false and isSortByExt = false handled in
     // LsApplicationTest.run_EmptyArgs_ReturnsCwdContents(...)
     @Test
-    void buildResult_IsRecursiveIsTrue_ReturnAllFiles() {
+    void buildResult_IsRecursiveIsTrue_ReturnsAllFiles() {
         // Given
         String expected = String.format("%s%s%s%s", UNSORTED_CWD_CONTENTS_WITH_HEADER, TWO_LINE_SEPARATOR,
                 UNSORTED_FOLDER_A_CONTENTS_WITH_HEADER, System.lineSeparator());
@@ -96,7 +96,7 @@ class LsApplicationHelperTest {
      * Tests if buildResult returns expected output given isSortByExt is true.
      */
     @Test
-    void buildResult_IsSortByExtIsTrue_ReturnTempDirFilesSortedByExt() {
+    void buildResult_IsSortByExtIsTrue_ReturnsTempDirFilesSortedByExt() {
         // Given
         String expected = String.format("%s%s", SORTED_CWD_CONTENTS_STRING_WITH_HEADER, TWO_LINE_SEPARATOR);
 
@@ -113,7 +113,7 @@ class LsApplicationHelperTest {
      * isSortByExt are true.
      */
     @Test
-    void buildResult_IsRecursiveIsTrueAndIsSortByExtIsTrue_ReturnAllFilesSortedByExt() {
+    void buildResult_IsRecursiveIsTrueAndIsSortByExtIsTrue_ReturnsAllFilesSortedByExt() {
         // Given
         String expected = String.format("%s%s%s%s", SORTED_CWD_CONTENTS_STRING_WITH_HEADER, TWO_LINE_SEPARATOR,
                 SORTED_FOLDER_A_CONTENTS_WITH_HEADER, System.lineSeparator());

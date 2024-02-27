@@ -18,7 +18,6 @@ import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -30,14 +29,15 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.doThrow;
 import static sg.edu.nus.comp.cs4218.impl.parser.ArgsParser.ILLEGAL_FLAG_MSG;
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.*;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_NOT_FOUND;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_OSTREAM;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NULL_ARGS;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_WRITE_STREAM;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_FILE_SEP;
 
 // To give a meaningful variable name
 @SuppressWarnings("PMD.LongVariable")
 class LsApplicationTest {
-    private LsApplication app;
-
     // Main temporary folder
     @TempDir
     private static Path cwdPath;
@@ -50,6 +50,7 @@ class LsApplicationTest {
     // Temporary folder A in main temporary folder
     private static final String[] FOLDER_A_NON_FOLDERS = { "0" };
 
+    private LsApplication app;
     private ByteArrayOutputStream outContent;
 
     private static String getCwdContents() {
@@ -67,6 +68,34 @@ class LsApplicationTest {
 
     private static String joinStringsByLineSeparator(String... strings) {
         return String.join(System.lineSeparator(), strings);
+    }
+
+    /**
+     * To provide valid arguments and expected output for run_ValidArgs_PrintsCorrectDirectoryContents.
+     */
+    static Stream<Arguments> provideValidArgs() {
+        String listedCwdContents = String.format("%s%s", joinStringsByLineSeparator(".:", getCwdContents()),
+                System.lineSeparator());
+        String listedFolderAContents = String.format("%s%s", FOLDER_A_NAME,
+                joinStringsByLineSeparator(":", getFolderAContents()));
+        return Stream.of(
+                // Relative paths
+                Arguments.of(new String[] { "." }, listedCwdContents),
+                Arguments.of(new String[] { String.format("..%s%s", CHAR_FILE_SEP, cwdName) }, listedCwdContents),
+                Arguments.of(new String[] { FOLDER_A_NAME }, listedFolderAContents),
+                // Absolute path
+                Arguments.of(new String[] { cwdPathName }, listedCwdContents));
+    }
+
+    /**
+     * To provide invalid flags as input and the first invalid flag as expected output for
+     * run_InvalidFlags_ThrowLsException.
+     */
+    static Stream<Arguments> provideInvalidFlags() {
+        return Stream.of(
+                Arguments.of(new String[] { "-a" }, "a"),
+                Arguments.of(new String[] { "-abc", "-X" }, "a"),
+                Arguments.of(new String[] { "-Ra" }, "a"));
     }
 
     @BeforeAll
@@ -99,7 +128,7 @@ class LsApplicationTest {
      * To test run to throw LsException when OutputStream is null.
      */
     @Test
-    void run_NullStdOut_ThrowLsException() {
+    void run_NullStdOut_ThrowsLsException() {
         Throwable result = assertThrows(LsException.class, () -> app.run(new String[0], System.in, null));
         assertEquals(String.format("ls: %s", ERR_NO_OSTREAM), result.getMessage());
     }
@@ -108,7 +137,7 @@ class LsApplicationTest {
      * To test run to throw LsException when args is null.
      */
     @Test
-    void run_NullArgs_ThrowLsException() {
+    void run_NullArgs_ThrowsLsException() {
         Throwable result = assertThrows(LsException.class, () -> app.run(null, System.in, System.out));
         assertEquals(String.format("ls: %s", ERR_NULL_ARGS), result.getMessage());
     }
@@ -117,7 +146,7 @@ class LsApplicationTest {
      * To test run to print current directory contents when args is empty.
      */
     @Test
-    void run_EmptyArgs_PrintCwdContents() throws LsException {
+    void run_EmptyArgs_PrintsCwdContents() throws LsException {
         // Given
         String expected = String.format("%s%s", getCwdContents(), System.lineSeparator()); //NOPMD - suppressed AvoidDuplicateLiterals - Is not duplicating literals
 
@@ -138,30 +167,13 @@ class LsApplicationTest {
      */
     @ParameterizedTest
     @MethodSource("provideValidArgs")
-    void run_ValidArgs_PrintCorrectDirectoryContents(String[] args, String expected) throws LsException {
+    void run_ValidArgs_PrintsCorrectDirectoryContents(String[] args, String expected) throws LsException {
         // When
         app.run(args, System.in, System.out);
         String actual = outContent.toString();
 
         // Then
         assertEquals(expected, actual);
-    }
-
-    /**
-     * To provide valid arguments and expected output for run_ValidArgs_PrintCorrectDirectoryContents.
-     */
-    static Stream<Arguments> provideValidArgs() {
-        String listedCwdContents = String.format("%s%s", joinStringsByLineSeparator(".:", getCwdContents()),
-                System.lineSeparator());
-        String listedFolderAContents = String.format("%s%s", FOLDER_A_NAME,
-                joinStringsByLineSeparator(":", getFolderAContents()));
-        return Stream.of(
-                // Relative paths
-                Arguments.of(new String[] { "." }, listedCwdContents),
-                Arguments.of(new String[] { String.format("..%s%s", CHAR_FILE_SEP, cwdName) }, listedCwdContents),
-                Arguments.of(new String[] { FOLDER_A_NAME }, listedFolderAContents),
-                // Absolute path
-                Arguments.of(new String[] { cwdPathName }, listedCwdContents));
     }
 
     /**
@@ -189,7 +201,7 @@ class LsApplicationTest {
      * @throws LsException To be thrown by run if an error occurs.
      */
     @Test
-    void run_NonExistentFolder_PrintFileNotFoundError() throws LsException {
+    void run_NonExistentFolder_PrintsFileNotFoundError() throws LsException {
         // Given
         String nonExistentFolderName = "nonExistentFolder";
         String expected = String.format("ls: cannot access '%s': %s%s", nonExistentFolderName, ERR_FILE_NOT_FOUND,
@@ -206,7 +218,7 @@ class LsApplicationTest {
     // TODO: Cant seem to mock the file to have no read permission or function isReadable to return false
 //    @Disabled
 //    @Test
-//    void run_NoReadPermissionFolder_PrintPermDeniedError() {
+//    void run_NoReadPermissionFolder_PrintsPermDeniedError() {
 //    }
 
     /**
@@ -217,20 +229,9 @@ class LsApplicationTest {
     // Tests for the errors thrown from ArgsParser.validateArgs(...)
     @ParameterizedTest
     @MethodSource("provideInvalidFlags")
-    void run_InvalidFlags_ThrowLsException(String[] args, String invalidArgOutput) {
+    void run_InvalidFlags_ThrowsLsException(String[] args, String invalidArgOutput) {
         Throwable result = assertThrows(LsException.class, () -> app.run(args, System.in, System.out));
         assertEquals(String.format("ls: %s%s", ILLEGAL_FLAG_MSG, invalidArgOutput), result.getMessage());
-    }
-
-    /**
-     * To provide invalid flags as input and the first invalid flag as expected output for
-     * run_InvalidFlags_ThrowLsException.
-     */
-    static Stream<Arguments> provideInvalidFlags() {
-        return Stream.of(
-                Arguments.of(new String[] { "-a" }, "a"),
-                Arguments.of(new String[] { "-abc", "-X" }, "a"),
-                Arguments.of(new String[] { "-Ra" }, "a"));
     }
 
     /**
@@ -249,8 +250,6 @@ class LsApplicationTest {
             result = assertThrows(LsException.class, () -> app.run(new String[0], null, mockedStdout));
         }
         assertEquals(String.format("ls: %s", ERR_WRITE_STREAM), result.getMessage());
-
-        Files.delete(tempFile);
     }
 
     /**
