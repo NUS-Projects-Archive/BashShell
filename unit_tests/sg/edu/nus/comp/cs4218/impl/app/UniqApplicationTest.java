@@ -4,12 +4,20 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
+import static org.junit.jupiter.api.Assertions.fail;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 import static sg.edu.nus.comp.cs4218.impl.util.AssertUtils.assertFileMatch;
 
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.AfterEach;
@@ -153,25 +161,46 @@ class UniqApplicationTest {
     @ParameterizedTest
     @MethodSource("validFlagsNoErrors")
     void uniqFromFile_VariousNoErrorFlags_FilesWithCorrectOutput(
-            boolean isCount, boolean isRepeated, boolean isAllRepeated,
-            String expectedFile,
-            @TempDir Path target) {
-
+            boolean isCount, boolean isRepeated, boolean isAllRepeated, String expectedFile, @TempDir Path target) {
         String outputFile = target.resolve("test-output.txt").toString();
         assertDoesNotThrow(() -> app.uniqFromFile(isCount, isRepeated, isAllRepeated, TEST_FILE_ONE, outputFile));
-
         assertFileMatch(expectedFile, outputFile);
     }
 
     @ParameterizedTest
     @MethodSource("validFlagsThrowsError")
     void uniqFromFile_VariousThrowsErrorFlags_ThrowsUniqException(
-            boolean isCount, boolean isRepeated, boolean isAllRepeated,
-            @TempDir Path target) {
-
+            boolean isCount, boolean isRepeated, boolean isAllRepeated, @TempDir Path target) {
         String outputFile = target.resolve("test-output.txt").toString();
         assertThrowsExactly(UniqException.class, () ->
                 app.uniqFromFile(isCount, isRepeated, isAllRepeated, TEST_FILE_ONE, outputFile)
         );
+    }
+
+    @ParameterizedTest
+    @MethodSource("validFlagsNoErrors")
+    void uniqFromStdin_VariousNoErrorFlags_FilesWithCorrectOutput(
+            boolean isCount, boolean isRepeated, boolean isAllRepeated, String expectedFile, @TempDir Path target) {
+        try (InputStream inputStream = new FileInputStream(TEST_FILE_ONE)) {
+            String outputFile = target.resolve("test-output.txt").toString();
+            assertDoesNotThrow(() -> app.uniqFromStdin(isCount, isRepeated, isAllRepeated, inputStream, outputFile));
+            assertFileMatch(expectedFile, outputFile);
+        } catch (IOException e) {
+            fail(e.getMessage());
+        }
+    }
+
+    @ParameterizedTest
+    @MethodSource("validFlagsThrowsError")
+    void uniqFromStdin_VariousThrowsErrorFlags_ThrowsUniqException(
+            boolean isCount, boolean isRepeated, boolean isAllRepeated, @TempDir Path target) {
+        try (InputStream inputStream = new FileInputStream(TEST_FILE_ONE)) {
+            String outputFile = target.resolve("test-output.txt").toString();
+            assertThrowsExactly(UniqException.class, () ->
+                    app.uniqFromStdin(isCount, isRepeated, isAllRepeated, inputStream, outputFile)
+            );
+        } catch (IOException e) {
+            fail(e.getMessage());
+        }
     }
 }
