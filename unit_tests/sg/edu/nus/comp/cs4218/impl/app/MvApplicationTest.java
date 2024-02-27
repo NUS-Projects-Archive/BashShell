@@ -5,6 +5,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledOnOs;
 import org.junit.jupiter.api.condition.OS;
 import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import sg.edu.nus.comp.cs4218.exception.MvException;
 
 import java.io.File;
@@ -24,6 +26,8 @@ import static sg.edu.nus.comp.cs4218.exception.MvException.PROB_MV_DEST_FILE;
 import static sg.edu.nus.comp.cs4218.exception.MvException.PROB_MV_FOLDER;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_NOT_FOUND;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IS_DIR;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_MISSING_ARG;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_ARGS;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_PERM;
 
 class MvApplicationTest {
@@ -60,6 +64,32 @@ class MvApplicationTest {
         Files.createFile(tempSrcFilePath);
         Files.createFile(tempDestFilePath);
         Files.createDirectories(tempDestDirPath);
+    }
+
+    @Test
+    void run_NullArgs_ThrowsMvException() {
+        Throwable result = assertThrows(MvException.class, () -> {
+            app.run(null, null, null);
+        });
+        assertEquals(MV_EX_MSG + ERR_MISSING_ARG, result.getMessage());
+    }
+
+    @Test
+    void run_EmptyArgsArray_ThrowsMvException() {
+        Throwable result = assertThrows(MvException.class, () -> {
+            String[] args = {};
+            app.run(args, null, null);
+        });
+        assertEquals(MV_EX_MSG + ERR_MISSING_ARG, result.getMessage());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"", "a", "1", "$", "."})
+    void run_InsufficientArgs_ThrowsMvException(String args) {
+        Throwable result = assertThrows(MvException.class, () -> {
+            app.run(args.split("\\s+"), null, null);
+        });
+        assertEquals(MV_EX_MSG + ERR_NO_ARGS, result.getMessage());
     }
 
     @Test

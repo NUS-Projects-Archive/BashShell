@@ -29,7 +29,7 @@ public class MvApplication implements MvInterface {
      *
      * @param args   Array of arguments for the application. Each array element is the path to a file.
      * @param stdin  An InputStream, not used.
-     * @param stdout An OutputStream. The output of the command is written to this OutputStream.
+     * @param stdout An OutputStream, not used.
      * @throws MvException
      */
     @Override
