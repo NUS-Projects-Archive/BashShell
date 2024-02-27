@@ -28,6 +28,15 @@ public class LsApplication implements LsInterface {
             return listCwdContent(isSortByExt);
         }
 
+        if (folderName.length == 1) {
+            List<Path> paths = resolvePaths(folderName);
+            boolean isFolderNameAValidFile = paths.size() == 1 && paths.get(0).toFile().isFile();
+            if (isFolderNameAValidFile) {
+                // Returns file name if only one valid file is specified
+                return paths.get(0).getFileName().toString();
+            }
+        }
+
         List<Path> paths;
         if (folderName.length == 0 && isRecursive) {
             String[] directories = new String[1];
