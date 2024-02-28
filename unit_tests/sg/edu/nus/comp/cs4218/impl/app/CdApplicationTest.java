@@ -82,8 +82,8 @@ class CdApplicationTest {
 	}
 
 	/**
-	* Tests run method in CdApplication with null args and expects a CdException to be thrown.
-	*/
+	 * Tests run method in CdApplication with null args and expects a CdException to be thrown.
+	 */
 	@Test
 	void run_NullArgs_ThrowsErrNullArgs() {
 		Throwable result = assertThrows(CdException.class, () -> cdApplication.run(null, System.in, System.out));
@@ -91,8 +91,8 @@ class CdApplicationTest {
 	}
 
 	/**
-	* Tests run method in CdApplication with multiple args and expects a CdException to be thrown.
-	*/
+	 * Tests run method in CdApplication with multiple args and expects a CdException to be thrown.
+	 */
 	@Test
 	void run_MultipleArgs_ThrowsErrTooManyArgs() {
 		Throwable result = assertThrows(CdException.class, () -> cdApplication.run(new String[] { "a", "b" }, System.in,
@@ -101,8 +101,8 @@ class CdApplicationTest {
 	}
 
 	/**
-	* Tests run method in CdApplication with empty args and expects the current directory to remain unchanged.
-	*/
+	 * Tests run method in CdApplication with empty args and expects the current directory to remain unchanged.
+	 */
 	@Test
 	void run_EmptyArgs_DoNothing() {
 		assertDoesNotThrow(() -> cdApplication.run(new String[] {}, System.in, System.out));
@@ -110,11 +110,11 @@ class CdApplicationTest {
 	}
 
 	/**
-	* Tests run method in CdApplication with valid directory and expects the current directory to be changed to the
-	* valid directory.
-	*
-	* @throws CdException  To be thrown by run if there is any error.
-	*/
+	 * Tests run method in CdApplication with valid directory and expects the current directory to be changed to the
+	 * valid directory.
+	 *
+	 * @throws CdException  To be thrown by run if there is any error.
+	 */
 	@ParameterizedTest
 	@MethodSource("getValidDirs")
 	void run_ValidDir_ChangeCurrentDirectoryToArg(String validDir, Path expectedDir) throws CdException {
@@ -123,12 +123,12 @@ class CdApplicationTest {
 	}
 
 	/**
-	* Tests changeToDirectory method in CdApplication and expects the current directory to be changed to the
-	* valid directory.
-	*
-	* @param validDir      String of a valid directory path or name that can be executed.
-	* @param expectedDir   Path of the expected directory.
-	*/
+	 * Tests changeToDirectory method in CdApplication and expects the current directory to be changed to the
+	 * valid directory.
+	 *
+	 * @param validDir      String of a valid directory path or name that can be executed.
+	 * @param expectedDir   Path of the expected directory.
+	 */
 	@ParameterizedTest
 	@MethodSource("getValidDirs")
 	void changeToDirectory_ValidDirectory_ChangeCurrentDirectoryToValidDirectory(String validDir, Path expectedDir) {
@@ -137,9 +137,9 @@ class CdApplicationTest {
 	}
 
 	/**
-	* Test case for changeToDirectory method in CdApplication.
-	* Tests with null path and expects a CdException to be thrown.
-	*/
+	 * Test case for changeToDirectory method in CdApplication.
+	 * Tests with null path and expects a CdException to be thrown.
+	 */
 	@Test
 	void changeToDirectory_NullPathStr_ThrowsErrNoArgs() {
 		Throwable result = assertThrows(CdException.class, () -> cdApplication.changeToDirectory(null));
@@ -147,9 +147,9 @@ class CdApplicationTest {
 	}
 
 	/**
-	* Test case for changeToDirectory method in CdApplication.
-	* Tests with empty path and expects a CdException to be thrown.
-	*/
+	 * Test case for changeToDirectory method in CdApplication.
+	 * Tests with empty path and expects a CdException to be thrown.
+	 */
 	@Test
 	void changeToDirectory_EmptyPathStr_ThrowsErrNoArgs() {
 		Throwable result = assertThrows(CdException.class, () -> cdApplication.changeToDirectory(""));
@@ -157,10 +157,10 @@ class CdApplicationTest {
 	}
 
 	/**
-	* Test case for changeToDirectory method in CdApplication.
-	* Tests with the relative path of a directory with no execute permission and expects a CdException to be thrown.
-	* This test is disabled on Windows as Windows does not use the same executable file permission concept.
-	*/
+	 * Test case for changeToDirectory method in CdApplication.
+	 * Tests with the relative path of a directory with no execute permission and expects a CdException to be thrown.
+	 * This test is disabled on Windows as Windows does not use the same executable file permission concept.
+	 */
 	@Test
 	@DisabledOnOs(OS.WINDOWS)
 	void changeToDirectory_NoExecutablePermissionDirectory_ThrowsErrNoPerm() {
@@ -193,9 +193,9 @@ class CdApplicationTest {
 	}
 
 	/**
-	* Test case for changeToDirectory method in CdApplication.
-	* Tests with the relative path of a non-existent directory and expects a CdException to be thrown.
-	*/
+	 * Test case for changeToDirectory method in CdApplication.
+	 * Tests with the relative path of a non-existent directory and expects a CdException to be thrown.
+	 */
 	@Test
 	void changeToDirectory_NonExistentDirectory_ThrowsErrFileNotFound() {
 		// Given
@@ -209,9 +209,9 @@ class CdApplicationTest {
 	}
 
 	/**
-	* Test case for changeToDirectory method in CdApplication.
-	* Tests with the relative path of a valid file and expects a CdException to be thrown.
-	*/
+	 * Test case for changeToDirectory method in CdApplication.
+	 * Tests with the relative path of a valid file and expects a CdException to be thrown.
+	 */
 	@Test
 	void changeToDirectory_ValidFile_ThrowsErrIsNotDir() {
 		// Given
