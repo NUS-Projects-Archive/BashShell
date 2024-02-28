@@ -27,17 +27,17 @@ class ArgumentResolverTest {
     private ArgumentResolver argumentResolver;
 
     private static final Map<String, List<String>> VALID_QUOTE_CONTENTS = new HashMap<>() {{
-        put("'\"'", List.of("\""));// '"'
-        put("'\"\"'", List.of("\"\""));// '""'
-        put("'`'", List.of("`"));// '`'
-        put("'```'", List.of("```"));// '``'
-        put("'Example\"`'", List.of("Example\"`")); // 'Example"`'
-        put("\"'\"", List.of("'"));// "'"
-        put("\"''\"", List.of("''"));// "''"
-        put("\"Example'\"", List.of("Example'"));// "Example'"
+        put("'\"'", List.of("\""));                     // '"'
+        put("'\"\"'", List.of("\"\""));                 // '""'
+        put("'`'", List.of("`"));                       // '`'
+        put("'```'", List.of("```"));                   // '``'
+        put("'Example\"`'", List.of("Example\"`"));     // 'Example"`'
+        put("\"'\"", List.of("'"));                     // "'"
+        put("\"''\"", List.of("''"));                   // "''"
+        put("\"Example'\"", List.of("Example'"));       // "Example'"
         // Some simplified test cases from project description
-        put("'`\"\"`'", List.of("`\"\"`"));// '`""`'
-        put("'\"`\"\"`\"'", List.of("\"`\"\"`\""));// '"`""`"'
+        put("'`\"\"`'", List.of("`\"\"`"));             // '`""`'
+        put("'\"`\"\"`\"'", List.of("\"`\"\"`\""));     // '"`""`"'
     }};
 
     static Stream<Arguments> getValidQuoteContents() {
