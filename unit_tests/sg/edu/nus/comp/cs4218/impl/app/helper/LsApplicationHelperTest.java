@@ -1,7 +1,5 @@
 package sg.edu.nus.comp.cs4218.impl.app.helper;
 
-import sg.edu.nus.comp.cs4218.exception.LsException;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -15,44 +13,45 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_FILE_SEP;
 
 // To give a meaningful variable name
 @SuppressWarnings("PMD.LongVariable")
 class LsApplicationHelperTest {
-    // Main temporary folder
+    // Main temporary dir
     @TempDir
     private static Path cwdPath;
-    private static final String[] CWD_NON_FOLDERS = { "a.z", "z.a", "z" };
-    private static final String FOLDER_A_NAME = "folderA";
-    private static final String[] CWD_FOLDERS = { FOLDER_A_NAME };
+    private static final String[] CWD_NON_DIRS = { "a.z", "z.a", "z" };
+    private static final String DIR_A_NAME = "dirA";
+    private static final String[] CWD_DIRS = { DIR_A_NAME };
     private static final String UNSORTED_CWD_CONTENTS = joinStringsBySystemLineSeparator(getCwdContents());
     private static final String UNSORTED_CWD_CONTENTS_WITH_HEADER = joinStringsBySystemLineSeparator(".:",
             UNSORTED_CWD_CONTENTS);
     private final String SORTED_CWD_CONTENTS_STRING = joinStringsBySystemLineSeparator(
-            joinStringsBySystemLineSeparator("folderA", "z", "z.a", "a.z"));
+            joinStringsBySystemLineSeparator("dirA", "z", "z.a", "a.z"));
     private final String SORTED_CWD_CONTENTS_STRING_WITH_HEADER = joinStringsBySystemLineSeparator(".:",
             SORTED_CWD_CONTENTS_STRING);
 
-    // Temporary folder A in main temporary folder
-    private static Path folderAPath;
-    private static final String[] FOLDER_A_NON_FOLDERS = { "0" };
-    private static final String UNSORTED_FOLDER_A_CONTENTS_WITH_HEADER = joinStringsBySystemLineSeparator(
-            String.format(".%s%s:", CHAR_FILE_SEP, FOLDER_A_NAME), getFolderAContents());
-    private static final String SORTED_FOLDER_A_CONTENTS_WITH_HEADER = UNSORTED_FOLDER_A_CONTENTS_WITH_HEADER;
+    // Temporary dir A in main temporary dir
+    private static Path dirAPath;
+    private static final String[] DIR_A_NON_DIRS = { "0" };
+    private static final String UNSORTED_DIR_A_CONTENTS_WITH_HEADER = joinStringsBySystemLineSeparator(
+            String.format(".%s%s:", CHAR_FILE_SEP, DIR_A_NAME), getDirAContents());
+    private static final String SORTED_DIR_A_CONTENTS_WITH_HEADER = UNSORTED_DIR_A_CONTENTS_WITH_HEADER;
 
     private static final String TWO_LINE_SEPARATOR = System.lineSeparator() + System.lineSeparator();
 
     private static String getCwdContents() {
-        List<String> fileList = Stream.concat(Arrays.stream(CWD_NON_FOLDERS), Arrays.stream(CWD_FOLDERS))
+        List<String> fileList = Stream.concat(Arrays.stream(CWD_NON_DIRS), Arrays.stream(CWD_DIRS))
                 .sorted()
                 .collect(Collectors.toList());
         return String.join(System.lineSeparator(), fileList);
     }
 
-    private static String getFolderAContents() {
-        return String.join(System.lineSeparator(), FOLDER_A_NON_FOLDERS) + System.lineSeparator();
+    private static String getDirAContents() {
+        return String.join(System.lineSeparator(), DIR_A_NON_DIRS) + System.lineSeparator();
     }
 
     private static String joinStringsBySystemLineSeparator(String... strings) {
@@ -61,29 +60,27 @@ class LsApplicationHelperTest {
 
     @BeforeAll
     static void setUpEnvironment() throws IOException {
-        for (String file : CWD_NON_FOLDERS) {
+        for (String file : CWD_NON_DIRS) {
             cwdPath.resolve(file).toFile().createNewFile();
         }
-        for (String folder : CWD_FOLDERS) {
-            Files.createDirectory(cwdPath.resolve(folder));
+        for (String dir : CWD_DIRS) {
+            Files.createDirectory(cwdPath.resolve(dir));
         }
-        for (String file : FOLDER_A_NON_FOLDERS) {
-            cwdPath.resolve(CWD_FOLDERS[0]).resolve(file).toFile().createNewFile();
+        for (String file : DIR_A_NON_DIRS) {
+            cwdPath.resolve(CWD_DIRS[0]).resolve(file).toFile().createNewFile();
         }
 
         String cwdPathName = cwdPath.toString();
-        folderAPath = Paths.get(cwdPathName, FOLDER_A_NAME);
+        dirAPath = Paths.get(cwdPathName, DIR_A_NAME);
         // Set current working directory to cwdPath
         System.setProperty("user.dir", cwdPathName);
     }
 
-    // isRecursive = false and isSortByExt = false handled in
-    // LsApplicationTest.run_EmptyArgs_ReturnsCwdContents(...)
     @Test
     void buildResult_IsRecursiveIsTrue_ReturnsAllFiles() {
         // Given
         String expected = String.format("%s%s%s%s", UNSORTED_CWD_CONTENTS_WITH_HEADER, TWO_LINE_SEPARATOR,
-                UNSORTED_FOLDER_A_CONTENTS_WITH_HEADER, System.lineSeparator());
+                UNSORTED_DIR_A_CONTENTS_WITH_HEADER, System.lineSeparator());
 
         // When
         String actual = LsApplicationHelper.buildResult(List.of(cwdPath), true, false, false);
@@ -116,7 +113,7 @@ class LsApplicationHelperTest {
     void buildResult_IsRecursiveIsTrueAndIsSortByExtIsTrue_ReturnsAllFilesSortedByExt() {
         // Given
         String expected = String.format("%s%s%s%s", SORTED_CWD_CONTENTS_STRING_WITH_HEADER, TWO_LINE_SEPARATOR,
-                SORTED_FOLDER_A_CONTENTS_WITH_HEADER, System.lineSeparator());
+                SORTED_DIR_A_CONTENTS_WITH_HEADER, System.lineSeparator());
 
         // When
         String actual = LsApplicationHelper.buildResult(List.of(cwdPath), true, true,
@@ -132,11 +129,10 @@ class LsApplicationHelperTest {
      * @param expected    Expected output.
      * @param isSortByExt Boolean to indicate if output should be sorted by
      *                    extension.
-     * @throws LsException Error is thrown in listCwdContent.
      */
-    void testListCwdContent(String expected, boolean isSortByExt) throws LsException {
+    void testListCwdContent(String expected, boolean isSortByExt) {
         // When
-        String actual = LsApplicationHelper.listCwdContent(isSortByExt);
+        String actual = assertDoesNotThrow(() -> LsApplicationHelper.listCwdContent(isSortByExt));
 
         // Then
         assertEquals(expected, actual);
@@ -144,11 +140,9 @@ class LsApplicationHelperTest {
 
     /**
      * Tests if listCwdContent returns sorted contents when isSortByExt is true.
-     *
-     * @throws LsException Error is thrown in listCwdContent.
      */
     @Test
-    void listCwdContent_IsSortByExtIsTrue_ReturnsSortedCwdContents() throws LsException {
+    void listCwdContent_IsSortByExtIsTrue_ReturnsSortedCwdContents() {
         // Given
         String expected = String.join(System.lineSeparator(), SORTED_CWD_CONTENTS_STRING);
 
@@ -157,11 +151,9 @@ class LsApplicationHelperTest {
 
     /**
      * Tests if listCwdContent returns unsorted contents when isSortByExt is false.
-     *
-     * @throws LsException Error is thrown in listCwdContent.
      */
     @Test
-    void listCwdContent_IsSortByExtIsFalse_ReturnsUnsortedCwdContents() throws LsException {
+    void listCwdContent_IsSortByExtIsFalse_ReturnsUnsortedCwdContents() {
         // Given
         String expected = String.join(System.lineSeparator(), UNSORTED_CWD_CONTENTS);
 
@@ -174,10 +166,10 @@ class LsApplicationHelperTest {
     @Test
     void resolvePaths_ValidDirectory_ReturnsValidListOfPath() {
         // Given
-        List<Path> expected = List.of(folderAPath);
+        List<Path> expected = List.of(dirAPath);
 
         // When
-        List<Path> actual = LsApplicationHelper.resolvePaths(FOLDER_A_NAME);
+        List<Path> actual = LsApplicationHelper.resolvePaths(DIR_A_NAME);
 
         // Then
         assertEquals(expected, actual);

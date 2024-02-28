@@ -101,7 +101,7 @@ public class LsApplicationHelper {
             }
         }
 
-        return error.toString() + result.toString();
+        return error.toString() + result;
     }
 
     /**
