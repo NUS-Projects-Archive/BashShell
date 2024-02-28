@@ -28,6 +28,7 @@ public class WcApplicationTest {
     private static final String NON_EXISTENT_FILE = "nonExistentFile.txt";
     private static final String WC_EXCEPTION_MSG = "wc: ";
     private static final String NUMBER_FORMAT = " %7d";
+    private static final String STRING_FORMAT = " %s";
     private WcApplication wcApplication;
     @TempDir
     private Path wcTestDir;
@@ -92,8 +93,8 @@ public class WcApplicationTest {
     void countFromFiles_CountFromFilesWithAllFlags_ReturnsAllCounts() throws Exception {
         String result = wcApplication.countFromFiles(true, true, true, filePathA, filePathB);
         List<String> expectedList = new ArrayList<>();
-        expectedList.add(appendString(3, 11, 57, String.format(" %s", filePathA)));
-        expectedList.add(appendString(3, 12, 75, String.format(" %s", filePathB)));
+        expectedList.add(appendString(3, 11, 57, String.format(STRING_FORMAT, filePathA)));
+        expectedList.add(appendString(3, 12, 75, String.format(STRING_FORMAT, filePathB)));
         expectedList.add(appendString(6, 23, 132, " total"));
         String expected = String.join(STRING_NEWLINE, expectedList);
         assertEquals(expected, result);
@@ -103,8 +104,8 @@ public class WcApplicationTest {
     void countFromFiles_CountFromFilesWithOnlyBytesFlag_ReturnsOnlyBytesCount() throws Exception {
         String result = wcApplication.countFromFiles(true, false, false, filePathA, filePathB);
         List<String> expectedList = new ArrayList<>();
-        expectedList.add(appendString(-1, -1, 57, String.format(" %s", filePathA)));
-        expectedList.add(appendString(-1, -1, 75, String.format(" %s", filePathB)));
+        expectedList.add(appendString(-1, -1, 57, String.format(STRING_FORMAT, filePathA)));
+        expectedList.add(appendString(-1, -1, 75, String.format(STRING_FORMAT, filePathB)));
         expectedList.add(appendString(-1, -1, 132, " total"));
         String expected = String.join(STRING_NEWLINE, expectedList);
         assertEquals(expected, result);
@@ -114,8 +115,8 @@ public class WcApplicationTest {
     void countFromFiles_CountFromFilesWithBytesAndLinesFlags_ReturnsBytesAndLinesCounts() throws Exception {
         String result = wcApplication.countFromFiles(false, true, true, filePathA, filePathB);
         List<String> expectedList = new ArrayList<>();
-        expectedList.add(appendString(3, 11, -1, String.format(" %s", filePathA)));
-        expectedList.add(appendString(3, 12, -1, String.format(" %s", filePathB)));
+        expectedList.add(appendString(3, 11, -1, String.format(STRING_FORMAT, filePathA)));
+        expectedList.add(appendString(3, 12, -1, String.format(STRING_FORMAT, filePathB)));
         expectedList.add(appendString(6, 23, -1, " total"));
         String expected = String.join(STRING_NEWLINE, expectedList);
         assertEquals(expected, result);
@@ -177,7 +178,7 @@ public class WcApplicationTest {
         }
         List<String> expectedList = new ArrayList<>();
         expectedList.add(appendString(3, 11, 57, " -"));
-        expectedList.add(appendString(3, 12, 75, String.format(" %s", filePathB)));
+        expectedList.add(appendString(3, 12, 75, String.format(STRING_FORMAT, filePathB)));
         expectedList.add(appendString(6, 23, 132, " total"));
         String expected = String.join(STRING_NEWLINE, expectedList);
         assertEquals(expected, result);
@@ -194,7 +195,7 @@ public class WcApplicationTest {
         }
         List<String> expectedList = new ArrayList<>();
         expectedList.add(appendString(-1, -1, 57, " -"));
-        expectedList.add(appendString(-1, -1, 75, String.format(" %s", filePathB)));
+        expectedList.add(appendString(-1, -1, 75, String.format(STRING_FORMAT, filePathB)));
         expectedList.add(appendString(-1, -1, 132, " total"));
         String expected = String.join(STRING_NEWLINE, expectedList);
         assertEquals(expected, result);
@@ -211,7 +212,7 @@ public class WcApplicationTest {
         }
         List<String> expectedList = new ArrayList<>();
         expectedList.add(appendString(3, -1, 57, " -"));
-        expectedList.add(appendString(3, -1, 75, String.format(" %s", filePathB)));
+        expectedList.add(appendString(3, -1, 75, String.format(STRING_FORMAT, filePathB)));
         expectedList.add(appendString(6, -1, 132, " total"));
         String expected = String.join(STRING_NEWLINE, expectedList);
         assertEquals(expected, result);
