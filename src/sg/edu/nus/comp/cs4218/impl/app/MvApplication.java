@@ -140,17 +140,17 @@ public class MvApplication implements MvInterface {
 
         // Ensure that destination folder exist
         if (!Files.exists(destFolderPath)) {
-            throw new MvException(PROB_MV_FOLDER + ERR_FILE_NOT_FOUND);
+            throw new MvException(String.format("%s'%s': %s", PROB_MV_DEST_FILE, destFolder, ERR_FILE_NOT_FOUND));
         }
 
         // Ensure that destination folder is a directory
         if (!Files.isDirectory(destFolderPath)) {
-            throw new MvException(PROB_MV_FOLDER + ERR_IS_DIR);
+            throw new MvException(String.format("%s'%s': %s", PROB_MV_DEST_FILE, destFolder, ERR_IS_DIR));
         }
 
         // Ensure that destination folder have the required write permission
         if (!Files.isWritable(destFolderPath)) {
-            throw new MvException(PROB_MV_FOLDER + ERR_NO_PERM);
+            throw new MvException(String.format("%s'%s': %s", PROB_MV_DEST_FILE, destFolder, ERR_NO_PERM));
         }
 
         List<String> result = new ArrayList<>();
