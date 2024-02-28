@@ -2,24 +2,19 @@ package sg.edu.nus.comp.cs4218.impl.app;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.condition.DisabledOnOs;
-import org.junit.jupiter.api.condition.OS;
 import org.junit.jupiter.api.io.TempDir;
 import sg.edu.nus.comp.cs4218.exception.CutException;
 import sg.edu.nus.comp.cs4218.skeleton.app.CutApplication;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.attribute.PosixFilePermission;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
@@ -85,34 +80,34 @@ class CutApplicationTest {
         String expectedMsg = "cut: OutputStream not provided";
         CutException exception = assertThrowsExactly(CutException.class, () -> {
             String[] args = {"-c", "1-5", tempFilePath.toString()};
-            InputStream stdin = new ByteArrayInputStream(TEMP_CONTENT.getBytes());
-            app.run(args, stdin, null);
+            InputStream mockedStdin = mock(InputStream.class);
+            app.run(args, mockedStdin, null);
         });
         assertEquals(expectedMsg, exception.getMessage());
     }
 
     @Test
-    void run_FailsToReadFromInputStream_CutException() throws IOException {
+    void run_FailsToReadFromInputStream_CutException() {
         String expectedMsg = "cut: Could not read from input stream";
         Throwable result = assertThrows(CutException.class, () -> {
             String[] args = {"-c", "1-5", tempFilePath.toString()};
             InputStream mockedStdin = mock(InputStream.class);
             doThrow(new IOException()).when(mockedStdin).read(any(byte[].class));
-            OutputStream stdout = new ByteArrayOutputStream();
-            app.run(args, mockedStdin, stdout);
+            OutputStream mockedStdout = mock(OutputStream.class);
+            app.run(args, mockedStdin, mockedStdout);
         });
         assertEquals(expectedMsg, result.getMessage());
     }
 
     @Test
-    void run_FailsToWriteToOutputStream_CutException() throws IOException {
+    void run_FailsToWriteToOutputStream_CutException() {
         String expectedMsg = "cut: Could not write to output stream";
         Throwable result = assertThrows(CutException.class, () -> {
             String[] args = {"-c", "1-5", tempFilePath.toString()};
-            InputStream stdin = new ByteArrayInputStream(TEMP_CONTENT.getBytes());
+            InputStream mockedStdin = mock(InputStream.class);
             OutputStream mockedStdout = mock(OutputStream.class);
             doThrow(new IOException()).when(mockedStdout).write(any(byte[].class));
-            app.run(args, stdin, mockedStdout);
+            app.run(args, mockedStdin, mockedStdout);
         });
         assertEquals(expectedMsg, result.getMessage());
     }
@@ -120,10 +115,10 @@ class CutApplicationTest {
     // The tests do not cover scenarios where no flag is provided, more than one flag is given,
     // or the invalidity of the range, as exceptions are expected to be thrown before reaching the cutFromFiles method.
     @Test
-    void cutFromFiles_CutByChar_ReturnsCutRange() throws CutException {
+    void cutFromFiles_CutByChar_ReturnsCutRange() {
         String expected = "12345";
         List<int[]> range = List.of(new int[]{1, 5});
-        String result = app.cutFromFiles(true, false, range, tempFilePath.toString());
+        String result = assertDoesNotThrow(() -> app.cutFromFiles(true, false, range, tempFilePath.toString()));
         assertEquals(expected, result);
     }
 
@@ -131,17 +126,18 @@ class CutApplicationTest {
     void cutFromFiles_CutByByte_ReturnsCutRange() throws CutException {
         String expected = "12345";
         List<int[]> range = List.of(new int[]{1, 5});
-        String result = app.cutFromFiles(false, true, range, tempFilePath.toString());
+        String result = assertDoesNotThrow(() -> app.cutFromFiles(false, true, range, tempFilePath.toString()));
         assertEquals(expected, result);
     }
 
     @Test
-    void cutFromFiles_EmptyFile_ReturnsEmptyString() throws CutException, IOException {
-        Files.write(tempFilePath, "".getBytes()); // Overwrites the file content with an empty string
+    void cutFromFiles_EmptyFile_ReturnsEmptyString() {
+        // Overwrites the file content with an empty string
+        assertDoesNotThrow(() -> Files.write(tempFilePath, "".getBytes()));
         String expected = "";
 
         List<int[]> range = List.of(new int[]{1, 5});
-        String result = app.cutFromFiles(true, false, range, tempFilePath.toString());
+        String result = assertDoesNotThrow(() -> app.cutFromFiles(true, false, range, tempFilePath.toString()));
 
         assertEquals(expected, result);
     }
@@ -182,29 +178,29 @@ class CutApplicationTest {
     }
 
     @Test
-    void cutFromStdin_CutByChar_ReturnsCutRange() throws CutException {
+    void cutFromStdin_CutByChar_ReturnsCutRange() {
         String expected = "12345";
         List<int[]> range = List.of(new int[]{1, 5});
         InputStream stdin = new ByteArrayInputStream(TEMP_CONTENT.getBytes());
-        String result = app.cutFromStdin(true, false, range, stdin);
+        String result = assertDoesNotThrow(() -> app.cutFromStdin(true, false, range, stdin));
         assertEquals(expected, result);
     }
 
     @Test
-    void cutFromStdin_CutByByte_ReturnsCutRange() throws CutException {
+    void cutFromStdin_CutByByte_ReturnsCutRange() {
         String expected = "12345";
         List<int[]> range = List.of(new int[]{1, 5});
         InputStream stdin = new ByteArrayInputStream(TEMP_CONTENT.getBytes());
-        String result = app.cutFromStdin(true, false, range, stdin);
+        String result = assertDoesNotThrow(() -> app.cutFromStdin(true, false, range, stdin));
         assertEquals(expected, result);
     }
 
     @Test
-    void cutFromStdin_EmptyStdin_ReturnsEmptyString() throws CutException {
+    void cutFromStdin_EmptyStdin_ReturnsEmptyString() {
         String expected = "";
         List<int[]> range = List.of(new int[]{1, 5});
         InputStream stdin = new ByteArrayInputStream("".getBytes());
-        String result = app.cutFromStdin(true, false, range, stdin);
+        String result = assertDoesNotThrow(() -> app.cutFromStdin(true, false, range, stdin));
         assertEquals(expected, result);
     }
 }
