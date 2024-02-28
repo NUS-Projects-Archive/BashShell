@@ -77,8 +77,8 @@ class MkdirApplicationTest {
 
     @Test
     void run_FolderDoNotExists_CreateFolderSuccessfully() {
-        Path nonExistFilePath = tempDir.resolve("missingTopLevel/" + NON_EXISTING_FILE);
-        String[] args = {"-p", nonExistFilePath.toString()};
+        Path nonExistFilePath = tempDir.resolve(NON_EXISTING_FILE);
+        String[] args = {nonExistFilePath.toString()};
         assertDoesNotThrow(() -> app.run(args, null, null));
         File file = new File(nonExistFilePath.toString());
         assertTrue(file.exists());
