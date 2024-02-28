@@ -57,8 +57,8 @@ class MkdirArgsParserTest {
     }
 
     @Test
-    void parse_ValidFlag_ReturnsGivenMatchingFlag() throws InvalidArgsException {
-        mkdirArgsParser.parse("-p");
+    void parse_ValidFlag_ReturnsGivenMatchingFlag() {
+        assertDoesNotThrow(() -> mkdirArgsParser.parse("-p"));
         assertEquals(VALID_FLAGS, mkdirArgsParser.flags, "Flags do not match");
     }
 
@@ -84,55 +84,55 @@ class MkdirArgsParserTest {
     }
 
     @Test
-    void isCreateParent_NoFlag_ReturnsFalse() throws InvalidArgsException {
-        mkdirArgsParser.parse();
+    void isCreateParent_NoFlag_ReturnsFalse() {
+        assertDoesNotThrow(() -> mkdirArgsParser.parse());
         assertFalse(mkdirArgsParser.isCreateParent());
     }
 
     @Test
-    void isCreateParent_ValidFlag_ReturnsTrue() throws InvalidArgsException {
-        mkdirArgsParser.parse("-p");
+    void isCreateParent_ValidFlag_ReturnsTrue() {
+        assertDoesNotThrow(() -> mkdirArgsParser.parse("-p"));
         assertTrue(mkdirArgsParser.isCreateParent());
     }
 
     @Test
-    void isCreateParent_ValidFlagAndNonFlagArg_ReturnsTrue() throws InvalidArgsException {
-        mkdirArgsParser.parse("-p", "example");
+    void isCreateParent_ValidFlagAndNonFlagArg_ReturnsTrue() {
+        assertDoesNotThrow(() -> mkdirArgsParser.parse("-p", "example"));
         assertTrue(mkdirArgsParser.isCreateParent());
     }
 
     @Test
-    void isCreateParent_OnlyNonFlagArg_ReturnsFalse() throws InvalidArgsException {
-        mkdirArgsParser.parse("example");
+    void isCreateParent_OnlyNonFlagArg_ReturnsFalse() {
+        assertDoesNotThrow(() -> mkdirArgsParser.parse("example"));
         assertFalse(mkdirArgsParser.isCreateParent());
     }
 
     @Test
-    void getDirectories_NoArg_ReturnsEmpty() throws InvalidArgsException {
-        mkdirArgsParser.parse();
+    void getDirectories_NoArg_ReturnsEmpty() {
+        assertDoesNotThrow(() -> mkdirArgsParser.parse());
         List<String> result = mkdirArgsParser.getDirectories();
         assertTrue(result.isEmpty());
     }
 
     @Test
-    void getDirectories_OneNonFlagArg_ReturnsOneFolder() throws InvalidArgsException {
-        mkdirArgsParser.parse("example");
+    void getDirectories_OneNonFlagArg_ReturnsOneFolder() {
+        assertDoesNotThrow(() -> mkdirArgsParser.parse("example"));
         List<String> expected = List.of("example");
         List<String> result = mkdirArgsParser.getDirectories();
         assertEquals(expected, result);
     }
 
     @Test
-    void getDirectories_MultipleNonFlagArg_ReturnsMultipleFolder() throws InvalidArgsException {
-        mkdirArgsParser.parse("example1", "example2", "example3");
+    void getDirectories_MultipleNonFlagArg_ReturnsMultipleFolder() {
+        assertDoesNotThrow(() -> mkdirArgsParser.parse("example1", "example2", "example3"));
         List<String> expected = List.of("example1", "example2", "example3");
         List<String> result = mkdirArgsParser.getDirectories();
         assertEquals(expected, result);
     }
 
     @Test
-    void getDirectories_ValidFlagAndOneNonFlagArg_ReturnsOneFolder() throws InvalidArgsException {
-        mkdirArgsParser.parse("-p", "example");
+    void getDirectories_ValidFlagAndOneNonFlagArg_ReturnsOneFolder() {
+        assertDoesNotThrow(() -> mkdirArgsParser.parse("-p", "example"));
         List<String> expected = List.of("example");
         List<String> result = mkdirArgsParser.getDirectories();
         assertEquals(expected, result);
