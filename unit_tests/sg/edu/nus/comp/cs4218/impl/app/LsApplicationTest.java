@@ -187,12 +187,12 @@ class LsApplicationTest {
      */
     @ParameterizedTest
     @MethodSource("validArgs")
-    void run_ValidArgs_PrintsCorrectDirectoryContents(String[] args, String expected) throws LsException {
+    void run_ValidArgs_PrintsCorrectDirectoryContents(String[] args, String expected) {
         // Given
         InputStream mockedInputStream = new ByteArrayInputStream("".getBytes());
 
         // When
-        app.run(args, mockedInputStream, System.out);
+        assertDoesNotThrow(() -> app.run(args, mockedInputStream, System.out));
         String actual = outContent.toString();
 
         // Then
@@ -201,18 +201,16 @@ class LsApplicationTest {
 
     /**
      * To test run to print the specified file when args is a valid file.
-     *
-     * @throws LsException To be thrown by run if an error occurs.
      */
     @Test
-    void run_ValidFile_PrintsFileName() throws LsException {
+    void run_ValidFile_PrintsFileName() {
         // Given
         String fileName = CWD_NON_DIRS[0];
         String expected = String.format("%s%s", fileName, System.lineSeparator());
         InputStream mockedInputStream = new ByteArrayInputStream("".getBytes());
 
         // When
-        app.run(new String[] { fileName }, mockedInputStream, System.out);
+        assertDoesNotThrow(() -> app.run(new String[] { fileName }, mockedInputStream, System.out));
 
         // Then
         String actual = outContent.toString();
@@ -221,11 +219,9 @@ class LsApplicationTest {
 
     /**
      * To test run to print file not found error when non-existent dir is entered as argument.
-     *
-     * @throws LsException To be thrown by run if an error occurs.
      */
     @Test
-    void run_NonExistentDir_PrintsFileNotFoundError() throws LsException {
+    void run_NonExistentDir_PrintsFileNotFoundError() {
         // Given
         String nonExistentDirName = "nonExistentDir";
         String expected = String.format("ls: cannot access '%s': %s%s", nonExistentDirName, ERR_FILE_NOT_FOUND,
@@ -233,7 +229,7 @@ class LsApplicationTest {
         InputStream mockedInputStream = new ByteArrayInputStream("".getBytes());
 
         // When
-        app.run(new String[] { nonExistentDirName }, mockedInputStream, System.out);
+        assertDoesNotThrow(() -> app.run(new String[] { nonExistentDirName }, mockedInputStream, System.out));
 
         // Then
         String actual = outContent.toString();
@@ -247,7 +243,7 @@ class LsApplicationTest {
      */
     @Test
     @DisabledOnOs(value = OS.WINDOWS)
-    void run_NoReadPermissionDir_PrintsPermDeniedError() throws IOException, LsException {
+    void run_NoReadPermissionDir_PrintsPermDeniedError() throws IOException {
         // Given
         InputStream mockedInputStream = new ByteArrayInputStream("".getBytes());
         String noReadPermissionDirName = "noReadPermissionDir";
@@ -261,7 +257,7 @@ class LsApplicationTest {
         }
         
         // When
-        app.run(new String[]{noReadPermissionDirName}, mockedInputStream, System.out);
+        assertDoesNotThrow(() -> app.run(new String[]{noReadPermissionDirName}, mockedInputStream, System.out));
 
         // Then
         String actual = outContent.toString();
@@ -309,7 +305,6 @@ class LsApplicationTest {
     /**
      * To test run to return current working directory contents in String format when no dir name is specified.
      */
-    // Essentially the same as run_EmptyArgs_PrintCurrentDirectoryContents
     @Test
     void listDirContent_NoDirNameSpecifiedAndNotRecursive_ReturnsCwdContent() {
         String expected = getCwdContents();
