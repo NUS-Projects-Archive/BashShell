@@ -13,15 +13,13 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.attribute.PosixFilePermission;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 import static sg.edu.nus.comp.cs4218.exception.MvException.PROB_MV_DEST_FILE;
 import static sg.edu.nus.comp.cs4218.exception.MvException.PROB_MV_FOLDER;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_NOT_FOUND;
@@ -104,9 +102,12 @@ class MvApplicationTest {
 
     @Test
     @DisabledOnOs(value = OS.WINDOWS)
-    void mvSrcFileToDestFile_SrcFileNoPermissionToRead_ThrowsMvException() throws IOException {
-        Files.setPosixFilePermissions(tempSrcFilePath,
-                new HashSet<>(Collections.singleton(PosixFilePermission.OWNER_READ)));
+    void mvSrcFileToDestFile_SrcFileNoPermissionToRead_ThrowsMvException() {
+        boolean isReadable = tempSrcFilePath.toFile().setReadable(false);
+        if (isReadable) {
+            fail("Failed to set read permission to false for test");
+        }
+
         Throwable result = assertThrows(MvException.class, () -> {
             app.mvSrcFileToDestFile(false, tempSrcFile, tempDestFile);
         });
@@ -115,9 +116,12 @@ class MvApplicationTest {
 
     @Test
     @DisabledOnOs(value = OS.WINDOWS)
-    void mvSrcFileToDestFile_DestFileNoPermissionToWrite_ThrowsMvException() throws IOException {
-        Files.setPosixFilePermissions(tempDestFilePath,
-                new HashSet<>(Collections.singleton(PosixFilePermission.OWNER_WRITE)));
+    void mvSrcFileToDestFile_DestFileNoPermissionToWrite_ThrowsMvException() {
+        boolean isWritable = tempSrcFilePath.toFile().setWritable(false);
+        if (isWritable) {
+            fail("Failed to set write permission to false for test");
+        }
+
         Throwable result = assertThrows(MvException.class, () -> {
             app.mvSrcFileToDestFile(false, tempSrcFile, tempDestFile);
         });
@@ -181,9 +185,12 @@ class MvApplicationTest {
 
     @Test
     @DisabledOnOs(value = OS.WINDOWS)
-    void mvFilesToFolder_DestFolderNoPermissionToWrite_ThrowsMvException() throws IOException {
-        Files.setPosixFilePermissions(tempDestDirPath,
-                new HashSet<>(Collections.singleton(PosixFilePermission.OWNER_WRITE)));
+    void mvFilesToFolder_DestFolderNoPermissionToWrite_ThrowsMvException() {
+        boolean isWritable = tempDestDirPath.toFile().setWritable(false);
+        if (isWritable) {
+            fail("Failed to set write permission to false for test");
+        }
+
         Throwable result = assertThrows(MvException.class, () -> {
             app.mvFilesToFolder(false, tempDestDir, null);
         });
@@ -201,9 +208,12 @@ class MvApplicationTest {
 
     @Test
     @DisabledOnOs(value = OS.WINDOWS)
-    void mvFilesToFolder_SrcFileNoPermissionToRead_ThrowsMvException() throws IOException {
-        Files.setPosixFilePermissions(tempSrcFilePath,
-                new HashSet<>(Collections.singleton(PosixFilePermission.OWNER_READ)));
+    void mvFilesToFolder_SrcFileNoPermissionToRead_ThrowsMvException() {
+        boolean isReadable = tempSrcFilePath.toFile().setReadable(false);
+        if (isReadable) {
+            fail("Failed to set read permission to false for test");
+        }
+
         Throwable result = assertThrows(MvException.class, () -> {
             app.mvFilesToFolder(false, tempDestDir, tempSrcFile);
         });

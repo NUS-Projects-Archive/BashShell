@@ -20,6 +20,7 @@ import java.util.HashSet;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -160,9 +161,12 @@ class SortApplicationTest {
 
     @Test
     @DisabledOnOs(value = OS.WINDOWS)
-    void sortFromFiles_FileNoPermissionToRead_ThrowsSortException() throws IOException {
-        Files.setPosixFilePermissions(tempFilePath,
-                new HashSet<>(Collections.singleton(PosixFilePermission.OWNER_READ)));
+    void sortFromFiles_FileNoPermissionToRead_ThrowsSortException() {
+        boolean isReadable =  tempFilePath.toFile().setReadable(false);
+        if (isReadable) {
+            fail("Failed to set read permission to false for test");
+        }
+
         Throwable result = assertThrows(SortException.class, () -> {
             app.sortFromFiles(false, false, false, TEMP_FILE);
         });
