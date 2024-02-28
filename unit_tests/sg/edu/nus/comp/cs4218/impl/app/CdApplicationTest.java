@@ -172,8 +172,6 @@ class CdApplicationTest {
 		String dirName = "noPermDirectory";
 		Path noPermDir = Files.createDirectory(dir.resolve(dirName));
 		boolean isSetExecutableSuccess = noPermDir.toFile().setExecutable(false);
-
-		// Guard clause
 		if (!isSetExecutableSuccess) {
 			fail("Failed to set executable permission for directory to test.");
 			Files.delete(noPermDir);
