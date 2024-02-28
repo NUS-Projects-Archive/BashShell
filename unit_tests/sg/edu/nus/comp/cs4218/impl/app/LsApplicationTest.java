@@ -2,7 +2,6 @@ package sg.edu.nus.comp.cs4218.impl.app;
 
 import sg.edu.nus.comp.cs4218.exception.LsException;
 
-import java.nio.file.attribute.PosixFilePermissions;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -10,12 +9,10 @@ import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.attribute.PosixFilePermission;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -228,31 +225,28 @@ class LsApplicationTest {
      */
     @Test
     @DisabledOnOs(value = OS.WINDOWS)
-    void run_NoReadPermissionFolder_PrintsPermDeniedError() {
+    void run_NoReadPermissionFolder_PrintsPermDeniedError() throws IOException, LsException {
         // Given
         String noReadPermissionFolderName = "noReadPermissionFolder";
         Path noReadPermissionFolderPath = cwdPath.resolve(noReadPermissionFolderName);
-        Set<PosixFilePermission> perms = PosixFilePermissions.fromString("-wx-wx-wx");
-        try {
-            Files.createDirectory(noReadPermissionFolderPath, PosixFilePermissions.asFileAttribute(perms));
-
-            // When
-            app.run(new String[]{noReadPermissionFolderName}, System.in, System.out);
-
-            // Then
-            String actual = outContent.toString();
-            String expected = String.format("ls: cannot open directory '%s': %s%s", noReadPermissionFolderName, ERR_NO_PERM,
-                    System.lineSeparator());
-            assertEquals(expected, actual);
-        } catch (IOException | LsException e) {
-            fail("Test failed due to exception: " + e.getMessage());
-        } finally {
-            try {
-                Files.deleteIfExists(noReadPermissionFolderPath);
-            } catch (IOException e) {
-                System.err.println("Failed to delete test directory: " + e.getMessage());
-            }
+        Files.createDirectories(noReadPermissionFolderPath);
+        boolean isSetReadableSuccess = noReadPermissionFolderPath.toFile().setReadable(false);
+        if (!isSetReadableSuccess) {
+            fail("Failed to set read permission for directory to test.");
+            Files.deleteIfExists(noReadPermissionFolderPath);
+            return;
         }
+        
+        // When
+        app.run(new String[]{noReadPermissionFolderName}, System.in, System.out);
+
+        // Then
+        String actual = outContent.toString();
+        String expected = String.format("ls: cannot open directory '%s': %s%s", noReadPermissionFolderName, ERR_NO_PERM,
+                System.lineSeparator());
+        assertEquals(expected, actual);
+
+        Files.deleteIfExists(noReadPermissionFolderPath);
     }
 
     /**
