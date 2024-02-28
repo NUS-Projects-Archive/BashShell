@@ -101,8 +101,8 @@ class MvApplicationTest {
     @Test
     @DisabledOnOs(value = OS.WINDOWS)
     void mvSrcFileToDestFile_SrcFileNoPermissionToRead_ThrowsMvException() {
-        boolean isReadable = tempSrcFilePath.toFile().setReadable(false);
-        if (isReadable) {
+        boolean isSetReadable = tempSrcFilePath.toFile().setReadable(false);
+        if (!isSetReadable) {
             fail("Failed to set read permission to false for test source file");
         }
 
@@ -117,8 +117,8 @@ class MvApplicationTest {
     @Test
     @DisabledOnOs(value = OS.WINDOWS)
     void mvSrcFileToDestFile_DestFileNoPermissionToWrite_ThrowsMvException() {
-        boolean isWritable = tempDestFilePath.toFile().setWritable(false);
-        if (isWritable) {
+        boolean isSetWritable = tempDestFilePath.toFile().setWritable(false);
+        if (!isSetWritable) {
             fail("Failed to set write permission to false for test destination file");
         }
 
@@ -190,8 +190,8 @@ class MvApplicationTest {
     @Test
     @DisabledOnOs(value = OS.WINDOWS)
     void mvFilesToFolder_DestFolderNoPermissionToWrite_ThrowsMvException() {
-        boolean isWritable = tempDestDirPath.toFile().setWritable(false);
-        if (isWritable) {
+        boolean isSetWritable = tempDestDirPath.toFile().setWritable(false);
+        if (!isSetWritable) {
             fail("Failed to set write permission to false for test destination directory");
         }
 
@@ -213,8 +213,8 @@ class MvApplicationTest {
     @Test
     @DisabledOnOs(value = OS.WINDOWS)
     void mvFilesToFolder_SrcFileNoPermissionToRead_ReturnsErrorMessage() throws MvException {
-        boolean isReadable = tempSrcFilePath.toFile().setReadable(false);
-        if (isReadable) {
+        boolean isSetReadable = tempSrcFilePath.toFile().setReadable(false);
+        if (!isSetReadable) {
             fail("Failed to set read permission to false for test source file");
         }
 

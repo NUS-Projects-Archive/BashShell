@@ -157,8 +157,8 @@ class SortApplicationTest {
     @Test
     @DisabledOnOs(value = OS.WINDOWS)
     void sortFromFiles_FileNoPermissionToRead_ThrowsSortException() {
-        boolean isReadable = tempFilePath.toFile().setReadable(false);
-        if (isReadable) {
+        boolean isSetReadable = tempFilePath.toFile().setReadable(false);
+        if (!isSetReadable) {
             fail("Failed to set read permission to false for test");
         }
 
