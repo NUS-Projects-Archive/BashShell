@@ -131,7 +131,7 @@ public class MvApplication implements MvInterface {
      * @param isOverwrite Boolean option to perform overwriting
      * @param destFolder  String representing the path to the destination folder
      * @param fileName    Array of String representing the file names
-     * @return null.
+     * @return Null if successful; otherwise, returns messages related to source file errors
      * @throws MvException
      */
     @Override

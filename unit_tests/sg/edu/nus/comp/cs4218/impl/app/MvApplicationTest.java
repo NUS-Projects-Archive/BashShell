@@ -15,6 +15,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -131,16 +132,16 @@ class MvApplicationTest {
     }
 
     @Test
-    void mvSrcFileToDestFile_DestFileDoNotExist_MovedFile() throws IOException, MvException {
+    void mvSrcFileToDestFile_DestFileDoNotExist_MovedFile() {
         String content = "a b c";
-        Files.write(tempSrcFilePath, content.getBytes());
-        List<String> expectedContent = Files.readAllLines(tempSrcFilePath);
+        assertDoesNotThrow(() -> Files.write(tempSrcFilePath, content.getBytes()));
+        List<String> expectedContent = assertDoesNotThrow(() -> Files.readAllLines(tempSrcFilePath));
 
         Path nonExistDestPath = tempDir.resolve("nonExistFile.txt");
         String nonExistDestFile = nonExistDestPath.toString();
 
-        app.mvSrcFileToDestFile(false, tempSrcFile, nonExistDestFile);
-        List<String> actualContent = Files.readAllLines(nonExistDestPath);
+        assertDoesNotThrow(() -> app.mvSrcFileToDestFile(false, tempSrcFile, nonExistDestFile));
+        List<String> actualContent = assertDoesNotThrow(() -> Files.readAllLines(nonExistDestPath));
 
         File destFile = nonExistDestPath.toFile();
         File srcFile = tempSrcFilePath.toFile();
@@ -151,16 +152,16 @@ class MvApplicationTest {
     }
 
     @Test
-    void mvSrcFileToDestFile_IsOverwrite_MovedFile() throws IOException, MvException {
+    void mvSrcFileToDestFile_IsOverwrite_MovedFile() {
         String srcContent = "a b c";
-        Files.write(tempSrcFilePath, srcContent.getBytes());
-        List<String> expectedContent = Files.readAllLines(tempSrcFilePath);
+        assertDoesNotThrow(() -> Files.write(tempSrcFilePath, srcContent.getBytes()));
+        List<String> expectedContent = assertDoesNotThrow(() -> Files.readAllLines(tempSrcFilePath));
 
         String destContent = "1 2 3";
-        Files.write(tempDestFilePath, destContent.getBytes());
+        assertDoesNotThrow(() -> Files.write(tempDestFilePath, destContent.getBytes()));
 
-        app.mvSrcFileToDestFile(true, tempSrcFile, tempDestFile);
-        List<String> actualContent = Files.readAllLines(tempDestFilePath);
+        assertDoesNotThrow(() -> app.mvSrcFileToDestFile(true, tempSrcFile, tempDestFile));
+        List<String> actualContent = assertDoesNotThrow(() -> Files.readAllLines(tempDestFilePath));
 
         File srcFile = tempSrcFilePath.toFile();
 
@@ -203,29 +204,29 @@ class MvApplicationTest {
     }
 
     @Test
-    void mvFilesToFolder_SrcFileDoNotExist_ReturnsErrorMessage() throws MvException {
+    void mvFilesToFolder_SrcFileDoNotExist_ReturnsErrorMessage() {
         String nonExistFile = tempDir.resolve("nonExistFile.txt").toString();
         String expected = String.format("mv: Problem move to folder: '%s': No such file or directory", nonExistFile);
-        String actual = app.mvFilesToFolder(false, tempDestDir, nonExistFile);
+        String actual = assertDoesNotThrow(() -> app.mvFilesToFolder(false, tempDestDir, nonExistFile));
         assertEquals(expected, actual);
     }
 
     @Test
     @DisabledOnOs(value = OS.WINDOWS)
-    void mvFilesToFolder_SrcFileNoPermissionToRead_ReturnsErrorMessage() throws MvException {
+    void mvFilesToFolder_SrcFileNoPermissionToRead_ReturnsErrorMessage() {
         boolean isSetReadable = tempSrcFilePath.toFile().setReadable(false);
         if (!isSetReadable) {
             fail("Failed to set read permission to false for test source file");
         }
 
         String expected = String.format("mv: Problem move to folder: '%s': Permission denied", tempSrcFile);
-        String actual = app.mvFilesToFolder(false, tempDestDir, tempSrcFile);
+        String actual = assertDoesNotThrow(() -> app.mvFilesToFolder(false, tempDestDir, tempSrcFile));
         assertEquals(expected, actual);
     }
 
     @Test
-    void mvFilesToFolder_SrcFileDoNotExistInDestFolder_MovedFile() throws MvException {
-        String result = app.mvFilesToFolder(false, tempDestDir, tempSrcFile);
+    void mvFilesToFolder_SrcFileDoNotExistInDestFolder_MovedFile() {
+        String result = assertDoesNotThrow(() -> app.mvFilesToFolder(false, tempDestDir, tempSrcFile));
         File srcFile = tempSrcFilePath.toFile();
         File movedSrcFile = tempDestDirPath.resolve(TEMP_SRC_FILE).toFile();
 
@@ -235,21 +236,21 @@ class MvApplicationTest {
     }
 
     @Test
-    void mvFilesToFolder_IsOverwrite_MovedFile() throws IOException, MvException {
+    void mvFilesToFolder_IsOverwrite_MovedFile() {
         String srcContent = "a b c";
-        Files.write(tempSrcFilePath, srcContent.getBytes());
-        List<String> expectedContent = Files.readAllLines(tempSrcFilePath);
+        assertDoesNotThrow(() -> Files.write(tempSrcFilePath, srcContent.getBytes()));
+        List<String> expectedContent = assertDoesNotThrow(() -> Files.readAllLines(tempSrcFilePath));
 
         String overwriteContent = "1 2 3";
         Path destFilePath = tempDestDirPath.resolve(TEMP_SRC_FILE);
-        Files.createFile(destFilePath);
-        Files.write(destFilePath, overwriteContent.getBytes());
+        assertDoesNotThrow(() -> Files.createFile(destFilePath));
+        assertDoesNotThrow(() -> Files.write(destFilePath, overwriteContent.getBytes()));
 
         // assert that another src file of different content exist in subdirectory
         assertTrue(destFilePath.toFile().exists());
 
-        app.mvFilesToFolder(true, tempDestDir, tempSrcFile);
-        List<String> actualContent = Files.readAllLines(destFilePath);
+        assertDoesNotThrow(() -> app.mvFilesToFolder(true, tempDestDir, tempSrcFile));
+        List<String> actualContent = assertDoesNotThrow(() -> Files.readAllLines(destFilePath));
 
         File destFile = destFilePath.toFile();
         File srcFile = tempSrcFilePath.toFile();
@@ -260,13 +261,14 @@ class MvApplicationTest {
     }
 
     @Test
-    void mvFilesToFolder_MultipleSrcFilesAllExists_MovedFile() throws IOException, MvException {
+    void mvFilesToFolder_MultipleSrcFilesAllExists_MovedFile() {
         Path srcFileAPath = tempDir.resolve("A");
         Path srcFileBPath = tempDir.resolve("B");
-        Files.createFile(srcFileAPath);
-        Files.createFile(srcFileBPath);
+        assertDoesNotThrow(() -> Files.createFile(srcFileAPath));
+        assertDoesNotThrow(() -> Files.createFile(srcFileBPath));
 
-        app.mvFilesToFolder(false, tempDestDirPath.toString(), srcFileAPath.toString(), srcFileBPath.toString());
+        assertDoesNotThrow(() -> app.mvFilesToFolder(false, tempDestDirPath.toString(),
+                srcFileAPath.toString(), srcFileBPath.toString()));
 
         File movedSrcFileA = tempDestDirPath.resolve("A").toFile();
         File movedSrcFileB = tempDestDirPath.resolve("B").toFile();
@@ -280,16 +282,16 @@ class MvApplicationTest {
     }
 
     @Test
-    void mvFilesToFolder_SomeSrcFileDoNotExistsAtEnd_MovedFile() throws IOException, MvException {
+    void mvFilesToFolder_SomeSrcFileDoNotExistsAtEnd_MovedFile() {
         Path srcFileAPath = tempDir.resolve("A");
         Path srcFileBPath = tempDir.resolve("B");
         Path srcFileCPath = tempDir.resolve("C"); // do not exist
-        Files.createFile(srcFileAPath);
-        Files.createFile(srcFileBPath);
+        assertDoesNotThrow(() -> Files.createFile(srcFileAPath));
+        assertDoesNotThrow(() -> Files.createFile(srcFileBPath));
 
         String expected = String.format("mv: Problem move to folder: '%s': No such file or directory", srcFileCPath);
-        String actual = app.mvFilesToFolder(false, tempDestDirPath.toString(),
-                srcFileAPath.toString(), srcFileBPath.toString(), srcFileCPath.toString());
+        String actual = assertDoesNotThrow(() -> app.mvFilesToFolder(false, tempDestDirPath.toString(),
+                srcFileAPath.toString(), srcFileBPath.toString(), srcFileCPath.toString()));
 
         File movedSrcFileA = tempDestDirPath.resolve("A").toFile();
         File movedSrcFileB = tempDestDirPath.resolve("B").toFile();
@@ -304,16 +306,16 @@ class MvApplicationTest {
     }
 
     @Test
-    void mvFilesToFolder_SomeSrcFileDoNotExistsAtStart_MovedFile() throws IOException, MvException {
+    void mvFilesToFolder_SomeSrcFileDoNotExistsAtStart_MovedFile() {
         Path srcFileAPath = tempDir.resolve("A"); // do not exist
         Path srcFileBPath = tempDir.resolve("B");
         Path srcFileCPath = tempDir.resolve("C");
-        Files.createFile(srcFileBPath);
-        Files.createFile(srcFileCPath);
+        assertDoesNotThrow(() -> Files.createFile(srcFileBPath));
+        assertDoesNotThrow(() -> Files.createFile(srcFileCPath));
 
         String expected = String.format("mv: Problem move to folder: '%s': No such file or directory", srcFileAPath);
-        String actual = app.mvFilesToFolder(false, tempDestDirPath.toString(),
-                srcFileAPath.toString(), srcFileBPath.toString(), srcFileCPath.toString());
+        String actual = assertDoesNotThrow(() -> app.mvFilesToFolder(false, tempDestDirPath.toString(),
+                srcFileAPath.toString(), srcFileBPath.toString(), srcFileCPath.toString()));
 
         File movedSrcFileB = tempDestDirPath.resolve("B").toFile();
         File movedSrcFileC = tempDestDirPath.resolve("C").toFile();
