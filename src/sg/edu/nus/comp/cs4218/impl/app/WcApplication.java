@@ -57,7 +57,7 @@ public class WcApplication implements WcInterface {
         try {
             wcArgsParser.parse(args);
         } catch (InvalidArgsException e) {
-            throw new WcException(e.getMessage());
+            throw new WcException(e.getMessage(), e);
         }
         String result;
         try {
@@ -122,13 +122,13 @@ public class WcApplication implements WcInterface {
             try {
                 input = IOUtils.openInputStream(file);
             } catch (ShellException e) {
-                throw new WcException(e.getMessage());
+                throw new WcException(e.getMessage(), e);
             }
             long[] count = getCountReport(input); // lines words bytes
             try {
                 IOUtils.closeInputStream(input);
             } catch (ShellException e) {
-                throw new WcException(e.getMessage());
+                throw new WcException(e.getMessage(), e);
             }
 
             // Format all output: " %7d %7d %7d %s"
@@ -226,7 +226,7 @@ public class WcApplication implements WcInterface {
 
             return String.join(STRING_NEWLINE, result);
         } catch (WcException e) {
-            throw new WcException(e.getMessage());
+            throw new WcException(e.getMessage(), e);
         }
     }
 
@@ -271,7 +271,7 @@ public class WcApplication implements WcInterface {
                 ++result[WORDS_INDEX]; // To handle last word
             }
         } catch (IOException e) {
-            throw new WcException(ERR_IO_EXCEPTION);
+            throw new WcException(ERR_IO_EXCEPTION, e);
         }
         totalWords += result[WORDS_INDEX];
         totalBytes += result[BYTES_INDEX];
