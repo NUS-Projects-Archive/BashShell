@@ -171,17 +171,20 @@ class CdApplicationTest {
 		// Given
 		String dirName = "noPermDirectory";
 		Path noPermDir = Files.createDirectory(dir.resolve(dirName));
-		boolean isExecutableSet = noPermDir.toFile().setExecutable(false);
+		boolean isSetExecutableSuccess = noPermDir.toFile().setExecutable(false);
 
-        if (isExecutableSet) {
-            // When
-            Throwable result = assertThrows(CdException.class, () -> cdApplication.changeToDirectory(dirName));
-
-            // Then
-            assertEquals(String.format("cd: %s: %s", dirName, ERR_NO_PERM), result.getMessage());
-        } else {
+		// Guard clause
+		if (!isSetExecutableSuccess) {
 			fail("Failed to set executable permission for directory to test.");
-        }
+			Files.delete(noPermDir);
+			return;
+		}
+
+		// When
+		Throwable result = assertThrows(CdException.class, () -> cdApplication.changeToDirectory(dirName));
+
+		// Then
+		assertEquals(String.format("cd: %s: %s", dirName, ERR_NO_PERM), result.getMessage());
 
 		Files.delete(noPermDir);
 	}
