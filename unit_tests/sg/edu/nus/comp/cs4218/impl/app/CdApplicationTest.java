@@ -30,6 +30,8 @@ import java.nio.file.Path;
 import java.util.stream.Stream;
 
 class CdApplicationTest {
+    private static final String DIR_NAME = "tempDir";
+    private static final String CHILD_DIR_NAME = "tempChildDir";
 
 	@TempDir
 	static Path parentDir;
@@ -37,10 +39,8 @@ class CdApplicationTest {
 
 	private static Path dir;
     private static String dirAbsPath;
-    private static final String DIR_NAME = "tempDir";
 
 	private static String childDirAbsPath;
-	private static final String CHILD_DIR_NAME = "tempChildDir";
 
 	private static CdApplication cdApplication;
 
