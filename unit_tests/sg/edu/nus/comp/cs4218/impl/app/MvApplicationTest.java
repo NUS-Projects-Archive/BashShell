@@ -195,7 +195,7 @@ class MvApplicationTest {
             fail("Failed to set write permission to false for test destination directory");
         }
 
-        String expectedMsg = String.format("mv: Problem move to folder: '%s': Permission denied", tempDestFile);
+        String expectedMsg = String.format("mv: Problem move to folder: '%s': Permission denied", tempDestDirPath);
         MvException exception = assertThrowsExactly(MvException.class, () -> {
             app.mvFilesToFolder(false, tempDestDir, null);
         });
