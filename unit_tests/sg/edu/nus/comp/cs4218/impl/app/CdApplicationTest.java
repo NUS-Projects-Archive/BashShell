@@ -33,25 +33,25 @@ class CdApplicationTest {
     private static final String DIR_NAME = "tempDir";
     private static final String CHILD_DIR_NAME = "tempChildDir";
 
-	@TempDir
-	static Path parentDir;
-	private static String parentDirAbsPath;
+    @TempDir
+    static Path parentDir;
+    private static String parentDirAbsPath;
 
-	private static Path dir;
+    private static Path dir;
     private static String dirAbsPath;
 
-	private static String childDirAbsPath;
+    private static String childDirAbsPath;
 
-	private static CdApplication cdApplication;
+    private static CdApplication cdApplication;
 
     static Stream<Arguments> getValidDirs() {
         return Stream.of(
-				Arguments.of(".", dirAbsPath),
-				Arguments.of("..", parentDirAbsPath),
-                Arguments.of(String.format(".%s%s", CHAR_FILE_SEP, CHILD_DIR_NAME), childDirAbsPath),
-                Arguments.of(String.format("..%s%s", CHAR_FILE_SEP, DIR_NAME), dirAbsPath),
-				Arguments.of(childDirAbsPath, childDirAbsPath),
-				Arguments.of(CHILD_DIR_NAME, childDirAbsPath)
+            Arguments.of(".", dirAbsPath),
+            Arguments.of("..", parentDirAbsPath),
+            Arguments.of(String.format(".%s%s", CHAR_FILE_SEP, CHILD_DIR_NAME), childDirAbsPath),
+            Arguments.of(String.format("..%s%s", CHAR_FILE_SEP, DIR_NAME), dirAbsPath),
+            Arguments.of(childDirAbsPath, childDirAbsPath),
+            Arguments.of(CHILD_DIR_NAME, childDirAbsPath)
         );
     }
 
