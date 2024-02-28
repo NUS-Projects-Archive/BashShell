@@ -23,6 +23,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -166,11 +167,13 @@ class CutApplicationTest {
     }
 
     @Test
-    @DisabledOnOs(value = OS.WINDOWS)
-    void cutFromFiles_FileNoPermissionToRead_ThrowsCutException() throws IOException {
+    void cutFromFiles_FileNoPermissionToRead_ThrowsCutException() {
         String expectedMsg = "cut: Permission denied";
-        Files.setPosixFilePermissions(tempFilePath,
-                new HashSet<>(Collections.singleton(PosixFilePermission.OWNER_READ)));
+        boolean isReadable = tempFilePath.toFile().setReadable(false);
+        if (isReadable) {
+            fail("Failed to set read permission to false for test");
+        }
+
         CutException exception = assertThrowsExactly(CutException.class, () -> {
             List<int[]> range = List.of(new int[]{1, 5});
             app.cutFromFiles(true, false, range, tempFilePath.toString());
