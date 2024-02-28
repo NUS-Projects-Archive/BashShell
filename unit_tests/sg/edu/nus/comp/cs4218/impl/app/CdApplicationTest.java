@@ -13,7 +13,11 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.fail;
+import static org.mockito.Mockito.mock;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_NOT_FOUND;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IS_NOT_DIR;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_ARGS;
@@ -23,6 +27,8 @@ import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_TOO_MANY_ARGS;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_FILE_SEP;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.stream.Stream;
@@ -42,7 +48,7 @@ class CdApplicationTest {
 
     private static CdApplication cdApplication;
 
-    static Stream<Arguments> getValidDirs() {
+    static Stream<Arguments> validDirs() {
         return Stream.of(
             Arguments.of(".", dirAbsPath),
             Arguments.of("..", parentDirAbsPath),
@@ -86,7 +92,10 @@ class CdApplicationTest {
      */
     @Test
     void run_NullArgs_ThrowsErrNullArgs() {
-        Throwable result = assertThrows(CdException.class, () -> cdApplication.run(null, System.in, System.out));
+        InputStream mockInputStream = mock(InputStream.class);
+        OutputStream mockOutputStream = mock(OutputStream.class);
+
+        CdException result = assertThrows(CdException.class, () -> cdApplication.run(null, mockInputStream, mockOutputStream));
         assertEquals("cd: " + ERR_NULL_ARGS, result.getMessage());
     }
 
@@ -95,8 +104,11 @@ class CdApplicationTest {
      */
     @Test
     void run_MultipleArgs_ThrowsErrTooManyArgs() {
-        Throwable result = assertThrows(CdException.class, () -> cdApplication.run(new String[] { "a", "b" }, System.in,
-                System.out));
+        InputStream mockInputStream = mock(InputStream.class);
+        OutputStream mockOutputStream = mock(OutputStream.class);
+
+        CdException result = assertThrows(CdException.class, () -> cdApplication.run(new String[] { "a", "b" },
+                mockInputStream, mockOutputStream));
         assertEquals(String.format("cd: %s", ERR_TOO_MANY_ARGS), result.getMessage());
     }
 
@@ -105,7 +117,10 @@ class CdApplicationTest {
      */
     @Test
     void run_EmptyArgs_DoNothing() {
-        assertDoesNotThrow(() -> cdApplication.run(new String[] {}, System.in, System.out));
+        InputStream mockInputStream = mock(InputStream.class);
+        OutputStream mockOutputStream = mock(OutputStream.class);
+
+        assertDoesNotThrow(() -> cdApplication.run(new String[] {}, mockInputStream, mockOutputStream));
         assertEquals(Environment.currentDirectory, Environment.currentDirectory);
     }
 
@@ -114,9 +129,12 @@ class CdApplicationTest {
      * valid directory.
      */
     @ParameterizedTest
-    @MethodSource("getValidDirs")
+    @MethodSource("validDirs")
     void run_ValidDir_ChangeCurrentDirectoryToArg(String validDir, Path expectedDir) {
-        assertDoesNotThrow(() -> cdApplication.run(new String[] { validDir }, System.in, System.out));
+        InputStream mockInputStream = mock(InputStream.class);
+        OutputStream mockOutputStream = mock(OutputStream.class);
+
+        assertDoesNotThrow(() -> cdApplication.run(new String[] { validDir }, mockInputStream, mockOutputStream));
         assertEquals(expectedDir.toString(), Environment.currentDirectory);
     }
 
@@ -128,7 +146,7 @@ class CdApplicationTest {
      * @param expectedDir   Path of the expected directory.
      */
     @ParameterizedTest
-    @MethodSource("getValidDirs")
+    @MethodSource("validDirs")
     void changeToDirectory_ValidDirectory_ChangeCurrentDirectoryToValidDirectory(String validDir, Path expectedDir) {
         assertDoesNotThrow(() -> cdApplication.changeToDirectory(validDir));
         assertEquals(expectedDir.toString(), Environment.currentDirectory);
@@ -140,7 +158,7 @@ class CdApplicationTest {
      */
     @Test
     void changeToDirectory_NullPathStr_ThrowsErrNoArgs() {
-        Throwable result = assertThrows(CdException.class, () -> cdApplication.changeToDirectory(null));
+        CdException result = assertThrows(CdException.class, () -> cdApplication.changeToDirectory(null));
         assertEquals(String.format("cd: %s", ERR_NO_ARGS), result.getMessage());
     }
 
@@ -150,7 +168,7 @@ class CdApplicationTest {
      */
     @Test
     void changeToDirectory_EmptyPathStr_ThrowsErrNoArgs() {
-        Throwable result = assertThrows(CdException.class, () -> cdApplication.changeToDirectory(""));
+        CdException result = assertThrows(CdException.class, () -> cdApplication.changeToDirectory(""));
         assertEquals(String.format("cd: %s", ERR_NO_ARGS), result.getMessage());
     }
 
@@ -178,7 +196,7 @@ class CdApplicationTest {
         }
 
         // When
-        Throwable result = assertThrows(CdException.class, () -> cdApplication.changeToDirectory(dirName));
+        CdException result = assertThrows(CdException.class, () -> cdApplication.changeToDirectory(dirName));
 
         // Then
         assertEquals(String.format("cd: %s: %s", dirName, ERR_NO_PERM), result.getMessage());
@@ -200,7 +218,7 @@ class CdApplicationTest {
         String dirName = "nonExistentDirectory";
 
         // When
-        Throwable result = assertThrows(CdException.class, () -> cdApplication.changeToDirectory(dirName));
+        CdException result = assertThrows(CdException.class, () -> cdApplication.changeToDirectory(dirName));
 
         // Then
         assertEquals(String.format("cd: %s: %s", dirName, ERR_FILE_NOT_FOUND), result.getMessage());
@@ -223,7 +241,7 @@ class CdApplicationTest {
         }
 
         // When
-        Throwable result = assertThrows(CdException.class, () -> cdApplication.changeToDirectory(fileName));
+        CdException result = assertThrows(CdException.class, () -> cdApplication.changeToDirectory(fileName));
 
         // Then
         assertEquals(String.format("cd: %s: %s", fileName, ERR_IS_NOT_DIR), result.getMessage());
