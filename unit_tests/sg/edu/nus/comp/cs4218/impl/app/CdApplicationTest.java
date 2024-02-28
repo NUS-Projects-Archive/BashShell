@@ -118,8 +118,8 @@ class CdApplicationTest {
 	@ParameterizedTest
 	@MethodSource("getValidDirs")
 	void run_ValidDir_ChangeCurrentDirectoryToArg(String validDir, Path expectedDir) throws CdException {
-	cdApplication.run(new String[] { validDir }, System.in, System.out);
-	assertEquals(expectedDir.toString(), Environment.currentDirectory);
+		cdApplication.run(new String[] { validDir }, System.in, System.out);
+		assertEquals(expectedDir.toString(), Environment.currentDirectory);
 	}
 
 	/**
