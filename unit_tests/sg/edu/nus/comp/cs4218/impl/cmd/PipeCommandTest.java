@@ -3,29 +3,16 @@ package sg.edu.nus.comp.cs4218.impl.cmd;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
-import static org.mockito.Mockito.mock;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 
 import java.io.ByteArrayOutputStream;
 import java.util.Arrays;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import sg.edu.nus.comp.cs4218.exception.ShellException;
-import sg.edu.nus.comp.cs4218.impl.util.ApplicationRunner;
-import sg.edu.nus.comp.cs4218.impl.util.ArgumentResolver;
 
 public class PipeCommandTest {
-
-    ApplicationRunner mockAppRunner;
-    ArgumentResolver mockArgResolver;
-
-    @BeforeEach
-    void setUp() {
-        mockAppRunner = mock(ApplicationRunner.class);
-        mockArgResolver = mock(ArgumentResolver.class);
-    }
 
     @Test
     void evaluate_InvalidFirstCommand_PrintErrorMessage() {
