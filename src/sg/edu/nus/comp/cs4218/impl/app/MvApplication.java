@@ -140,17 +140,17 @@ public class MvApplication implements MvInterface {
 
         // Ensure that destination folder exist
         if (!Files.exists(destFolderPath)) {
-            throw new MvException(String.format("%s'%s': %s", PROB_MV_DEST_FILE, destFolder, ERR_FILE_NOT_FOUND));
+            throw new MvException(String.format("%s'%s': %s", PROB_MV_FOLDER, destFolder, ERR_FILE_NOT_FOUND));
         }
 
         // Ensure that destination folder is a directory
         if (!Files.isDirectory(destFolderPath)) {
-            throw new MvException(String.format("%s'%s': %s", PROB_MV_DEST_FILE, destFolder, ERR_IS_DIR));
+            throw new MvException(String.format("%s'%s': %s", PROB_MV_FOLDER, destFolder, ERR_IS_DIR));
         }
 
         // Ensure that destination folder have the required write permission
         if (!Files.isWritable(destFolderPath)) {
-            throw new MvException(String.format("%s'%s': %s", PROB_MV_DEST_FILE, destFolder, ERR_NO_PERM));
+            throw new MvException(String.format("%s'%s': %s", PROB_MV_FOLDER, destFolder, ERR_NO_PERM));
         }
 
         List<String> result = new ArrayList<>();
@@ -160,14 +160,12 @@ public class MvApplication implements MvInterface {
 
             // Ensure that source file exist
             if (!Files.exists(srcPath)) {
-                // throw new MvException(PROB_MV_FOLDER + ERR_FILE_NOT_FOUND);
                 result.add(String.format("mv: %s'%s': %s", PROB_MV_FOLDER, srcFile, ERR_FILE_NOT_FOUND));
                 continue;
             }
 
             // Ensure that source file have the required read permission
             if (!Files.isReadable(srcPath)) {
-                // throw new MvException(PROB_MV_FOLDER + ERR_NO_PERM);
                 result.add(String.format("mv: %s'%s': %s", PROB_MV_FOLDER, srcFile, ERR_NO_PERM));
                 continue;
             }
