@@ -20,6 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@SuppressWarnings("PMD.AvoidDuplicateLiterals")
 public class CutArgsParserTest {
 
     private final Set<Character> VALID_FLAGS = Set.of('c', 'b');

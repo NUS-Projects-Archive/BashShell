@@ -27,6 +27,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 
+@SuppressWarnings("PMD.AvoidDuplicateLiterals")
 class CutApplicationTest {
 
     private static final String TEMP_FILE = "file.txt";
@@ -91,10 +92,10 @@ class CutApplicationTest {
     @Test
     void run_FailsToReadFromInputStream_CutException() throws IOException {
         String expectedMsg = "cut: Could not read from input stream";
-        InputStream mockedStdin = mock(InputStream.class);
-        doThrow(new IOException()).when(mockedStdin).read(any(byte[].class));
         Throwable result = assertThrows(CutException.class, () -> {
             String[] args = {"-c", "1-5", tempFilePath.toString()};
+            InputStream mockedStdin = mock(InputStream.class);
+            doThrow(new IOException()).when(mockedStdin).read(any(byte[].class));
             OutputStream stdout = new ByteArrayOutputStream();
             app.run(args, mockedStdin, stdout);
         });
@@ -104,11 +105,11 @@ class CutApplicationTest {
     @Test
     void run_FailsToWriteToOutputStream_CutException() throws IOException {
         String expectedMsg = "cut: Could not write to output stream";
-        OutputStream mockedStdout = mock(OutputStream.class);
-        doThrow(new IOException()).when(mockedStdout).write(any(byte[].class));
         Throwable result = assertThrows(CutException.class, () -> {
             String[] args = {"-c", "1-5", tempFilePath.toString()};
             InputStream stdin = new ByteArrayInputStream(TEMP_CONTENT.getBytes());
+            OutputStream mockedStdout = mock(OutputStream.class);
+            doThrow(new IOException()).when(mockedStdout).write(any(byte[].class));
             app.run(args, stdin, mockedStdout);
         });
         assertEquals(expectedMsg, result.getMessage());
