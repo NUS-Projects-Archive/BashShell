@@ -74,7 +74,7 @@ public class WcArgsParserTest {
 
     @ParameterizedTest
     @MethodSource("validSyntax")
-    void parse_ValidSyntax_DoNotThrowException(String... args) {
+    void parse_ValidSyntax_DoesNotThrowException(String... args) {
         assertDoesNotThrow(() -> wcArgsParser.parse(args));
     }
 

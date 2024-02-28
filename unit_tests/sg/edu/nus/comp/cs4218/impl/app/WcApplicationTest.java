@@ -52,7 +52,6 @@ public class WcApplicationTest {
     @BeforeEach
     void setUp() throws IOException {
         this.wcApplication = new WcApplication();
-        wcTestDir = Files.createTempDirectory("wcTestDir");
 
         Path pathA = wcTestDir.resolve(FILE_NAME_A);
         Path pathB = wcTestDir.resolve(FILE_NAME_B);
@@ -68,7 +67,7 @@ public class WcApplicationTest {
     }
 
     @Test
-    void run_NullStdin_ShouldThrowWcException() {
+    void run_NullStdin_ThrowsWcException() {
         Throwable result = assertThrows(WcException.class, () -> {
             wcApplication.run(new String[]{filePathA}, null, System.out);
         });
@@ -76,7 +75,7 @@ public class WcApplicationTest {
     }
 
     @Test
-    void run_NullStdout_ShouldThrowWcException() {
+    void run_NullStdout_ThrowsWcException() {
         Throwable result = assertThrows(WcException.class, () -> {
             wcApplication.run(new String[]{filePathA}, System.in, null);
         });
@@ -84,13 +83,13 @@ public class WcApplicationTest {
     }
 
     @Test
-    void countFromFiles_NonExistentFile_ShouldReturnFileNotFoundError() throws Exception {
+    void countFromFiles_NonExistentFile_ReturnsFileNotFoundError() throws Exception {
         String result = wcApplication.countFromFiles(true, true, true, NON_EXISTENT_FILE);
         assertEquals(WC_EXCEPTION_MSG + ERR_FILE_NOT_FOUND, result);
     }
 
     @Test
-    void countFromFiles_CountFromFilesWithAllFlags_ShouldReturnAllCounts() throws Exception {
+    void countFromFiles_CountFromFilesWithAllFlags_ReturnsAllCounts() throws Exception {
         String result = wcApplication.countFromFiles(true, true, true, filePathA, filePathB);
         List<String> expectedList = new ArrayList<>();
         expectedList.add(appendString(3, 11, 57, String.format(" %s", filePathA)));
@@ -101,7 +100,7 @@ public class WcApplicationTest {
     }
 
     @Test
-    void countFromFiles_CountFromFilesWithOnlyBytesFlag_ShouldReturnOnlyBytesCount() throws Exception {
+    void countFromFiles_CountFromFilesWithOnlyBytesFlag_ReturnsOnlyBytesCount() throws Exception {
         String result = wcApplication.countFromFiles(true, false, false, filePathA, filePathB);
         List<String> expectedList = new ArrayList<>();
         expectedList.add(appendString(-1, -1, 57, String.format(" %s", filePathA)));
@@ -112,7 +111,7 @@ public class WcApplicationTest {
     }
 
     @Test
-    void countFromFiles_CountFromFilesWithBytesAndLinesFlags_ShouldReturnBytesAndLinesCounts() throws Exception {
+    void countFromFiles_CountFromFilesWithBytesAndLinesFlags_ReturnsBytesAndLinesCounts() throws Exception {
         String result = wcApplication.countFromFiles(false, true, true, filePathA, filePathB);
         List<String> expectedList = new ArrayList<>();
         expectedList.add(appendString(3, 11, -1, String.format(" %s", filePathA)));
@@ -123,7 +122,7 @@ public class WcApplicationTest {
     }
 
     @Test
-    void countFromStdin_CountFromStdinWithAllFlags_ShouldReturnAllCounts() throws Exception {
+    void countFromStdin_CountFromStdinWithAllFlags_ReturnsAllCounts() throws Exception {
         InputStream inputStream = IOUtils.openInputStream(filePathA);
         String result;
         try {
@@ -138,7 +137,7 @@ public class WcApplicationTest {
     }
 
     @Test
-    void countFromStdin_CountFromStdinWithBytesFlag_ShouldReturnBytesCount() throws Exception {
+    void countFromStdin_CountFromStdinWithBytesFlag_ReturnsBytesCount() throws Exception {
         InputStream inputStream = IOUtils.openInputStream(filePathA);
         String result;
         try {
@@ -153,7 +152,7 @@ public class WcApplicationTest {
     }
 
     @Test
-    void countFromStdin_CountFromStdinWithLinesAndWordsFlags_ShouldReturnLinesAndWordsCounts() throws Exception {
+    void countFromStdin_CountFromStdinWithLinesAndWordsFlags_ReturnsLinesAndWordsCounts() throws Exception {
         InputStream inputStream = IOUtils.openInputStream(filePathA);
         String result;
         try {
@@ -168,7 +167,7 @@ public class WcApplicationTest {
     }
 
     @Test
-    void countFromFileAndStdin_CountFromFileAndStdinWithAllFlags_ShouldReturnAllCounts() throws Exception {
+    void countFromFileAndStdin_CountFromFileAndStdinWithAllFlags_ReturnsAllCounts() throws Exception {
         InputStream inputStream = IOUtils.openInputStream(filePathA);
         String result;
         try {
@@ -185,7 +184,7 @@ public class WcApplicationTest {
     }
 
     @Test
-    void countFromFileAndStdin_CountFromFileAndStdinWithBytesFlag_ShouldReturnBytesCount() throws Exception {
+    void countFromFileAndStdin_CountFromFileAndStdinWithBytesFlag_ReturnsBytesCount() throws Exception {
         InputStream inputStream = IOUtils.openInputStream(filePathA);
         String result;
         try {
@@ -202,7 +201,7 @@ public class WcApplicationTest {
     }
 
     @Test
-    void countFromFileAndStdin_CountFromFileAndStdinWithBytesAndLinesFlags_ShouldReturnBytesAndLinesCounts() throws Exception {
+    void countFromFileAndStdin_CountFromFileAndStdinWithBytesAndLinesFlags_ReturnsBytesAndLinesCounts() throws Exception {
         InputStream inputStream = IOUtils.openInputStream(filePathA);
         String result;
         try {
