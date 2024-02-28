@@ -159,7 +159,7 @@ class CdApplicationTest {
 	/**
 	 * Test case for changeToDirectory method in CdApplication.
 	 * Tests with the relative path of a directory with no execute permission and expects a CdException to be thrown.
-	 * This test is disabled on Windows as Windows does not use the same executable file permission concept.
+	 * This test is disabled on Windows OS as Windows does not use the same executable file permission concept.
 	 */
 	@Test
 	@DisabledOnOs(OS.WINDOWS)
