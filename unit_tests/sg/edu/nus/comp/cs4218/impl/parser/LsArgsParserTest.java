@@ -15,10 +15,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.*;
 
 class LsArgsParserTest {
 
@@ -71,9 +68,8 @@ class LsArgsParserTest {
     @ParameterizedTest
     @MethodSource("validSyntax")
     void parse_ValidSyntax_HasCorrectFlagsAndNonFlagArgs(String[] args, Set<Character> expectedFlags,
-            List<String> expectedNFA)
-            throws InvalidArgsException {
-        lsArgsParser.parse(args);
+                                                         List<String> expectedNFA) {
+        assertDoesNotThrow(() -> lsArgsParser.parse(args));
         assertEquals(expectedFlags, lsArgsParser.flags, "Flags do not match");
         assertEquals(expectedNFA, lsArgsParser.nonFlagArgs, "Non-flag arguments do not match");
     }
@@ -86,47 +82,47 @@ class LsArgsParserTest {
 
     @ParameterizedTest
     @ValueSource(strings = { FLAG_R, FLAG_RX, FLAG_XR })
-    void isRecursive_ValidFlag_ReturnsTrue(String args) throws InvalidArgsException {
-        lsArgsParser.parse(args);
+    void isRecursive_ValidFlag_ReturnsTrue(String args) {
+        assertDoesNotThrow(() -> lsArgsParser.parse(args));
         assertTrue(lsArgsParser.isRecursive());
     }
 
     @ParameterizedTest
     @ValueSource(strings = { FLAG_X, EXAMPLE })
-    void isRecursive_InvalidFlag_ReturnsFalse(String args) throws InvalidArgsException {
-        lsArgsParser.parse(args);
+    void isRecursive_InvalidFlag_ReturnsFalse(String args) {
+        assertDoesNotThrow(() -> lsArgsParser.parse(args));
         assertFalse(lsArgsParser.isRecursive());
     }
 
     @Test
-    void isRecursive_NoFlag_ReturnsFalse() throws InvalidArgsException {
-        lsArgsParser.parse("");
+    void isRecursive_NoFlag_ReturnsFalse() {
+        assertDoesNotThrow(() -> lsArgsParser.parse(""));
         assertFalse(lsArgsParser.isRecursive());
     }
 
     @ParameterizedTest
     @ValueSource(strings = { FLAG_X, FLAG_RX, FLAG_XR })
-    void isSortByExt_ValidFlag_ReturnsTrue(String args) throws InvalidArgsException {
-        lsArgsParser.parse(args);
+    void isSortByExt_ValidFlag_ReturnsTrue(String args) {
+        assertDoesNotThrow(() -> lsArgsParser.parse(args));
         assertTrue(lsArgsParser.isSortByExt());
     }
 
     @ParameterizedTest
     @ValueSource(strings = { FLAG_R, EXAMPLE })
-    void isSortByExt_InvalidFlag_ReturnsFalse(String args) throws InvalidArgsException {
-        lsArgsParser.parse(args);
+    void isSortByExt_InvalidFlag_ReturnsFalse(String args) {
+        assertDoesNotThrow(() -> lsArgsParser.parse(args));
         assertFalse(lsArgsParser.isSortByExt());
     }
 
     @Test
-    void isSortByExt_NoFlag_ReturnsFalse() throws InvalidArgsException {
-        lsArgsParser.parse("");
+    void isSortByExt_NoFlag_ReturnsFalse() {
+        assertDoesNotThrow(() -> lsArgsParser.parse(""));
         assertFalse(lsArgsParser.isSortByExt());
     }
 
-    private void testGetDirectoriesReturningEmpty(String... args) throws InvalidArgsException {
+    private void testGetDirectoriesReturningEmpty(String... args) {
         // When
-        lsArgsParser.parse(args);
+        assertDoesNotThrow(() -> lsArgsParser.parse(args));
         List<String> result = lsArgsParser.getDirectories();
 
         // Then
@@ -134,23 +130,23 @@ class LsArgsParserTest {
     }
 
     @Test
-    void getDirectories_NoArg_ReturnsEmpty() throws InvalidArgsException {
+    void getDirectories_NoArg_ReturnsEmpty() {
         testGetDirectoriesReturningEmpty();
     }
 
     @Test
-    void getDirectories_WithArgsThatHasNoNonFlagArgs_ReturnsEmpty() throws InvalidArgsException {
+    void getDirectories_WithArgsThatHasNoNonFlagArgs_ReturnsEmpty() {
         testGetDirectoriesReturningEmpty(FLAG_R, FLAG_X);
     }
 
     @Test
-    void getDirectories_WithArgsThatHasNonFlagArgs_ReturnsNonFlagArgs() throws InvalidArgsException {
+    void getDirectories_WithArgsThatHasNonFlagArgs_ReturnsNonFlagArgs() {
         // Given
         String[] args = new String[] { EXAMPLE, FLAG_R, FLAG_X };
         List<String> expected = List.of(EXAMPLE);
 
         // When
-        lsArgsParser.parse(args);
+        assertDoesNotThrow(() -> lsArgsParser.parse(args));
         List<String> result = lsArgsParser.getDirectories();
 
         // Then
