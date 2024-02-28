@@ -23,7 +23,9 @@ class CommandBuilderTest {
     }
 
     /**
-     * Tests for commandStrings with \n and expects a Shell Exception.
+     * Quoting unit tests for commandStrings with \n and expects a Shell Exception.
+     * 
+     * @param newlineInQuotes String with newline within quotes
      */  
     @ParameterizedTest
     @MethodSource("getNewlineInQuotes")
@@ -33,7 +35,9 @@ class CommandBuilderTest {
     }
     
     /**
-     * Tests for commandStrings with unmatched quotes and expects a Shell Exception.
+     * Quoting unit tests for commandStrings with unmatched quotes and expects a Shell Exception.
+     * 
+     * @param unmatchedQuotes Unmatched quotes in String
      */
     @ParameterizedTest
     @ValueSource(strings = {
