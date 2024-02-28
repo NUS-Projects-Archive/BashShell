@@ -32,6 +32,7 @@ class CutApplicationTest {
 
     private static final String TEMP_FILE = "file.txt";
     private static final String TEMP_CONTENT = "1234567890";
+
     @TempDir
     private Path tempDir;
     private Path tempFilePath;
