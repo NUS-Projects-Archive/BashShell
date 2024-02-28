@@ -8,10 +8,10 @@ import sg.edu.nus.comp.cs4218.impl.util.IOUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -60,11 +60,10 @@ public class WcApplicationTest {
         filePathA = pathA.toString();
         filePathB = pathB.toString();
 
-        String contentFileA = "This is a sample text\nTo test Wc Application\n For CS4218";
-        Files.write(pathA, Arrays.asList(contentFileA.split("\n")));
-
-        String contentFileB = "Lorem Ipsum is simply\ndummy text of the printing\nand typesetting industry.";
-        Files.write(pathB, Arrays.asList(contentFileB.split("\n")));
+        String contentFileA = "This is a sample text\nTo test Wc Application\n For CS4218\n";
+        String contentFileB = "Lorem Ipsum is simply\ndummy text of the printing\nand typesetting industry.\n";
+        Files.write(pathA, contentFileA.getBytes(StandardCharsets.UTF_8));
+        Files.write(pathB, contentFileB.getBytes(StandardCharsets.UTF_8));
     }
 
     @Test
