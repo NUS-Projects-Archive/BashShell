@@ -112,13 +112,11 @@ class CdApplicationTest {
     /**
      * Tests run method in CdApplication with valid directory and expects the current directory to be changed to the
      * valid directory.
-     *
-     * @throws CdException  To be thrown by run if there is any error.
      */
     @ParameterizedTest
     @MethodSource("getValidDirs")
-    void run_ValidDir_ChangeCurrentDirectoryToArg(String validDir, Path expectedDir) throws CdException {
-        cdApplication.run(new String[] { validDir }, System.in, System.out);
+    void run_ValidDir_ChangeCurrentDirectoryToArg(String validDir, Path expectedDir) {
+        assertDoesNotThrow(() -> cdApplication.run(new String[] { validDir }, System.in, System.out));
         assertEquals(expectedDir.toString(), Environment.currentDirectory);
     }
 
