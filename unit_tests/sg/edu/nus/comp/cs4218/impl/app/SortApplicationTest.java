@@ -67,10 +67,10 @@ class SortApplicationTest {
     void run_FailsToWriteToOutputStream_ThrowsSortException() throws IOException {
         String content = joinStringsBySystemLineSeparator("a", "c", "b", "A");
         Files.write(tempFilePath, content.getBytes());
-        String[] args = {tempFilePath.toString()};
-        OutputStream mockedStdout = mock(OutputStream.class);
-        doThrow(new IOException()).when(mockedStdout).write(any(byte[].class));
         Throwable result = assertThrows(SortException.class, () -> {
+            String[] args = {tempFilePath.toString()};
+            OutputStream mockedStdout = mock(OutputStream.class);
+            doThrow(new IOException()).when(mockedStdout).write(any(byte[].class));
             app.run(args, null, mockedStdout);
         });
         assertEquals(SORT_EX_MSG + ERR_WRITE_STREAM, result.getMessage());
@@ -80,9 +80,9 @@ class SortApplicationTest {
     void run_NoFlags_WritesSortedListToStdout() throws SortException, IOException {
         String content = joinStringsBySystemLineSeparator("a", "c", "b", "A");
         Files.write(tempFilePath, content.getBytes());
-        String[] args = {tempFilePath.toString()};
         OutputStream stdout = new ByteArrayOutputStream();
         String expected = joinStringsBySystemLineSeparator("A", "a", "b", "c") + System.lineSeparator();
+        String[] args = {tempFilePath.toString()};
         app.run(args, null, stdout);
         assertEquals(expected, stdout.toString());
     }
@@ -91,9 +91,9 @@ class SortApplicationTest {
     void run_IsFirstWordNumberFlag_WritesSortedListToStdout() throws SortException, IOException {
         String content = joinStringsBySystemLineSeparator("10", "1", "2");
         Files.write(tempFilePath, content.getBytes());
-        String[] args = {"-n", tempFilePath.toString()};
         OutputStream stdout = new ByteArrayOutputStream();
         String expected = joinStringsBySystemLineSeparator("1", "2", "10") + System.lineSeparator();
+        String[] args = {"-n", tempFilePath.toString()};
         app.run(args, null, stdout);
         assertEquals(expected, stdout.toString());
     }
@@ -102,9 +102,9 @@ class SortApplicationTest {
     void run_IsReverseOrderFlag_WritesReverseSortedListToStdout() throws SortException, IOException {
         String content = joinStringsBySystemLineSeparator("a", "c", "b");
         Files.write(tempFilePath, content.getBytes());
-        String[] args = {"-r", tempFilePath.toString()};
         OutputStream stdout = new ByteArrayOutputStream();
         String expected = joinStringsBySystemLineSeparator("c", "b", "a") + System.lineSeparator();
+        String[] args = {"-r", tempFilePath.toString()};
         app.run(args, null, stdout);
         assertEquals(expected, stdout.toString());
     }
@@ -113,9 +113,9 @@ class SortApplicationTest {
     void run_IsCaseIndependentFlag_WritesCaseIndependentSortedListToStdout() throws SortException, IOException {
         String content = joinStringsBySystemLineSeparator("a", "c", "b", "A");
         Files.write(tempFilePath, content.getBytes());
-        String[] args = {"-f", tempFilePath.toString()};
         OutputStream stdout = new ByteArrayOutputStream();
         String expected = joinStringsBySystemLineSeparator("a", "A", "b", "c") + System.lineSeparator();
+        String[] args = {"-f", tempFilePath.toString()};
         app.run(args, null, stdout);
         assertEquals(expected, stdout.toString());
     }
@@ -125,10 +125,10 @@ class SortApplicationTest {
             throws SortException, IOException {
         String content = joinStringsBySystemLineSeparator("a", "3", "B", "2", "C", "1");
         Files.write(tempFilePath, content.getBytes());
-        String[] args = {"-n", "-f", tempFilePath.toString()};
         OutputStream stdout = new ByteArrayOutputStream();
         String expected = joinStringsBySystemLineSeparator("1", "2", "3", "B", "C", "a")
                 + System.lineSeparator();
+        String[] args = {"-n", "-f", tempFilePath.toString()};
         app.run(args, null, stdout);
         assertEquals(expected, stdout.toString());
     }

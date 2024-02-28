@@ -35,7 +35,7 @@ public class MkdirApplication implements MkdirInterface {
         try {
             parser.parse(args);
         } catch (InvalidArgsException e) {
-            throw new MkdirException(e.getMessage());
+            throw new MkdirException(e.getMessage(), e);
         }
 
         final Boolean isCreateParent = parser.isCreateParent();
