@@ -14,9 +14,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.attribute.PosixFilePermission;
-import java.util.Collections;
-import java.util.HashSet;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -168,7 +165,7 @@ class SortApplicationTest {
         }
 
         Throwable result = assertThrows(SortException.class, () -> {
-            app.sortFromFiles(false, false, false, TEMP_FILE);
+            app.sortFromFiles(false, false, false, tempFilePath.toString());
         });
         assertEquals(SORT_EX_MSG + PROB_SORT_FILE + ERR_NO_PERM, result.getMessage());
     }
