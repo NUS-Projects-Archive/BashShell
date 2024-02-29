@@ -123,7 +123,7 @@ class CutApplicationTest {
     }
 
     @Test
-    void cutFromFiles_CutByByte_ReturnsCutRange() throws CutException {
+    void cutFromFiles_CutByByte_ReturnsCutRange() {
         String expected = "12345";
         List<int[]> range = List.of(new int[]{1, 5});
         String result = assertDoesNotThrow(() -> app.cutFromFiles(false, true, range, tempFilePath.toString()));
