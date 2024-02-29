@@ -39,7 +39,7 @@ import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 public class IORedirectionHandlerTest {
     private InputStream inputStream;
     private OutputStream outputStream;
-    private ArgumentResolver argumentResolverMock;
+    private ArgumentResolver argResolverMock;
 
     private String fileA;
     private String fileB;
@@ -51,7 +51,7 @@ public class IORedirectionHandlerTest {
 
     @BeforeEach
     void setUp() throws IOException {
-        argumentResolverMock = mock(ArgumentResolver.class);
+        argResolverMock = mock(ArgumentResolver.class);
         inputStream = new ByteArrayInputStream("origInputStream".getBytes(StandardCharsets.UTF_8));
         outputStream = new ByteArrayOutputStream();
         testDir = Files.createTempDirectory("testDir");
@@ -84,69 +84,69 @@ public class IORedirectionHandlerTest {
     @ValueSource(strings = {"< < input.txt", "> > output.txt", "input.txt < > output.txt", "output.txt > < input.txt"})
     void extractRedirOptions_InvalidSyntax_ThrowsShellException(String args) {
         List<String> invalidSyntax = Arrays.asList(args.split("\\s+"));
-        IORedirectionHandler ioRedirectionHandler = new IORedirectionHandler(invalidSyntax, inputStream, outputStream, argumentResolverMock);
-        ShellException shellException = assertThrows(ShellException.class, ioRedirectionHandler::extractRedirOptions);
+        IORedirectionHandler ioRedirHandler = new IORedirectionHandler(invalidSyntax, inputStream, outputStream, argResolverMock);
+        ShellException shellException = assertThrows(ShellException.class, ioRedirHandler::extractRedirOptions);
         assertEquals("shell: " + ERR_SYNTAX, shellException.getMessage());
     }
 
     @Test
     void extractRedirOptions_AmbiguousRedirect_ThrowsShellException() throws AbstractApplicationException, ShellException, IOException {
         List<String> ambiguousRedirect = Arrays.asList(">", "*.txt");
-        IORedirectionHandler ioRedirectionHandler = new IORedirectionHandler(ambiguousRedirect, inputStream, outputStream, argumentResolverMock);
-        when(argumentResolverMock.resolveOneArgument("*.txt"))
+        IORedirectionHandler ioRedirHandler = new IORedirectionHandler(ambiguousRedirect, inputStream, outputStream, argResolverMock);
+        when(argResolverMock.resolveOneArgument("*.txt"))
                 .thenReturn(Arrays.asList("file1.txt", "file2.txt"));
         ShellException shellException = assertThrows(ShellException.class,
-                ioRedirectionHandler::extractRedirOptions);
+                ioRedirHandler::extractRedirOptions);
         assertEquals("shell: " + ERR_SYNTAX, shellException.getMessage());
     }
 
     @ParameterizedTest
     @ValueSource(strings = {"> file.txt", "< file.txt > file.txt", "< file.txt"})
     void extractRedirOptions_IORedirectionOnly_GetNoRedirArgsListIsEmpty(String args) throws FileNotFoundException, AbstractApplicationException, ShellException {
-        List<String> IORedirectsOnly = Arrays.asList(args.split("\\s+"));
-        IORedirectionHandler ioRedirectionHandler = new IORedirectionHandler(IORedirectsOnly, inputStream, outputStream, argumentResolverMock);
-        when(argumentResolverMock.resolveOneArgument("file.txt"))
+        List<String> ioRedirectsOnly = Arrays.asList(args.split("\\s+"));
+        IORedirectionHandler ioRedirHandler = new IORedirectionHandler(ioRedirectsOnly, inputStream, outputStream, argResolverMock);
+        when(argResolverMock.resolveOneArgument("file.txt"))
                 .thenReturn(List.of("file.txt"));
-        ioRedirectionHandler.extractRedirOptions();
-        assertTrue(ioRedirectionHandler.getNoRedirArgsList().isEmpty());
+        ioRedirHandler.extractRedirOptions();
+        assertTrue(ioRedirHandler.getNoRedirArgsList().isEmpty());
     }
 
     @ParameterizedTest
     @ValueSource(strings = {"file1.txt", "file2.txt file3.txt", "-"})
     void extractRedirOptions_NoRedirection_GetNoRedirArgsListIsNotEmpty(String args) throws FileNotFoundException, AbstractApplicationException, ShellException {
-        List<String> NoRedirection = Arrays.asList(args.split("\\s+"));
-        IORedirectionHandler ioRedirectionHandler = new IORedirectionHandler(NoRedirection, inputStream, outputStream, argumentResolverMock);
-        when(argumentResolverMock.resolveOneArgument(anyString()))
+        List<String> noRedirection = Arrays.asList(args.split("\\s+"));
+        IORedirectionHandler ioRedirHandler = new IORedirectionHandler(noRedirection, inputStream, outputStream, argResolverMock);
+        when(argResolverMock.resolveOneArgument(anyString()))
                 .thenReturn(List.of("file1.txt"), List.of("file2.txt"), List.of("file3.txt"), List.of("-"));
-        ioRedirectionHandler.extractRedirOptions();
-        assertFalse(ioRedirectionHandler.getNoRedirArgsList().isEmpty());
-        assertSame(inputStream, ioRedirectionHandler.getInputStream());
-        assertSame(outputStream, ioRedirectionHandler.getOutputStream());
+        ioRedirHandler.extractRedirOptions();
+        assertFalse(ioRedirHandler.getNoRedirArgsList().isEmpty());
+        assertSame(inputStream, ioRedirHandler.getInputStream());
+        assertSame(outputStream, ioRedirHandler.getOutputStream());
     }
 
     @ParameterizedTest
     @ValueSource(strings = {"< A.txt", "B.txt < A.txt"})
     void extractRedirOptions_OneInputRedirection_InputStreamChangesFromOriginal(String args) throws IOException, AbstractApplicationException, ShellException {
         List<String> inputs = Arrays.asList(args.split("\\s+"));
-        IORedirectionHandler ioRedirectionHandler = new IORedirectionHandler(inputs, inputStream, outputStream, argumentResolverMock);
-        when(argumentResolverMock.resolveOneArgument(anyString()))
+        IORedirectionHandler ioRedirHandler = new IORedirectionHandler(inputs, inputStream, outputStream, argResolverMock);
+        when(argResolverMock.resolveOneArgument(anyString()))
                 .thenReturn(List.of(this.fileA), List.of(this.fileB), List.of(this.fileA));
-        ioRedirectionHandler.extractRedirOptions();
+        ioRedirHandler.extractRedirOptions();
         String expected = new String(this.inputStream.readAllBytes());
-        String result = new String(ioRedirectionHandler.getInputStream().readAllBytes());
+        String result = new String(ioRedirHandler.getInputStream().readAllBytes());
         assertNotEquals(expected, result);
-        assertNotSame(inputStream, ioRedirectionHandler.getInputStream());
+        assertNotSame(inputStream, ioRedirHandler.getInputStream());
     }
 
     @Test
     void extractRedirOptions_MultipleInputRedirections_TakeLatestInputStream() throws IOException, AbstractApplicationException, ShellException {
         List<String> inputs = List.of("<", "A.txt", "<", "B.txt");
-        IORedirectionHandler ioRedirectionHandler = new IORedirectionHandler(inputs, inputStream, outputStream, argumentResolverMock);
-        when(argumentResolverMock.resolveOneArgument(anyString()))
+        IORedirectionHandler ioRedirHandler = new IORedirectionHandler(inputs, inputStream, outputStream, argResolverMock);
+        when(argResolverMock.resolveOneArgument(anyString()))
                 .thenReturn(List.of(this.fileA), List.of(this.fileB));
-        ioRedirectionHandler.extractRedirOptions();
+        ioRedirHandler.extractRedirOptions();
         String expected = "Java" + STRING_NEWLINE;
-        String result = new String(ioRedirectionHandler.getInputStream().readAllBytes());
+        String result = new String(ioRedirHandler.getInputStream().readAllBytes());
         assertEquals(expected, result);
     }
 
@@ -154,24 +154,24 @@ public class IORedirectionHandlerTest {
     @ValueSource(strings = {"> A.txt", "B.txt > A.txt"})
     void extractRedirOptions_OneOutputRedirection_OutputStreamChangesFromOriginal(String args) throws IOException, AbstractApplicationException, ShellException {
         List<String> inputs = Arrays.asList(args.split("\\s+"));
-        IORedirectionHandler ioRedirectionHandler = new IORedirectionHandler(inputs, inputStream, outputStream, argumentResolverMock);
-        when(argumentResolverMock.resolveOneArgument(anyString()))
+        IORedirectionHandler ioRedirHandler = new IORedirectionHandler(inputs, inputStream, outputStream, argResolverMock);
+        when(argResolverMock.resolveOneArgument(anyString()))
                 .thenReturn(List.of(this.fileA), List.of(this.fileB), List.of(this.fileA));
-        ioRedirectionHandler.extractRedirOptions();
-        assertNotSame(outputStream, ioRedirectionHandler.getOutputStream());
+        ioRedirHandler.extractRedirOptions();
+        assertNotSame(outputStream, ioRedirHandler.getOutputStream());
     }
 
     @Test
     void extractRedirOptions_MultipleOutputRedirections_TakeLatestOutputStream() throws IOException, AbstractApplicationException, ShellException {
         List<String> inputs = List.of("<", "C.txt", ">", "B.txt", ">", "C.txt");
-        IORedirectionHandler ioRedirectionHandler = new IORedirectionHandler(inputs, inputStream, outputStream, argumentResolverMock);
-        when(argumentResolverMock.resolveOneArgument(anyString()))
+        IORedirectionHandler ioRedirHandler = new IORedirectionHandler(inputs, inputStream, outputStream, argResolverMock);
+        when(argResolverMock.resolveOneArgument(anyString()))
                 .thenReturn(List.of(this.fileC), List.of(this.fileB), List.of(this.fileC));
-        ioRedirectionHandler.extractRedirOptions();
-        assertEquals(0, new String(ioRedirectionHandler.getInputStream().readAllBytes()).length());
+        ioRedirHandler.extractRedirOptions();
+        assertEquals(0, new String(ioRedirHandler.getInputStream().readAllBytes()).length());
         String str = "Not Empty";
         byte[] bytes = str.getBytes(StandardCharsets.UTF_8);
-        ioRedirectionHandler.getOutputStream().write(bytes);
-        assertTrue(new String(ioRedirectionHandler.getInputStream().readAllBytes()).length() > 0);
+        ioRedirHandler.getOutputStream().write(bytes);
+        assertTrue(new String(ioRedirHandler.getInputStream().readAllBytes()).length() > 0);
     }
 }
