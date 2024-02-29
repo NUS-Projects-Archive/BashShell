@@ -1,7 +1,6 @@
 package sg.edu.nus.comp.cs4218.impl.app;
 
 import sg.edu.nus.comp.cs4218.app.MkdirInterface;
-import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
 import sg.edu.nus.comp.cs4218.exception.InvalidArgsException;
 import sg.edu.nus.comp.cs4218.exception.MkdirException;
 import sg.edu.nus.comp.cs4218.impl.parser.MkdirArgsParser;
@@ -20,16 +19,13 @@ public class MkdirApplication implements MkdirInterface {
     /**
      * Runs the mkdir application with the specified arguments.
      *
-     * @param args   Array of arguments for the application. Each array element is the path to a
-     *               file. If no files are specified stdin is used.
-     * @param stdin  An InputStream. The input for the command is read from this InputStream if no
-     *               files are specified.
-     * @param stdout An OutputStream. The output of the command is written to this OutputStream
-     *               if no files are specified.
-     * @throws AbstractApplicationException
+     * @param args   Array of arguments for the application. Each array element is the path to a file.
+     * @param stdin  An InputStream, not used.
+     * @param stdout An OutputStream, not used.
+     * @throws MkdirException
      */
     @Override
-    public void run(String[] args, InputStream stdin, OutputStream stdout) throws AbstractApplicationException {
+    public void run(String[] args, InputStream stdin, OutputStream stdout) throws MkdirException {
         if (args == null || args.length == 0) {
             throw new MkdirException(ERR_NULL_ARGS);
         }
@@ -39,7 +35,7 @@ public class MkdirApplication implements MkdirInterface {
         try {
             parser.parse(args);
         } catch (InvalidArgsException e) {
-            throw new MkdirException(e.getMessage());
+            throw new MkdirException(e.getMessage(), e);
         }
 
         final Boolean isCreateParent = parser.isCreateParent();
@@ -62,10 +58,10 @@ public class MkdirApplication implements MkdirInterface {
      * Creates folders specified by the given folder names.
      *
      * @param folderName Array of string of folder names to be created.
-     * @throws AbstractApplicationException If folder already exists.
+     * @throws MkdirException If folder already exists.
      */
     @Override
-    public void createFolder(String... folderName) throws AbstractApplicationException {
+    public void createFolder(String... folderName) throws MkdirException {
         for (String folder : folderName) {
             File file = new File(folder);
 

@@ -50,7 +50,7 @@ public class SortApplication implements SortInterface {
         try {
             sortArgsParser.parse(args);
         } catch (InvalidArgsException e) {
-            throw new SortException(e.getMessage());
+            throw new SortException(e.getMessage(), e);
         }
         StringBuilder output = new StringBuilder();
         if (sortArgsParser.getFileNames().isEmpty()) {
@@ -111,17 +111,17 @@ public class SortApplication implements SortInterface {
             try {
                 input = IOUtils.openInputStream(file);
             } catch (ShellException e) {
-                throw new SortException(PROB_SORT_FILE + e.getMessage());
+                throw new SortException(PROB_SORT_FILE + e.getMessage(), e);
             }
             try {
                 lines.addAll(IOUtils.getLinesFromInputStream(input));
             } catch (IOException e) {
-                throw new SortException(PROB_SORT_FILE + ERR_IO_EXCEPTION);
+                throw new SortException(PROB_SORT_FILE + ERR_IO_EXCEPTION, e);
             }
             try {
                 IOUtils.closeInputStream(input);
             } catch (ShellException e) {
-                throw new SortException(PROB_SORT_FILE + e.getMessage());
+                throw new SortException(PROB_SORT_FILE + e.getMessage(), e);
             }
 
         }
@@ -148,10 +148,10 @@ public class SortApplication implements SortInterface {
         try {
             lines = IOUtils.getLinesFromInputStream(stdin);
         } catch (Exception e) {
-            throw new SortException(PROB_SORT_STDIN + ERR_IO_EXCEPTION);
+            throw new SortException(PROB_SORT_STDIN + ERR_IO_EXCEPTION, e);
         }
         sortInputString(isFirstWordNumber, isReverseOrder, isCaseIndependent, lines);
-        return String.join(PROB_SORT_STDIN + STRING_NEWLINE, lines);
+        return String.join(STRING_NEWLINE, lines);
     }
 
     /**
@@ -167,8 +167,8 @@ public class SortApplication implements SortInterface {
         Collections.sort(input, new Comparator<String>() {
             @Override
             public int compare(String str1, String str2) {
-                String temp1 = isCaseIndependent ? str1.toLowerCase() : str1;//NOPMD
-                String temp2 = isCaseIndependent ? str2.toLowerCase() : str2;//NOPMD
+                String temp1 = isCaseIndependent && !isFirstWordNumber ? str1.toLowerCase() : str1;//NOPMD
+                String temp2 = isCaseIndependent && !isFirstWordNumber ? str2.toLowerCase() : str2;//NOPMD
 
                 // Extract the first group of numbers if possible.
                 if (isFirstWordNumber && !temp1.isEmpty() && !temp2.isEmpty()) {
