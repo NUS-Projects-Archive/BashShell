@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -75,10 +76,10 @@ class MkdirApplicationTest {
     }
 
     @Test
-    void run_FolderDoNotExists_CreateFolderSuccessfully() throws MkdirException {
+    void run_FolderDoNotExists_CreateFolderSuccessfully() {
         Path nonExistFilePath = tempDir.resolve(NON_EXISTING_FILE);
         String[] args = {nonExistFilePath.toString()};
-        app.run(args, null, null);
+        assertDoesNotThrow(() -> app.run(args, null, null));
         File file = new File(nonExistFilePath.toString());
         assertTrue(file.exists());
     }
@@ -92,18 +93,18 @@ class MkdirApplicationTest {
     }
 
     @Test
-    void createFolder_FolderDoNotExists_CreateFolderSuccessfully() throws MkdirException {
+    void createFolder_FolderDoNotExists_CreateFolderSuccessfully() {
         Path nonExistFilePath = tempDir.resolve(NON_EXISTING_FILE);
         File nonExistFile = nonExistFilePath.toFile();
-        app.createFolder(nonExistFile.toString());
+        assertDoesNotThrow(() -> app.createFolder(nonExistFile.toString()));
         assertTrue(nonExistFile.exists());
     }
 
     @Test
-    void createFolder_FolderAndTopLevelDoNotExist_CreateFolderSuccessfully() throws MkdirException {
+    void createFolder_FolderAndTopLevelDoNotExist_CreateFolderSuccessfully() {
         Path nonExistFilePath = tempDir.resolve("missingTopLevel/" + NON_EXISTING_FILE);
         File nonExistFile = nonExistFilePath.toFile();
-        app.createFolder(nonExistFile.toString());
+        assertDoesNotThrow(() -> app.createFolder(nonExistFile.toString()));
         assertTrue(nonExistFile.exists());
     }
 }
