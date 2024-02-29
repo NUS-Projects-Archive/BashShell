@@ -93,13 +93,15 @@ public class LsApplicationHelper {
             } catch (DirectoryAccessDeniedException e) {
                 // Append the error message to the result normally
                 // Trim the last newline
-                result.deleteCharAt(result.length() - 1);
+                if (result.length() > 0) {
+                    result.deleteCharAt(result.length() - 1);
+                }
                 result.append(e.getMessage());
                 result.append(StringUtils.STRING_NEWLINE + StringUtils.STRING_NEWLINE);
             }
         }
 
-        return error.toString() + result.toString();
+        return error.toString() + result;
     }
 
     /**
