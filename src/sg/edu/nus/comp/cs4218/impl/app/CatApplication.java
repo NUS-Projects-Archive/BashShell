@@ -72,8 +72,7 @@ public class CatApplication implements CatInterface {
             }
         }  else {
             // all other cases
-            IORedirectionHandler redirHandler = new IORedirectionHandler(nonFlagArgs, stdin,
-                    stdout, new ArgumentResolver());
+            IORedirectionHandler redirHandler = new IORedirectionHandler(nonFlagArgs, stdin, stdout, new ArgumentResolver());
             try {
                 redirHandler.extractRedirOptions();
             } catch (ShellException | FileNotFoundException | AbstractApplicationException e) {
@@ -84,22 +83,22 @@ public class CatApplication implements CatInterface {
             try {
                 if (noRedirArgsList.size() > 0) {
                     // Input redirect is not relevant
-                    if (!nonFlagArgs.contains("-")) {
-                        output = catFiles(isLineNumber, noRedirArgsArray);
-                    } else {
+                    if (nonFlagArgs.contains("-")) {
                         output = catFileAndStdin(isLineNumber, stdin, noRedirArgsArray);
+                    } else {
+                        output = catFiles(isLineNumber, noRedirArgsArray);
                     }
                 } else {
                     // Input redirect cannot be ignored, get from redirect handler
                     output = catStdin(isLineNumber, redirHandler.getInputStream());
                 }
                 byte[] bytes = output.getBytes();
-                if (!nonFlagArgs.contains(">")) {
-                    // no Output redirect, write to shell
-                    stdout.write(bytes);
-                } else {
+                if (nonFlagArgs.contains(">")) {
                     // write to file
                     redirHandler.getOutputStream().write(bytes);
+                } else {
+                    // no Output redirect, write to shell
+                    stdout.write(bytes);
                 }
             } catch (IOException e) {
                 throw new CatException(ERR_WRITE_STREAM + " " + e.getMessage());
@@ -129,8 +128,8 @@ public class CatApplication implements CatInterface {
 
     @Override
     public String catStdin(Boolean isLineNumber, InputStream stdin) throws CatException {
-            BufferedReader br = new BufferedReader(new InputStreamReader(stdin));
-            return readStdIn(isLineNumber, br);
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(stdin));
+        return readStdIn(isLineNumber, bufferedReader);
     }
 
     @Override
@@ -139,8 +138,8 @@ public class CatApplication implements CatInterface {
         for (String fileName : fileNames) {
             try {
                 if (fileName.equals("-")) {
-                    BufferedReader br = new BufferedReader(new InputStreamReader(stdin));
-                    result.append(readStdIn(isLineNumber, br));
+                    BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(stdin));
+                    result.append(readStdIn(isLineNumber, bufferedReader));
                 } else if (fileName.contains("*")) {
                     List<String> globbedFiles = search(Paths.get(Environment.currentDirectory), fileName);
                     for (String globbedFile : globbedFiles) {
@@ -156,19 +155,21 @@ public class CatApplication implements CatInterface {
         return result.toString();
     }
 
-    public String readStdIn(Boolean isLineNumber, BufferedReader br) throws CatException {
+    public String readStdIn(Boolean isLineNumber, BufferedReader bufferedReader) throws CatException {
         StringBuilder userInput = new StringBuilder();
         String line;
         int lineNumber = 1;
         // Read lines from stdin until an empty line is encountered
         while (true) {
             try {
-                if (!((line = br.readLine()) != null && !line.isEmpty())) break;
+                if (!((line = bufferedReader.readLine()) != null && !line.isEmpty())) {
+                    break;
+                }
             } catch (IOException e) {
                 throw new CatException(ERR_IO_EXCEPTION + " " + e.getMessage());
             }
             if (isLineNumber) {
-                userInput.append(lineNumber).append(" ");
+                userInput.append(lineNumber).append(' ');
                 lineNumber++;
             }
             userInput.append(line).append(StringUtils.STRING_NEWLINE);
@@ -183,7 +184,7 @@ public class CatApplication implements CatInterface {
             int lineNumber = 1;
             while ((line = reader.readLine()) != null) {
                 if (isLineNumber) {
-                    content.append(lineNumber).append(" ");
+                    content.append(lineNumber).append(' ');
                     lineNumber++;
                 }
                 content.append(line).append(StringUtils.STRING_NEWLINE);
@@ -199,8 +200,8 @@ public class CatApplication implements CatInterface {
         FileVisitor<Path> matcherVisitor = new SimpleFileVisitor<>() {
             @Override
             public FileVisitResult visitFile(Path file, BasicFileAttributes attribs) {
-                FileSystem fs = FileSystems.getDefault();
-                PathMatcher matcher = fs.getPathMatcher(pattern);
+                FileSystem fileSystem = FileSystems.getDefault();
+                PathMatcher matcher = fileSystem.getPathMatcher(pattern);
                 Path name = file.getFileName();
                 if (matcher.matches(name)) {
                     matchesList.add(name.toString());
