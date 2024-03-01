@@ -35,7 +35,7 @@ class CatApplicationTest {
     // catfileandstdin
     // readfile
     // readstdin (done)
-    // search
+
     private CatApplication app;
     private BufferedReader brMock;
     private InputStream inputStreamMock;
@@ -43,7 +43,7 @@ class CatApplicationTest {
     private String fileB;
     private String fileC;
     private final String CAT_EXCEPTION_MSG = "cat: ";
-    private static final String NON_EXISTENT_PATH = "nonexistent.txt";
+    private static final String NON_EXISTENT_FILE = "nonexistent.txt";
 
     @TempDir
     Path testDir;
@@ -75,7 +75,7 @@ class CatApplicationTest {
     @Test
     void readFile_FileNotFound_ThrowsCatException() {
         Throwable result = assertThrows(CatException.class, () -> {
-            app.readFile(false, new File(NON_EXISTENT_PATH));
+            app.readFile(false, new File(NON_EXISTENT_FILE));
         });
         assertEquals(CAT_EXCEPTION_MSG + ERR_FILE_NOT_FOUND, result.getMessage());
     }
@@ -231,27 +231,73 @@ class CatApplicationTest {
         }
     }
 
-    @Test
-    void catFileAndStdin_StdinOnlyNoLineNumber_ReturnsUserInput() {
+    @ParameterizedTest
+    @ValueSource(strings = {"", "Hello", "Hello\r\nWorld"})
+    void catFileAndStdin_StdinOnlyNoLineNumber_ReturnsUserInput(String args) {
+        try {
+            inputStreamMock = new ByteArrayInputStream(args.getBytes(StandardCharsets.UTF_8));
+            String result = app.catFileAndStdin(false, inputStreamMock, "-");
+            assertEquals(args + STRING_NEWLINE, result);
+        } catch (CatException e) {
+            fail(e.getMessage());
+        }
     }
 
-//    @Test
-//    void catFileAndStdin_StdinOnlyHasLineNumber_ReturnsLineNumberedUserInput() {
-//    }
-//
-//    @Test
-//    void catFileAndStdin_FileOnlyNoLineNumber_ReturnsFileContent() {
-//    }
-//
-//    @Test
-//    void catFileAndStdin_FileOnlyHasLineNumber_ReturnsLineNumberedFileContent() {
-//    }
-//
-//    @Test
-//    void catFileAndStdin_FileAndStdInNoLineNumber_ReturnsConcatenatedFileAndStdin() {
-//    }
-//
-//    @Test
-//    void catFileAndStdin_FileAndStdInHasLineNumber_ReturnsLineNumberedConcatenatedFileAndStdin() {
-//    }
+    @Test
+    void catFileAndStdin_StdinOnlyHasLineNumber_ReturnsLineNumberedUserInput() {
+        try {
+            inputStreamMock = new ByteArrayInputStream("Hello\r\nWorld".getBytes(StandardCharsets.UTF_8));
+            String result = app.catFileAndStdin(true, inputStreamMock, "-");
+            String expected = "1 Hello" + STRING_NEWLINE + "2 World" + STRING_NEWLINE;
+            assertEquals(expected, result);
+        } catch (CatException e) {
+            fail(e.getMessage());
+        }
+    }
+
+    @Test
+    void catFileAndStdin_FileOnlyNoLineNumber_ReturnsFileContent() {
+        try {
+            String result = app.catFileAndStdin(false, inputStreamMock, new String[]{this.fileA, this.fileB});
+            assertEquals("Hello\r\nWorld\r\nSoftware\r\nTesting" + STRING_NEWLINE, result);
+        } catch (CatException e) {
+            fail(e.getMessage());
+        }
+    }
+
+    @Test
+    void catFileAndStdin_FileOnlyHasLineNumber_ReturnsLineNumberedFileContent() {
+        try {
+            String result = app.catFileAndStdin(true, inputStreamMock, new String[]{this.fileA, this.fileB});
+            assertEquals("1 Hello\r\n2 World\r\n1 Software\r\n2 Testing" + STRING_NEWLINE, result);
+        } catch (CatException e) {
+            fail(e.getMessage());
+        }
+    }
+
+    @Test
+    void catFileAndStdin_FileAndStdInNoLineNumber_ReturnsConcatenatedFileAndStdin() {
+        try {
+            inputStreamMock = new ByteArrayInputStream("From\r\nStdin".getBytes(StandardCharsets.UTF_8));
+            String result = app.catFileAndStdin(false, inputStreamMock, new String[]{this.fileA, "-", this.fileB});
+            String expected = "Hello\r\nWorld\r\nFrom\r\n" +
+                    "Stdin\r\nSoftware\r\nTesting" + STRING_NEWLINE;
+            assertEquals(expected, result);
+        } catch (CatException e) {
+            fail(e.getMessage());
+        }
+    }
+
+    @Test
+    void catFileAndStdin_FileAndStdInHasLineNumber_ReturnsLineNumberedConcatenatedFileAndStdin() {
+        try {
+            inputStreamMock = new ByteArrayInputStream("From\r\nStdin".getBytes(StandardCharsets.UTF_8));
+            String result = app.catFileAndStdin(true, inputStreamMock, new String[]{this.fileA, "-", this.fileB});
+            String expected = "1 Hello\r\n2 World\r\n1 From\r\n" +
+                    "2 Stdin\r\n1 Software\r\n2 Testing" + STRING_NEWLINE;
+            assertEquals(expected, result);
+        } catch (CatException e) {
+            fail(e.getMessage());
+        }
+    }
 }
