@@ -70,10 +70,8 @@ public class LsApplicationHelper {
                 final String formatted = formatContents(contents, isSortByExt);
                 final String relativePath = getRelativeToCwd(path).toString();
                 result.append(StringUtils.isBlank(relativePath)
-                        ? STRING_CURR_DIR
-                        : hasFolder
-                        ? relativePath
-                        : PATH_CURR_DIR + relativePath);
+                        ? STRING_CURR_DIR : hasFolder
+                        ? relativePath : PATH_CURR_DIR + relativePath);
                 result.append(COLON_NEW_LINE);
                 result.append(formatted);
 
