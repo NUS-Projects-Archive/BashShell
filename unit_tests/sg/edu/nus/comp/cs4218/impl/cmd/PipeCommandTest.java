@@ -15,7 +15,7 @@ import sg.edu.nus.comp.cs4218.exception.ShellException;
 public class PipeCommandTest {
 
     @Test
-    void evaluate_InvalidFirstCommand_PrintErrorMessage() {
+    void evaluate_InvalidFirstCommand_PrintsErrorMessage() {
         PipeCommand pipeCommand = new PipeCommand(Arrays.asList(
                 new CallCommandStub("lsa"),
                 new CallCommandStub("echo", "hello", "world")
@@ -29,7 +29,7 @@ public class PipeCommandTest {
     }
 
     @Test
-    void evaluate_ValidCommands_ReturnCorrectResult() {
+    void evaluate_ValidCommands_ReturnsCorrectResult() {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         PipeCommand pipeCommand = new PipeCommand(Arrays.asList(
                 new CallCommandStub("paste", "ghost.txt"),
@@ -43,7 +43,7 @@ public class PipeCommandTest {
     }
 
     @Test
-    void evaluate_ChainValidCommands_ReturnCorrectResult() {
+    void evaluate_ChainValidCommands_ReturnsCorrectResult() {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         PipeCommand pipeCommand = new PipeCommand(Arrays.asList(
                 new CallCommandStub("paste", "ghost.txt"),

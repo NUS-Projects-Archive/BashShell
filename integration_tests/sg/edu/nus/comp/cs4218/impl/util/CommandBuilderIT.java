@@ -22,7 +22,7 @@ public class CommandBuilderIT {
 
     @ParameterizedTest
     @ValueSource(strings = {"AAA BBB CCC", "echo hello world", "ls -a"})
-    void parseCommand_CallCommand_ReturnCorrectCallCommand(String args) {
+    void parseCommand_CallCommand_ReturnsCorrectCallCommand(String args) {
         List<String> expected = List.of(args.split(" "));
 
         Command cmd = assertDoesNotThrow(() -> CommandBuilder.parseCommand(args, null));
@@ -32,7 +32,7 @@ public class CommandBuilderIT {
     }
 
     @Test
-    void parseCommand_PipeCommand_ReturnCorrectPipeCommand() {
+    void parseCommand_PipeCommand_ReturnsCorrectPipeCommand() {
         String args = "paste ghost.txt | grep Line";
         List<CallCommand> expected = List.of(
                 new CallCommand(List.of("paste", "ghost.txt"), null, new ArgumentResolver()),
@@ -46,7 +46,7 @@ public class CommandBuilderIT {
     }
 
     @Test
-    void parseCommand_SequenceCommandOfCallCall_ReturnCorrectSequenceCommand() {
+    void parseCommand_SequenceCommandOfCallCall_ReturnsCorrectSequenceCommand() {
         String args = "paste ghost.txt; ls";
         List<Command> expected = List.of(
                 new CallCommand(List.of("paste", "ghost.txt"), null, new ArgumentResolver()),
@@ -60,7 +60,7 @@ public class CommandBuilderIT {
     }
 
     @Test
-    void parseCommand_SequenceCommandOfPipeCall_ReturnCorrectSequenceCommand() {
+    void parseCommand_SequenceCommandOfPipeCall_ReturnsCorrectSequenceCommand() {
         String args = "paste ghost.txt | grep Line; ls";
         List<Command> expected = List.of(
                 new PipeCommand(List.of(

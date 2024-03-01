@@ -37,8 +37,8 @@ public final class CustomAssertUtils {
                         ((CallCommand) cmd1).getArgsList(),
                         ((CallCommand) cmd2).getArgsList());
             } else if (cmd1.getClass() == PipeCommand.class) {
-                assertCallCommandListEquals((
-                                (PipeCommand) cmd1).getCallCommands(),
+                assertCallCommandListEquals(
+                        ((PipeCommand) cmd1).getCallCommands(),
                         ((PipeCommand) cmd2).getCallCommands());
             } else if (cmd1.getClass() == SequenceCommand.class) {
                 assertCommandListEquals(
