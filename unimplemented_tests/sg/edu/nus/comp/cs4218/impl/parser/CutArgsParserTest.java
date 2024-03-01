@@ -151,7 +151,7 @@ public class CutArgsParserTest {
 
     @Test
     void isCharPo_ValidFlagAndSyntax_ReturnsTrue() {
-        assertDoesNotThrow(() -> cutArgsParser.parse("-c", "1", "example.txt");
+        assertDoesNotThrow(() -> cutArgsParser.parse("-c", "1", "example.txt"));
         assertTrue(cutArgsParser.isCharPo());
     }
 
