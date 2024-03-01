@@ -5,14 +5,12 @@ import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 import static org.junit.jupiter.api.Assertions.fail;
 import static sg.edu.nus.comp.cs4218.impl.util.AssertUtils.assertFileMatch;
 
-import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.stream.Stream;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -49,6 +47,7 @@ class UniqApplicationTest {
     void setUp() {
         this.app = new UniqApplication();
     }
+
     @ParameterizedTest
     @MethodSource("validFlagsNoErrors")
     void uniqFromFile_VariousNoErrorFlags_FilesWithCorrectOutput(
