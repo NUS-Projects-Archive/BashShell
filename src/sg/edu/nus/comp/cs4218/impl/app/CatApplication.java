@@ -164,17 +164,19 @@ public class CatApplication implements CatInterface {
             try {
                 if (!((line = bufferedReader.readLine()) != null && !line.isEmpty())) {
                     break;
+                } else if (userInput.length() > 0) {
+                    userInput.append(StringUtils.STRING_NEWLINE);
                 }
             } catch (IOException e) {
-                throw new CatException(ERR_IO_EXCEPTION + " " + e.getMessage());
+                throw new CatException(ERR_IO_EXCEPTION);
             }
             if (isLineNumber) {
                 userInput.append(lineNumber).append(' ');
                 lineNumber++;
             }
-            userInput.append(line).append(StringUtils.STRING_NEWLINE);
+            userInput.append(line);
         }
-        return userInput.toString();
+        return userInput.append(StringUtils.STRING_NEWLINE).toString();
     }
 
     public String readFile(Boolean isLineNumber, File file) throws IOException, CatException {
@@ -190,7 +192,7 @@ public class CatApplication implements CatInterface {
                 content.append(line).append(StringUtils.STRING_NEWLINE);
             }
         } catch (FileNotFoundException e) {
-            throw new CatException(ERR_FILE_NOT_FOUND + " " + e.getMessage());
+            throw new CatException(ERR_FILE_NOT_FOUND);
         }
         return content.toString();
     }
