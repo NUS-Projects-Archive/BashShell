@@ -106,8 +106,8 @@ class TeeApplicationTest {
     void run_ValidArgs_DoesNotThrowException() {
         String[] args = {"-a"};
         InputStream mockedStdin = mock(InputStream.class);
-        OutputStream mockedStdoun = mock(OutputStream.class);
-        assertDoesNotThrow(() -> teeApplication.run(args, mockedStdin, mockedStdoun));
+        OutputStream mockedStdout = mock(OutputStream.class);
+        assertDoesNotThrow(() -> teeApplication.run(args, mockedStdin, mockedStdout));
     }
 
     @Test
