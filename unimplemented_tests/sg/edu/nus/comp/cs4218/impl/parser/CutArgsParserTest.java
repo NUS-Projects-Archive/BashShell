@@ -17,8 +17,8 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static sg.edu.nus.comp.cs4218.impl.parser.ArgsParser.ILLEGAL_FLAG_MSG;
 
 public class CutArgsParserTest {
 
@@ -27,24 +27,67 @@ public class CutArgsParserTest {
 
     private static Stream<Arguments> validSyntax() {
         return Stream.of(
-                Arguments.of((Object) new String[]{}),
-                Arguments.of((Object) new String[]{"-c"}),
-                Arguments.of((Object) new String[]{"-b"}),
-                Arguments.of((Object) new String[]{"-c", "example"}),
-                Arguments.of((Object) new String[]{"-b", "example"}),
-                Arguments.of((Object) new String[]{"-c", "-"}),
-                Arguments.of((Object) new String[]{"-b", "-"}),
-                Arguments.of((Object) new String[]{"-c", "example"}),
-                Arguments.of((Object) new String[]{"-b", "example"})
+                Arguments.of((Object) new String[]{"-c", "1"}),
+                Arguments.of((Object) new String[]{"-b", "1"}),
+                Arguments.of((Object) new String[]{"-c", "1", "-"}),
+                Arguments.of((Object) new String[]{"-b", "1", "-"}),
+                Arguments.of((Object) new String[]{"-c", "1", "example.txt"}),
+                Arguments.of((Object) new String[]{"-b", "1", "example.txt"}),
+                Arguments.of((Object) new String[]{"-c", "1-5", "example.txt"}),
+                Arguments.of((Object) new String[]{"-b", "1-5", "example.txt"}),
+                Arguments.of((Object) new String[]{"-c", "1,5", "example.txt"}),
+                Arguments.of((Object) new String[]{"-b", "1,5", "example.txt"}),
+                Arguments.of((Object) new String[]{"-c", "1-5,10,15", "example.txt"}),
+                Arguments.of((Object) new String[]{"-b", "1-5,10,15", "example.txt"}),
+                Arguments.of((Object) new String[]{"-c", "1,5,10-15", "example.txt"}),
+                Arguments.of((Object) new String[]{"-b", "1,5,10-15", "example.txt"}),
+                Arguments.of((Object) new String[]{"-c", "1", "-"}),
+                Arguments.of((Object) new String[]{"-b", "1", "-"}),
+                Arguments.of((Object) new String[]{"-c", "1", "example.txt", "-"}),
+                Arguments.of((Object) new String[]{"-b", "1", "example.txt", "-"}),
+                Arguments.of((Object) new String[]{"-c", "1", "-", "-"}),
+                Arguments.of((Object) new String[]{"-b", "1", "-", "-"}),
+                Arguments.of((Object) new String[]{"-c", "1", "example1.txt", "example2.txt"}),
+                Arguments.of((Object) new String[]{"-b", "1", "example1.txt", "example2.txt"})
         );
     }
 
     private static Stream<Arguments> invalidSyntax() {
         return Stream.of(
-                Arguments.of((Object) new String[]{"-c", "-a", "example"}),
-                Arguments.of((Object) new String[]{"-b", "--", "example"}),
-                Arguments.of((Object) new String[]{"-C"}),
-                Arguments.of((Object) new String[]{"-B"})
+                Arguments.of((Object) new String[]{}),
+                Arguments.of((Object) new String[]{"1", "example.txt"}),
+                Arguments.of((Object) new String[]{"-c", "example.txt"}),
+                Arguments.of((Object) new String[]{"-b", "example.txt"}),
+                Arguments.of((Object) new String[]{"-c", "-b", "1", "example.txt"}),
+                Arguments.of((Object) new String[]{"-b", "-c", "1", "example.txt"}),
+                Arguments.of((Object) new String[]{"-C", "1", "example.txt"}),
+                Arguments.of((Object) new String[]{"-B", "1", "example.txt"}),
+                Arguments.of((Object) new String[]{"-c", "0", "example.txt"}),
+                Arguments.of((Object) new String[]{"-c", "0-5", "example.txt"}),
+                Arguments.of((Object) new String[]{"-c", "0,5", "example.txt"}),
+                Arguments.of((Object) new String[]{"-c", "-1", "example.txt"}),
+                Arguments.of((Object) new String[]{"-c", "-1-5", "example.txt"}),
+                Arguments.of((Object) new String[]{"-c", "-1,5", "example.txt"})
+        );
+    }
+
+    static Stream<Arguments> validRangeList() {
+        return Stream.of(
+                Arguments.of(new String[]{"-c", "1", "example.txt"}, List.of(new int[]{1, 1})),
+                Arguments.of(new String[]{"-c", "1-5", "example.txt"}, List.of(new int[]{1, 5})),
+                Arguments.of(new String[]{"-c", "1,5", "example.txt"}, List.of(new int[]{1, 1}, new int[]{1, 5})),
+                Arguments.of(new String[]{"-c", "1-5", "example.txt"}, List.of(new int[]{1, 5})),
+                Arguments.of(new String[]{"-c", "1,5,10-15", "example.txt"},
+                        List.of(new int[]{1, 1}, new int[]{1, 5}), new int[]{10, 15}),
+                Arguments.of(new String[]{"-c", "10-15,5,1", "example.txt"},
+                        List.of(new int[]{1, 1}, new int[]{1, 5}), new int[]{10, 15}),
+                Arguments.of(new String[]{"-c", "1", "-"}, List.of(new int[]{1, 1})),
+                Arguments.of(new String[]{"-c", "1-5", "-"}, List.of(new int[]{1, 5})),
+                Arguments.of(new String[]{"-c", "1,5", "-"}, List.of(new int[]{1, 1}, new int[]{1, 5})),
+                Arguments.of(new String[]{"-c", "1,5,10-15", "-"},
+                        List.of(new int[]{1, 1}, new int[]{1, 5}), new int[]{10, 15}),
+                Arguments.of(new String[]{"-c", "10-15,5,1", "-"},
+                        List.of(new int[]{1, 1}, new int[]{1, 5}), new int[]{10, 15})
         );
     }
 
@@ -77,10 +120,20 @@ public class CutArgsParserTest {
     @ParameterizedTest
     @ValueSource(strings = {"-a", "-1", "-!", "-C", "-B", "--"})
     void parse_InvalidFlag_ThrowsInvalidArgsException(String args) {
-        Throwable result = assertThrows(InvalidArgsException.class, () -> {
-            cutArgsParser.parse(args);
+        String expectedMsg = String.format("illegal option -- %s", args.charAt(1));
+        InvalidArgsException exception = assertThrowsExactly(InvalidArgsException.class, () -> {
+            cutArgsParser.parse(args, "1", "example.txt");
         });
-        assertEquals(ILLEGAL_FLAG_MSG + args.charAt(1), result.getMessage());
+        assertEquals(expectedMsg, exception.getMessage());
+    }
+
+    @Test
+    void parse_NoFlags_ThrowsInvalidArgsException() {
+        String expectedMsg = "Invalid syntax"; // one valid flag is expected
+        InvalidArgsException exception = assertThrowsExactly(InvalidArgsException.class, () -> {
+            cutArgsParser.parse("1", "example.txt");
+        });
+        assertEquals(expectedMsg, exception.getMessage());
     }
 
     @ParameterizedTest
@@ -92,84 +145,61 @@ public class CutArgsParserTest {
     @ParameterizedTest
     @MethodSource("invalidSyntax")
     void parse_invalidSyntax_ThrowsInvalidArgsException(String... args) {
+        // InvalidArgsException to be thrown for scenarios where no flag is provided or more than one flag is given
         assertThrows(InvalidArgsException.class, () -> cutArgsParser.parse(args));
     }
 
     @Test
-    void isCutByChar_NoFlag_ReturnsFalse() throws InvalidArgsException {
-        cutArgsParser.parse();
-        assertFalse(cutArgsParser.isCutByChar());
+    void isCharPo_ValidFlagAndSyntax_ReturnsTrue() throws InvalidArgsException {
+        cutArgsParser.parse("-c", "1", "example.txt");
+        assertTrue(cutArgsParser.isCharPo());
     }
 
     @Test
-    void isCutByChar_ValidFlag_ReturnsTrue() throws InvalidArgsException {
-        cutArgsParser.parse("-c");
-        assertTrue(cutArgsParser.isCutByChar());
+    void isCharPo_DifferentValidFlagAndSyntax_ReturnsFalse() throws InvalidArgsException {
+        cutArgsParser.parse("-b", "1", "example.txt");
+        assertFalse(cutArgsParser.isCharPo());
     }
 
     @Test
-    void isCutByChar_ValidFlagAndNonFlagArg_ReturnsTrue() throws InvalidArgsException {
-        cutArgsParser.parse("-c", "example");
-        assertTrue(cutArgsParser.isCutByChar());
+    void isBytePo_ValidFlagAndSyntax_ReturnsTrue() throws InvalidArgsException {
+        cutArgsParser.parse("-b", "1", "example.txt");
+        assertTrue(cutArgsParser.isBytePo());
     }
 
     @Test
-    void isCutByChar_OnlyNonFlagArg_ReturnsTrue() throws InvalidArgsException {
-        cutArgsParser.parse("example");
-        assertFalse(cutArgsParser.isCutByChar());
+    void isBytePo_DifferentValidFlagAndSyntax_ReturnsTrue() throws InvalidArgsException {
+        cutArgsParser.parse("-c", "1", "example.txt");
+        assertFalse(cutArgsParser.isBytePo());
     }
 
-    @Test
-    void isCutByByte_NoFlag_ReturnsFalse() throws InvalidArgsException {
-        cutArgsParser.parse();
-        assertFalse(cutArgsParser.isCutByByte());
+    @ParameterizedTest
+    @MethodSource("validRangeList")
+    void getRangeList_ValidList_ReturnsSortedList(String[] args, List<Integer[]> expected)
+            throws InvalidArgsException {
+        cutArgsParser.parse(args);
+        assertEquals(cutArgsParser.getRangeList(), expected);
     }
 
-    @Test
-    void isCutByByte_ValidFlag_ReturnsTrue() throws InvalidArgsException {
-        cutArgsParser.parse("-b");
-        assertTrue(cutArgsParser.isCutByByte());
-    }
-
-    @Test
-    void isCutByByte_ValidFlagAndNonFlagArg_ReturnsTrue() throws InvalidArgsException {
-        cutArgsParser.parse("-b", "example");
-        assertTrue(cutArgsParser.isCutByByte());
-    }
-
-    @Test
-    void isCutByByte_OnlyNonFlagArg_ReturnsTrue() throws InvalidArgsException {
-        cutArgsParser.parse("example");
-        assertFalse(cutArgsParser.isCutByByte());
-    }
-
-    @Test
-    void getFileNames_NoArg_ReturnsEmpty() throws InvalidArgsException {
-        cutArgsParser.parse();
-        List<String> result = cutArgsParser.getFileNames();
-        assertTrue(result.isEmpty());
-    }
-
-    @Test
-    void getFileNames_OneNonFlagArg_ReturnsOneFile() throws InvalidArgsException {
-        cutArgsParser.parse("example");
-        List<String> expected = List.of("example");
+    @ParameterizedTest
+    @ValueSource(strings = {"-c 1 example.txt", "-c 1 -"})
+    void getFileNames_OneFileGiven_ReturnsOneFile(String args) throws InvalidArgsException {
+        String[] arguments = args.split("\\s+");
+        String lastFile = arguments[arguments.length - 1];
+        cutArgsParser.parse(arguments);
+        List<String> expected = List.of(lastFile);
         List<String> result = cutArgsParser.getFileNames();
         assertEquals(expected, result);
     }
 
-    @Test
-    void getFileNames_MultipleNonFlagArg_ReturnsMultipleFiles() throws InvalidArgsException {
-        cutArgsParser.parse("example1", "example2", "example3");
-        List<String> expected = List.of("example1", "example2", "example3");
-        List<String> result = cutArgsParser.getFileNames();
-        assertEquals(expected, result);
-    }
-
-    @Test
-    void getFileNames_ValidFlagsAndOneNonFlagArg_ReturnsOneFile() throws InvalidArgsException {
-        cutArgsParser.parse("-c", "-b", "example");
-        List<String> expected = List.of("example");
+    @ParameterizedTest
+    @ValueSource(strings = {"-c 1 example1.txt example2.txt", "-c 1 - -", "-c 1 example1.txt -"})
+    void getFileNames_MultipleFilesGiven_ReturnsMultipleFiles(String args) throws InvalidArgsException {
+        String[] arguments = args.split("\\s+");
+        String secondLastFile = arguments[arguments.length - 2];
+        String lastFile = arguments[arguments.length - 1];
+        cutArgsParser.parse(arguments);
+        List<String> expected = List.of(secondLastFile, lastFile);
         List<String> result = cutArgsParser.getFileNames();
         assertEquals(expected, result);
     }

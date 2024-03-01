@@ -10,12 +10,16 @@ public class CutArgsParser extends ArgsParser {
         super();
     }
 
-    public Boolean isCutByChar() {
+    public Boolean isCharPo() {
         return false;
     }
 
-    public Boolean isCutByByte() {
+    public Boolean isBytePo() {
         return false;
+    }
+
+    public List<Integer[]> getRangeList() {
+        return null;
     }
 
     public List<String> getFileNames() {
