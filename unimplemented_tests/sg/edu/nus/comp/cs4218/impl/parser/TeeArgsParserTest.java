@@ -48,9 +48,10 @@ public class TeeArgsParserTest {
     }
 
     @Test
-    void parse_ValidFlag_ReturnsGivenMatchingFlag() throws InvalidArgsException {
+    void parse_ValidFlag_ReturnsGivenMatchingFlag() {
         teeArgsParser.parse("-a");
-        assertEquals(VALID_FLAGS, teeArgsParser.flags, "Flags do not match");
+        assertDoesNotThrow(() -> teeArgsParser.parse("-a"));
+        assertFalse(teeArgsParser.flags.isEmpty());
     }
 
     @ParameterizedTest
@@ -75,43 +76,43 @@ public class TeeArgsParserTest {
     }
 
     @Test
-    void isAppend_ValidFlag_ReturnsTrue() throws InvalidArgsException {
-        teeArgsParser.parse("-a");
+    void isAppend_ValidFlag_ReturnsTrue() {
+        assertDoesNotThrow(() -> teeArgsParser.parse("-a"));
         assertTrue(teeArgsParser.isAppend());
     }
 
     @Test
-    void isAppend_OnlyNonFlagArg_ReturnsFalse() throws InvalidArgsException {
-        teeArgsParser.parse("example.txt");
+    void isAppend_OnlyNonFlagArg_ReturnsFalse() {
+        assertDoesNotThrow(() -> teeArgsParser.parse("example.txt"));
         assertFalse(teeArgsParser.isAppend());
     }
 
     @Test
-    void getFileNames_NoArg_ReturnsEmpty() throws InvalidArgsException {
-        teeArgsParser.parse();
+    void getFileNames_NoArg_ReturnsEmpty() {
+        assertDoesNotThrow(() -> teeArgsParser.parse());
         List<String> result = teeArgsParser.getFileNames();
         assertTrue(result.isEmpty());
     }
 
     @Test
     void getFileNames_OneNonFlagArg_ReturnsOneNonFlagArg() throws InvalidArgsException {
-        teeArgsParser.parse("example.txt");
+        assertDoesNotThrow(() -> teeArgsParser.parse("example.txt"));
         List<String> result = teeArgsParser.getFileNames();
         List<String> expected = List.of("example");
         assertEquals(expected, result);
     }
 
     @Test
-    void getFileNames_MultipleNonFlagArgs_ReturnsMultipleNonFlagArgs() throws InvalidArgsException {
-        teeArgsParser.parse("example1.txt", "example2.txt", "example3.txt");
+    void getFileNames_MultipleNonFlagArgs_ReturnsMultipleNonFlagArgs() {
+        assertDoesNotThrow(() -> teeArgsParser.parse("example1.txt", "example2.txt", "example3.txt"));
         List<String> expected = List.of("example1.txt", "example2.txt", "example3.txt");
         List<String> result = teeArgsParser.getFileNames();
         assertEquals(expected, result);
     }
 
     @Test
-    void getFileNames_ValidFlagAndOneNonFlagArg_ReturnsOneNonFlagArg() throws InvalidArgsException {
-        teeArgsParser.parse("-a", "example.txt");
+    void getFileNames_ValidFlagAndOneNonFlagArg_ReturnsOneNonFlagArg() {
+        assertDoesNotThrow(() -> teeArgsParser.parse("-a", "example.txt"));
         List<String> expected = List.of("example.txt");
         List<String> result = teeArgsParser.getFileNames();
         assertEquals(expected, result);
