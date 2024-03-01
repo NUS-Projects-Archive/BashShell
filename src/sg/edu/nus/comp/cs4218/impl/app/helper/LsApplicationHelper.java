@@ -1,11 +1,14 @@
 package sg.edu.nus.comp.cs4218.impl.app.helper;
 
 import sg.edu.nus.comp.cs4218.Environment;
+import sg.edu.nus.comp.cs4218.exception.DirectoryAccessDeniedException;
+import sg.edu.nus.comp.cs4218.exception.InvalidDirectoryException;
 import sg.edu.nus.comp.cs4218.exception.LsException;
 import sg.edu.nus.comp.cs4218.impl.util.StringUtils;
 
 import java.io.File;
 import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -17,7 +20,6 @@ import java.util.stream.Collectors;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_FILE_SEP;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_CURR_DIR;
 
-@SuppressWarnings("PMD.PreserveStackTrace")
 public class LsApplicationHelper {
     private final static String PATH_CURR_DIR = STRING_CURR_DIR + CHAR_FILE_SEP;
     private final static String colonNewLine = ":" + StringUtils.STRING_NEWLINE;
@@ -37,7 +39,7 @@ public class LsApplicationHelper {
         try {
             return formatContents(getContents(Paths.get(cwd)), isSortByExt);
         } catch (InvalidDirectoryException | DirectoryAccessDeniedException e) {
-            throw new LsException(e.getMessage());
+            throw new LsException(e.getMessage(), e);
         }
     }
 
@@ -46,16 +48,15 @@ public class LsApplicationHelper {
      * <p>
      * NOTE: This is recursively called if user wants recursive mode.
      *
-     * @param paths                 List of java.nio.Path objects to list
-     * @param isRecursive           Recursive mode, repeatedly ls the child directories
-     * @param isSortByExt           Sorts folder contents alphabetically by file extension
-     *                              (characters after the last ‘.’ (without quotes)). Files
- *                                  with no extension are sorted first
-     * @param isFolderNameSpecified Boolean to indicate if folder name is specified
+     * @param paths       List of java.nio.Path objects to list
+     * @param isRecursive Recursive mode, repeatedly ls the child directories
+     * @param isSortByExt Sorts folder contents alphabetically by file extension
+     *                    (characters after the last ‘.’ (without quotes)). Files
+     *                    with no extension are sorted first
+     * @param hasFolder   Boolean to indicate if folder name is specified
      * @return String to be written to output stream
      */
-    public static String buildResult(List<Path> paths, Boolean isRecursive, Boolean isSortByExt,
-                                     boolean isFolderNameSpecified) {
+    public static String buildResult(List<Path> paths, Boolean isRecursive, Boolean isSortByExt, Boolean hasFolder) {
         StringBuilder result = new StringBuilder();
         StringBuilder error = new StringBuilder();
         for (Path path : paths) {
@@ -70,7 +71,7 @@ public class LsApplicationHelper {
                 final String relativePath = getRelativeToCwd(path).toString();
                 result.append(StringUtils.isBlank(relativePath)
                         ? STRING_CURR_DIR
-                        : isFolderNameSpecified
+                        : hasFolder
                         ? relativePath
                         : PATH_CURR_DIR + relativePath);
                 result.append(colonNewLine);
@@ -84,7 +85,7 @@ public class LsApplicationHelper {
 
                 // RECURSE!
                 if (isRecursive) {
-                    result.append(buildResult(contents, isRecursive, isSortByExt, isFolderNameSpecified));
+                    result.append(buildResult(contents, isRecursive, isSortByExt, hasFolder));
                 }
             } catch (InvalidDirectoryException e) {
                 // If the directory is invalid, print the errors at the top
@@ -187,7 +188,7 @@ public class LsApplicationHelper {
      * @param directories List of directories to be resolved into Path objects
      * @return List of java.nio.Path objects
      */
-    public static List<Path> resolvePaths(String... directories) {
+    public static List<Path> resolvePaths(String... directories) throws InvalidDirectoryException {
         List<Path> paths = new ArrayList<>();
         for (int i = 0; i < directories.length; i++) {
             paths.add(resolvePath(directories[i]));
@@ -203,13 +204,17 @@ public class LsApplicationHelper {
      * @param directory Directory to be converted into a Path object
      * @return
      */
-    private static Path resolvePath(String directory) {
-        if (directory.charAt(0) == '/' || directory.equals(Environment.currentDirectory)) {
-            return Paths.get(directory).normalize();
-        }
+    private static Path resolvePath(String directory) throws InvalidDirectoryException {
+        try {
+            if (directory.charAt(0) == '/' || directory.equals(Environment.currentDirectory)) {
+                return Paths.get(directory).normalize();
+            }
 
-        // Construct path relative to current directory
-        return Paths.get(Environment.currentDirectory, directory).normalize();
+            // Construct path relative to current directory
+            return Paths.get(Environment.currentDirectory, directory).normalize();
+        } catch (InvalidPathException e) {
+            throw new InvalidDirectoryException(directory);
+        }
     }
 
     /**
@@ -245,26 +250,5 @@ public class LsApplicationHelper {
     private static String getFileExtension(String file) {
         int lastDotIndex = file.lastIndexOf('.');
         return lastDotIndex == -1 ? "" : file.substring(lastDotIndex + 1);
-    }
-
-    /**
-     * This exception is thrown only when the directory passed as an argument is
-     * invalid.
-     * It is considered invalid if it does not exist.
-     */
-    private static class InvalidDirectoryException extends Exception {
-        InvalidDirectoryException(String directory) {
-            super(String.format("ls: cannot access '%s': No such file or directory", directory));
-        }
-    }
-
-    /**
-     * This exception is thrown only when the directory passed as an argument is
-     * valid but the user does not have permission to access it.
-     */
-    private static class DirectoryAccessDeniedException extends Exception {
-        DirectoryAccessDeniedException(String directory) {
-            super(String.format("ls: cannot open directory '%s': Permission denied", directory));
-        }
     }
 }
