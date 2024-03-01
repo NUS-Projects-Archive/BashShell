@@ -21,7 +21,7 @@ import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 
 class EchoApplicationTest {
 
-    private final String ECHO_EXCEPTION_MSG = "echo: ";
+    private static final String ECHO_EXCEPTION_MSG = "echo: ";
     private EchoApplication app;
 
     private OutputStream exceptionThrowingOutputStream;

@@ -165,7 +165,8 @@ public class CatApplication implements CatInterface {
         // Read lines from stdin until an empty line is encountered
         while (true) {
             try {
-                if (!((line = bufferedReader.readLine()) != null && !line.isEmpty())) {
+                line = bufferedReader.readLine();
+                if (line == null || line.isEmpty()) {
                     break;
                 } else if (userInput.length() > 0) {
                     userInput.append(StringUtils.STRING_NEWLINE);

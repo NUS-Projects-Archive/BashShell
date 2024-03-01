@@ -9,9 +9,11 @@ import sg.edu.nus.comp.cs4218.exception.CatException;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -29,20 +31,14 @@ import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 
 class CatApplicationTest {
 
-    // run
-    // catstdin (done)
-    // catfiles (done)
-    // catfileandstdin
-    // readfile
-    // readstdin (done)
-
     private CatApplication app;
     private BufferedReader brMock;
     private InputStream inputStreamMock;
+    private OutputStream out;
     private String fileA;
     private String fileB;
     private String fileC;
-    private final String CAT_EXCEPTION_MSG = "cat: ";
+    private static final String CAT_EXCEPTION_MSG = "cat: ";
     private static final String NON_EXISTENT_FILE = "nonexistent.txt";
 
     @TempDir
@@ -51,6 +47,7 @@ class CatApplicationTest {
     @BeforeEach
     void setUp() throws IOException {
         this.app = new CatApplication();
+        this.out = new ByteArrayOutputStream();
         brMock = mock(BufferedReader.class);
         inputStreamMock = mock(InputStream.class);
         testDir = Files.createTempDirectory("testDir");
@@ -79,10 +76,6 @@ class CatApplicationTest {
         });
         assertEquals(CAT_EXCEPTION_MSG + ERR_FILE_NOT_FOUND, result.getMessage());
     }
-
-//    @Test
-//    void readFile_NoPermissionToAccessFile_ThrowsCatException() throws IOException {
-//    }
 
     @Test
     void readFile_ValidFileNoLineNumber_ReturnsFileContent() {
@@ -297,6 +290,276 @@ class CatApplicationTest {
                     "2 Stdin\r\n1 Software\r\n2 Testing" + STRING_NEWLINE;
             assertEquals(expected, result);
         } catch (CatException e) {
+            fail(e.getMessage());
+        }
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"", "Hello", "Hello\r\nWorld"})
+    void run_NoArgsNoLineNumber_PrintsStdin(String args) {
+        // Given
+        String[] tokens = new String[0];
+        inputStreamMock = new ByteArrayInputStream(args.getBytes(StandardCharsets.UTF_8));
+        // When
+        try {
+            this.app.run(tokens, inputStreamMock, this.out);
+            // Then
+            assertEquals(args + STRING_NEWLINE, this.out.toString());
+        } catch (CatException e) {
+            fail(e.getMessage());
+        }
+    }
+
+    @Test
+    void run_NoArgsHasLineNumber_PrintsLineNumberedStdin() {
+        // Given
+        String[] tokens = new String[]{"-n"};
+        inputStreamMock = new ByteArrayInputStream("Hello\r\nWorld".getBytes(StandardCharsets.UTF_8));
+        // When
+        try {
+            this.app.run(tokens, inputStreamMock, this.out);
+            // Then
+            assertEquals("1 Hello\r\n2 World" + STRING_NEWLINE, this.out.toString());
+        } catch (CatException e) {
+            fail(e.getMessage());
+        }
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"", "Hello", "Hello\r\nWorld"})
+    void run_DashOnlyNoLineNumber_PrintsStdin(String args) {
+        // Given
+        String[] tokens = new String[]{"-"};
+        inputStreamMock = new ByteArrayInputStream(args.getBytes(StandardCharsets.UTF_8));
+        // When
+        try {
+            this.app.run(tokens, inputStreamMock, this.out);
+            // Then
+            assertEquals(args + STRING_NEWLINE, this.out.toString());
+        } catch (CatException e) {
+            fail(e.getMessage());
+        }
+    }
+
+    @Test
+    void run_DashOnlyHasLineNumber_PrintsLineNumberedStdin() {
+        // Given
+        String[] tokens = new String[]{"-n", "-"};
+        inputStreamMock = new ByteArrayInputStream("Hello\r\nWorld".getBytes(StandardCharsets.UTF_8));
+        // When
+        try {
+            this.app.run(tokens, inputStreamMock, this.out);
+            // Then
+            assertEquals("1 Hello\r\n2 World" + STRING_NEWLINE, this.out.toString());
+        } catch (CatException e) {
+            fail(e.getMessage());
+        }
+    }
+
+    @Test
+    void run_FileOnlyNoLineNumber_PrintsConcatenatedFilesContent() {
+        // Given
+        String[] tokens = new String[]{this.fileA, this.fileB};
+        // When
+        try {
+            this.app.run(tokens, inputStreamMock, this.out);
+            // Then
+            assertEquals("Hello\r\nWorld\r\nSoftware\r\n" +
+                    "Testing" + STRING_NEWLINE, this.out.toString());
+        } catch (CatException e) {
+            fail(e.getMessage());
+        }
+    }
+
+    @Test
+    void run_FileOnlyHasLineNumber_PrintsLineNumberedConcatenatedFilesContent() {
+        // Given
+        String[] tokens = new String[]{"-n", this.fileA, this.fileB};
+        // When
+        try {
+            this.app.run(tokens, inputStreamMock, this.out);
+            // Then
+            assertEquals("1 Hello\r\n2 World\r\n1 Software\r\n" +
+                    "2 Testing" + STRING_NEWLINE, this.out.toString());
+        } catch (CatException e) {
+            fail(e.getMessage());
+        }
+    }
+
+    @Test
+    void run_FileAndDashNoLineNumber_PrintsConcatenatedContent() {
+        // Given
+        String[] tokens = new String[]{"-", this.fileA, this.fileB};
+        inputStreamMock = new ByteArrayInputStream("From\r\nStdin".getBytes(StandardCharsets.UTF_8));
+        // When
+        try {
+            this.app.run(tokens, inputStreamMock, this.out);
+            // Then
+            assertEquals("From\r\nStdin\r\nHello\r\nWorld\r\nSoftware\r\n" +
+                    "Testing" + STRING_NEWLINE, this.out.toString());
+        } catch (CatException e) {
+            fail(e.getMessage());
+        }
+    }
+
+    @Test
+    void run_FileAndDashHasLineNumber_PrintsLineNumberedConcatenatedContent() {
+        // Given
+        String[] tokens = new String[]{"-n", "-", this.fileA, this.fileB};
+        inputStreamMock = new ByteArrayInputStream("From\r\nStdin".getBytes(StandardCharsets.UTF_8));
+        // When
+        try {
+            this.app.run(tokens, inputStreamMock, this.out);
+            // Then
+            assertEquals("1 From\r\n2 Stdin\r\n1 Hello\r\n2 World\r\n1 Software\r\n" +
+                    "2 Testing" + STRING_NEWLINE, this.out.toString());
+        } catch (CatException e) {
+            fail(e.getMessage());
+        }
+    }
+
+    @Test
+    void run_InputRedirOnlyNoLineNum_PrintsInputStream() {
+        // Given
+        String[] tokens = new String[]{"<", this.fileA};
+        // When
+        try {
+            this.app.run(tokens, inputStreamMock, this.out);
+            // Then
+            assertEquals("Hello\r\nWorld" + STRING_NEWLINE, this.out.toString());
+        } catch (CatException e) {
+            fail(e.getMessage());
+        }
+    }
+
+    @Test
+    void run_InputRedirOnlyHasLineNum_PrintsLineNumberedInputStream() {
+        // Given
+        String[] tokens = new String[]{"-n", "<", this.fileA};
+        // When
+        try {
+            this.app.run(tokens, inputStreamMock, this.out);
+            // Then
+            assertEquals("1 Hello\r\n2 World" + STRING_NEWLINE, this.out.toString());
+        } catch (CatException e) {
+            fail(e.getMessage());
+        }
+    }
+
+    @Test
+    void run_MultipleInputRedirNoLineNum_PrintsLatestInputStream() {
+        // Given
+        String[] tokens = new String[]{"<", this.fileA, "<", this.fileB};
+        // When
+        try {
+            this.app.run(tokens, inputStreamMock, this.out);
+            // Then
+            assertEquals("Software\r\nTesting" + STRING_NEWLINE, this.out.toString());
+        } catch (CatException e) {
+            fail(e.getMessage());
+        }
+    }
+
+    @Test
+    void run_MultipleInputRedirHasLineNum_PrintsLineNumberedLatestInputStream() {
+        // Given
+        String[] tokens = new String[]{"-n", "<", this.fileA, "<", this.fileB};
+        // When
+        try {
+            this.app.run(tokens, inputStreamMock, this.out);
+            // Then
+            assertEquals("1 Software\r\n2 Testing" + STRING_NEWLINE, this.out.toString());
+        } catch (CatException e) {
+            fail(e.getMessage());
+        }
+    }
+
+    @Test
+    void run_InputRedirAndFilesOnlyNoLineNum_PrintsConcatenatedFilesOnly() {
+        // Given
+        String[] tokens = new String[]{"<", this.fileA, this.fileB};
+        // When
+        try {
+            this.app.run(tokens, inputStreamMock, this.out);
+            // Then
+            assertEquals("Software\r\nTesting" + STRING_NEWLINE, this.out.toString());
+        } catch (CatException e) {
+            fail(e.getMessage());
+        }
+    }
+
+    @Test
+    void run_InputRedirAndFilesOnlyHasLineNum_PrintsLineNumberedConcatenatedFilesOnly() {
+        // Given
+        String[] tokens = new String[]{"-n", "<", this.fileA, this.fileB};
+        // When
+        try {
+            this.app.run(tokens, inputStreamMock, this.out);
+            // Then
+            assertEquals("1 Software\r\n2 Testing" + STRING_NEWLINE, this.out.toString());
+        } catch (CatException e) {
+            fail(e.getMessage());
+        }
+    }
+
+    @Test
+    void run_OutputRedirNoLineNumber_WritesContentIntoOutputFile() {
+        // Given
+        String[] tokens = new String[]{this.fileA, this.fileB, ">", this.fileC};
+        // When
+        try {
+            this.app.run(tokens, inputStreamMock, this.out);
+            String result = app.readFile(false, new File(this.fileC));
+            // Then
+            assertEquals("Hello\r\nWorld\r\nSoftware\r\n" +
+                    "Testing" + STRING_NEWLINE, result);
+        } catch (CatException | IOException e) {
+            fail(e.getMessage());
+        }
+    }
+
+    @Test
+    void run_OutputRedirHasLineNumber_WritesLineNumberedContentIntoOutputFile() {
+        // Given
+        String[] tokens = new String[]{"-n", this.fileA, this.fileB, ">", this.fileC};
+        // When
+        try {
+            this.app.run(tokens, inputStreamMock, this.out);
+            String result = app.readFile(false, new File(this.fileC));
+            // Then
+            assertEquals("1 Hello\r\n2 World\r\n1 Software\r\n" +
+                    "2 Testing" + STRING_NEWLINE, result);
+        } catch (CatException | IOException e) {
+            fail(e.getMessage());
+        }
+    }
+
+    @Test
+    void run_MultipleOutputRedirNoLineNumber_WritesContentIntoLatestOutputFile() {
+        // Given
+        String[] tokens = new String[]{this.fileA, ">", this.fileB, ">", this.fileC};
+        // When
+        try {
+            this.app.run(tokens, inputStreamMock, this.out);
+            String result = app.readFile(false, new File(this.fileC));
+            // Then
+            assertEquals("Hello\r\nWorld" + STRING_NEWLINE, result);
+        } catch (CatException | IOException e) {
+            fail(e.getMessage());
+        }
+    }
+
+    @Test
+    void run_MultipleOutputRedirasLineNumber_WritesLineNumberedContentIntoLatestOutputFile() {
+        // Given
+        String[] tokens = new String[]{"-n", this.fileA, ">", this.fileB, ">", this.fileC};
+        // When
+        try {
+            this.app.run(tokens, inputStreamMock, this.out);
+            String result = app.readFile(false, new File(this.fileC));
+            // Then
+            assertEquals("1 Hello\r\n2 World" + STRING_NEWLINE, result);
+        } catch (CatException | IOException e) {
             fail(e.getMessage());
         }
     }
