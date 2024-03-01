@@ -32,7 +32,7 @@ public class PipeCommandTest {
     void evaluate_ValidCommands_ReturnCorrectResult() {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         PipeCommand pipeCommand = new PipeCommand(Arrays.asList(
-                new CallCommandStub("paste", "ghost | .txt"),
+                new CallCommandStub("paste", "ghost.txt"),
                 new CallCommandStub("grep", "Line#")
         ));
 
