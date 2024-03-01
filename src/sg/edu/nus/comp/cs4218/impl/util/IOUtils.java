@@ -31,7 +31,7 @@ public final class IOUtils {
         try {
             fileInputStream = new FileInputStream(new File(resolvedFileName));
         } catch (FileNotFoundException e) {
-            throw new ShellException(ERR_FILE_NOT_FOUND);
+            throw new ShellException(ERR_FILE_NOT_FOUND, e);
         }
 
         return fileInputStream;
@@ -68,7 +68,7 @@ public final class IOUtils {
         try {
             inputStream.close();
         } catch (IOException e) {
-            throw new ShellException(ERR_CLOSING_STREAMS);
+            throw new ShellException(ERR_CLOSING_STREAMS, e);
         }
     }
 
@@ -86,7 +86,7 @@ public final class IOUtils {
         try {
             outputStream.close();
         } catch (IOException e) {
-            throw new ShellException(ERR_CLOSING_STREAMS);
+            throw new ShellException(ERR_CLOSING_STREAMS, e);
         }
     }
 

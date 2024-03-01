@@ -12,17 +12,18 @@ import java.io.OutputStream;
 import java.nio.file.Path;
 import java.util.List;
 
-import static sg.edu.nus.comp.cs4218.impl.app.helper.LsApplicationHelper.*;
+import static sg.edu.nus.comp.cs4218.impl.app.helper.LsApplicationHelper.buildResult;
+import static sg.edu.nus.comp.cs4218.impl.app.helper.LsApplicationHelper.listCwdContent;
+import static sg.edu.nus.comp.cs4218.impl.app.helper.LsApplicationHelper.resolvePaths;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_OSTREAM;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NULL_ARGS;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_WRITE_STREAM;
 
-@SuppressWarnings("PMD.PreserveStackTrace")
 public class LsApplication implements LsInterface {
     @Override
     public String listFolderContent(Boolean isRecursive, Boolean isSortByExt,
-            String... folderName) throws LsException {
-        boolean isFolderNameSpecified = folderName.length > 0;
+                                    String... folderName) throws LsException {
+        boolean hasFolder = folderName.length > 0;
 
         if (folderName.length == 0 && !isRecursive) {
             return listCwdContent(isSortByExt);
@@ -30,8 +31,8 @@ public class LsApplication implements LsInterface {
 
         if (folderName.length == 1) {
             List<Path> paths = resolvePaths(folderName);
-            boolean isFolderNameAValidFile = paths.size() == 1 && paths.get(0).toFile().isFile();
-            if (isFolderNameAValidFile) {
+            boolean isValidFolderName = paths.size() == 1 && paths.get(0).toFile().isFile();
+            if (isValidFolderName) {
                 // Returns file name if only one valid file is specified
                 return paths.get(0).getFileName().toString();
             }
@@ -47,7 +48,7 @@ public class LsApplication implements LsInterface {
         }
 
         // End of output should not have newline
-        return buildResult(paths, isRecursive, isSortByExt, isFolderNameSpecified).trim();
+        return buildResult(paths, isRecursive, isSortByExt, hasFolder).trim();
     }
 
     @Override
@@ -65,7 +66,7 @@ public class LsApplication implements LsInterface {
         try {
             parser.parse(args);
         } catch (InvalidArgsException e) {
-            throw new LsException(e.getMessage());
+            throw new LsException(e.getMessage(), e);
         }
 
         Boolean recursive = parser.isRecursive();
@@ -78,7 +79,7 @@ public class LsApplication implements LsInterface {
             stdout.write(result.getBytes());
             stdout.write(StringUtils.STRING_NEWLINE.getBytes());
         } catch (Exception e) {
-            throw new LsException(ERR_WRITE_STREAM);
+            throw new LsException(ERR_WRITE_STREAM, e);
         }
     }
 }

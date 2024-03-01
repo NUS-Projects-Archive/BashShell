@@ -77,13 +77,13 @@ public class WcApplication implements WcInterface {
             }
         } catch (Exception e) {
             // Will never happen
-            throw new WcException(ERR_GENERAL); //NOPMD
+            throw new WcException(ERR_GENERAL, e);
         }
         try {
             stdout.write(result.getBytes());
             stdout.write(STRING_NEWLINE.getBytes());
         } catch (IOException e) {
-            throw new WcException(ERR_WRITE_STREAM);//NOPMD
+            throw new WcException(ERR_WRITE_STREAM, e);
         }
     }
 

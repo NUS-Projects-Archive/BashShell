@@ -169,7 +169,7 @@ class LsApplicationHelperTest {
         List<Path> expected = List.of(dirAPath);
 
         // When
-        List<Path> actual = LsApplicationHelper.resolvePaths(DIR_A_NAME);
+        List<Path> actual = assertDoesNotThrow(() -> LsApplicationHelper.resolvePaths(DIR_A_NAME));
 
         // Then
         assertEquals(expected, actual);
