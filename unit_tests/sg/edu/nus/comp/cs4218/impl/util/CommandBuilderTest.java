@@ -16,9 +16,9 @@ import sg.edu.nus.comp.cs4218.exception.ShellException;
 class CommandBuilderTest {
     private static Stream<String> getNewlineInQuotes() {
         return Stream.of(
-            "'" + STRING_NEWLINE + "'",
-            "\"" + STRING_NEWLINE + "\"",
-            "`" + STRING_NEWLINE + "`"
+                "'" + STRING_NEWLINE + "'",
+                "\"" + STRING_NEWLINE + "\"",
+                "`" + STRING_NEWLINE + "`"
         );
     }
 
@@ -41,11 +41,11 @@ class CommandBuilderTest {
      */
     @ParameterizedTest
     @ValueSource(strings = {
-        "'",            // '
-        "\"",           // "
-        "\"\"\"",       // """
-        "`",            // `
-        "```",          // ```
+            "'",            // '
+            "\"",           // "
+            "\"\"\"",       // """
+            "`",            // `
+            "```",          // ```
     })
     void parseCommand_UnmatchedQuotes_ThrowsShellException(String unmatchedQuotes) {
         Throwable result = assertThrows(ShellException.class, () -> CommandBuilder.parseCommand(unmatchedQuotes, null));

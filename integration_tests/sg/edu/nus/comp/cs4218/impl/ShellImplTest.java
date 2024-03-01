@@ -30,8 +30,8 @@ class ShellImplTest {
 
     static Stream<Arguments> getValidQuoteContents() {
         return Stream.of(
-            Arguments.of("echo \"`echo testing`\"", String.format("testing %s", System.lineSeparator())),
-            Arguments.of("echo `echo testing`", String.format("testing%s", System.lineSeparator()))
+                Arguments.of("echo \"`echo testing`\"", String.format("testing %s", System.lineSeparator())),
+                Arguments.of("echo `echo testing`", String.format("testing%s", System.lineSeparator()))
         );
     }
 
@@ -64,7 +64,7 @@ class ShellImplTest {
 
         // When
         ShellException result = assertThrows(ShellException.class,
-            () -> shellImpl.parseAndEvaluate(commandString, System.out));
+                () -> shellImpl.parseAndEvaluate(commandString, System.out));
 
         // Then
         assertEquals(String.format("shell: %s: %s", invalidAppName, ERR_INVALID_APP), result.getMessage());
