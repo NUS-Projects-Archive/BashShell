@@ -11,4 +11,8 @@ public class InvalidDirectoryException extends LsException {
     public InvalidDirectoryException(String directory) {
         super(String.format("cannot access '%s': No such file or directory", directory));
     }
+
+    public InvalidDirectoryException(String directory, Throwable cause) {
+        super(String.format("cannot access '%s': No such file or directory", directory, cause));
+    }
 }

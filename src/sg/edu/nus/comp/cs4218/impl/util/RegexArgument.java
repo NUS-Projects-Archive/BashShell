@@ -70,7 +70,7 @@ public final class RegexArgument {
     public List<String> globFiles() {
         List<String> globbedFiles = new LinkedList<>();
 
-        if (isRegex) {
+        if (isRegex()) {
             Pattern regexPattern = Pattern.compile(regex.toString());
             String dir = "";
             String[] tokens = plaintext.toString().replaceAll("\\\\", "/").split("/");
@@ -79,13 +79,16 @@ public final class RegexArgument {
             }
 
             File currentDir = Paths.get(Environment.currentDirectory + File.separator + dir).toFile();
+            String[] files = currentDir.list();
 
-            for (String candidate : currentDir.list()) {
-                // Replace any platform-specific File.separator with forward slash '/'
-                // Ensure compatibility with regexPattern, which matches directory separators using forward slash '/'
-                candidate = (dir + candidate).replace(File.separator, "/");
-                if (regexPattern.matcher(candidate).matches()) {
-                    globbedFiles.add(candidate);
+            if (files != null) {
+                for (String candidate : files) {
+                    // Replace any platform-specific File.separator with forward slash '/'
+                    // Ensure compatibility with regexPattern, which matches directory separators using forward slash '/'
+                    candidate = (dir + candidate).replace(File.separator, "/");
+                    if (regexPattern.matcher(candidate).matches()) {
+                        globbedFiles.add(candidate);
+                    }
                 }
             }
 

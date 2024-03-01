@@ -22,7 +22,7 @@ import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_CURR_DIR;
 
 public class LsApplicationHelper {
     private final static String PATH_CURR_DIR = STRING_CURR_DIR + CHAR_FILE_SEP;
-    private final static String colonNewLine = ":" + StringUtils.STRING_NEWLINE;
+    private final static String COLON_NEW_LINE = ":" + StringUtils.STRING_NEWLINE;
 
     /**
      * Lists only the current directory's content and RETURNS. This does not account
@@ -74,7 +74,7 @@ public class LsApplicationHelper {
                         : hasFolder
                         ? relativePath
                         : PATH_CURR_DIR + relativePath);
-                result.append(colonNewLine);
+                result.append(COLON_NEW_LINE);
                 result.append(formatted);
 
                 if (!formatted.isEmpty()) {
@@ -213,7 +213,7 @@ public class LsApplicationHelper {
             // Construct path relative to current directory
             return Paths.get(Environment.currentDirectory, directory).normalize();
         } catch (InvalidPathException e) {
-            throw new InvalidDirectoryException(directory);
+            throw new InvalidDirectoryException(directory, e);
         }
     }
 

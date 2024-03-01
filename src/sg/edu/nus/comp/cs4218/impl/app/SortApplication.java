@@ -75,7 +75,7 @@ public class SortApplication implements SortInterface {
                 stdout.write(STRING_NEWLINE.getBytes());
             }
         } catch (IOException e) {
-            throw new SortException(ERR_WRITE_STREAM);//NOPMD
+            throw new SortException(ERR_WRITE_STREAM, e);
         }
     }
 

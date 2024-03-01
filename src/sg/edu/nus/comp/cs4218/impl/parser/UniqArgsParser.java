@@ -1,28 +1,28 @@
 package sg.edu.nus.comp.cs4218.impl.parser;
 
 public class UniqArgsParser extends ArgsParser {
-    public static final char FLAG_IS_COUNT_OCCUR = 'c';
-    public static final char FLAG_IS_DUPLICATE_GRP = 'd';
-    public static final char FLAG_IS_DUPLICATE = 'D';
+    public static final char FLAG_COUNT_OCCUR = 'c';
+    public static final char FLAG_DUP_GRP = 'd';
+    public static final char FLAG_DUPLICATE = 'D';
     public static final char NO_IN_FILE = '-';
 
     public UniqArgsParser() {
         super();
-        legalFlags.add(FLAG_IS_COUNT_OCCUR);
-        legalFlags.add(FLAG_IS_DUPLICATE_GRP);
-        legalFlags.add(FLAG_IS_DUPLICATE);
+        legalFlags.add(FLAG_COUNT_OCCUR);
+        legalFlags.add(FLAG_DUP_GRP);
+        legalFlags.add(FLAG_DUPLICATE);
     }
 
     public Boolean isPrefixWithOccurrencesCount() {
-        return flags.contains(FLAG_IS_COUNT_OCCUR);
+        return flags.contains(FLAG_COUNT_OCCUR);
     }
 
     public Boolean isPrintDuplicateOncePerGroup() {
-        return flags.contains(FLAG_IS_DUPLICATE_GRP);
+        return flags.contains(FLAG_DUP_GRP);
     }
 
     public Boolean isPrintAllDuplicate() {
-        return flags.contains(FLAG_IS_DUPLICATE);
+        return flags.contains(FLAG_DUPLICATE);
     }
 
     /**

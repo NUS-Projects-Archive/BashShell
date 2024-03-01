@@ -39,7 +39,7 @@ public class MvApplication implements MvInterface {
     @Override
     public void run(String[] args, InputStream stdin, OutputStream stdout) throws MvException {
         // Format: mv [Option] SOURCE TARGET
-        //         mv [Option] SOURCE … DIRECTORY
+        //         mv [Option] SOURCE ... DIRECTORY
 
         if (args == null || args.length == 0) {
             throw new MvException(ERR_MISSING_ARG);
@@ -58,14 +58,14 @@ public class MvApplication implements MvInterface {
         }
 
         final Boolean isOverwrite = parser.isOverwrite();
-        final String[] sourceDirectories = parser.getSourceDirectories().toArray(new String[parser.getSourceDirectories().size()]);
-        final String destinationDirectory = parser.getDestinationDirectory();
+        final String[] srcDirectories = parser.getSourceDirectories().toArray(new String[parser.getSourceDirectories().size()]);
+        final String destDirectory = parser.getDestinationDirectory();
 
         String result;
-        if (sourceDirectories.length > 1) {
-            result = mvFilesToFolder(isOverwrite, destinationDirectory, sourceDirectories);
+        if (srcDirectories.length > 1) {
+            result = mvFilesToFolder(isOverwrite, destDirectory, srcDirectories);
         } else {
-            result = mvSrcFileToDestFile(isOverwrite, sourceDirectories[0], destinationDirectory);
+            result = mvSrcFileToDestFile(isOverwrite, srcDirectories[0], destDirectory);
         }
 
         try {
@@ -75,7 +75,7 @@ public class MvApplication implements MvInterface {
             stdout.write(result.getBytes());
             stdout.write(STRING_NEWLINE.getBytes());
         } catch (IOException e) {
-            throw new MvException(ERR_WRITE_STREAM);//NOPMD
+            throw new MvException(ERR_WRITE_STREAM, e);
         }
     }
 
