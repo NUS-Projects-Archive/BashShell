@@ -11,6 +11,10 @@ public class CatArgsParser extends ArgsParser {
         legalFlags.add(FLAG_LINE_NUMBER);
     }
 
+    public Boolean isLineNumber() {
+        return flags.contains(FLAG_LINE_NUMBER);
+    }
+
     public List<String> getNonFlagArgs() {
         return nonFlagArgs;
     }

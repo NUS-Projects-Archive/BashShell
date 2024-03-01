@@ -1,8 +1,8 @@
 package sg.edu.nus.comp.cs4218.impl.app.helper;
 
 import sg.edu.nus.comp.cs4218.Environment;
-import sg.edu.nus.comp.cs4218.exception.DirectoryAccessDeniedException;
-import sg.edu.nus.comp.cs4218.exception.InvalidDirectoryException;
+import sg.edu.nus.comp.cs4218.exception.DirectoryAccessDeniedLsException;
+import sg.edu.nus.comp.cs4218.exception.InvalidDirectoryLsException;
 import sg.edu.nus.comp.cs4218.exception.LsException;
 import sg.edu.nus.comp.cs4218.impl.util.StringUtils;
 
@@ -38,7 +38,7 @@ public class LsApplicationHelper {
         final String cwd = Environment.currentDirectory;
         try {
             return formatContents(getContents(Paths.get(cwd)), isSortByExt);
-        } catch (InvalidDirectoryException | DirectoryAccessDeniedException e) {
+        } catch (InvalidDirectoryLsException | DirectoryAccessDeniedLsException e) {
             throw new LsException(e.getMessage(), e);
         }
     }
@@ -87,11 +87,11 @@ public class LsApplicationHelper {
                 if (isRecursive) {
                     result.append(buildResult(contents, isRecursive, isSortByExt, hasFolder));
                 }
-            } catch (InvalidDirectoryException e) {
+            } catch (InvalidDirectoryLsException e) {
                 // If the directory is invalid, print the errors at the top
                 error.append(e.getMessage());
                 error.append(StringUtils.STRING_NEWLINE);
-            } catch (DirectoryAccessDeniedException e) {
+            } catch (DirectoryAccessDeniedLsException e) {
                 // Append the error message to the result normally
                 // Trim the last newline
                 if (result.length() > 0) {
@@ -144,21 +144,21 @@ public class LsApplicationHelper {
      * @return List of files + directories in the passed directory
      */
     private static List<Path> getContents(Path directory)
-            throws InvalidDirectoryException, DirectoryAccessDeniedException {
+            throws InvalidDirectoryLsException, DirectoryAccessDeniedLsException {
         if (Files.isDirectory(directory)) {
             if (Files.isReadable(directory)) {
                 // Get contents from directory
                 return getContentsFromReadableDirectory(directory);
             } else {
                 // Directory has no read access
-                throw new DirectoryAccessDeniedException(getRelativeToCwd(directory).toString());
+                throw new DirectoryAccessDeniedLsException(getRelativeToCwd(directory).toString());
             }
         } else if (Files.isRegularFile(directory)) {
             // Path is a non-folder
             return null;
         } else {
             // Path does not exist
-            throw new InvalidDirectoryException(getRelativeToCwd(directory).toString());
+            throw new InvalidDirectoryLsException(getRelativeToCwd(directory).toString());
         }
     }
 
@@ -188,7 +188,7 @@ public class LsApplicationHelper {
      * @param directories List of directories to be resolved into Path objects
      * @return List of java.nio.Path objects
      */
-    public static List<Path> resolvePaths(String... directories) throws InvalidDirectoryException {
+    public static List<Path> resolvePaths(String... directories) throws InvalidDirectoryLsException {
         List<Path> paths = new ArrayList<>();
         for (int i = 0; i < directories.length; i++) {
             paths.add(resolvePath(directories[i]));
@@ -204,7 +204,7 @@ public class LsApplicationHelper {
      * @param directory Directory to be converted into a Path object
      * @return
      */
-    private static Path resolvePath(String directory) throws InvalidDirectoryException {
+    private static Path resolvePath(String directory) throws InvalidDirectoryLsException {
         try {
             if (directory.charAt(0) == '/' || directory.equals(Environment.currentDirectory)) {
                 return Paths.get(directory).normalize();
@@ -213,7 +213,7 @@ public class LsApplicationHelper {
             // Construct path relative to current directory
             return Paths.get(Environment.currentDirectory, directory).normalize();
         } catch (InvalidPathException e) {
-            throw new InvalidDirectoryException(directory, e);
+            throw new InvalidDirectoryLsException(directory, e);
         }
     }
 

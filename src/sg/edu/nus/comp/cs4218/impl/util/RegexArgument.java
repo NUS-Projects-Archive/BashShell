@@ -70,7 +70,7 @@ public final class RegexArgument {
     public List<String> globFiles() {
         List<String> globbedFiles = new LinkedList<>();
 
-        if (isRegex()) {
+        if (isRegex) {
             Pattern regexPattern = Pattern.compile(regex.toString());
             String dir = "";
             String[] tokens = plaintext.toString().replaceAll("\\\\", "/").split("/");
