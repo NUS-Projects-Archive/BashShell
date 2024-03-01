@@ -22,7 +22,7 @@ import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 public class EchoApplication implements EchoInterface {
 
     @Override
-    public String constructResult(String[] args) throws AbstractApplicationException {
+    public String constructResult(String[] args) throws EchoException {
         if (args == null) {
             throw new EchoException(ERR_NULL_ARGS);
         }
@@ -46,7 +46,7 @@ public class EchoApplication implements EchoInterface {
      *               space character.
      * @throws EchoException If an I/O exception occurs.
      */
-    public void run(String[] args, InputStream stdin, OutputStream stdout) throws AbstractApplicationException {
+    public void run(String[] args, InputStream stdin, OutputStream stdout) throws EchoException {
         if (stdout == null) {
             throw new EchoException(ERR_NO_OSTREAM);
         }
