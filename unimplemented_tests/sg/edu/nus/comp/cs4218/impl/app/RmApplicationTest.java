@@ -57,6 +57,13 @@ public class RmApplicationTest {
     }
 
     @Test
+    void run_NoArgs_ThrowsRmException() {
+        final String expectedMsg = "rm: missing operand"; // Given
+        RmException exception = assertThrowsExactly(RmException.class, () -> app.run(null, null, null)); // When
+        assertEquals(expectedMsg, exception.getMessage()); // Then
+    }
+
+    @Test
     void run_RemoveExistingFile_SuccessfullyRemoveFile() {
         final String[] args = {TEST_FILE_ONE};
         assertDoesNotThrow(() -> app.run(args, null, null));
