@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static sg.edu.nus.comp.cs4218.impl.app.GrepApplication.NULL_POINTER;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_INVALID_REGEX;
 import static sg.edu.nus.comp.cs4218.impl.util.FileUtils.createNewFile;
-import static sg.edu.nus.comp.cs4218.impl.util.FileUtils.deleteFile;
+import static sg.edu.nus.comp.cs4218.impl.util.FileUtils.deleteFileOrDirectory;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 
 import java.io.ByteArrayInputStream;
@@ -46,7 +46,7 @@ class GrepApplicationTest {
 
     @AfterEach
     void tearDown() {
-        deleteFile(file);
+        deleteFileOrDirectory(file);
     }
 
     /**
@@ -89,7 +89,7 @@ class GrepApplicationTest {
     void grepFromFile_isPrefixFileNameIsTrueForOneFile_ReturnsCorrectMatchingLinesWithFileName() {
         String expected = FILE_NAME + SEMICOLON_SPACE + FILE_CONTENTS + STRING_NEWLINE;
         String result = assertDoesNotThrow(() ->
-                grepApplication.grepFromFiles(PATTERN_BIG_E, false, false, true, fileAbsPath));
+                grepApplication.grepFromFiles(PATTERN_SMALL_E, false, false, true, fileAbsPath));
         assertEquals(expected, result);
     }
 
@@ -113,7 +113,7 @@ class GrepApplicationTest {
                 grepApplication.grepFromFiles(PATTERN_SMALL_E, false, false, false, fileAbsPath, secFileAbsPath));
         assertEquals(expected, result);
 
-        deleteFile(secFile);
+        deleteFileOrDirectory(secFile);
     }
 
     /**

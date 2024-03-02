@@ -11,7 +11,7 @@ import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_INPUT;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_PERM;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_SYNTAX;
 import static sg.edu.nus.comp.cs4218.impl.util.FileUtils.createNewFile;
-import static sg.edu.nus.comp.cs4218.impl.util.FileUtils.deleteFile;
+import static sg.edu.nus.comp.cs4218.impl.util.FileUtils.deleteFileOrDirectory;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 
 import java.io.ByteArrayInputStream;
@@ -26,7 +26,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import sg.edu.nus.comp.cs4218.exception.GrepException;
-import sg.edu.nus.comp.cs4218.impl.util.FileUtils;
 
 class GrepApplicationIT { //NOPMD - suppressed ClassNamingConventions - Following the class name convention for IT
     private static final String VALID_PATTERN_A_B = "ab";
@@ -126,7 +125,7 @@ class GrepApplicationIT { //NOPMD - suppressed ClassNamingConventions - Followin
         assertEquals(expected, outContent.toString());
 
         // Clean up
-        deleteFile(file);
+        deleteFileOrDirectory(file);
     }
 
     /**
@@ -158,8 +157,8 @@ class GrepApplicationIT { //NOPMD - suppressed ClassNamingConventions - Followin
         assertEquals(expected, outContent.toString());
 
         // Clean up
-        deleteFile(fileOne);
-        deleteFile(fileTwo);
+        deleteFileOrDirectory(fileOne);
+        deleteFileOrDirectory(fileTwo);
     }
 
     /**
@@ -189,7 +188,7 @@ class GrepApplicationIT { //NOPMD - suppressed ClassNamingConventions - Followin
         Path file = createNewFile("tempFile", INPUT_CONTENTS);
         if (!file.toFile().setReadable(false)) {
             fail("Unable to set file to not readable");
-            FileUtils.deleteFile(file);
+            deleteFileOrDirectory(file);
             return;
         }
 
@@ -205,6 +204,6 @@ class GrepApplicationIT { //NOPMD - suppressed ClassNamingConventions - Followin
         assertEquals(expected, outContent.toString());
 
         // Clean up
-        deleteFile(file);
+        deleteFileOrDirectory(file);
     }
 }

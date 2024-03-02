@@ -20,11 +20,11 @@ public class FileUtils {
     }
 
     /**
-     * Deletes specified file if it exists.
+     * Deletes specified file/directory if it exists.
      *
-     * @param file File to be deleted.
+     * @param file File/directory to be deleted.
      */
-    public static void deleteFile(Path file) {
-        assertDoesNotThrow(() -> Files.deleteIfExists(file), "Unable to delete temporary file");
+    public static void deleteFileOrDirectory(Path file) {
+        assertDoesNotThrow(() -> Files.deleteIfExists(file), "Unable to delete temporary file/directory");
     }
 }
