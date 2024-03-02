@@ -25,7 +25,7 @@ public class MvApplicationIT {
 
     @BeforeEach
     void setUp() throws IOException {
-        this.app = new MvApplication();
+        app = new MvApplication();
     }
 
     @Test

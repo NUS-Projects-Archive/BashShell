@@ -30,16 +30,16 @@ public class EchoApplicationIT {
 
     @BeforeEach
     public void setUp() throws IOException {
-        this.app = new EchoApplication();
-        this.exceptionThrowingOutputStream = mock(OutputStream.class);
+        app = new EchoApplication();
+        exceptionThrowingOutputStream = mock(OutputStream.class);
         doThrow(new IOException()).when(exceptionThrowingOutputStream).write(any(byte[].class));
-        this.out = new ByteArrayOutputStream();
+        out = new ByteArrayOutputStream();
     }
 
     @AfterEach
     void tearDown() throws IOException {
-        this.exceptionThrowingOutputStream.close();
-        this.out.close();
+        exceptionThrowingOutputStream.close();
+        out.close();
     }
 
     @Test
@@ -53,7 +53,7 @@ public class EchoApplicationIT {
     @Test
     void run_IOExceptionWhenWritingByteBuffer_ThrowsEchoException() {
         Throwable result = assertThrows(EchoException.class, () -> {
-            app.run(new String[]{"A", "B", "C"}, null, this.exceptionThrowingOutputStream);
+            app.run(new String[]{"A", "B", "C"}, null, exceptionThrowingOutputStream);
         });
         assertEquals(ECHO_EXCEPTION_MSG + ERR_IO_EXCEPTION, result.getMessage());
     }
@@ -63,8 +63,8 @@ public class EchoApplicationIT {
         // Given
         String[] tokens = new String[]{"Hello", "World!"};
         // When
-        this.app.run(tokens, null, this.out);
+        app.run(tokens, null, out);
         // Then
-        assertEquals("Hello World!" + STRING_NEWLINE, this.out.toString());
+        assertEquals("Hello World!" + STRING_NEWLINE, out.toString());
     }
 }

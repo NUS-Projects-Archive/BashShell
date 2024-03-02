@@ -36,7 +36,7 @@ public class SortApplicationIT {
 
     @BeforeEach
     void setUp() throws IOException {
-        this.app = new SortApplication();
+        app = new SortApplication();
 
         // Create temporary file, automatically deletes after test execution
         tempFilePath = tempDir.resolve(TEMP_FILE);
