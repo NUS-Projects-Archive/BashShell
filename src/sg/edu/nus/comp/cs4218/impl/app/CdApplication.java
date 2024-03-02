@@ -12,7 +12,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.*;
+import sg.edu.nus.comp.cs4218.Environment;
+import sg.edu.nus.comp.cs4218.app.CdInterface;
+import sg.edu.nus.comp.cs4218.exception.CdException;
+import sg.edu.nus.comp.cs4218.impl.util.StringUtils;
 
 public class CdApplication implements CdInterface {
 
@@ -45,7 +48,7 @@ public class CdApplication implements CdInterface {
         if (StringUtils.isBlank(pathStr)) {
             throw new CdException(ERR_NO_ARGS);
         }
-        
+
         Path path = new File(pathStr).toPath();
         if (!path.isAbsolute()) {
             path = Paths.get(Environment.currentDirectory, pathStr);

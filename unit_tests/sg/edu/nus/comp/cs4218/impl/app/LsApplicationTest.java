@@ -42,6 +42,7 @@ class LsApplicationTest {
     private static Path cwdPath;
     private static String cwdName;
     private static String cwdPathName;
+  
     private LsApplication app;
 
     private static String getCwdContents() {
@@ -184,6 +185,7 @@ class LsApplicationTest {
     @EnabledOnOs(OS.WINDOWS)
     void listFolderContent_NoDirNameSpecifiedAndIsRecursiveOnWindows_ReturnsAllItems() {
         String expected = getCwdContentsRecursively("\\");
+  
         // When
         String actual = assertDoesNotThrow(() -> app.listFolderContent(true, false));
         // Then
