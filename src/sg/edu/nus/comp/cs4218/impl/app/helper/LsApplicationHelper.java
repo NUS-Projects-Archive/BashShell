@@ -112,7 +112,7 @@ public class LsApplicationHelper {
      *                    with no extension are sorted first
      * @return
      */
-    private static String formatContents(List<Path> contents, Boolean isSortByExt) {
+    public static String formatContents(List<Path> contents, Boolean isSortByExt) {
         StringBuilder result = new StringBuilder();
 
         List<String> fileNames = contents.stream()
