@@ -113,6 +113,7 @@ public class PasteApplication implements PasteInterface {
                     redirectionHandler.getOutputStream().write(bytes);
                 } else {
                     stdout.write(result.getBytes());
+                    stdout.write(STRING_NEWLINE.getBytes());
                 }
             } catch (Exception e) {
                 throw new PasteException(e.getMessage());
