@@ -1,17 +1,5 @@
 package sg.edu.nus.comp.cs4218.impl.parser;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
-import org.junit.jupiter.params.provider.ValueSource;
-import sg.edu.nus.comp.cs4218.exception.InvalidArgsException;
-
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Stream;
-
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -19,12 +7,25 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static sg.edu.nus.comp.cs4218.impl.parser.ArgsParser.ILLEGAL_FLAG_MSG;
 
-@SuppressWarnings("PMD.AvoidDuplicateLiterals")
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Stream;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
+
+import sg.edu.nus.comp.cs4218.exception.InvalidArgsException;
+
 class MvArgsParserTest {
 
     private final Set<Character> VALID_FLAGS = Set.of('n');
     private MvArgsParser mvArgsParser;
 
+    @SuppressWarnings("PMD.AvoidDuplicateLiterals")
     private static Stream<Arguments> validSyntax() {
         return Stream.of(
                 Arguments.of((Object) new String[]{}),
@@ -59,8 +60,8 @@ class MvArgsParserTest {
     }
 
     @Test
-    void parse_ValidFlag_ReturnsGivenMatchingFlag() throws InvalidArgsException {
-        mvArgsParser.parse("-n");
+    void parse_ValidFlag_ReturnsGivenMatchingFlag() {
+        assertDoesNotThrow(() -> mvArgsParser.parse("-n"));
         assertEquals(VALID_FLAGS, mvArgsParser.flags, "Flags do not match");
     }
 
@@ -86,20 +87,20 @@ class MvArgsParserTest {
     }
 
     @Test
-    void isOverwrite_NoFlag_ReturnsFalse() throws InvalidArgsException {
-        mvArgsParser.parse();
+    void isOverwrite_NoFlag_ReturnsFalse() {
+        assertDoesNotThrow(() -> mvArgsParser.parse());
         assertTrue(mvArgsParser.isOverwrite());
     }
 
     @Test
-    void isOverwrite_ValidFlag_ReturnsFalse() throws InvalidArgsException {
-        mvArgsParser.parse("-n");
+    void isOverwrite_ValidFlag_ReturnsFalse() {
+        assertDoesNotThrow(() -> mvArgsParser.parse("-n"));
         assertFalse(mvArgsParser.isOverwrite());
     }
 
     @Test
-    void isOverwrite_OnlyNonFlagArg_ReturnsFalse() throws InvalidArgsException {
-        mvArgsParser.parse("example");
+    void isOverwrite_OnlyNonFlagArg_ReturnsFalse() {
+        assertDoesNotThrow(() -> mvArgsParser.parse("example"));
         assertTrue(mvArgsParser.isOverwrite());
     }
 
@@ -112,9 +113,8 @@ class MvArgsParserTest {
 
     @ParameterizedTest
     @ValueSource(strings = {"example", "-n example"})
-    void getSourceDirectories_OneNonFlagArg_ReturnsEmptyList(String args)
-            throws InvalidArgsException {
-        mvArgsParser.parse(args.split("\\s+"));
+    void getSourceDirectories_OneNonFlagArg_ReturnsEmptyList(String args) {
+        assertDoesNotThrow(() -> mvArgsParser.parse(args.split("\\s+")));
         List<String> expected = List.of();
         List<String> result = mvArgsParser.getSourceDirectories();
         assertEquals(expected, result);
@@ -122,9 +122,8 @@ class MvArgsParserTest {
 
     @ParameterizedTest
     @ValueSource(strings = {"example1 example2", "-n example1 example2"})
-    void getSourceDirectories_TwoNonFlagArgs_ReturnsFirstDirectory(String args)
-            throws InvalidArgsException {
-        mvArgsParser.parse(args.split("\\s+"));
+    void getSourceDirectories_TwoNonFlagArgs_ReturnsFirstDirectory(String args) {
+        assertDoesNotThrow(() -> mvArgsParser.parse(args.split("\\s+")));
         List<String> expected = List.of("example1");
         List<String> result = mvArgsParser.getSourceDirectories();
         assertEquals(expected, result);
@@ -132,9 +131,8 @@ class MvArgsParserTest {
 
     @ParameterizedTest
     @ValueSource(strings = {"example1 example2 example3", "-n example1 example2 example3"})
-    void getSourceDirectories_MultipleNonFlagArgs_ReturnsAllDirectoriesExceptLast(String args)
-            throws InvalidArgsException {
-        mvArgsParser.parse(args.split("\\s+"));
+    void getSourceDirectories_MultipleNonFlagArgs_ReturnsAllDirectoriesExceptLast(String args) {
+        assertDoesNotThrow(() -> mvArgsParser.parse(args.split("\\s+")));
         List<String> expected = List.of("example1", "example2");
         List<String> result = mvArgsParser.getSourceDirectories();
         assertEquals(expected, result);
@@ -149,9 +147,8 @@ class MvArgsParserTest {
 
     @ParameterizedTest
     @ValueSource(strings = {"example", "-n example"})
-    void getDestinationDirectory_OneNonFlagArg_ReturnsLastDirectory(String args)
-            throws InvalidArgsException {
-        mvArgsParser.parse(args.split("\\s+"));
+    void getDestinationDirectory_OneNonFlagArg_ReturnsLastDirectory(String args) {
+        assertDoesNotThrow(() -> mvArgsParser.parse(args.split("\\s+")));
         String expected = "example";
         String result = mvArgsParser.getDestinationDirectory();
         assertEquals(expected, result);
@@ -159,9 +156,8 @@ class MvArgsParserTest {
 
     @ParameterizedTest
     @ValueSource(strings = {"example1 example2", "-n example1 example2"})
-    void getDestinationDirectory_TwoNonFlagArgs_ReturnsLastDirectory(String args)
-            throws InvalidArgsException {
-        mvArgsParser.parse(args.split("\\s+"));
+    void getDestinationDirectory_TwoNonFlagArgs_ReturnsLastDirectory(String args) {
+        assertDoesNotThrow(() -> mvArgsParser.parse(args.split("\\s+")));
         String expected = "example2";
         String result = mvArgsParser.getDestinationDirectory();
         assertEquals(expected, result);
@@ -169,9 +165,8 @@ class MvArgsParserTest {
 
     @ParameterizedTest
     @ValueSource(strings = {"example1 example2 example3", "-n example1 example2 example3"})
-    void getDestinationDirectory_MultipleNonFlagArgs_ReturnsReturnsLastDirectory(String args)
-            throws InvalidArgsException {
-        mvArgsParser.parse(args.split("\\s+"));
+    void getDestinationDirectory_MultipleNonFlagArgs_ReturnsReturnsLastDirectory(String args) {
+        assertDoesNotThrow(() -> mvArgsParser.parse(args.split("\\s+")));
         String expected = "example3";
         String result = mvArgsParser.getDestinationDirectory();
         assertEquals(expected, result);

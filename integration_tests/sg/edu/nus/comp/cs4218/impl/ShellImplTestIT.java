@@ -17,7 +17,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 import sg.edu.nus.comp.cs4218.exception.ShellException;
 
-class ShellImplTestIT { //NOPMD - suppressed ClassNamingConventions - TODO explain reason for suppression
+class ShellImplTestIT { //NOPMD - suppressed ClassNamingConventions - Follow naming convention
     private ShellImpl shellImpl;
     private ByteArrayOutputStream outContent;
 
@@ -27,6 +27,13 @@ class ShellImplTestIT { //NOPMD - suppressed ClassNamingConventions - TODO expla
      * @return
      */
     static Stream<Arguments> validQuoteContents() {
+        return Stream.of(
+                Arguments.of("echo \"`echo testing`\"", String.format("testing %s", System.lineSeparator())),
+                Arguments.of("echo `echo testing`", String.format("testing%s", System.lineSeparator()))
+        );
+    }
+
+    static Stream<Arguments> getValidQuoteContents() {
         return Stream.of(
                 Arguments.of("echo \"`echo testing`\"", String.format("testing %s", System.lineSeparator())),
                 Arguments.of("echo `echo testing`", String.format("testing%s", System.lineSeparator()))

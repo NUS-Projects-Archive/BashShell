@@ -1,16 +1,24 @@
 package sg.edu.nus.comp.cs4218.impl.util;
 
-import sg.edu.nus.comp.cs4218.Environment;
-import sg.edu.nus.comp.cs4218.exception.ShellException;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_CLOSING_STREAMS;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_NOT_FOUND;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_CLOSING_STREAMS;
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_NOT_FOUND;
+import sg.edu.nus.comp.cs4218.Environment;
+import sg.edu.nus.comp.cs4218.exception.ShellException;
 
 @SuppressWarnings("PMD.PreserveStackTrace")
 public final class IOUtils {
@@ -31,7 +39,7 @@ public final class IOUtils {
         try {
             fileInputStream = new FileInputStream(new File(resolvedFileName));
         } catch (FileNotFoundException e) {
-            throw new ShellException(ERR_FILE_NOT_FOUND);
+            throw new ShellException(ERR_FILE_NOT_FOUND, e);
         }
 
         return fileInputStream;
@@ -68,7 +76,7 @@ public final class IOUtils {
         try {
             inputStream.close();
         } catch (IOException e) {
-            throw new ShellException(ERR_CLOSING_STREAMS);
+            throw new ShellException(ERR_CLOSING_STREAMS, e);
         }
     }
 
@@ -86,7 +94,7 @@ public final class IOUtils {
         try {
             outputStream.close();
         } catch (IOException e) {
-            throw new ShellException(ERR_CLOSING_STREAMS);
+            throw new ShellException(ERR_CLOSING_STREAMS, e);
         }
     }
 

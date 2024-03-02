@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.Reader;
 import java.util.Arrays;
 import java.util.List;
 
@@ -42,7 +41,7 @@ public class CallCommandStub extends CallCommand {
             } else if (matchArgsListExactly("grep", "Line#")) {
                 mockGrep("Line#", stdin, stdout);
             } else if (matchArgsListExactly("grep", "2")) {
-                mockGrep("2", stdin, stdout); // fixme: dry this maybe
+                mockGrep("2", stdin, stdout);
             } else {
                 throw new RuntimeException("CallCommandStub: case not mocked");
             }
