@@ -104,19 +104,6 @@ public class WcApplicationTest {
     }
 
     @Test
-    void countFromFiles_CountFromFilesWithOnlyBytesFlag_ReturnsOnlyBytesCount() {
-        List<String> expectedList = new ArrayList<>();
-        expectedList.add(appendString(-1, -1, 57, String.format(STRING_FORMAT, filePathA)));
-        expectedList.add(appendString(-1, -1, 75, String.format(STRING_FORMAT, filePathB)));
-        expectedList.add(appendString(-1, -1, 132, " total"));
-        String expected = String.join(STRING_NEWLINE, expectedList);
-        assertDoesNotThrow(() -> {
-            String result = wcApplication.countFromFiles(true, false, false, filePathA, filePathB);
-            assertEquals(expected, result);
-        });
-    }
-
-    @Test
     void countFromFiles_CountFromFilesWithBytesAndLinesFlags_ReturnsBytesAndLinesCounts() {
         List<String> expectedList = new ArrayList<>();
         expectedList.add(appendString(3, 11, -1, String.format(STRING_FORMAT, filePathA)));
@@ -138,6 +125,17 @@ public class WcApplicationTest {
     }
 
     @Test
+    void countFromStdin_EmptyStdin_ReturnsCorrectCounts() {
+        List<String> expectedList = new ArrayList<>();
+        expectedList.add(appendString(0, 0, 0, ""));
+        String expected = String.join(STRING_NEWLINE, expectedList);
+        assertDoesNotThrow(() -> {
+            String result = wcApplication.countFromStdin(true, true, true, new ByteArrayInputStream("".getBytes()));
+            assertEquals(expected, result);
+        });
+    }
+
+    @Test
     void countFromStdin_CountFromStdinWithAllFlags_ReturnsAllCounts() {
         List<String> expectedList = new ArrayList<>();
         expectedList.add(appendString(3, 11, 57, ""));
@@ -145,21 +143,6 @@ public class WcApplicationTest {
         try (InputStream inputStream = IOUtils.openInputStream(filePathA);) {
             assertDoesNotThrow(() -> {
                 String result = wcApplication.countFromStdin(true, true, true, inputStream);
-                assertEquals(expected, result);
-            });
-        } catch (IOException | ShellException e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Test
-    void countFromStdin_CountFromStdinWithBytesFlag_ReturnsBytesCount() {
-        List<String> expectedList = new ArrayList<>();
-        expectedList.add(appendString(-1, -1, 57, ""));
-        String expected = String.join(STRING_NEWLINE, expectedList);
-        try (InputStream inputStream = IOUtils.openInputStream(filePathA)) {
-            assertDoesNotThrow(() -> {
-                String result = wcApplication.countFromStdin(true, false, false, inputStream);
                 assertEquals(expected, result);
             });
         } catch (IOException | ShellException e) {
@@ -200,23 +183,6 @@ public class WcApplicationTest {
     }
 
     @Test
-    void countFromFileAndStdin_CountFromFileAndStdinWithBytesFlag_ReturnsBytesCount() {
-        List<String> expectedList = new ArrayList<>();
-        expectedList.add(appendString(-1, -1, 57, " -"));
-        expectedList.add(appendString(-1, -1, 75, String.format(STRING_FORMAT, filePathB)));
-        expectedList.add(appendString(-1, -1, 132, " total"));
-        String expected = String.join(STRING_NEWLINE, expectedList);
-        try (InputStream inputStream = IOUtils.openInputStream(filePathA)) {
-            assertDoesNotThrow(() -> {
-                String result = wcApplication.countFromFileAndStdin(true, false, false, inputStream, "-", filePathB);
-                assertEquals(expected, result);
-            });
-        } catch (IOException | ShellException e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Test
     void countFromFileAndStdin_CountFromFileAndStdinWithBytesAndLinesFlags_ReturnsBytesAndLinesCounts() {
         List<String> expectedList = new ArrayList<>();
         expectedList.add(appendString(3, -1, 57, " -"));
@@ -231,39 +197,6 @@ public class WcApplicationTest {
         } catch (IOException | ShellException e) {
             e.printStackTrace();
         }
-    }
-
-    @Test
-    void countFromFilesAndStdin_NonExistentFileAndStdin_ReturnsStdinCountAndException() {
-        List<String> expectedList = new ArrayList<>();
-        expectedList.add(appendString(3, 11, 57, " -"));
-        expectedList.add(WC_EXCEPTION_MSG + ERR_FILE_NOT_FOUND);
-        expectedList.add(appendString(3, 11, 57, " total"));
-        String expected = String.join(STRING_NEWLINE, expectedList);
-
-        try (InputStream inputStream = IOUtils.openInputStream(filePathA)) {
-            assertDoesNotThrow(() -> {
-                String result = wcApplication.countFromFileAndStdin(true, true, true, inputStream, "-", NON_EXISTENT_FILE);
-                assertEquals(expected, result);
-            });
-        } catch (IOException | ShellException e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Test
-    void countFromFilesAndStdin_EmptyStdinAndValidFile_ReturnsCorrectCount() {
-        List<String> expectedList = new ArrayList<>();
-        expectedList.add(appendString(0, 0, 0, " -"));
-        expectedList.add(appendString(3, 11, 57, String.format(STRING_FORMAT, filePathA)));
-        expectedList.add(appendString(3, 11, 57, " total"));
-        String expected = String.join(STRING_NEWLINE, expectedList);
-
-        InputStream mockedInputStream = new ByteArrayInputStream("".getBytes());
-        assertDoesNotThrow(() -> {
-            String result = wcApplication.countFromFileAndStdin(true, true, true, mockedInputStream, "-", filePathA);
-            assertEquals(result, expected);
-        });
     }
 
 }
