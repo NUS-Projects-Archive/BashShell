@@ -15,7 +15,7 @@ import sg.edu.nus.comp.cs4218.exception.ShellException;
 public class PipeCommandTest {
 
     @Test
-    void evaluate_InvalidFirstCommand_PrintErrorMessage() {
+    void evaluate_InvalidFirstCommand_PrintsErrorMessage() {
         PipeCommand pipeCommand = new PipeCommand(Arrays.asList(
                 new CallCommandStub("lsa"),
                 new CallCommandStub("echo", "hello", "world")
@@ -29,7 +29,21 @@ public class PipeCommandTest {
     }
 
     @Test
-    void evaluate_validCommands_RunSuccessfully() {
+    void evaluate_ValidCommands_ReturnsCorrectResult() {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        PipeCommand pipeCommand = new PipeCommand(Arrays.asList(
+                new CallCommandStub("paste", "ghost.txt"),
+                new CallCommandStub("grep", "Line#")
+        ));
+
+        assertDoesNotThrow(() -> pipeCommand.evaluate(null, outputStream));
+
+        String expected = "Line# 1" + STRING_NEWLINE + "Line# 2" + STRING_NEWLINE;
+        assertEquals(expected, outputStream.toString());
+    }
+
+    @Test
+    void evaluate_ChainValidCommands_ReturnsCorrectResult() {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         PipeCommand pipeCommand = new PipeCommand(Arrays.asList(
                 new CallCommandStub("paste", "ghost.txt"),
@@ -39,6 +53,7 @@ public class PipeCommandTest {
 
         assertDoesNotThrow(() -> pipeCommand.evaluate(null, outputStream));
 
-        assertEquals("Line# 2" + STRING_NEWLINE, outputStream.toString());
+        String expected = "Line# 2" + STRING_NEWLINE;
+        assertEquals(expected, outputStream.toString());
     }
 }

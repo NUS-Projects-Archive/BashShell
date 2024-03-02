@@ -106,7 +106,8 @@ public final class StringUtils {
 
     /**
      * Remove trailing instances of given sequence.
-     * @param str String to remove sequence from
+     *
+     * @param str      String to remove sequence from
      * @param sequence String of sequence to remove
      * @return String of result with trailing sequence removed
      */

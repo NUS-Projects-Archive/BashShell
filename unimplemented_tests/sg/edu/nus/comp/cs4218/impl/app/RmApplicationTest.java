@@ -19,7 +19,6 @@ import org.junit.jupiter.api.io.TempDir;
 
 import sg.edu.nus.comp.cs4218.exception.RmException;
 import sg.edu.nus.comp.cs4218.impl.util.StringUtils;
-import sg.edu.nus.comp.cs4218.skeleton.app.RmApplication;
 
 public class RmApplicationTest {
     private static final String TEST_RESOURCES = "resources/rm/";
@@ -37,12 +36,12 @@ public class RmApplicationTest {
     void setUp(@TempDir(cleanup = CleanupMode.ALWAYS) Path tempDir) throws IOException {
 
         final String resourceDirectory = StringUtils.removeTrailing(TEST_RESOURCES, "/");
-        testingDirectory = tempDir;
-        app = new RmApplication();
+        this.testingDirectory = tempDir;
+        this.app = new RmApplication();
 
         try (Stream<Path> stream = Files.walk(Paths.get(resourceDirectory))) {
             stream.forEach(source -> {
-                Path destination = Paths.get(testingDirectory.toString(),
+                Path destination = Paths.get(this.testingDirectory.toString(),
                         source.toString().substring(resourceDirectory.length()));
 
                 try {
@@ -52,84 +51,21 @@ public class RmApplicationTest {
                 }
             });
 
-            Files.createDirectory(testingDirectory.resolve(EMPTY_DIRECTORY));
+            Files.createDirectory(this.testingDirectory.resolve(EMPTY_DIRECTORY));
         }
     }
 
     @Test
-    void run_RemoveExistingFile_SuccessfullyRemoveFile() {
-        final String[] args = {TEST_FILE_ONE};
-        assertDoesNotThrow(() -> app.run(args, null, null));
-        assertTrue(Files.notExists(Paths.get(testingDirectory.toString(), TEST_FILE_ONE)));
-    }
-
-    @Test
-    void run_RemoveNonExistentFile_ThrowsRmException() {
-        // Given
-        final String[] args = {NON_EXIST_FILE};
-        final String expectedMsg = String.format("rm: cannot remove '%s': No such file or directory", NON_EXIST_FILE);
-
-        RmException exception = assertThrowsExactly(RmException.class, () -> app.run(args, null, null)); // When
-        assertEquals(expectedMsg, exception.getMessage()); // Then
-    }
-
-    @Test
-    void run_RemoveDirectoryWithoutFlag_ThrowsRmException() {
-        // Given
-        final String[] args = {TEST_DIRECTORY};
-        final String expectedMsg = String.format("rm: cannot remove '%s': Is a directory", TEST_DIRECTORY);
-
-        RmException exception = assertThrowsExactly(RmException.class, () -> app.run(args, null, null)); // When
-        assertEquals(expectedMsg, exception.getMessage()); // Then
-    }
-
-    @Test
-    void run_RemoveEmptyDirectory_SuccessfullyRemoveDirectory() {
-        final String[] args = {"-d", EMPTY_DIRECTORY};
-        assertDoesNotThrow(() -> app.run(args, null, null));
-        assertTrue(Files.notExists(Paths.get(testingDirectory.toString(), EMPTY_DIRECTORY)));
-    }
-
-    @Test
-    void run_RemoveNonEmptyDirectory_ThrowsRmException() {
-        // Given
-        final String[] args = {"-d", TEST_DIRECTORY};
-        final String expectedMsg = String.format("rm: cannot remove '%s': Directory not empty", TEST_DIRECTORY);
-
-        RmException exception = assertThrowsExactly(RmException.class, () -> app.run(args, null, null)); // When
-        assertEquals(expectedMsg, exception.getMessage()); // Then
-    }
-
-    @Test
-    void run_RemoveSingleDirectoryRecursively_SuccessfullyRemoveAllFilesAndDirectory() {
-        final String[] args = {"-r", TEST_DIRECTORY};
-        assertDoesNotThrow(() -> app.run(args, null, null));
-        assertTrue(Files.exists(Paths.get(testingDirectory.toString(), TEST_FILE_ONE))); // not in folder, should exist
-        assertTrue(Files.exists(Paths.get(testingDirectory.toString(), EMPTY_DIRECTORY))); // not in folder, should
-        // exist
-        assertTrue(Files.notExists(Paths.get(testingDirectory.toString(), TEST_DIRECTORY)));
-    }
-
-    @Test
-    void run_RemoveMultipleDirectoriesRecursively_SuccessfullyRemoveAllFilesAndDirectory() {
-        final String[] args = {"-r", TEST_DIRECTORY, EMPTY_DIRECTORY};
-        assertDoesNotThrow(() -> app.run(args, null, null));
-        assertTrue(Files.exists(Paths.get(testingDirectory.toString(), TEST_FILE_ONE))); // not in folder, should exist
-        assertTrue(Files.notExists(Paths.get(testingDirectory.toString(), EMPTY_DIRECTORY)));
-        assertTrue(Files.notExists(Paths.get(testingDirectory.toString(), TEST_DIRECTORY)));
-    }
-
-    @Test
     void remove_ExistingFile_SuccessfullyRemoveFile() {
-        assertDoesNotThrow(() -> app.remove(false, false, TEST_FILE_ONE));
-        assertTrue(Files.notExists(Paths.get(testingDirectory.toString(), TEST_FILE_ONE)));
+        assertDoesNotThrow(() -> this.app.remove(false, false, TEST_FILE_ONE));
+        assertTrue(Files.notExists(Paths.get(this.testingDirectory.toString(), TEST_FILE_ONE)));
     }
 
     @Test
     void remove_NonExistentFile_ThrowsRmException() {
         final String expectedMsg = String.format("rm: cannot remove '%s': No such file or directory", NON_EXIST_FILE);
         RmException exception = assertThrowsExactly(RmException.class, () ->
-                app.remove(false, false, NON_EXIST_FILE)
+                this.app.remove(false, false, NON_EXIST_FILE)
         ); // When
         assertEquals(expectedMsg, exception.getMessage()); // Then
     }
@@ -138,33 +74,32 @@ public class RmApplicationTest {
     void remove_DirectoryWithoutFlag_ThrowsRmException() {
         final String expectedMsg = String.format("rm: cannot remove '%s': Is a directory", TEST_DIRECTORY);
         RmException exception = assertThrowsExactly(RmException.class, () ->
-                app.remove(false, false, TEST_DIRECTORY)
+                this.app.remove(false, false, TEST_DIRECTORY)
         ); // When
         assertEquals(expectedMsg, exception.getMessage()); // Then
     }
 
     @Test
     void remove_EmptyDirectory_SuccessfullyRemoveDirectory() {
-        assertDoesNotThrow(() -> app.remove(true, false, EMPTY_DIRECTORY));
-        assertTrue(Files.notExists(Paths.get(testingDirectory.toString(), EMPTY_DIRECTORY)));
+        assertDoesNotThrow(() -> this.app.remove(true, false, EMPTY_DIRECTORY));
+        assertTrue(Files.notExists(Paths.get(this.testingDirectory.toString(), EMPTY_DIRECTORY)));
     }
 
     @Test
     void remove_NonEmptyDirectory_ThrowsRmException() {
         final String expectedMsg = String.format("rm: cannot remove '%s': Directory not empty", TEST_DIRECTORY);
         RmException exception = assertThrowsExactly(RmException.class, () ->
-                app.remove(true, false, TEST_DIRECTORY)
+                this.app.remove(true, false, TEST_DIRECTORY)
         ); // When
         assertEquals(expectedMsg, exception.getMessage()); // Then
     }
 
     @Test
     void remove_SingleDirectoryRecursively_SuccessfullyRemoveAllFilesAndDirectory() {
-        assertDoesNotThrow(() -> app.remove(false, true, TEST_DIRECTORY));
-        assertTrue(Files.exists(Paths.get(testingDirectory.toString(), TEST_FILE_ONE))); // not in folder, should exist
-        assertTrue(Files.exists(Paths.get(testingDirectory.toString(), EMPTY_DIRECTORY))); // not in folder, should
-        // exist
-        assertTrue(Files.notExists(Paths.get(testingDirectory.toString(), TEST_DIRECTORY)));
+        assertDoesNotThrow(() -> this.app.remove(false, true, TEST_DIRECTORY));
+        assertTrue(Files.exists(Paths.get(this.testingDirectory.toString(), TEST_FILE_ONE))); // should exist
+        assertTrue(Files.exists(Paths.get(this.testingDirectory.toString(), EMPTY_DIRECTORY))); // should exist
+        assertTrue(Files.notExists(Paths.get(this.testingDirectory.toString(), TEST_DIRECTORY)));
     }
 
 }

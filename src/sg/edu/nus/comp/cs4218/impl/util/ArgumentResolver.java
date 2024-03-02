@@ -1,18 +1,5 @@
 package sg.edu.nus.comp.cs4218.impl.util;
 
-import sg.edu.nus.comp.cs4218.Command;
-import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
-import sg.edu.nus.comp.cs4218.exception.ShellException;
-
-import java.io.ByteArrayOutputStream;
-import java.io.FileNotFoundException;
-import java.io.OutputStream;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Stack;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_SYNTAX;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_ASTERISK;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_BACK_QUOTE;
@@ -20,6 +7,20 @@ import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_DOUBLE_QUOTE;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_SINGLE_QUOTE;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_SPACE;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
+
+import java.io.ByteArrayOutputStream;
+import java.io.FileNotFoundException;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Stack;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import sg.edu.nus.comp.cs4218.Command;
+import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
+import sg.edu.nus.comp.cs4218.exception.ShellException;
 
 // Suppressed as subCommand is always reinitialised before use in resolveOneArgument
 @SuppressWarnings("PMD.AvoidStringBufferField")
@@ -134,6 +135,8 @@ public class ArgumentResolver {
                     RegexArgument firstOutputArg = subOutputSegment.remove(0);
                     appendParsedArgIntoSegment(parsedArgsSegment, firstOutputArg);
                 }
+                // add remaining tokens to parsedArgsSegment
+                parsedArgsSegment.addAll(new ArrayList<>(subOutputSegment));
 
             } else {
                 // don't tokenize subCommand output

@@ -1,9 +1,9 @@
 package sg.edu.nus.comp.cs4218.app;
 
+import java.io.InputStream;
+
 import sg.edu.nus.comp.cs4218.Application;
 import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
-
-import java.io.InputStream;
 
 public interface TeeInterface extends Application {
 

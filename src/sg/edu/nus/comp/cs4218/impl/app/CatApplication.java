@@ -57,7 +57,7 @@ public class CatApplication implements CatInterface {
             } catch (IOException e) {
                 throw new CatException(ERR_WRITE_STREAM + " " + e.getMessage());
             }
-        }  else {
+        } else {
             // all other cases
             IORedirectionHandler redirHandler = new IORedirectionHandler(nonFlagArgs, stdin, stdout, new ArgumentResolver());
             try {

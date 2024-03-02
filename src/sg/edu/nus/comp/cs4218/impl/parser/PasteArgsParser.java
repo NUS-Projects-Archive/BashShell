@@ -4,16 +4,15 @@ import java.util.List;
 
 public class PasteArgsParser extends ArgsParser {
 
-    public static final char FLAG_IS_SERIAL = 's';
+    public static final char FLAG_SERIAL = 's';
 
     public PasteArgsParser() {
         super();
-
-        legalFlags.add(FLAG_IS_SERIAL);
+        legalFlags.add(FLAG_SERIAL);
     }
 
     public Boolean isSerial() {
-        return flags.contains(FLAG_IS_SERIAL);
+        return flags.contains(FLAG_SERIAL);
     }
 
     public List<String> getNonFlagArgs() {

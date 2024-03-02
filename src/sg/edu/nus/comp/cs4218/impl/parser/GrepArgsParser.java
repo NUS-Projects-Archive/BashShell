@@ -15,7 +15,8 @@ public class GrepArgsParser extends ArgsParser {
     }
 
     public String getPattern() {
-        return nonFlagArgs.isEmpty() ? nonFlagArgs.get(INDEX_PATTERN) : null;
+        // Bug fix
+        return nonFlagArgs.isEmpty() ? null: nonFlagArgs.get(INDEX_PATTERN);
     }
 
     public String[] getFileNames() {
