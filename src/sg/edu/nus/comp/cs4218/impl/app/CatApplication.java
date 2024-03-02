@@ -3,30 +3,7 @@ package sg.edu.nus.comp.cs4218.impl.app;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_NOT_FOUND;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_INVALID_FLAG;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IO_EXCEPTION;
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_PERM;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.nio.file.FileSystem;
-import java.nio.file.FileSystems;
-import java.nio.file.FileVisitResult;
-import java.nio.file.FileVisitor;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.PathMatcher;
-import java.nio.file.Paths;
-import java.nio.file.SimpleFileVisitor;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.util.ArrayList;
-import java.util.List;
-
-import sg.edu.nus.comp.cs4218.Environment;
 import sg.edu.nus.comp.cs4218.app.CatInterface;
 import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
 import sg.edu.nus.comp.cs4218.exception.CatException;
@@ -36,6 +13,16 @@ import sg.edu.nus.comp.cs4218.impl.parser.CatArgsParser;
 import sg.edu.nus.comp.cs4218.impl.util.ArgumentResolver;
 import sg.edu.nus.comp.cs4218.impl.util.IORedirectionHandler;
 import sg.edu.nus.comp.cs4218.impl.util.StringUtils;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.util.List;
 
 public class CatApplication implements CatInterface {
     public static final String ERR_WRITE_STREAM = "Could not write to output stream";
@@ -112,9 +99,19 @@ public class CatApplication implements CatInterface {
         for (String fileName : fileNames) {
             try {
                 if (fileName.contains("*")) {
-                    List<String> globbedFiles = search(Paths.get(Environment.currentDirectory), fileName);
-                    for (String globbedFile : globbedFiles) {
-                        result.append(readFile(isLineNumber, new File(globbedFile))).append(StringUtils.STRING_NEWLINE);
+                    ArgumentResolver argResolver = new ArgumentResolver();
+                    try {
+                        List<String> globbedFiles = argResolver.resolveOneArgument(fileName);
+                        if (globbedFiles.isEmpty()) {
+                            continue;
+                        }
+                        for (String globbedFile : globbedFiles) {
+                            String str = readFile(isLineNumber, new File(globbedFile));
+                            result.append(str);
+                            result.append(StringUtils.STRING_NEWLINE);
+                        }
+                    } catch (AbstractApplicationException | ShellException | FileNotFoundException e) {
+                        throw new CatException(ERR_FILE_NOT_FOUND);
                     }
                 } else {
                     result.append(readFile(isLineNumber, new File(fileName)));
@@ -141,9 +138,19 @@ public class CatApplication implements CatInterface {
                     BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(stdin));
                     result.append(readStdIn(isLineNumber, bufferedReader));
                 } else if (fileName.contains("*")) {
-                    List<String> globbedFiles = search(Paths.get(Environment.currentDirectory), fileName);
-                    for (String globbedFile : globbedFiles) {
-                        result.append(readFile(isLineNumber, new File(globbedFile))).append(StringUtils.STRING_NEWLINE);
+                    ArgumentResolver argResolver = new ArgumentResolver();
+                    try {
+                        List<String> globbedFiles = argResolver.resolveOneArgument(fileName);
+                        if (globbedFiles.isEmpty()) {
+                            continue;
+                        }
+                        for (String globbedFile : globbedFiles) {
+                            String str = readFile(isLineNumber, new File(globbedFile));
+                            result.append(str);
+                            result.append(StringUtils.STRING_NEWLINE);
+                        }
+                    } catch (AbstractApplicationException | ShellException | FileNotFoundException e) {
+                        throw new CatException(ERR_FILE_NOT_FOUND);
                     }
                 } else {
                     result.append(readFile(isLineNumber, new File(fileName)));
@@ -162,8 +169,11 @@ public class CatApplication implements CatInterface {
         // Read lines from stdin until an empty line is encountered
         while (true) {
             try {
-                if (!((line = bufferedReader.readLine()) != null && !line.isEmpty())) {
+                line = bufferedReader.readLine();
+                if (line == null || line.isEmpty()) {
                     break;
+                } else if (userInput.length() > 0) {
+                    userInput.append(StringUtils.STRING_NEWLINE);
                 }
             } catch (IOException e) {
                 throw new CatException(ERR_IO_EXCEPTION + " " + e.getMessage());
@@ -172,9 +182,9 @@ public class CatApplication implements CatInterface {
                 userInput.append(lineNumber).append(' ');
                 lineNumber++;
             }
-            userInput.append(line).append(StringUtils.STRING_NEWLINE);
+            userInput.append(line);
         }
-        return userInput.toString();
+        return userInput.append(StringUtils.STRING_NEWLINE).toString();
     }
 
     public String readFile(Boolean isLineNumber, File file) throws IOException, CatException {
@@ -193,27 +203,5 @@ public class CatApplication implements CatInterface {
             throw new CatException(ERR_FILE_NOT_FOUND + " " + e.getMessage());
         }
         return content.toString();
-    }
-
-    public List<String> search(Path rootDir, String pattern) throws IOException, CatException {
-        List<String> matchesList = new ArrayList<>();
-        FileVisitor<Path> matcherVisitor = new SimpleFileVisitor<>() {
-            @Override
-            public FileVisitResult visitFile(Path file, BasicFileAttributes attribs) {
-                FileSystem fileSystem = FileSystems.getDefault();
-                PathMatcher matcher = fileSystem.getPathMatcher(pattern);
-                Path name = file.getFileName();
-                if (matcher.matches(name)) {
-                    matchesList.add(name.toString());
-                }
-                return FileVisitResult.CONTINUE;
-            }
-        };
-        try {
-            Files.walkFileTree(rootDir, matcherVisitor);
-        } catch (SecurityException e) {
-            throw new CatException(ERR_NO_PERM + " " + e.getMessage());
-        }
-        return matchesList;
     }
 }
