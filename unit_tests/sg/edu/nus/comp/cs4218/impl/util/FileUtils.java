@@ -20,6 +20,18 @@ public class FileUtils {
     }
 
     /**
+     * Create a temporary directory with no contents.
+     *
+     * @param parentPath New directory to be created in this parentPath
+     * @param dirName    Name of directory to be created
+     * @return
+     */
+    public static Path createNewDirectory(Path parentPath, String dirName) {
+        Path path = parentPath.resolve(dirName);
+        return assertDoesNotThrow(() -> Files.createDirectories(path), "Unable to create temporary directory");
+    }
+
+    /**
      * Deletes specified file/directory if it exists.
      *
      * @param file File/directory to be deleted.
