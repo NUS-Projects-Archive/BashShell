@@ -175,13 +175,20 @@ public class PasteApplication implements PasteInterface {
             }
 
             List<String> fileData;
-            InputStream input;
+            InputStream input = null;
             try {
                 input = IOUtils.openInputStream(file);
                 fileData = IOUtils.getLinesFromInputStream(input);
                 IOUtils.closeInputStream(input);
+                input.close();
             } catch (ShellException | IOException e) {
                 throw new PasteException(e.getMessage(), e);
+            } finally {
+                try {
+                    if (input != null) { input.close(); }
+                } catch (IOException e) {
+                    throw new PasteException(e.getMessage(), e);
+                }
             }
 
             maxFileLength = Math.max(maxFileLength, fileData.size());

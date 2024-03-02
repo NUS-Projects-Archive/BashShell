@@ -119,16 +119,20 @@ public class WcApplication implements WcInterface {
             }
 
             InputStream input = null;
+            long[] count;
             try {
                 input = IOUtils.openInputStream(file);
-            } catch (ShellException e) {
-                throw new WcException(e.getMessage(), e);
-            }
-            long[] count = getCountReport(input); // lines words bytes
-            try {
+                count = getCountReport(input); // lines words bytes
                 IOUtils.closeInputStream(input);
-            } catch (ShellException e) {
+                input.close();
+            } catch (ShellException | IOException e) {
                 throw new WcException(e.getMessage(), e);
+            } finally {
+                try {
+                    if (input != null) { input.close(); }
+                } catch (IOException e) {
+                    throw new WcException(e.getMessage(), e);
+                }
             }
 
             // Format all output: " %7d %7d %7d %s"

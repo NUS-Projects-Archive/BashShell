@@ -107,23 +107,20 @@ public class SortApplication implements SortInterface {
                 throw new SortException(PROB_SORT_FILE + ERR_NO_PERM);
             }
             InputStream input = null;
-
             try {
                 input = IOUtils.openInputStream(file);
-            } catch (ShellException e) {
-                throw new SortException(PROB_SORT_FILE + e.getMessage(), e);
-            }
-            try {
                 lines.addAll(IOUtils.getLinesFromInputStream(input));
-            } catch (IOException e) {
-                throw new SortException(PROB_SORT_FILE + ERR_IO_EXCEPTION, e);
-            }
-            try {
                 IOUtils.closeInputStream(input);
-            } catch (ShellException e) {
+                input.close();
+            } catch (ShellException | IOException e) {
                 throw new SortException(PROB_SORT_FILE + e.getMessage(), e);
+            } finally {
+                try {
+                    if (input != null) { input.close(); }
+                } catch (IOException e) {
+                    throw new SortException(PROB_SORT_FILE + e.getMessage(), e);
+                }
             }
-
         }
         sortInputString(isFirstWordNumber, isReverseOrder, isCaseIndependent, lines);
         return String.join(STRING_NEWLINE, lines);

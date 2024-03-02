@@ -13,6 +13,7 @@ import sg.edu.nus.comp.cs4218.exception.ShellException;
 import sg.edu.nus.comp.cs4218.impl.util.ApplicationRunner;
 import sg.edu.nus.comp.cs4218.impl.util.ArgumentResolver;
 import sg.edu.nus.comp.cs4218.impl.util.IORedirectionHandler;
+import sg.edu.nus.comp.cs4218.impl.util.IOUtils;
 
 /**
  * A Call Command is a sub-command consisting of at least one non-keyword or quoted.
@@ -50,7 +51,6 @@ public class CallCommand implements Command {
             String app = parsedArgsList.remove(0);
             appRunner.runApp(app, parsedArgsList.toArray(new String[0]), inputStream, outputStream);
         }
-
     }
 
     @Override
