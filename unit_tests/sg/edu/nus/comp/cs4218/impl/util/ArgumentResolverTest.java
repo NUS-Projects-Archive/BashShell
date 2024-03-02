@@ -25,7 +25,6 @@ import org.junit.jupiter.params.provider.ValueSource;
 import sg.edu.nus.comp.cs4218.Environment;
 import sg.edu.nus.comp.cs4218.exception.ShellException;
 
-// TODO: Command substitution tests are not implemented yet
 class ArgumentResolverTest {
 
     private static final Map<String, List<String>> VALID_QUOTE_CONTENTS = new HashMap<>() {{
@@ -144,8 +143,7 @@ class ArgumentResolverTest {
             "\"`\"",        // "`"
             "\"```\"",      // "```"
     })
-    void resolveOneArgument_InvalidDoubleQuoteContentsWithUnmatchedBackQuote_ThrowsShellException
-            (String invalidQuoteContent) {
+    void resolveOneArgument_InvalidDoubleQuoteContentsWithUnmatchedBackQuote_ThrowsShellException(String invalidQuoteContent) {
         Throwable result = assertThrows(ShellException.class,
                 () -> argumentResolver.resolveOneArgument(invalidQuoteContent));
         assertEquals(String.format("shell: %s", ERR_SYNTAX), result.getMessage());
@@ -182,5 +180,45 @@ class ArgumentResolverTest {
         Environment.currentDirectory = tempDir.toString();
         List<String> result = assertDoesNotThrow(() -> argumentResolver.resolveOneArgument("subdirectory/*"));
         assertEquals(List.of("subdirectory/*"), result);
+    }
+
+    /**
+     * Command Substitution unit test case to resolve command substitution arguments with single quote.
+     */
+    @Test
+    void resolveArgument_CommandSubstitutionWithSingleQuote_ReturnsCorrectArgs() {
+        List<String> argList = List.of("echo", "`echo 'hello world'`");
+        List<String> expected = List.of("echo", "hello", "world");
+        List<String> result = assertDoesNotThrow(() -> argumentResolver.parseArguments(argList));
+        assertEquals(expected, result);
+    }
+
+    /**
+     * Command Substitution unit test case to resolve command substitution arguments with mixed quotes.
+     */
+    @Test
+    void resolveArguments_CommandSubstitutionWithMixedQuotes_ReturnsCorrectArgs() {
+        List<String> argList = List.of("echo", "`echo \"'quote is not interpreted as special character'\"`");
+        List<String> expected = List.of("echo", "'quote", "is", "not", "interpreted", "as", "special", "character'");
+        List<String> result = assertDoesNotThrow(() -> argumentResolver.parseArguments(argList));
+        assertEquals(expected, result);
+    }
+
+    /**
+     * Command Substitution unit test case to resolve command substitution arguments with invalid args.
+     */
+    @ParameterizedTest
+    @ValueSource(strings = {"`", "`invalid command`", "echo `"})
+    void resolveArguments_CommandSubstitutionInvalidArgs_ThrowsShellException(String args) {
+        assertThrows(ShellException.class, () -> argumentResolver.resolveOneArgument(args));
+    }
+
+    /**
+     * Command Substitution unit test case to resolve command substitution arguments with invalid newline.
+     */
+    @Test
+    void resolveArguments_CommandSubstitutionContainsNewline_ThrowsShellException() {
+        List<String> argList = List.of("echo", "`echo hello" + System.lineSeparator() + "`");
+        assertThrows(ShellException.class, () -> argumentResolver.parseArguments(argList));
     }
 }
