@@ -3,14 +3,12 @@ package sg.edu.nus.comp.cs4218.impl.app;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_FILE_SEP;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_CURR_DIR;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -25,7 +23,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledOnOs;
 import org.junit.jupiter.api.condition.OS;
 import org.junit.jupiter.api.io.TempDir;
-import org.junit.jupiter.params.provider.Arguments;
 
 import sg.edu.nus.comp.cs4218.Environment;
 
@@ -40,9 +37,8 @@ class LsApplicationTest {
     // Main temporary dir
     @TempDir
     private static Path cwdPath;
-    private static String cwdName;
     private static String cwdPathName;
-  
+
     private LsApplication app;
 
     private static String getCwdContents() {
@@ -56,35 +52,6 @@ class LsApplicationTest {
         List<String> fileList = new ArrayList<>(Arrays.asList(DIR_A_NON_DIRS));
         Collections.sort(fileList);
         return String.join(STRING_NEWLINE, fileList);
-    }
-
-    /**
-     * Provides valid arguments and expected output for run_ValidArgs_PrintsCorrectDirectoryContents.
-     */
-    static Stream<Arguments> validArgs() {
-        String listedCwdContents = String.format("%s%s", String.join(STRING_NEWLINE, ".:", getCwdContents()),
-                STRING_NEWLINE);
-        String listedDirAContents = DIR_A_NAME + String.join(STRING_NEWLINE, ":", getDirAContents());
-        return Stream.of(
-                // Relative paths
-                Arguments.of(new String[]{"."}, listedCwdContents),
-                Arguments.of(new String[]{String.format("..%s%s", CHAR_FILE_SEP, cwdName)}, listedCwdContents),
-                Arguments.of(new String[]{DIR_A_NAME}, listedDirAContents),
-                // Absolute path
-                Arguments.of(new String[]{cwdPathName}, listedCwdContents)
-        );
-    }
-
-    /**
-     * Provides invalid flags as input and the first invalid flag as expected output for
-     * run_InvalidFlags_ThrowLsException.
-     */
-    static Stream<Arguments> provideInvalidFlags() {
-        return Stream.of(
-                Arguments.of(new String[]{"-a"}, "a"),
-                Arguments.of(new String[]{"-abc", "-X"}, "a"),
-                Arguments.of(new String[]{"-Ra"}, "a")
-        );
     }
 
     /**
@@ -105,7 +72,6 @@ class LsApplicationTest {
             }
 
             cwdPathName = cwdPath.toString();
-            cwdName = Paths.get(cwdPathName).getFileName().toString();
 
             // Set current working directory to the temporary dir
             Environment.currentDirectory = cwdPathName;
@@ -185,7 +151,7 @@ class LsApplicationTest {
     @EnabledOnOs(OS.WINDOWS)
     void listFolderContent_NoDirNameSpecifiedAndIsRecursiveOnWindows_ReturnsAllItems() {
         String expected = getCwdContentsRecursively("\\");
-  
+
         // When
         String actual = assertDoesNotThrow(() -> app.listFolderContent(true, false));
         // Then

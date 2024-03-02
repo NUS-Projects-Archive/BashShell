@@ -194,7 +194,6 @@ class LsApplicationIT { //NOPMD - suppressed ClassNamingConventions - Following 
      *
      * @param args     The directory to list
      * @param expected The specified directory contents
-     * @param expected The specified directory contents
      */
     @ParameterizedTest
     @MethodSource("validArgs")
@@ -307,7 +306,7 @@ class LsApplicationIT { //NOPMD - suppressed ClassNamingConventions - Following 
             fail("Failed to create mocked output stream.");
             return;
         }
-        
+
         assertEquals(String.format("ls: %s", ERR_WRITE_STREAM), result.getMessage());
 
         deleteFileOrDirectory(tempFile);
