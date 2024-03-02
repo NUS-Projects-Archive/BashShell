@@ -27,7 +27,7 @@ import sg.edu.nus.comp.cs4218.exception.ShellException;
 
 class ArgumentResolverTest {
 
-    private static final Map<String, List<String>> VALID_QUOTE_CONTENTS = new HashMap<>() {{
+    private static final Map<String, List<String>> VALID_QUOTES = new HashMap<>() {{
         put("'\"'", List.of("\""));                     // '"'
         put("'\"\"'", List.of("\"\""));                 // '""'
         put("'`'", List.of("`"));                       // '`'
@@ -43,7 +43,7 @@ class ArgumentResolverTest {
     private ArgumentResolver argumentResolver;
 
     static Stream<Arguments> getValidQuoteContents() {
-        return VALID_QUOTE_CONTENTS.entrySet().stream().map(entry -> Arguments.of(entry.getKey(), entry.getValue()));
+        return VALID_QUOTES.entrySet().stream().map(entry -> Arguments.of(entry.getKey(), entry.getValue()));
     }
 
     @BeforeEach
@@ -56,9 +56,9 @@ class ArgumentResolverTest {
      */
     @Test
     void parseArguments_ValidQuotingArgsList_ReturnsEntireParsedArgsList() {
-        List<String> argsList = new ArrayList<>(VALID_QUOTE_CONTENTS.keySet());
+        List<String> argsList = new ArrayList<>(VALID_QUOTES.keySet());
         List<String> result = assertDoesNotThrow(() -> argumentResolver.parseArguments(argsList));
-        assertEquals(VALID_QUOTE_CONTENTS.values().stream().flatMap(List::stream).collect(Collectors.toList()), result);
+        assertEquals(VALID_QUOTES.values().stream().flatMap(List::stream).collect(Collectors.toList()), result);
     }
 
     /**
@@ -66,7 +66,7 @@ class ArgumentResolverTest {
      */
     @Test
     void parseArguments_InvalidQuotingArgsList_ThrowsShellException() {
-        List<String> argsList = new ArrayList<>(VALID_QUOTE_CONTENTS.keySet());
+        List<String> argsList = new ArrayList<>(VALID_QUOTES.keySet());
         argsList.add("\"`\"");
         Throwable result = assertThrows(ShellException.class, () -> argumentResolver.parseArguments(argsList));
         assertEquals(String.format("shell: %s", ERR_SYNTAX), result.getMessage());
@@ -136,16 +136,16 @@ class ArgumentResolverTest {
     /**
      * Quoting unit test case to throw ShellException when the quote contents are invalid.
      *
-     * @param invalidQuoteContent The invalid quote content to test
+     * @param invalidQuotes The invalid quote content to test
      */
     @ParameterizedTest
     @ValueSource(strings = {
             "\"`\"",        // "`"
             "\"```\"",      // "```"
     })
-    void resolveOneArgument_InvalidDoubleQuoteContentsWithUnmatchedBackQuote_ThrowsShellException(String invalidQuoteContent) {
+    void resolveOneArgument_InvalidDoubleQuoteContentsWithUnmatchedBackQuote_ThrowsShellException(String invalidQuotes) {
         Throwable result = assertThrows(ShellException.class,
-                () -> argumentResolver.resolveOneArgument(invalidQuoteContent));
+                () -> argumentResolver.resolveOneArgument(invalidQuotes));
         assertEquals(String.format("shell: %s", ERR_SYNTAX), result.getMessage());
     }
 

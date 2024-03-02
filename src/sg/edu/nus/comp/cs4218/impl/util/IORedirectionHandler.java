@@ -17,8 +17,6 @@ import sg.edu.nus.comp.cs4218.exception.ShellException;
 public class IORedirectionHandler {
     private final List<String> argsList;
     private final ArgumentResolver argumentResolver;
-    private final InputStream origInputStream;
-    private final OutputStream origOutputStream;
     private List<String> noRedirArgsList;
     private InputStream inputStream;
     private OutputStream outputStream;
@@ -27,9 +25,7 @@ public class IORedirectionHandler {
                                 OutputStream origOutputStream, ArgumentResolver argumentResolver) {
         this.argsList = argsList;
         this.inputStream = origInputStream;
-        this.origInputStream = origInputStream;
         this.outputStream = origOutputStream;
-        this.origOutputStream = origOutputStream;
         this.argumentResolver = argumentResolver;
     }
 

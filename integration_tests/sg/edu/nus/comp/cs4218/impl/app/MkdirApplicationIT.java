@@ -29,14 +29,13 @@ public class MkdirApplicationIT {
 
     @TempDir
     private Path tempDir;
-    private Path tempFilePath;
 
     @BeforeEach
     void setUp() throws IOException {
         app = new MkdirApplication();
 
         // Create temporary file
-        tempFilePath = tempDir.resolve(TEMP_FILE); // automatically deletes after test execution
+        Path tempFilePath = tempDir.resolve(TEMP_FILE); // automatically deletes after test execution
         Files.createFile(tempFilePath);
     }
 

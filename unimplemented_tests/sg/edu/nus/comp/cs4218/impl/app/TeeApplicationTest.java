@@ -26,7 +26,6 @@ class TeeApplicationTest {
 
     @TempDir
     private Path tempDir;
-    private Path fileAPath;
     private Path fileBPath;
     private Path emptyFilePath;
     private String fileA;
@@ -37,7 +36,7 @@ class TeeApplicationTest {
     void setUp() throws IOException {
         this.app = new TeeApplication();
 
-        fileAPath = tempDir.resolve(FILE_A);
+        Path fileAPath = tempDir.resolve(FILE_A);
         fileBPath = tempDir.resolve(FILE_B);
         emptyFilePath = tempDir.resolve(EMPTY_FILE);
 

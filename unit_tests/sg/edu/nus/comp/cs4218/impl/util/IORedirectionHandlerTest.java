@@ -40,11 +40,9 @@ public class IORedirectionHandlerTest {
     private InputStream inputStream;
     private OutputStream outputStream;
     private ArgumentResolver argResolverMock;
-    private String file;
     private String fileA;
     private String fileB;
     private String fileC;
-
 
     @TempDir
     Path testDir;
@@ -61,7 +59,6 @@ public class IORedirectionHandlerTest {
         Path pathB = testDir.resolve("B.txt");
         Path pathC = testDir.resolve("C.txt");
 
-        file = path.toString();
         fileA = pathA.toString();
         fileB = pathB.toString();
         fileC = pathC.toString();

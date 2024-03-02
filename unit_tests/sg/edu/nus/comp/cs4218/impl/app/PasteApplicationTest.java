@@ -25,18 +25,15 @@ public class PasteApplicationTest {
     private static final String NON_EXISTENT_FILE = "NonExistentFile.txt";
     private static final String STDIN = "-";
     private PasteApplication app;
-    @TempDir
-    private Path pasteTestDir;
     private String filePathA;
     private String filePathB;
 
     @BeforeEach
-    void setUp() throws IOException {
+    void setUp(@TempDir Path tempDir) throws IOException {
         app = new PasteApplication();
-        pasteTestDir = Files.createTempDirectory("pasteTestDir");
 
-        Path pathA = pasteTestDir.resolve(FILE_NAME_A);
-        Path pathB = pasteTestDir.resolve(FILE_NAME_B);
+        Path pathA = tempDir.resolve(FILE_NAME_A);
+        Path pathB = tempDir.resolve(FILE_NAME_B);
 
         filePathA = pathA.toString();
         filePathB = pathB.toString();
@@ -46,7 +43,6 @@ public class PasteApplicationTest {
 
         String contentFileB = "1\n2\n3\n4\n5";
         Files.write(pathB, Arrays.asList(contentFileB.split("\n")));
-
     }
 
     @Test

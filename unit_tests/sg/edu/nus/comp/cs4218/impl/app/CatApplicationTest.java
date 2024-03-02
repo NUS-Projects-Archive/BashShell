@@ -38,7 +38,6 @@ class CatApplicationTest {
     private InputStream inputStreamMock;
     private String fileA;
     private String fileB;
-    private String fileC;
 
     @TempDir
     Path testDir;
@@ -52,20 +51,15 @@ class CatApplicationTest {
 
         Path pathA = testDir.resolve("A.txt");
         Path pathB = testDir.resolve("B.txt");
-        Path pathC = testDir.resolve("C.txt");
 
         fileA = pathA.toString();
         fileB = pathB.toString();
-        fileC = pathC.toString();
 
         String contentFileA = "Hello" + STRING_NEWLINE + "World";
         Files.write(pathA, List.of(contentFileA));
 
         String contentFileB = "Software" + STRING_NEWLINE + "Testing";
         Files.write(pathB, List.of(contentFileB));
-
-        String contentFileC = "";
-        Files.write(pathC, List.of(contentFileC));
     }
 
     @Test
