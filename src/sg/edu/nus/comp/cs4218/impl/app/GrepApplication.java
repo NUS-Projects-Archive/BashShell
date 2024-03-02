@@ -123,17 +123,17 @@ public class GrepApplication implements GrepInterface { //NOPMD - suppressed God
                 }
                 reader.close();
             } catch (PatternSyntaxException pse) {
-                throw new GrepException(ERR_INVALID_REGEX);
+                throw new GrepException(ERR_INVALID_REGEX, pse);
             } catch (FileNotFoundException e) {
-                throw new GrepException(ERR_FILE_NOT_FOUND);
+                throw new GrepException(ERR_FILE_NOT_FOUND, e);
             } catch (IOException e) {
-                throw new GrepException(ERR_IO_EXCEPTION);
+                throw new GrepException(ERR_IO_EXCEPTION, e);
             } finally {
                 if (reader != null) {
                     try {
                         reader.close();
                     } catch (IOException e) {
-                        throw new GrepException(ERR_IO_EXCEPTION);
+                        throw new GrepException(ERR_IO_EXCEPTION, e);
                     }
                 }
             }
@@ -203,13 +203,13 @@ public class GrepApplication implements GrepInterface { //NOPMD - suppressed God
             }
             reader.close();
         } catch (PatternSyntaxException pse) {
-            throw new GrepException(ERR_INVALID_REGEX);
+            throw new GrepException(ERR_INVALID_REGEX, pse);
         } catch (NullPointerException npe) {
             // try-catch not catching more specifically, anything that is not supposed to be null including stdin
             // will execute this line, which is wrong.
-            throw new GrepException(ERR_FILE_NOT_FOUND);
+            throw new GrepException(ERR_FILE_NOT_FOUND, npe);
         } catch (IOException e) {
-            throw new GrepException(ERR_IO_EXCEPTION);
+            throw new GrepException(ERR_IO_EXCEPTION, e);
         }
 
         String results = "";
@@ -254,7 +254,7 @@ public class GrepApplication implements GrepInterface { //NOPMD - suppressed God
         } catch (GrepException grepException) {
             throw grepException;
         } catch (Exception e) {
-            throw new GrepException(e.getMessage());
+            throw new GrepException(e.getMessage(), e);
         }
     }
 

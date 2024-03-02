@@ -60,7 +60,7 @@ public class PasteApplication implements PasteInterface {
         try {
             pasteArgsParser.parse(args);
         } catch (InvalidArgsException e) {
-            throw new PasteException(e.getMessage());
+            throw new PasteException(e.getMessage(), e);
         }
 
         List<String> nonFlagArgs = pasteArgsParser.getNonFlagArgs();
@@ -84,7 +84,7 @@ public class PasteApplication implements PasteInterface {
                 stdout.write(result.getBytes());
                 stdout.write(STRING_NEWLINE.getBytes());
             } catch (IOException e) {
-                throw new PasteException(ERR_WRITE_STREAM);
+                throw new PasteException(ERR_WRITE_STREAM, e);
             }
         }
 
@@ -93,7 +93,7 @@ public class PasteApplication implements PasteInterface {
             try {
                 redirHandler.extractRedirOptions();
             } catch (Exception e) {
-                throw new PasteException(e.getMessage());
+                throw new PasteException(e.getMessage(), e);
             }
 
             List<String> noRedirArgsList = redirHandler.getNoRedirArgsList();
@@ -116,7 +116,7 @@ public class PasteApplication implements PasteInterface {
                     stdout.write(STRING_NEWLINE.getBytes());
                 }
             } catch (Exception e) {
-                throw new PasteException(e.getMessage());
+                throw new PasteException(e.getMessage(), e);
             }
         }
     }
@@ -140,7 +140,7 @@ public class PasteApplication implements PasteInterface {
             data = IOUtils.getLinesFromInputStream(stdin);
             tempListResult.add(data);
         } catch (Exception e) {
-            throw new PasteException(e.getMessage());
+            throw new PasteException(e.getMessage(), e);
         }
         maxFileLength = Math.max(maxFileLength, data.size());
 
@@ -181,7 +181,7 @@ public class PasteApplication implements PasteInterface {
                 fileData = IOUtils.getLinesFromInputStream(input);
                 IOUtils.closeInputStream(input);
             } catch (ShellException | IOException e) {
-                throw new PasteException(e.getMessage());
+                throw new PasteException(e.getMessage(), e);
             }
 
             maxFileLength = Math.max(maxFileLength, fileData.size());
@@ -224,7 +224,7 @@ public class PasteApplication implements PasteInterface {
         try {
             data = IOUtils.getLinesFromInputStream(stdin);
         } catch (IOException e) {
-            throw new PasteException(e.getMessage());
+            throw new PasteException(e.getMessage(), e);
         }
 
         int numOfDash = 0;
