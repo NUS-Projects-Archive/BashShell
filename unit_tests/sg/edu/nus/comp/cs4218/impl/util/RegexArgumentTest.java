@@ -19,6 +19,7 @@ import sg.edu.nus.comp.cs4218.Environment;
 
 class RegexArgumentTest {
 
+    private static final List<String> LIST_REGEX_STR = List.of("regexString1", "regexString2", "regexString3");
     private RegexArgument regexArg;
 
     @BeforeEach
@@ -120,10 +121,9 @@ class RegexArgumentTest {
 
     @Test
     void merge_MultipleRegexArgument_ReturnsCorrectRegexArgument() {
-        String[] regexStrings = {"regexString1", "regexString2", "regexString3"};
         StringBuilder expectedPlaintext = new StringBuilder();
         StringBuilder expectedRegex = new StringBuilder();
-        for (String regex : regexStrings) {
+        for (String regex : LIST_REGEX_STR) {
             RegexArgument other = new RegexArgument(regex);
             regexArg.merge(other);
             expectedPlaintext.append(regex);
@@ -141,10 +141,9 @@ class RegexArgumentTest {
 
     @Test
     void merge_MultipleStr_ReturnsCorrectRegexArgument() {
-        List<String> regexStrings = List.of("regexString1", "regexString2", "regexString3");
         StringBuilder expectedPlaintext = new StringBuilder();
         StringBuilder expectedRegex = new StringBuilder();
-        for (String regex : regexStrings) {
+        for (String regex : LIST_REGEX_STR) {
             regexArg.merge(regex);
             expectedPlaintext.append(regex);
             expectedRegex.append(Pattern.quote(regex));
