@@ -19,7 +19,6 @@ import org.junit.jupiter.api.io.TempDir;
 
 import sg.edu.nus.comp.cs4218.exception.RmException;
 import sg.edu.nus.comp.cs4218.impl.util.StringUtils;
-import sg.edu.nus.comp.cs4218.skeleton.app.RmApplication;
 
 @SuppressWarnings("PMD.ClassNamingConventions")
 public class RmApplicationIT {
