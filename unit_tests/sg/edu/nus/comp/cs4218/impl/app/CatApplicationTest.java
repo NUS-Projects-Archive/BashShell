@@ -1,5 +1,15 @@
 package sg.edu.nus.comp.cs4218.impl.app;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_NOT_FOUND;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IO_EXCEPTION;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -19,15 +29,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.fail;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_NOT_FOUND;
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IO_EXCEPTION;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 
 class CatApplicationTest {
 
@@ -74,7 +75,7 @@ class CatApplicationTest {
         Throwable result = assertThrows(CatException.class, () -> {
             app.readFile(false, new File(NON_EXISTENT_FILE));
         });
-        assertEquals(CAT_EXCEPTION_MSG + ERR_FILE_NOT_FOUND, result.getMessage());
+        assertTrue(result.getMessage().contains(CAT_EXCEPTION_MSG + ERR_FILE_NOT_FOUND));
     }
 
     @Test
@@ -106,7 +107,7 @@ class CatApplicationTest {
             Throwable result = assertThrows(CatException.class, () -> {
                 app.readStdIn(false, brMock);
             });
-            assertEquals(CAT_EXCEPTION_MSG + ERR_IO_EXCEPTION, result.getMessage());
+            assertTrue(result.getMessage().contains(CAT_EXCEPTION_MSG + ERR_IO_EXCEPTION));
         } catch (IOException e) {
             fail(e.getMessage());
         }
@@ -144,7 +145,7 @@ class CatApplicationTest {
             Throwable result = assertThrows(CatException.class, () -> {
                 app.catStdin(false, inputStreamMock);
             });
-            assertEquals(CAT_EXCEPTION_MSG + ERR_IO_EXCEPTION, result.getMessage());
+            assertTrue(result.getMessage().contains(CAT_EXCEPTION_MSG + ERR_IO_EXCEPTION));
         } catch (IOException e) {
             fail(e.getMessage());
         }

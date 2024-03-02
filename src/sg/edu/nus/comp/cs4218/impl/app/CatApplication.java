@@ -1,5 +1,9 @@
 package sg.edu.nus.comp.cs4218.impl.app;
 
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_NOT_FOUND;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_INVALID_FLAG;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IO_EXCEPTION;
+
 import sg.edu.nus.comp.cs4218.app.CatInterface;
 import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
 import sg.edu.nus.comp.cs4218.exception.CatException;
@@ -19,10 +23,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.util.List;
-
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_NOT_FOUND;
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_INVALID_FLAG;
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IO_EXCEPTION;
 
 public class CatApplication implements CatInterface {
     public static final String ERR_WRITE_STREAM = "Could not write to output stream";
@@ -106,7 +106,9 @@ public class CatApplication implements CatInterface {
                             continue;
                         }
                         for (String globbedFile : globbedFiles) {
-                            result.append(readFile(isLineNumber, new File(globbedFile))).append(StringUtils.STRING_NEWLINE);
+                            String str = readFile(isLineNumber, new File(globbedFile));
+                            result.append(str);
+                            result.append(StringUtils.STRING_NEWLINE);
                         }
                     } catch (AbstractApplicationException | ShellException | FileNotFoundException e) {
                         throw new CatException(ERR_FILE_NOT_FOUND);
@@ -143,7 +145,9 @@ public class CatApplication implements CatInterface {
                             continue;
                         }
                         for (String globbedFile : globbedFiles) {
-                            result.append(readFile(isLineNumber, new File(globbedFile))).append(StringUtils.STRING_NEWLINE);
+                            String str = readFile(isLineNumber, new File(globbedFile));
+                            result.append(str);
+                            result.append(StringUtils.STRING_NEWLINE);
                         }
                     } catch (AbstractApplicationException | ShellException | FileNotFoundException e) {
                         throw new CatException(ERR_FILE_NOT_FOUND);
@@ -172,7 +176,7 @@ public class CatApplication implements CatInterface {
                     userInput.append(StringUtils.STRING_NEWLINE);
                 }
             } catch (IOException e) {
-                throw new CatException(ERR_IO_EXCEPTION);
+                throw new CatException(ERR_IO_EXCEPTION + " " + e.getMessage());
             }
             if (isLineNumber) {
                 userInput.append(lineNumber).append(' ');
@@ -196,7 +200,7 @@ public class CatApplication implements CatInterface {
                 content.append(line).append(StringUtils.STRING_NEWLINE);
             }
         } catch (FileNotFoundException e) {
-            throw new CatException(ERR_FILE_NOT_FOUND);
+            throw new CatException(ERR_FILE_NOT_FOUND + " " + e.getMessage());
         }
         return content.toString();
     }

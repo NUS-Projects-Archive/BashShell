@@ -21,7 +21,7 @@ import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 
 class EchoApplicationTest {
 
-    private static final String ECHO_EXCEPTION_MSG = "echo: ";
+    private static final String ECHO_EXCEPTION = "echo: ";
     private EchoApplication app;
 
     private OutputStream exceptionThrowingOutputStream;
@@ -46,7 +46,7 @@ class EchoApplicationTest {
         Throwable result = assertThrows(EchoException.class, () -> {
             app.run(new String[]{"A", "B", "C"}, null, null);
         });
-        assertEquals(ECHO_EXCEPTION_MSG + ERR_NO_OSTREAM, result.getMessage());
+        assertEquals(ECHO_EXCEPTION + ERR_NO_OSTREAM, result.getMessage());
     }
 
     @Test
@@ -54,7 +54,7 @@ class EchoApplicationTest {
         Throwable result = assertThrows(EchoException.class, () -> {
             app.run(new String[]{"A", "B", "C"}, null, this.exceptionThrowingOutputStream);
         });
-        assertEquals(ECHO_EXCEPTION_MSG + ERR_IO_EXCEPTION, result.getMessage());
+        assertEquals(ECHO_EXCEPTION + ERR_IO_EXCEPTION, result.getMessage());
     }
 
     @Test
@@ -72,7 +72,7 @@ class EchoApplicationTest {
         Throwable result = assertThrows(EchoException.class, () -> {
             app.constructResult(null);
         });
-        assertEquals(ECHO_EXCEPTION_MSG + ERR_NULL_ARGS, result.getMessage());
+        assertEquals(ECHO_EXCEPTION + ERR_NULL_ARGS, result.getMessage());
     }
 
     @Test
