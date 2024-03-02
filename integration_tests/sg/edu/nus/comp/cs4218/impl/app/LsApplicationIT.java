@@ -3,6 +3,7 @@ package sg.edu.nus.comp.cs4218.impl.app;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.doThrow;
 import static sg.edu.nus.comp.cs4218.impl.parser.ArgsParser.ILLEGAL_FLAG_MSG;
@@ -46,6 +47,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mockito;
 
 import sg.edu.nus.comp.cs4218.Environment;
+import sg.edu.nus.comp.cs4218.exception.InvalidDirectoryLsException;
 import sg.edu.nus.comp.cs4218.exception.LsException;
 
 // To give a meaningful variable name
@@ -231,19 +233,19 @@ class LsApplicationIT { //NOPMD - suppressed ClassNamingConventions - Following 
      * Tests run to print file not found error when non-existent dir is entered as argument.
      */
     @Test
-    void run_NonExistentDir_PrintsFileNotFoundError() {
+    void run_NonExistentDir_ThrowsInvalidDirectoryLsException() {
         // Given
         String nonExistentDirName = "nonExistentDir";
-        String expected = String.format("ls: cannot access '%s': %s%s", nonExistentDirName, ERR_FILE_NOT_FOUND,
-                STRING_NEWLINE);
+        String expected = String.format("ls: cannot access '%s': %s", nonExistentDirName, ERR_FILE_NOT_FOUND);
         InputStream mockedInputStream = new ByteArrayInputStream("".getBytes());
 
         // When
-        assertDoesNotThrow(() -> app.run(new String[]{nonExistentDirName}, mockedInputStream, System.out));
+        InvalidDirectoryLsException exception = assertThrowsExactly(InvalidDirectoryLsException.class, () -> {
+            app.run(new String[]{nonExistentDirName}, mockedInputStream, System.out);
+        });
 
         // Then
-        String actual = outContent.toString();
-        assertEquals(expected, actual);
+        assertEquals(expected, exception.getMessage());
     }
 
     /**

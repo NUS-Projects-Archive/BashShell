@@ -204,12 +204,20 @@ public class LsApplicationHelper {
      */
     private static Path resolvePath(String directory) throws InvalidDirectoryLsException {
         try {
+            Path path;
             if (directory.charAt(0) == '/' || directory.equals(Environment.currentDirectory)) {
-                return Paths.get(directory).normalize();
+                path = Paths.get(directory).normalize();
+            } else {
+                // Construct path relative to current directory
+                path = Paths.get(Environment.currentDirectory, directory).normalize();
             }
 
-            // Construct path relative to current directory
-            return Paths.get(Environment.currentDirectory, directory).normalize();
+            if (!Files.exists(path)) {
+                throw new InvalidDirectoryLsException(getRelativeToCwd(path).toString());
+            }
+
+            return path;
+
         } catch (InvalidPathException e) {
             throw new InvalidDirectoryLsException(directory, e);
         }
