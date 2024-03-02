@@ -8,7 +8,6 @@ import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_SYNTAX;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -208,7 +207,7 @@ class ArgumentResolverTest {
     }
 
     /**
-     * Command Substitution unit test case to resolve command substitution arguments with invalid args
+     * Command Substitution unit test case to resolve command substitution arguments with invalid args.
      */
     @ParameterizedTest
     @ValueSource(strings = {"`", "`invalid command`", "echo `"})
@@ -217,7 +216,7 @@ class ArgumentResolverTest {
     }
 
     /**
-     * Command Substitution unit test case to resolve command substitution arguments with invalid newline
+     * Command Substitution unit test case to resolve command substitution arguments with invalid newline.
      */
     @Test
     void resolveArguments_CommandSubstitutionContainsNewline_ThrowsShellException() {
