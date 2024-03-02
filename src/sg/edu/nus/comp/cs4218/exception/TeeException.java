@@ -9,6 +9,6 @@ public class TeeException extends AbstractApplicationException {
     }
 
     public TeeException(String message, Throwable cause) {
-        super("tee: " + message);
+        super("tee: " + message, cause);
     }
 }

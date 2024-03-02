@@ -1,4 +1,4 @@
-package sg.edu.nus.comp.cs4218.skeleton.app;
+package sg.edu.nus.comp.cs4218.impl.app;
 
 import sg.edu.nus.comp.cs4218.app.CutInterface;
 import sg.edu.nus.comp.cs4218.exception.CutException;
