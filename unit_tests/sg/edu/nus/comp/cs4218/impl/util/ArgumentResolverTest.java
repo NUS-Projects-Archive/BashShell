@@ -25,7 +25,6 @@ import org.junit.jupiter.params.provider.ValueSource;
 import sg.edu.nus.comp.cs4218.Environment;
 import sg.edu.nus.comp.cs4218.exception.ShellException;
 
-// TODO: Command substitution tests are not implemented yet
 class ArgumentResolverTest {
 
     private static final Map<String, List<String>> VALID_QUOTE_CONTENTS = new HashMap<>() {{
