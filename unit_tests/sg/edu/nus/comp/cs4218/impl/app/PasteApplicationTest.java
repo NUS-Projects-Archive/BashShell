@@ -22,7 +22,7 @@ import sg.edu.nus.comp.cs4218.impl.util.StringUtils;
 public class PasteApplicationTest {
     private static final String FILE_NAME_A = "A.txt";
     private static final String FILE_NAME_B = "B.txt";
-    private static final String NONEXISTENT_FILE = "NonExistent.txt";
+    private static final String NON_EXISTENT_FILE = "NonExistentFile.txt";
     private static final String STDIN = "-";
     private PasteApplication pasteApplication;
     @TempDir
@@ -116,7 +116,7 @@ public class PasteApplicationTest {
 
     @Test
     void mergeFile_NonExistentFile_ThrowsFileNotFoundException() {
-        assertThrowsExactly(PasteException.class, () -> pasteApplication.mergeFile(false, NONEXISTENT_FILE));
+        assertThrowsExactly(PasteException.class, () -> pasteApplication.mergeFile(false, NON_EXISTENT_FILE));
     }
 
     @Test
@@ -159,7 +159,7 @@ public class PasteApplicationTest {
     @Test
     void mergeFileAndStdin_NonExistentFileAndStdin_ThrowsFileNotFoundException() {
         try (InputStream inputStream = IOUtils.openInputStream(filePathA)) {
-            assertThrowsExactly(PasteException.class, () -> pasteApplication.mergeFileAndStdin(false, inputStream, NONEXISTENT_FILE));
+            assertThrowsExactly(PasteException.class, () -> pasteApplication.mergeFileAndStdin(false, inputStream, NON_EXISTENT_FILE));
         } catch (IOException | ShellException e) {
             e.printStackTrace();
         }

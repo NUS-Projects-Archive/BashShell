@@ -52,7 +52,6 @@ public class PasteApplicationIT {
 
         String contentFileB = "1\n2\n3\n4\n5";
         Files.write(pathB, Arrays.asList(contentFileB.split("\n")));
-
     }
 
     @Test
@@ -73,69 +72,60 @@ public class PasteApplicationIT {
 
     @Test
     void run_NoFlagsAndOneFile_PrintsFileInParallel() {
-        String[] args = {filePathA};
-
         String expected = "A" + StringUtils.STRING_NEWLINE + "B" +
                 StringUtils.STRING_NEWLINE + "C" +
                 StringUtils.STRING_NEWLINE + "D" +
                 StringUtils.STRING_NEWLINE + "E" + StringUtils.STRING_NEWLINE;
 
-        assertDoesNotThrow(() -> this.pasteApplication.run(args, System.in, this.outputStream));
+        assertDoesNotThrow(() -> this.pasteApplication.run(new String[]{filePathA}, System.in, this.outputStream));
         assertEquals(expected, this.outputStream.toString());
     }
 
     @Test
     void run_NoFlagsAndMultipleFiles_PrintsFilesInParallel() {
-        String[] args = {filePathA, filePathB};
-
         String expected = "A" + StringUtils.STRING_TAB + "1" +
                 StringUtils.STRING_NEWLINE + "B" + StringUtils.STRING_TAB + "2" +
                 StringUtils.STRING_NEWLINE + "C" + StringUtils.STRING_TAB + "3" +
                 StringUtils.STRING_NEWLINE + "D" + StringUtils.STRING_TAB + "4" +
                 StringUtils.STRING_NEWLINE + "E" + StringUtils.STRING_TAB + "5" + StringUtils.STRING_NEWLINE;
 
-        assertDoesNotThrow(() -> this.pasteApplication.run(args, System.in, this.outputStream));
+        assertDoesNotThrow(() -> this.pasteApplication.run(new String[]{filePathA, filePathB}, System.in, this.outputStream));
         assertEquals(expected, this.outputStream.toString());
     }
 
 
     @Test
     void run_SerialFlagAndOneFile_PrintsFileInSerial() {
-        String[] args = {filePathA, "-s"};
-
         String expected = "A" + StringUtils.STRING_TAB + "B" +
                 StringUtils.STRING_TAB + "C" +
                 StringUtils.STRING_TAB + "D" +
                 StringUtils.STRING_TAB + "E" + StringUtils.STRING_NEWLINE;
 
-        assertDoesNotThrow(() -> this.pasteApplication.run(args, System.in, this.outputStream));
+        assertDoesNotThrow(() -> this.pasteApplication.run(new String[]{filePathA, "-s"}, System.in, this.outputStream));
         assertEquals(expected, this.outputStream.toString());
     }
 
     @Test
     void run_SerialFlagAndMultipleFiles_PrintsFilesInSerial() {
-        String[] args = {filePathA, filePathB, "-s"};
-
         String expected = "A" + StringUtils.STRING_TAB + "B" +
                 StringUtils.STRING_TAB + "C" + StringUtils.STRING_TAB + "D" +
                 StringUtils.STRING_TAB + "E" + StringUtils.STRING_NEWLINE + "1" +
                 StringUtils.STRING_TAB + "2" + StringUtils.STRING_TAB + "3" +
                 StringUtils.STRING_TAB + "4" + StringUtils.STRING_TAB + "5" + StringUtils.STRING_NEWLINE;
 
-        assertDoesNotThrow(() -> this.pasteApplication.run(args, System.in, this.outputStream));
+        assertDoesNotThrow(() -> this.pasteApplication.run(new String[]{filePathA, filePathB, "-s"}, System.in, this.outputStream));
         assertEquals(expected, this.outputStream.toString());
     }
 
     @Test
     void run_NoFlagAndStdin_PrintsStdinInParallel() {
-        String[] args = {};
         String expected = "A" + StringUtils.STRING_NEWLINE + "B" +
                 StringUtils.STRING_NEWLINE + "C" +
                 StringUtils.STRING_NEWLINE + "D" +
                 StringUtils.STRING_NEWLINE + "E" + StringUtils.STRING_NEWLINE;
 
         try (InputStream inputStream = IOUtils.openInputStream(filePathA)) {
-            assertDoesNotThrow(() -> this.pasteApplication.run(args, inputStream, this.outputStream));
+            assertDoesNotThrow(() -> this.pasteApplication.run(new String[]{}, inputStream, this.outputStream));
             assertEquals(expected, this.outputStream.toString());
         } catch (IOException | ShellException e) {
             e.printStackTrace();
@@ -144,14 +134,13 @@ public class PasteApplicationIT {
 
     @Test
     void run_ValidFlagAndStdin_PrintsStdinInSerial() {
-        String[] args = {"-s"};
         String expected = "A" + StringUtils.STRING_TAB + "B" +
                 StringUtils.STRING_TAB + "C" +
                 StringUtils.STRING_TAB + "D" +
                 StringUtils.STRING_TAB + "E" + StringUtils.STRING_NEWLINE;
 
         try (InputStream inputStream = IOUtils.openInputStream(filePathA)) {
-            assertDoesNotThrow(() -> this.pasteApplication.run(args, inputStream, this.outputStream));
+            assertDoesNotThrow(() -> this.pasteApplication.run(new String[]{"-s"}, inputStream, this.outputStream));
             assertEquals(expected, this.outputStream.toString());
         } catch (IOException | ShellException e) {
             e.printStackTrace();
@@ -160,7 +149,6 @@ public class PasteApplicationIT {
 
     @Test
     void run_NoFlagStdinAndFile_PrintsStdinAndFileInParallel() {
-        String[] args = {STDIN, filePathB, STDIN};
         String expected = "A" + StringUtils.STRING_TAB + "1" + StringUtils.STRING_TAB + "B" +
                 StringUtils.STRING_NEWLINE + "C" + StringUtils.STRING_TAB + "2" + StringUtils.STRING_TAB + "D" +
                 StringUtils.STRING_NEWLINE + "E" + StringUtils.STRING_TAB + "3" +
@@ -169,7 +157,7 @@ public class PasteApplicationIT {
                 StringUtils.STRING_TAB + StringUtils.STRING_NEWLINE;
 
         try (InputStream inputStream = IOUtils.openInputStream(filePathA)) {
-            assertDoesNotThrow(() -> this.pasteApplication.run(args, inputStream, this.outputStream));
+            assertDoesNotThrow(() -> this.pasteApplication.run(new String[]{STDIN, filePathB, STDIN}, inputStream, this.outputStream));
             assertEquals(expected, this.outputStream.toString());
         } catch (IOException | ShellException e) {
             e.printStackTrace();
@@ -178,7 +166,6 @@ public class PasteApplicationIT {
 
     @Test
     void run_ValidFlagStdinAndFile_PrintsStdinAndFileInSerial() {
-        String[] args = {STDIN, filePathB, STDIN, "-s"};
         String expected = "A" + StringUtils.STRING_TAB + "B" +
                 StringUtils.STRING_TAB + "C" + StringUtils.STRING_TAB + "D" +
                 StringUtils.STRING_TAB + "E" + StringUtils.STRING_NEWLINE + "1" +
@@ -187,7 +174,7 @@ public class PasteApplicationIT {
                 StringUtils.STRING_NEWLINE;
 
         try (InputStream inputStream = IOUtils.openInputStream(filePathA)) {
-            assertDoesNotThrow(() -> this.pasteApplication.run(args, inputStream, this.outputStream));
+            assertDoesNotThrow(() -> this.pasteApplication.run(new String[]{STDIN, filePathB, STDIN, "-s"}, inputStream, this.outputStream));
             assertEquals(expected, this.outputStream.toString());
         } catch (IOException | ShellException e) {
             e.printStackTrace();
