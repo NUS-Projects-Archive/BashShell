@@ -206,7 +206,7 @@ public class PasteApplication implements PasteInterface {
         }
 
         for (String file : fileName) {
-            if (!file.equals("-")) {
+            if (!("-").equals(file)) {
                 File node = IOUtils.resolveFilePath(file).toFile();
                 if (!node.exists()) {
                     throw new PasteException(ERR_FILE_NOT_FOUND);

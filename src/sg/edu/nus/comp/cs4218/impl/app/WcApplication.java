@@ -203,7 +203,7 @@ public class WcApplication implements WcInterface {
             List<String> result = new ArrayList<>();
 
             for (String file : fileName) {
-                if (file.equals("-")) {
+                if (("-").equals(file)) {
                     result.add(countFromStdin(isBytes, isLines, isWords, stdin) + " -");
                 } else {
                     result.add(countFromFiles(isBytes, isLines, isWords, file));

@@ -29,7 +29,6 @@ import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
@@ -44,9 +43,6 @@ public class IORedirectionHandlerTest {
     private String fileB;
     private String fileC;
 
-    @TempDir
-    private Path testDir;
-
     private String[] splitArgs(String args) {
         return args.split("\\s+");
     }
@@ -56,8 +52,8 @@ public class IORedirectionHandlerTest {
         argResolverMock = mock(ArgumentResolver.class);
         inputStream = new ByteArrayInputStream("origInputStream".getBytes(StandardCharsets.UTF_8));
         outputStream = new ByteArrayOutputStream();
-        testDir = Files.createTempDirectory("testDir");
 
+        Path testDir = Files.createTempDirectory("testDir");
         Path path = testDir.resolve("file.txt");
         Path pathA = testDir.resolve("A.txt");
         Path pathB = testDir.resolve("B.txt");
