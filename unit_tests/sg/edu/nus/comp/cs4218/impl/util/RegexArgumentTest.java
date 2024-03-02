@@ -23,7 +23,7 @@ class RegexArgumentTest {
 
     @BeforeEach
     void setUp() {
-        this.regexArg = new RegexArgument();
+        regexArg = new RegexArgument();
     }
 
     /**

@@ -45,7 +45,7 @@ class MkdirArgsParserTest {
 
     @BeforeEach
     void setUp() {
-        this.mkdirArgsParser = new MkdirArgsParser();
+        mkdirArgsParser = new MkdirArgsParser();
     }
 
     @ParameterizedTest

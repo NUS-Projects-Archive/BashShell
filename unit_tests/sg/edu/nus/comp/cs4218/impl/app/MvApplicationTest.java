@@ -40,7 +40,7 @@ class MvApplicationTest {
 
     @BeforeEach
     void setUp() throws IOException {
-        this.app = new MvApplication();
+        app = new MvApplication();
 
         // Create temporary file and subdirectory, automatically deletes after test execution
         tempSrcFilePath = tempDir.resolve(TEMP_SRC_FILE);

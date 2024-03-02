@@ -1,28 +1,5 @@
 package sg.edu.nus.comp.cs4218.impl.util;
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
-import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
-import sg.edu.nus.comp.cs4218.exception.ShellException;
-
-
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.Arrays;
-import java.util.List;
-
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -36,6 +13,28 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_SYNTAX;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Arrays;
+import java.util.List;
+
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
+
+import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
+import sg.edu.nus.comp.cs4218.exception.ShellException;
 
 public class IORedirectionHandlerTest {
     private InputStream inputStream;
@@ -62,10 +61,10 @@ public class IORedirectionHandlerTest {
         Path pathB = testDir.resolve("B.txt");
         Path pathC = testDir.resolve("C.txt");
 
-        this.file = path.toString();
-        this.fileA = pathA.toString();
-        this.fileB = pathB.toString();
-        this.fileC = pathC.toString();
+        file = path.toString();
+        fileA = pathA.toString();
+        fileB = pathB.toString();
+        fileC = pathC.toString();
 
         String contentFile = "Test";
         Files.write(path, List.of(contentFile));
@@ -82,8 +81,8 @@ public class IORedirectionHandlerTest {
 
     @AfterEach
     void tearDown() throws IOException {
-        this.inputStream.close();
-        this.outputStream.close();
+        inputStream.close();
+        outputStream.close();
     }
 
     @ParameterizedTest
@@ -147,9 +146,9 @@ public class IORedirectionHandlerTest {
         List<String> inputs = Arrays.asList(args.split("\\s+"));
         IORedirectionHandler ioRedirHandler = new IORedirectionHandler(inputs, inputStream, outputStream, argResolverMock);
         try {
-            when(argResolverMock.resolveOneArgument(anyString())).thenReturn(List.of(this.fileA), List.of(this.fileB), List.of(this.fileA));
+            when(argResolverMock.resolveOneArgument(anyString())).thenReturn(List.of(fileA), List.of(fileB), List.of(fileA));
             ioRedirHandler.extractRedirOptions();
-            String expected = new String(this.inputStream.readAllBytes());
+            String expected = new String(inputStream.readAllBytes());
             String result = new String(ioRedirHandler.getInputStream().readAllBytes());
             assertNotEquals(expected, result);
             assertNotSame(inputStream, ioRedirHandler.getInputStream());
@@ -163,7 +162,7 @@ public class IORedirectionHandlerTest {
         List<String> inputs = List.of("<", "A.txt", "<", "B.txt");
         IORedirectionHandler ioRedirHandler = new IORedirectionHandler(inputs, inputStream, outputStream, argResolverMock);
         try {
-            when(argResolverMock.resolveOneArgument(anyString())).thenReturn(List.of(this.fileA), List.of(this.fileB));
+            when(argResolverMock.resolveOneArgument(anyString())).thenReturn(List.of(fileA), List.of(fileB));
             ioRedirHandler.extractRedirOptions();
             String expected = "Java" + STRING_NEWLINE;
             String result = new String(ioRedirHandler.getInputStream().readAllBytes());
@@ -179,7 +178,7 @@ public class IORedirectionHandlerTest {
         List<String> inputs = Arrays.asList(args.split("\\s+"));
         IORedirectionHandler ioRedirHandler = new IORedirectionHandler(inputs, inputStream, outputStream, argResolverMock);
         try {
-            when(argResolverMock.resolveOneArgument(anyString())).thenReturn(List.of(this.fileA), List.of(this.fileB), List.of(this.fileA));
+            when(argResolverMock.resolveOneArgument(anyString())).thenReturn(List.of(fileA), List.of(fileB), List.of(fileA));
             ioRedirHandler.extractRedirOptions();
             assertNotSame(outputStream, ioRedirHandler.getOutputStream());
         } catch (IOException | AbstractApplicationException | ShellException e) {
@@ -192,7 +191,7 @@ public class IORedirectionHandlerTest {
         List<String> inputs = List.of("<", "C.txt", ">", "B.txt", ">", "C.txt");
         IORedirectionHandler ioRedirHandler = new IORedirectionHandler(inputs, inputStream, outputStream, argResolverMock);
         try {
-            when(argResolverMock.resolveOneArgument(anyString())).thenReturn(List.of(this.fileC), List.of(this.fileB), List.of(this.fileC));
+            when(argResolverMock.resolveOneArgument(anyString())).thenReturn(List.of(fileC), List.of(fileB), List.of(fileC));
             ioRedirHandler.extractRedirOptions();
             assertEquals(0, new String(ioRedirHandler.getInputStream().readAllBytes()).length());
             String str = "Not Empty";

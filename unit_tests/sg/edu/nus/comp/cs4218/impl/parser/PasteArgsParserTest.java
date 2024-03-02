@@ -45,7 +45,7 @@ public class PasteArgsParserTest {
 
     @BeforeEach
     void setUp() {
-        this.pasteArgsParser = new PasteArgsParser();
+        pasteArgsParser = new PasteArgsParser();
     }
 
     @Test

@@ -45,7 +45,7 @@ class UniqApplicationTest {
 
     @BeforeEach
     void setUp() {
-        this.app = new UniqApplication();
+        app = new UniqApplication();
     }
 
     @ParameterizedTest
@@ -54,7 +54,7 @@ class UniqApplicationTest {
             boolean isCount, boolean isRepeated, boolean isAllRepeated, String expectedFile, @TempDir Path target) {
         String outputFile = target.resolve(TEST_OUTPUT_FILE).toString();
         assertDoesNotThrow(() ->
-                this.app.uniqFromFile(isCount, isRepeated, isAllRepeated, TEST_INPUT_FILE, outputFile)
+                app.uniqFromFile(isCount, isRepeated, isAllRepeated, TEST_INPUT_FILE, outputFile)
         );
         assertFileMatch(expectedFile, outputFile);
     }
@@ -65,7 +65,7 @@ class UniqApplicationTest {
             boolean isCount, boolean isRepeated, boolean isAllRepeated, @TempDir Path target) {
         String outputFile = target.resolve(TEST_OUTPUT_FILE).toString();
         assertThrowsExactly(UniqException.class, () ->
-                this.app.uniqFromFile(isCount, isRepeated, isAllRepeated, TEST_INPUT_FILE, outputFile)
+                app.uniqFromFile(isCount, isRepeated, isAllRepeated, TEST_INPUT_FILE, outputFile)
         );
     }
 
@@ -76,7 +76,7 @@ class UniqApplicationTest {
         try (InputStream inputStream = new FileInputStream(TEST_INPUT_FILE)) {
             String outputFile = target.resolve(TEST_OUTPUT_FILE).toString();
             assertDoesNotThrow(() ->
-                    this.app.uniqFromStdin(isCount, isRepeated, isAllRepeated, inputStream, outputFile)
+                    app.uniqFromStdin(isCount, isRepeated, isAllRepeated, inputStream, outputFile)
             );
             assertFileMatch(expectedFile, outputFile);
         } catch (IOException e) {
@@ -91,7 +91,7 @@ class UniqApplicationTest {
         try (InputStream inputStream = new FileInputStream(TEST_INPUT_FILE)) {
             String outputFile = target.resolve(TEST_OUTPUT_FILE).toString();
             assertThrowsExactly(UniqException.class, () ->
-                    this.app.uniqFromStdin(isCount, isRepeated, isAllRepeated, inputStream, outputFile)
+                    app.uniqFromStdin(isCount, isRepeated, isAllRepeated, inputStream, outputFile)
             );
         } catch (IOException e) {
             fail(e.getMessage());

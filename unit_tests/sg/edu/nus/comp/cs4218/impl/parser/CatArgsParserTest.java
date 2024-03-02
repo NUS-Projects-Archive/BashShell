@@ -44,7 +44,7 @@ class CatArgsParserTest {
 
     @BeforeEach
     void setUp() {
-        this.catArgsParser = new CatArgsParser();
+        catArgsParser = new CatArgsParser();
     }
 
     @ParameterizedTest

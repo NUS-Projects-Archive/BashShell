@@ -48,7 +48,7 @@ class ArgumentResolverTest {
 
     @BeforeEach
     void setUp() {
-        this.argumentResolver = new ArgumentResolver();
+        argumentResolver = new ArgumentResolver();
     }
 
     /**

@@ -28,16 +28,16 @@ class EchoApplicationTest {
 
     @BeforeEach
     public void setUp() throws IOException {
-        this.app = new EchoApplication();
-        this.exceptionThrowingOutputStream = mock(OutputStream.class);
+        app = new EchoApplication();
+        exceptionThrowingOutputStream = mock(OutputStream.class);
         doThrow(new IOException()).when(exceptionThrowingOutputStream).write(any(byte[].class));
-        this.out = new ByteArrayOutputStream();
+        out = new ByteArrayOutputStream();
     }
 
     @AfterEach
     void tearDown() throws IOException {
-        this.exceptionThrowingOutputStream.close();
-        this.out.close();
+        exceptionThrowingOutputStream.close();
+        out.close();
     }
 
     @Test

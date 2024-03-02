@@ -32,7 +32,8 @@ public class WcApplicationTest {
     private static final String WC_EXCEPTION_MSG = "wc: ";
     private static final String NUMBER_FORMAT = " %7d";
     private static final String STRING_FORMAT = " %s";
-    private WcApplication wcApplication;
+    private WcApplication app;
+
     @TempDir
     private Path wcTestDir;
     private String filePathA;
@@ -55,7 +56,7 @@ public class WcApplicationTest {
 
     @BeforeEach
     void setUp() throws IOException {
-        this.wcApplication = new WcApplication();
+        app = new WcApplication();
 
         Path pathA = wcTestDir.resolve(FILE_NAME_A);
         Path pathB = wcTestDir.resolve(FILE_NAME_B);
@@ -72,7 +73,7 @@ public class WcApplicationTest {
     @Test
     void countFromFiles_NonExistentFile_ReturnsFileNotFoundError() {
         assertDoesNotThrow(() -> {
-            String result = wcApplication.countFromFiles(true, true, true, NON_EXISTENT_FILE);
+            String result = app.countFromFiles(true, true, true, NON_EXISTENT_FILE);
             assertEquals(WC_EXCEPTION_MSG + ERR_FILE_NOT_FOUND, result);
         });
     }
@@ -85,7 +86,7 @@ public class WcApplicationTest {
         expectedList.add(appendString(3, 11, 57, " total"));
         String expected = String.join(STRING_NEWLINE, expectedList);
         assertDoesNotThrow(() -> {
-            String result = wcApplication.countFromFiles(true, true, true, NON_EXISTENT_FILE, filePathA);
+            String result = app.countFromFiles(true, true, true, NON_EXISTENT_FILE, filePathA);
             assertEquals(expected, result);
         });
     }
@@ -98,7 +99,7 @@ public class WcApplicationTest {
         expectedList.add(appendString(6, 23, 132, " total"));
         String expected = String.join(STRING_NEWLINE, expectedList);
         assertDoesNotThrow(() -> {
-            String result = wcApplication.countFromFiles(true, true, true, filePathA, filePathB);
+            String result = app.countFromFiles(true, true, true, filePathA, filePathB);
             assertEquals(expected, result);
         });
     }
@@ -111,7 +112,7 @@ public class WcApplicationTest {
         expectedList.add(appendString(6, 23, -1, " total"));
         String expected = String.join(STRING_NEWLINE, expectedList);
         assertDoesNotThrow(() -> {
-            String result = wcApplication.countFromFiles(false, true, true, filePathA, filePathB);
+            String result = app.countFromFiles(false, true, true, filePathA, filePathB);
             assertEquals(expected, result);
         });
     }
@@ -119,7 +120,7 @@ public class WcApplicationTest {
     @Test
     void countFromStdin_NullStdin_ThrowsException() {
         assertThrows(WcException.class, () -> {
-            String result = wcApplication.countFromStdin(true, true, true, null);
+            String result = app.countFromStdin(true, true, true, null);
             assertEquals(WC_EXCEPTION_MSG + ERR_NULL_STREAMS, result);
         });
     }
@@ -130,7 +131,7 @@ public class WcApplicationTest {
         expectedList.add(appendString(0, 0, 0, ""));
         String expected = String.join(STRING_NEWLINE, expectedList);
         assertDoesNotThrow(() -> {
-            String result = wcApplication.countFromStdin(true, true, true, new ByteArrayInputStream("".getBytes()));
+            String result = app.countFromStdin(true, true, true, new ByteArrayInputStream("".getBytes()));
             assertEquals(expected, result);
         });
     }
@@ -142,7 +143,7 @@ public class WcApplicationTest {
         String expected = String.join(STRING_NEWLINE, expectedList);
         try (InputStream inputStream = IOUtils.openInputStream(filePathA)) {
             assertDoesNotThrow(() -> {
-                String result = wcApplication.countFromStdin(true, true, true, inputStream);
+                String result = app.countFromStdin(true, true, true, inputStream);
                 assertEquals(expected, result);
             });
         } catch (IOException | ShellException e) {
@@ -157,7 +158,7 @@ public class WcApplicationTest {
         String expected = String.join(STRING_NEWLINE, expectedList);
         try (InputStream inputStream = IOUtils.openInputStream(filePathA)) {
             assertDoesNotThrow(() -> {
-                String result = wcApplication.countFromStdin(false, true, true, inputStream);
+                String result = app.countFromStdin(false, true, true, inputStream);
                 assertEquals(expected, result);
             });
         } catch (IOException | ShellException e) {
@@ -174,7 +175,7 @@ public class WcApplicationTest {
         String expected = String.join(STRING_NEWLINE, expectedList);
         try (InputStream inputStream = IOUtils.openInputStream(filePathA)) {
             assertDoesNotThrow(() -> {
-                String result = wcApplication.countFromFileAndStdin(true, true, true, inputStream, "-", filePathB);
+                String result = app.countFromFileAndStdin(true, true, true, inputStream, "-", filePathB);
                 assertEquals(expected, result);
             });
         } catch (IOException | ShellException e) {
@@ -191,7 +192,7 @@ public class WcApplicationTest {
         String expected = String.join(STRING_NEWLINE, expectedList);
         try (InputStream inputStream = IOUtils.openInputStream(filePathA)) {
             assertDoesNotThrow(() -> {
-                String result = wcApplication.countFromFileAndStdin(true, true, false, inputStream, "-", filePathB);
+                String result = app.countFromFileAndStdin(true, true, false, inputStream, "-", filePathB);
                 assertEquals(expected, result);
             });
         } catch (IOException | ShellException e) {

@@ -24,7 +24,7 @@ public class PasteApplicationTest {
     private static final String FILE_NAME_B = "B.txt";
     private static final String NON_EXISTENT_FILE = "NonExistentFile.txt";
     private static final String STDIN = "-";
-    private PasteApplication pasteApplication;
+    private PasteApplication app;
     @TempDir
     private Path pasteTestDir;
     private String filePathA;
@@ -32,7 +32,7 @@ public class PasteApplicationTest {
 
     @BeforeEach
     void setUp() throws IOException {
-        this.pasteApplication = new PasteApplication();
+        app = new PasteApplication();
         pasteTestDir = Files.createTempDirectory("pasteTestDir");
 
         Path pathA = pasteTestDir.resolve(FILE_NAME_A);
@@ -58,7 +58,7 @@ public class PasteApplicationTest {
 
         try (InputStream inputStream = IOUtils.openInputStream(filePathA)) {
             assertDoesNotThrow(() -> {
-                String result = pasteApplication.mergeStdin(false, inputStream);
+                String result = app.mergeStdin(false, inputStream);
                 assertEquals(result, expected);
             });
         } catch (IOException | ShellException e) {
@@ -75,7 +75,7 @@ public class PasteApplicationTest {
 
         try (InputStream inputStream = IOUtils.openInputStream(filePathA)) {
             assertDoesNotThrow(() -> {
-                String result = pasteApplication.mergeStdin(true, inputStream);
+                String result = app.mergeStdin(true, inputStream);
                 assertEquals(result, expected);
             });
         } catch (IOException | ShellException e) {
@@ -85,7 +85,7 @@ public class PasteApplicationTest {
 
     @Test
     void mergeStdin_NullStdin_ThrowsNullStreamsException() {
-        assertThrowsExactly(PasteException.class, () -> pasteApplication.mergeStdin(false, null));
+        assertThrowsExactly(PasteException.class, () -> app.mergeStdin(false, null));
     }
 
     @Test
@@ -96,7 +96,7 @@ public class PasteApplicationTest {
                 StringUtils.STRING_NEWLINE + "D" + StringUtils.STRING_TAB + "4" +
                 StringUtils.STRING_NEWLINE + "E" + StringUtils.STRING_TAB + "5";
         assertDoesNotThrow(() -> {
-            String result = pasteApplication.mergeFile(false, filePathA, filePathB);
+            String result = app.mergeFile(false, filePathA, filePathB);
             assertEquals(expected, result);
         });
     }
@@ -109,14 +109,14 @@ public class PasteApplicationTest {
                 StringUtils.STRING_TAB + "2" + StringUtils.STRING_TAB + "3" +
                 StringUtils.STRING_TAB + "4" + StringUtils.STRING_TAB + "5";
         assertDoesNotThrow(() -> {
-            String result = pasteApplication.mergeFile(true, filePathA, filePathB);
+            String result = app.mergeFile(true, filePathA, filePathB);
             assertEquals(expected, result);
         });
     }
 
     @Test
     void mergeFile_NonExistentFile_ThrowsFileNotFoundException() {
-        assertThrowsExactly(PasteException.class, () -> pasteApplication.mergeFile(false, NON_EXISTENT_FILE));
+        assertThrowsExactly(PasteException.class, () -> app.mergeFile(false, NON_EXISTENT_FILE));
     }
 
     @Test
@@ -130,7 +130,7 @@ public class PasteApplicationTest {
 
         try (InputStream inputStream = IOUtils.openInputStream(filePathA)) {
             assertDoesNotThrow(() -> {
-                String result = pasteApplication.mergeFileAndStdin(false, inputStream, STDIN, filePathB, STDIN);
+                String result = app.mergeFileAndStdin(false, inputStream, STDIN, filePathB, STDIN);
                 assertEquals(result, expected);
             });
         } catch (IOException | ShellException e) {
@@ -148,7 +148,7 @@ public class PasteApplicationTest {
 
         try (InputStream inputStream = IOUtils.openInputStream(filePathA)) {
             assertDoesNotThrow(() -> {
-                String result = pasteApplication.mergeFileAndStdin(true, inputStream, STDIN, filePathB, STDIN);
+                String result = app.mergeFileAndStdin(true, inputStream, STDIN, filePathB, STDIN);
                 assertEquals(expected, result);
             });
         } catch (IOException | ShellException e) {
@@ -159,7 +159,7 @@ public class PasteApplicationTest {
     @Test
     void mergeFileAndStdin_NonExistentFileAndStdin_ThrowsFileNotFoundException() {
         try (InputStream inputStream = IOUtils.openInputStream(filePathA)) {
-            assertThrowsExactly(PasteException.class, () -> pasteApplication.mergeFileAndStdin(false, inputStream, NON_EXISTENT_FILE));
+            assertThrowsExactly(PasteException.class, () -> app.mergeFileAndStdin(false, inputStream, NON_EXISTENT_FILE));
         } catch (IOException | ShellException e) {
             e.printStackTrace();
         }

@@ -30,7 +30,7 @@ class MkdirApplicationTest {
 
     @BeforeEach
     void setUp() throws IOException {
-        this.app = new MkdirApplication();
+        app = new MkdirApplication();
 
         // Create temporary file
         tempFilePath = tempDir.resolve(TEMP_FILE); // automatically deletes after test execution

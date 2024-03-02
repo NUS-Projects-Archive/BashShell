@@ -48,7 +48,7 @@ public class WcArgsParserTest {
 
     @BeforeEach
     void setUp() {
-        this.wcArgsParser = new WcArgsParser();
+        wcArgsParser = new WcArgsParser();
     }
 
     @ParameterizedTest
