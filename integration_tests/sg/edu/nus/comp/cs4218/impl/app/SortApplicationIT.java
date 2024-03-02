@@ -58,8 +58,8 @@ public class SortApplicationIT {
         String content = joinStringsBySystemLineSeparator("a", "c", "b", "A");
         assertDoesNotThrow(() -> Files.write(tempFilePath, content.getBytes()));
         String expectedMsg = "sort: Could not write to output stream";
+        String[] args = {tempFile};
         SortException exception = assertThrowsExactly(SortException.class, () -> {
-            String[] args = {tempFile};
             OutputStream mockedStdout = mock(OutputStream.class);
             doThrow(new IOException()).when(mockedStdout).write(any(byte[].class));
             app.run(args, null, mockedStdout);

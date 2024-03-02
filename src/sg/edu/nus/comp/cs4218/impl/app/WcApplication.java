@@ -123,14 +123,8 @@ public class WcApplication implements WcInterface {
                 input = IOUtils.openInputStream(file);
             } catch (ShellException e) {
                 throw new WcException(e.getMessage(), e);
-            } finally {
-                try {
-                    if (input != null) { input.close(); }
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
             }
-                long[] count = getCountReport(input); // lines words bytes
+            long[] count = getCountReport(input); // lines words bytes
             try {
                 IOUtils.closeInputStream(input);
             } catch (ShellException e) {

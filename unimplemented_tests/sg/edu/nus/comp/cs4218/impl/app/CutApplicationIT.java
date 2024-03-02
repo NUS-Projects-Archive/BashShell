@@ -83,7 +83,7 @@ public class CutApplicationIT {
     }
 
     @Test
-    void run_FailsToReadFromInputStream_CutException() {
+    void run_FailsToReadFromInputStream_ThrowsCutException() {
         String expectedMsg = "cut: Could not read from input stream";
         Throwable result = assertThrows(CutException.class, () -> {
             String[] args = {"-c", "1-5", tempFilePath.toString()};
@@ -96,7 +96,7 @@ public class CutApplicationIT {
     }
 
     @Test
-    void run_FailsToWriteToOutputStream_CutException() {
+    void run_FailsToWriteToOutputStream_ThrowsCutException() {
         String expectedMsg = "cut: Could not write to output stream";
         Throwable result = assertThrows(CutException.class, () -> {
             String[] args = {"-c", "1-5", tempFilePath.toString()};

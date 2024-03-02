@@ -41,7 +41,7 @@ class CdApplicationTest {
     private static CdApplication cdApplication;
 
     @TempDir
-    static Path parentDir;
+    private static Path parentDir;
     private static String parentDirAbsPath;
 
     static Stream<Arguments> validDirs() {

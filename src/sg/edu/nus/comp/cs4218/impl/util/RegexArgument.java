@@ -59,7 +59,7 @@ public final class RegexArgument {
     public void merge(RegexArgument other) {
         plaintext.append(other.plaintext);
         regex.append(other.regex);
-        hasAsterisk = hasAsterisk || other.hasAsterisk;
+        hasAsterisk = this.hasAsterisk || other.hasAsterisk;
     }
 
     public void merge(String str) {
@@ -70,7 +70,7 @@ public final class RegexArgument {
     public List<String> globFiles() {
         List<String> globbedFiles = new LinkedList<>();
 
-        if (isRegex()) {
+        if (hasAsterisk) {
             Pattern regexPattern = Pattern.compile(regex.toString());
             String dir = "";
             String[] tokens = plaintext.toString().replaceAll("\\\\", "/").split("/");
