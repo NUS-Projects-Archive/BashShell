@@ -1,6 +1,7 @@
 package sg.edu.nus.comp.cs4218.impl.app;
 
 import static sg.edu.nus.comp.cs4218.impl.app.helper.LsApplicationHelper.buildResult;
+import static sg.edu.nus.comp.cs4218.impl.app.helper.LsApplicationHelper.formatContents;
 import static sg.edu.nus.comp.cs4218.impl.app.helper.LsApplicationHelper.listCwdContent;
 import static sg.edu.nus.comp.cs4218.impl.app.helper.LsApplicationHelper.resolvePaths;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_OSTREAM;
@@ -10,6 +11,7 @@ import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_WRITE_STREAM;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 
 import sg.edu.nus.comp.cs4218.Environment;
@@ -39,16 +41,29 @@ public class LsApplication implements LsInterface {
         }
 
         List<Path> paths;
+        List<Path> files = new ArrayList<>();
         if (folderName.length == 0 && isRecursive) {
             String[] directories = new String[1];
             directories[0] = Environment.currentDirectory;
             paths = resolvePaths(directories);
         } else {
-            paths = resolvePaths(folderName);
+            List<Path> directories = new ArrayList<>();
+            resolvePaths(folderName).forEach(folder -> {
+                if (folder.toFile().isDirectory()) {
+                    directories.add(folder);
+                } else {
+                    files.add(folder);
+                }
+            });
+            paths = directories;
         }
 
         // End of output should not have newline
-        return buildResult(paths, isRecursive, isSortByExt, hasFolder).trim();
+        String output = buildResult(paths, isRecursive, isSortByExt, hasFolder).trim();
+        if (!files.isEmpty()) {
+            output = formatContents(files, isSortByExt) + output;
+        }
+        return output;
     }
 
     @Override
@@ -74,7 +89,6 @@ public class LsApplication implements LsInterface {
         String[] directories = parser.getDirectories()
                 .toArray(new String[parser.getDirectories().size()]);
         String result = listFolderContent(recursive, sortByExt, directories);
-
         try {
             stdout.write(result.getBytes());
             stdout.write(StringUtils.STRING_NEWLINE.getBytes());
