@@ -205,6 +205,21 @@ public class PasteApplication implements PasteInterface {
             throw new PasteException(ERR_GENERAL);
         }
 
+        for (String file : fileName) {
+            if (!file.equals("-")) {
+                File node = IOUtils.resolveFilePath(file).toFile();
+                if (!node.exists()) {
+                    throw new PasteException(ERR_FILE_NOT_FOUND);
+                }
+                if (node.isDirectory()) {
+                    throw new PasteException(ERR_IS_DIR);
+                }
+                if (!node.canRead()) {
+                    throw new PasteException(ERR_NO_PERM);
+                }
+            }
+        }
+
         List<String> data;
         try {
             data = IOUtils.getLinesFromInputStream(stdin);
