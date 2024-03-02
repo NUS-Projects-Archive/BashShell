@@ -143,8 +143,7 @@ class ArgumentResolverTest {
             "\"`\"",        // "`"
             "\"```\"",      // "```"
     })
-    void resolveOneArgument_InvalidDoubleQuoteContentsWithUnmatchedBackQuote_ThrowsShellException
-    (String invalidQuoteContent) {
+    void resolveOneArgument_InvalidDoubleQuoteContentsWithUnmatchedBackQuote_ThrowsShellException(String invalidQuoteContent) {
         Throwable result = assertThrows(ShellException.class,
                 () -> argumentResolver.resolveOneArgument(invalidQuoteContent));
         assertEquals(String.format("shell: %s", ERR_SYNTAX), result.getMessage());
