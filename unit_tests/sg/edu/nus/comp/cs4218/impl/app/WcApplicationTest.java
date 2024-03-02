@@ -40,18 +40,18 @@ public class WcApplicationTest {
     private String filePathB;
 
     private static String appendString(int lineCount, int wordCount, int byteCount, String lastLine) {
-        StringBuilder sb = new StringBuilder(); //NOPMD
+        StringBuilder stringBuilder = new StringBuilder();
         if (lineCount > -1) {
-            sb.append(String.format(NUMBER_FORMAT, lineCount));
+            stringBuilder.append(String.format(NUMBER_FORMAT, lineCount));
         }
         if (wordCount > -1) {
-            sb.append(String.format(NUMBER_FORMAT, wordCount));
+            stringBuilder.append(String.format(NUMBER_FORMAT, wordCount));
         }
         if (byteCount > -1) {
-            sb.append(String.format(NUMBER_FORMAT, byteCount));
+            stringBuilder.append(String.format(NUMBER_FORMAT, byteCount));
         }
-        sb.append(lastLine);
-        return sb.toString();
+        stringBuilder.append(lastLine);
+        return stringBuilder.toString();
     }
 
     @BeforeEach

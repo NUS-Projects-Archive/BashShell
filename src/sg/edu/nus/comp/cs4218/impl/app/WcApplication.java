@@ -133,34 +133,34 @@ public class WcApplication implements WcInterface {
 
             // Format all output: " %7d %7d %7d %s"
             // Output in the following order: lines words bytes filename
-            StringBuilder sb = new StringBuilder(); //NOPMD
+            StringBuilder stringBuilder = new StringBuilder();
             if (isLines) {
-                sb.append(String.format(NUMBER_FORMAT, count[0]));
+                stringBuilder.append(String.format(NUMBER_FORMAT, count[0]));
             }
             if (isWords) {
-                sb.append(String.format(NUMBER_FORMAT, count[1]));
+                stringBuilder.append(String.format(NUMBER_FORMAT, count[1]));
             }
             if (isBytes) {
-                sb.append(String.format(NUMBER_FORMAT, count[2]));
+                stringBuilder.append(String.format(NUMBER_FORMAT, count[2]));
             }
-            sb.append(String.format(" %s", file));
-            result.add(sb.toString());
+            stringBuilder.append(String.format(" %s", file));
+            result.add(stringBuilder.toString());
         }
 
         // Print cumulative counts for all the files
         if (fileName.length > 1) {
-            StringBuilder sb = new StringBuilder(); //NOPMD
+            StringBuilder stringBuilder = new StringBuilder();
             if (isLines) {
-                sb.append(String.format(NUMBER_FORMAT, totalLines));
+                stringBuilder.append(String.format(NUMBER_FORMAT, totalLines));
             }
             if (isWords) {
-                sb.append(String.format(NUMBER_FORMAT, totalWords));
+                stringBuilder.append(String.format(NUMBER_FORMAT, totalWords));
             }
             if (isBytes) {
-                sb.append(String.format(NUMBER_FORMAT, totalBytes));
+                stringBuilder.append(String.format(NUMBER_FORMAT, totalBytes));
             }
-            sb.append(" total");
-            result.add(sb.toString());
+            stringBuilder.append(" total");
+            result.add(stringBuilder.toString());
         }
         return String.join(STRING_NEWLINE, result);
     }
@@ -182,18 +182,18 @@ public class WcApplication implements WcInterface {
         }
         long[] count = getCountReport(stdin); // lines words bytes;
 
-        StringBuilder sb = new StringBuilder(); //NOPMD
+        StringBuilder stringBuilder = new StringBuilder();
         if (isLines) {
-            sb.append(String.format(NUMBER_FORMAT, count[0]));
+            stringBuilder.append(String.format(NUMBER_FORMAT, count[0]));
         }
         if (isWords) {
-            sb.append(String.format(NUMBER_FORMAT, count[1]));
+            stringBuilder.append(String.format(NUMBER_FORMAT, count[1]));
         }
         if (isBytes) {
-            sb.append(String.format(NUMBER_FORMAT, count[2]));
+            stringBuilder.append(String.format(NUMBER_FORMAT, count[2]));
         }
 
-        return sb.toString();
+        return stringBuilder.toString();
     }
 
     @Override
@@ -210,18 +210,18 @@ public class WcApplication implements WcInterface {
                 }
             }
             if (fileName.length > 1) {
-                StringBuilder sb = new StringBuilder(); //NOPMD
+                StringBuilder stringBuilder = new StringBuilder();
                 if (isLines) {
-                    sb.append(String.format(NUMBER_FORMAT, totalLines));
+                    stringBuilder.append(String.format(NUMBER_FORMAT, totalLines));
                 }
                 if (isWords) {
-                    sb.append(String.format(NUMBER_FORMAT, totalWords));
+                    stringBuilder.append(String.format(NUMBER_FORMAT, totalWords));
                 }
                 if (isBytes) {
-                    sb.append(String.format(NUMBER_FORMAT, totalBytes));
+                    stringBuilder.append(String.format(NUMBER_FORMAT, totalBytes));
                 }
-                sb.append(" total");
-                result.add(sb.toString());
+                stringBuilder.append(" total");
+                result.add(stringBuilder.toString());
             }
 
             return String.join(STRING_NEWLINE, result);
