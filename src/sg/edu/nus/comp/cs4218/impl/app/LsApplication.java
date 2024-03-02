@@ -60,10 +60,16 @@ public class LsApplication implements LsInterface {
 
         // End of output should not have newline
         String output = buildResult(paths, isRecursive, isSortByExt, hasFolder).trim();
-        if (!files.isEmpty()) {
-            output = formatContents(files, isSortByExt) + output;
+        if (files.isEmpty()) {
+            return output;
         }
-        return output;
+
+        String formattedFiles = formatContents(files, isSortByExt);
+        if (output.isEmpty()) {
+            return formattedFiles;
+        }
+
+        return formattedFiles + StringUtils.STRING_NEWLINE + StringUtils.STRING_NEWLINE + output;
     }
 
     @Override
