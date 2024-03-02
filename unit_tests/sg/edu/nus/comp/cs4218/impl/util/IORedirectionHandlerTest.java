@@ -41,7 +41,7 @@ public class IORedirectionHandlerTest {
     private InputStream inputStream;
     private OutputStream outputStream;
     private ArgumentResolver argResolverMock;
-
+    private String file;
     private String fileA;
     private String fileB;
     private String fileC;
@@ -57,13 +57,18 @@ public class IORedirectionHandlerTest {
         outputStream = new ByteArrayOutputStream();
         testDir = Files.createTempDirectory("testDir");
 
+        Path path = testDir.resolve("file.txt");
         Path pathA = testDir.resolve("A.txt");
         Path pathB = testDir.resolve("B.txt");
         Path pathC = testDir.resolve("C.txt");
 
+        this.file = path.toString();
         this.fileA = pathA.toString();
         this.fileB = pathB.toString();
         this.fileC = pathC.toString();
+
+        String contentFile = "Test";
+        Files.write(path, List.of(contentFile));
 
         String contentFileA = "Hello";
         Files.write(pathA, List.of(contentFileA));

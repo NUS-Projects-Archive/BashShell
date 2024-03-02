@@ -14,7 +14,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import sg.edu.nus.comp.cs4218.exception.InvalidArgsException;
-import sg.edu.nus.comp.cs4218.skeleton.parser.RmArgsParser;
 
 public class RmArgsParserTest {
     private RmArgsParser parser;

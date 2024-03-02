@@ -1,5 +1,6 @@
 package sg.edu.nus.comp.cs4218.impl.util;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.BufferedInputStream;
@@ -47,8 +48,12 @@ public final class AssertUtils {
             fail(e.getMessage());
         } finally {
             try {
-                if (streamOfExpected != null) { streamOfExpected.close(); }
-                if (streamOfActual != null) { streamOfActual.close(); }
+                if (streamOfExpected != null) {
+                    streamOfExpected.close();
+                }
+                if (streamOfActual != null) {
+                    streamOfActual.close();
+                }
             } catch (IOException e) {
                 fail(e.getMessage());
             }
@@ -64,5 +69,15 @@ public final class AssertUtils {
      */
     public static void assertFileMatch(String expected, String actual) {
         assertFileMatch(Paths.get(expected), Paths.get(actual));
+    }
+
+    /**
+     * Assert that {@code actualObject} has the type {@code expectedType}.
+     *
+     * @param expectedType Type that the object is expected to be. Should end with {@code .class}.
+     * @param actualObject Object to assert the type of
+     */
+    public static void assertSameType(Object expectedType, Object actualObject) {
+        assertEquals(actualObject.getClass(), expectedType);
     }
 }

@@ -1,13 +1,13 @@
 package sg.edu.nus.comp.cs4218.impl.parser;
 
-import sg.edu.nus.comp.cs4218.exception.InvalidArgsException;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_FLAG_PREFIX;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_FLAG_PREFIX;
+import sg.edu.nus.comp.cs4218.exception.InvalidArgsException;
 
 /**
  * Every application's parser should extend this class to encapsulate their own parsing details and

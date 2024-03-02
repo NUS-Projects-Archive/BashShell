@@ -1,4 +1,4 @@
-package sg.edu.nus.comp.cs4218.skeleton.app;
+package sg.edu.nus.comp.cs4218.impl.app;
 
 import java.io.InputStream;
 import java.io.OutputStream;
