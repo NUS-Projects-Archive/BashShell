@@ -1,5 +1,10 @@
 package sg.edu.nus.comp.cs4218.impl;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_INVALID_APP;
+
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.util.stream.Stream;
@@ -11,11 +16,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import sg.edu.nus.comp.cs4218.exception.ShellException;
-
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_INVALID_APP;
 
 class ShellImplTest {
     private ShellImpl shellImpl;
@@ -30,8 +30,8 @@ class ShellImplTest {
 
     static Stream<Arguments> getValidQuoteContents() {
         return Stream.of(
-            Arguments.of("echo \"`echo testing`\"", String.format("testing %s", System.lineSeparator())),
-            Arguments.of("echo `echo testing`", String.format("testing%s", System.lineSeparator()))
+                Arguments.of("echo \"`echo testing`\"", String.format("testing %s", System.lineSeparator())),
+                Arguments.of("echo `echo testing`", String.format("testing%s", System.lineSeparator()))
         );
     }
 
@@ -57,7 +57,7 @@ class ShellImplTest {
      * @param commandString String with some sort of invalid back quotes content
      */
     @ParameterizedTest
-    @ValueSource(strings = { "\"`echdo testing`\"", "`edcho testing`" })
+    @ValueSource(strings = {"\"`echdo testing`\"", "`edcho testing`"})
     void parseAndEvaluate_InvalidCommandWithinBackQuotes_ThrowsShellException(String commandString) {
         // Given
         String invalidAppName = commandString.split(" ")[0].replace("`", "").replace("\"", "");

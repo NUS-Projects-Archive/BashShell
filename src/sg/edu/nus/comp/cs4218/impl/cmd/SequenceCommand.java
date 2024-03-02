@@ -1,9 +1,6 @@
 package sg.edu.nus.comp.cs4218.impl.cmd;
 
-import sg.edu.nus.comp.cs4218.Command;
-import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
-import sg.edu.nus.comp.cs4218.exception.ExitException;
-import sg.edu.nus.comp.cs4218.exception.ShellException;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
@@ -13,7 +10,10 @@ import java.io.OutputStream;
 import java.util.LinkedList;
 import java.util.List;
 
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
+import sg.edu.nus.comp.cs4218.Command;
+import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
+import sg.edu.nus.comp.cs4218.exception.ExitException;
+import sg.edu.nus.comp.cs4218.exception.ShellException;
 
 /**
  * A Sequence Command is a sub-command consisting of two Commands separated with a semicolon.

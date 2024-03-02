@@ -1,17 +1,5 @@
 package sg.edu.nus.comp.cs4218.impl.parser;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
-import org.junit.jupiter.params.provider.ValueSource;
-import sg.edu.nus.comp.cs4218.exception.InvalidArgsException;
-
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Stream;
-
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -19,12 +7,25 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static sg.edu.nus.comp.cs4218.impl.parser.ArgsParser.ILLEGAL_FLAG_MSG;
 
-@SuppressWarnings("PMD.AvoidDuplicateLiterals")
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Stream;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
+
+import sg.edu.nus.comp.cs4218.exception.InvalidArgsException;
+
 class MvArgsParserTest {
 
     private final Set<Character> VALID_FLAGS = Set.of('n');
     private MvArgsParser mvArgsParser;
 
+    @SuppressWarnings("PMD.AvoidDuplicateLiterals")
     private static Stream<Arguments> validSyntax() {
         return Stream.of(
                 Arguments.of((Object) new String[]{}),

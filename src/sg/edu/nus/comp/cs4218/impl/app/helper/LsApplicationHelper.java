@@ -1,10 +1,7 @@
 package sg.edu.nus.comp.cs4218.impl.app.helper;
 
-import sg.edu.nus.comp.cs4218.Environment;
-import sg.edu.nus.comp.cs4218.exception.DirectoryAccessDeniedLsException;
-import sg.edu.nus.comp.cs4218.exception.InvalidDirectoryLsException;
-import sg.edu.nus.comp.cs4218.exception.LsException;
-import sg.edu.nus.comp.cs4218.impl.util.StringUtils;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_FILE_SEP;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_CURR_DIR;
 
 import java.io.File;
 import java.nio.file.Files;
@@ -17,8 +14,11 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_FILE_SEP;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_CURR_DIR;
+import sg.edu.nus.comp.cs4218.Environment;
+import sg.edu.nus.comp.cs4218.exception.DirectoryAccessDeniedLsException;
+import sg.edu.nus.comp.cs4218.exception.InvalidDirectoryLsException;
+import sg.edu.nus.comp.cs4218.exception.LsException;
+import sg.edu.nus.comp.cs4218.impl.util.StringUtils;
 
 public class LsApplicationHelper {
     private final static String PATH_CURR_DIR = STRING_CURR_DIR + CHAR_FILE_SEP;

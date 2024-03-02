@@ -1,11 +1,11 @@
 package sg.edu.nus.comp.cs4218.impl.parser;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static sg.edu.nus.comp.cs4218.impl.parser.ArgsParser.ILLEGAL_FLAG_MSG;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
 import java.util.Set;
@@ -20,11 +20,13 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 import sg.edu.nus.comp.cs4218.exception.InvalidArgsException;
 
+
 public class TeeArgsParserTest {
 
-    private final VALID_FLAG ='a';
+    private final Set<Character> VALID_FLAGS = Set.of('a');
     private TeeArgsParser teeArgsParser;
 
+    @SuppressWarnings("PMD.AvoidDuplicateLiterals")
     private static Stream<Arguments> validSyntax() {
         return Stream.of(
                 Arguments.of((Object) new String[]{"-a"}),
@@ -49,18 +51,18 @@ public class TeeArgsParserTest {
 
     @Test
     void parse_ValidFlag_ReturnsGivenMatchingFlag() {
-        teeArgsParser.parse("-a");
         assertDoesNotThrow(() -> teeArgsParser.parse("-a"));
-        assertFalse(teeArgsParser.flags.isEmpty());
+        assertEquals(VALID_FLAGS, teeArgsParser.flags, "Flags do not match");
     }
 
     @ParameterizedTest
-    @ValueSource(Strings = {"-b", "-1", "-!", "-A", "--"})
+    @ValueSource(strings = {"-b", "-1", "-!", "-A", "--"})
     void parse_InvalidFlag_ThrowsInvalidArgsException(String args) {
-        Throwable result = assertThrows(InvalidArgsException.class, () -> {
+        String expectedMsg = "illegal option -- " + args.charAt(1);
+        InvalidArgsException exception = assertThrowsExactly(InvalidArgsException.class, () -> {
             teeArgsParser.parse(args);
         });
-        assertEquals(ILLEGAL_FLAG_MSG + args.charAt(1), result.getMessage());
+        assertEquals(expectedMsg, exception.getMessage());
     }
 
     @ParameterizedTest
@@ -95,7 +97,7 @@ public class TeeArgsParserTest {
     }
 
     @Test
-    void getFileNames_OneNonFlagArg_ReturnsOneNonFlagArg() throws InvalidArgsException {
+    void getFileNames_OneNonFlagArg_ReturnsOneNonFlagArg() {
         assertDoesNotThrow(() -> teeArgsParser.parse("example.txt"));
         List<String> result = teeArgsParser.getFileNames();
         List<String> expected = List.of("example");
