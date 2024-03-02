@@ -29,7 +29,8 @@ import sg.edu.nus.comp.cs4218.app.GrepInterface;
 import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
 import sg.edu.nus.comp.cs4218.exception.GrepException;
 
-public class GrepApplication implements GrepInterface {
+public class GrepApplication implements GrepInterface { //NOPMD - suppressed GodClass - EF2 not implemented
+
     public static final String INVALID_PATTERN = "Invalid pattern syntax";
     public static final String EMPTY_PATTERN = "Pattern should not be empty.";
     public static final String IS_DIRECTORY = "Is a directory";
@@ -58,10 +59,10 @@ public class GrepApplication implements GrepInterface {
 
         String results = "";
         if (isCountLines) {
-            results = countResults.toString() + STRING_NEWLINE;
+            results = countResults + STRING_NEWLINE;
         } else {
             if (!lineResults.toString().isEmpty()) {
-                results = lineResults.toString() + STRING_NEWLINE;
+                results = lineResults + STRING_NEWLINE;
             }
         }
         return results;
@@ -167,7 +168,7 @@ public class GrepApplication implements GrepInterface {
      */
     private String convertPathToSystemPath(String path) {
         String convertedPath = path;
-        String pathIdentifier = "\\" + Character.toString(CHAR_FILE_SEP);
+        String pathIdentifier = "\\" + CHAR_FILE_SEP;
         convertedPath = convertedPath.replaceAll("(\\\\)+", pathIdentifier);
         convertedPath = convertedPath.replaceAll("/+", pathIdentifier);
 
@@ -216,7 +217,7 @@ public class GrepApplication implements GrepInterface {
             results = count + STRING_NEWLINE;
         } else {
             if (!stringJoiner.toString().isEmpty()) {
-                results = stringJoiner.toString() + STRING_NEWLINE;
+                results = stringJoiner + STRING_NEWLINE;
             }
         }
         return results;

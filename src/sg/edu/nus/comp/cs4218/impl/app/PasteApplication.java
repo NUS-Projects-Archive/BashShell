@@ -89,28 +89,28 @@ public class PasteApplication implements PasteInterface {
         }
 
         if (isRedirect) {
-            IORedirectionHandler redirectionHandler = new IORedirectionHandler(nonFlagArgs, stdin, stdout, new ArgumentResolver());
+            IORedirectionHandler redirHandler = new IORedirectionHandler(nonFlagArgs, stdin, stdout, new ArgumentResolver());
             try {
-                redirectionHandler.extractRedirOptions();
+                redirHandler.extractRedirOptions();
             } catch (Exception e) {
                 throw new PasteException(e.getMessage());
             }
 
-            List<String> noRedirectionArgsList = redirectionHandler.getNoRedirArgsList();
-            if (noRedirectionArgsList.size() > 0) {
-                if (nonFlagArgs.contains("-")) {
-                    result = mergeFileAndStdin(isSerial, stdin, noRedirectionArgsList.toArray(new String[0]));
-                } else {
-                    result = mergeFile(isSerial, noRedirectionArgsList.toArray(new String[0]));
-                }
+            List<String> noRedirArgsList = redirHandler.getNoRedirArgsList();
+            if (noRedirArgsList.isEmpty()) {
+                result = mergeStdin(isSerial, redirHandler.getInputStream());
             } else {
-                result = mergeStdin(isSerial, redirectionHandler.getInputStream());
+                if (nonFlagArgs.contains("-")) {
+                    result = mergeFileAndStdin(isSerial, stdin, noRedirArgsList.toArray(new String[0]));
+                } else {
+                    result = mergeFile(isSerial, noRedirArgsList.toArray(new String[0]));
+                }
             }
 
             try {
                 if (nonFlagArgs.contains(">")) {
                     byte[] bytes = result.getBytes();
-                    redirectionHandler.getOutputStream().write(bytes);
+                    redirHandler.getOutputStream().write(bytes);
                 } else {
                     stdout.write(result.getBytes());
                     stdout.write(STRING_NEWLINE.getBytes());
@@ -235,9 +235,9 @@ public class PasteApplication implements PasteInterface {
         }
 
         if (numOfDash != 0) {
-            maxFileLength = Math.max(maxFileLength, (int) (data.size() / numOfDash));
+            maxFileLength = Math.max(maxFileLength, data.size() / numOfDash);
             if (data.size() % numOfDash != 0) {
-                maxFileLength = Math.max(maxFileLength, (int) (data.size() / numOfDash) + 1);
+                maxFileLength = Math.max(maxFileLength, (data.size() / numOfDash) + 1);
             }
         }
 

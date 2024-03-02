@@ -23,20 +23,20 @@ class EchoApplicationTest {
     private static final String ECHO_EXCEPTION = "echo: ";
     private EchoApplication app;
 
-    private OutputStream exceptionThrowingOutputStream;
+    private OutputStream outThrowException;
     private OutputStream out;
 
     @BeforeEach
     public void setUp() throws IOException {
         app = new EchoApplication();
-        exceptionThrowingOutputStream = mock(OutputStream.class);
-        doThrow(new IOException()).when(exceptionThrowingOutputStream).write(any(byte[].class));
+        outThrowException = mock(OutputStream.class);
+        doThrow(new IOException()).when(outThrowException).write(any(byte[].class));
         out = new ByteArrayOutputStream();
     }
 
     @AfterEach
     void tearDown() throws IOException {
-        exceptionThrowingOutputStream.close();
+        outThrowException.close();
         out.close();
     }
 

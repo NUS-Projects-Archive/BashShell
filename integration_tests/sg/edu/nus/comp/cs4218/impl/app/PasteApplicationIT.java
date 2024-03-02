@@ -26,7 +26,7 @@ import sg.edu.nus.comp.cs4218.impl.util.StringUtils;
 public class PasteApplicationIT {
     private static final String FILE_NAME_A = "A.txt";
     private static final String FILE_NAME_B = "B.txt";
-    private static final String PASTE_EXCEPTION_MSG = "paste: ";
+    private static final String PASTE_EX_MSG = "paste: ";
     private static final String STDIN = "-";
     private PasteApplication app;
     private ByteArrayOutputStream outputStream;
@@ -59,7 +59,7 @@ public class PasteApplicationIT {
         Throwable result = assertThrows(PasteException.class, () -> {
             app.run(new String[]{filePathA}, null, System.out);
         });
-        assertEquals(PASTE_EXCEPTION_MSG + ERR_NO_ISTREAM, result.getMessage());
+        assertEquals(PASTE_EX_MSG + ERR_NO_ISTREAM, result.getMessage());
     }
 
     @Test
@@ -67,7 +67,7 @@ public class PasteApplicationIT {
         Throwable result = assertThrows(PasteException.class, () -> {
             app.run(new String[]{filePathA}, System.in, null);
         });
-        assertEquals(PASTE_EXCEPTION_MSG + ERR_NULL_STREAMS, result.getMessage());
+        assertEquals(PASTE_EX_MSG + ERR_NULL_STREAMS, result.getMessage());
     }
 
     @Test

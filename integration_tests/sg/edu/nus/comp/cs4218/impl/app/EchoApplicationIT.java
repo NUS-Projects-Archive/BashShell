@@ -22,23 +22,23 @@ import sg.edu.nus.comp.cs4218.exception.EchoException;
 @SuppressWarnings("PMD.ClassNamingConventions")
 public class EchoApplicationIT {
 
-    private final String ECHO_EXCEPTION_MSG = "echo: ";
+    private static final String ECHO_EX_MSG = "echo: ";
     private EchoApplication app;
 
-    private OutputStream exceptionThrowingOutputStream;
+    private OutputStream outThrowException;
     private OutputStream out;
 
     @BeforeEach
     public void setUp() throws IOException {
         app = new EchoApplication();
-        exceptionThrowingOutputStream = mock(OutputStream.class);
-        doThrow(new IOException()).when(exceptionThrowingOutputStream).write(any(byte[].class));
+        outThrowException = mock(OutputStream.class);
+        doThrow(new IOException()).when(outThrowException).write(any(byte[].class));
         out = new ByteArrayOutputStream();
     }
 
     @AfterEach
     void tearDown() throws IOException {
-        exceptionThrowingOutputStream.close();
+        outThrowException.close();
         out.close();
     }
 
@@ -47,15 +47,15 @@ public class EchoApplicationIT {
         Throwable result = assertThrows(EchoException.class, () -> {
             app.run(new String[]{"A", "B", "C"}, null, null);
         });
-        assertEquals(ECHO_EXCEPTION_MSG + ERR_NO_OSTREAM, result.getMessage());
+        assertEquals(ECHO_EX_MSG + ERR_NO_OSTREAM, result.getMessage());
     }
 
     @Test
     void run_IOExceptionWhenWritingByteBuffer_ThrowsEchoException() {
         Throwable result = assertThrows(EchoException.class, () -> {
-            app.run(new String[]{"A", "B", "C"}, null, exceptionThrowingOutputStream);
+            app.run(new String[]{"A", "B", "C"}, null, outThrowException);
         });
-        assertEquals(ECHO_EXCEPTION_MSG + ERR_IO_EXCEPTION, result.getMessage());
+        assertEquals(ECHO_EX_MSG + ERR_IO_EXCEPTION, result.getMessage());
     }
 
     @Test

@@ -25,6 +25,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 import sg.edu.nus.comp.cs4218.exception.CatException;
 
+@SuppressWarnings("PMD.ClassNamingConventions")
 public class CatApplicationIT {
 
     private CatApplication app;
