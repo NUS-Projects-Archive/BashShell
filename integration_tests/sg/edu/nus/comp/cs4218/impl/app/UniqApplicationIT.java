@@ -28,13 +28,13 @@ public class UniqApplicationIT {
 
     @BeforeEach
     void setUp() {
-        this.app = new UniqApplication();
-        this.outputStream = new ByteArrayOutputStream();
+        app = new UniqApplication();
+        outputStream = new ByteArrayOutputStream();
     }
 
     @AfterEach
     void tearDown() throws IOException {
-        this.outputStream.close();
+        outputStream.close();
     }
 
     @Test
@@ -47,8 +47,8 @@ public class UniqApplicationIT {
                 STR_ALICE + STRING_NEWLINE +
                 STR_BOB + STRING_NEWLINE;
 
-        assertDoesNotThrow(() -> this.app.run(args, null, this.outputStream)); // When
-        assertEquals(expected, this.outputStream.toString()); // Then
+        assertDoesNotThrow(() -> app.run(args, null, outputStream)); // When
+        assertEquals(expected, outputStream.toString()); // Then
     }
 
     @Test
@@ -61,8 +61,8 @@ public class UniqApplicationIT {
                 "1 Alice" + STRING_NEWLINE +
                 "1 Bob" + STRING_NEWLINE;
 
-        assertDoesNotThrow(() -> this.app.run(args, null, this.outputStream)); // When
-        assertEquals(expected, this.outputStream.toString()); // Then
+        assertDoesNotThrow(() -> app.run(args, null, outputStream)); // When
+        assertEquals(expected, outputStream.toString()); // Then
     }
 
     @Test
@@ -72,8 +72,8 @@ public class UniqApplicationIT {
         final String expected = STR_HELLO_WORLD + STRING_NEWLINE +
                 STR_ALICE + STRING_NEWLINE;
 
-        assertDoesNotThrow(() -> this.app.run(args, null, this.outputStream)); // When
-        assertEquals(expected, this.outputStream.toString()); // Then
+        assertDoesNotThrow(() -> app.run(args, null, outputStream)); // When
+        assertEquals(expected, outputStream.toString()); // Then
     }
 
     @Test
@@ -85,8 +85,8 @@ public class UniqApplicationIT {
                 STR_ALICE + STRING_NEWLINE +
                 STR_ALICE + STRING_NEWLINE;
 
-        assertDoesNotThrow(() -> this.app.run(args, null, this.outputStream)); // When
-        assertEquals(expected, this.outputStream.toString()); // Then
+        assertDoesNotThrow(() -> app.run(args, null, outputStream)); // When
+        assertEquals(expected, outputStream.toString()); // Then
     }
 
     @Test
@@ -99,8 +99,8 @@ public class UniqApplicationIT {
                 STR_ALICE + STRING_NEWLINE +
                 STR_ALICE + STRING_NEWLINE;
 
-        assertDoesNotThrow(() -> this.app.run(args, null, this.outputStream)); // When
-        assertEquals(expected, this.outputStream.toString()); // Then
+        assertDoesNotThrow(() -> app.run(args, null, outputStream)); // When
+        assertEquals(expected, outputStream.toString()); // Then
     }
 
     @Test
@@ -110,8 +110,8 @@ public class UniqApplicationIT {
         final String expected = "2 Hello World" + STRING_NEWLINE +
                 "2 Alice" + STRING_NEWLINE;
 
-        assertDoesNotThrow(() -> this.app.run(args, null, this.outputStream)); // When
-        assertEquals(expected, this.outputStream.toString()); // Then
+        assertDoesNotThrow(() -> app.run(args, null, outputStream)); // When
+        assertEquals(expected, outputStream.toString()); // Then
     }
 
     @Test
@@ -120,7 +120,7 @@ public class UniqApplicationIT {
         final String[] args = {"-cD", TEST_INPUT_FILE};
         final String expectedMessage = "uniq: printing all duplicated lines and repeat counts is meaningless";
 
-        Throwable thrown = assertThrows(UniqException.class, () -> this.app.run(args, null, null)); // When
+        Throwable thrown = assertThrows(UniqException.class, () -> app.run(args, null, null)); // When
         assertEquals(expectedMessage, thrown.getMessage()); // Then
     }
 }

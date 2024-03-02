@@ -16,12 +16,12 @@ import sg.edu.nus.comp.cs4218.Environment;
 public final class RegexArgument {
     private final StringBuilder plaintext;
     private final StringBuilder regex;
-    private boolean isRegex;
+    private boolean hasAsterisk;
 
     public RegexArgument() {
         this.plaintext = new StringBuilder();
         this.regex = new StringBuilder();
-        this.isRegex = false;
+        this.hasAsterisk = false;
     }
 
     public RegexArgument(String str) {
@@ -31,10 +31,10 @@ public final class RegexArgument {
 
     // Used for `find` command.
     // `text` here corresponds to the folder that we want to look in.
-    public RegexArgument(String str, String text, boolean isRegex) {
+    public RegexArgument(String str, String text, boolean hasAsterisk) {
         this();
         this.plaintext.append(text);
-        this.isRegex = isRegex;
+        this.hasAsterisk = hasAsterisk;
         this.regex.append(".*"); // We want to match filenames
         for (char c : str.toCharArray()) {
             if (c == CHAR_ASTERISK) {
@@ -52,14 +52,14 @@ public final class RegexArgument {
 
     public void appendAsterisk() {
         plaintext.append(CHAR_ASTERISK);
-        regex.append("[^" + StringUtils.fileSeparator() + "]*");
-        isRegex = true;
+        regex.append("[^").append(StringUtils.fileSeparator()).append("]*");
+        hasAsterisk = true;
     }
 
     public void merge(RegexArgument other) {
         plaintext.append(other.plaintext);
         regex.append(other.regex);
-        isRegex = isRegex || other.isRegex;
+        hasAsterisk = this.hasAsterisk || other.hasAsterisk;
     }
 
     public void merge(String str) {
@@ -70,7 +70,7 @@ public final class RegexArgument {
     public List<String> globFiles() {
         List<String> globbedFiles = new LinkedList<>();
 
-        if (isRegex) {
+        if (hasAsterisk) {
             Pattern regexPattern = Pattern.compile(regex.toString());
             String dir = "";
             String[] tokens = plaintext.toString().replaceAll("\\\\", "/").split("/");
@@ -138,7 +138,7 @@ public final class RegexArgument {
     }
 
     public boolean isRegex() {
-        return isRegex;
+        return hasAsterisk;
     }
 
     public boolean isEmpty() {

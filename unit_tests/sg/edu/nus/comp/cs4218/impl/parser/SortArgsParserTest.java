@@ -59,7 +59,7 @@ class SortArgsParserTest {
 
     @BeforeEach
     void setUp() {
-        this.sortArgsParser = new SortArgsParser();
+        sortArgsParser = new SortArgsParser();
     }
 
     @ParameterizedTest

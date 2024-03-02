@@ -74,12 +74,12 @@ class LsArgsParserTest {
 
     @BeforeEach
     void setUp() {
-        this.lsArgsParser = new LsArgsParser();
+        lsArgsParser = new LsArgsParser();
     }
 
     /**
      * Tests if parse sets the flags and non-flag arguments correctly.
-     * 
+     *
      * @param args          Arguments to parse.
      * @param expectedFlags Expected flags.
      * @param expectedNFA   Expected non-flag arguments.
@@ -95,7 +95,7 @@ class LsArgsParserTest {
 
     /**
      * Tests if parse throws InvalidArgsException when given invalid syntax.
-     * 
+     *
      * @param args Arguments to parse.
      */
     @ParameterizedTest
@@ -106,7 +106,7 @@ class LsArgsParserTest {
 
     /**
      * Tests if isRecursive returns true when -R flag is present in args.
-     * 
+     *
      * @param args Arguments with -R to parse.
      */
     @ParameterizedTest
@@ -118,7 +118,7 @@ class LsArgsParserTest {
 
     /**
      * Tests if isRecursive returns false when -R flag is not present in args.
-     * 
+     *
      * @param args Arguments without -R to parse.
      */
     @ParameterizedTest
@@ -139,7 +139,7 @@ class LsArgsParserTest {
 
     /**
      * Tests if isSortByExt returns true when -X flag is present in args.
-     * 
+     *
      * @param args Arguments with -X to parse.
      */
     @ParameterizedTest
@@ -151,7 +151,7 @@ class LsArgsParserTest {
 
     /**
      * Tests if isSortByExt returns false when -X flag is not present in args.
-     * 
+     *
      * @param args Arguments without -X to parse.
      */
     @ParameterizedTest

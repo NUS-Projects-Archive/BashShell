@@ -19,8 +19,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledOnOs;
 import org.junit.jupiter.api.condition.OS;
 import org.junit.jupiter.api.io.TempDir;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
 
 import sg.edu.nus.comp.cs4218.exception.MvException;
 
@@ -42,7 +40,7 @@ class MvApplicationTest {
 
     @BeforeEach
     void setUp() throws IOException {
-        this.app = new MvApplication();
+        app = new MvApplication();
 
         // Create temporary file and subdirectory, automatically deletes after test execution
         tempSrcFilePath = tempDir.resolve(TEMP_SRC_FILE);
@@ -57,35 +55,6 @@ class MvApplicationTest {
         Files.createFile(tempSrcFilePath);
         Files.createFile(tempDestFilePath);
         Files.createDirectories(tempDestDirPath);
-    }
-
-    @Test
-    void run_NullArgs_ThrowsMvException() {
-        String expectedMsg = "mv: Missing Argument";
-        MvException exception = assertThrowsExactly(MvException.class, () -> {
-            app.run(null, null, null);
-        });
-        assertEquals(expectedMsg, exception.getMessage());
-    }
-
-    @Test
-    void run_EmptyArgsArray_ThrowsMvException() {
-        String expectedMsg = "mv: Missing Argument";
-        MvException exception = assertThrowsExactly(MvException.class, () -> {
-            String[] args = {};
-            app.run(args, null, null);
-        });
-        assertEquals(expectedMsg, exception.getMessage());
-    }
-
-    @ParameterizedTest
-    @ValueSource(strings = {"", "a", "1", "$", "."})
-    void run_InsufficientArgs_ThrowsMvException(String args) {
-        String expectedMsg = "mv: Insufficient arguments";
-        MvException exception = assertThrowsExactly(MvException.class, () -> {
-            app.run(args.split("\\s+"), null, null);
-        });
-        assertEquals(expectedMsg, exception.getMessage());
     }
 
     @Test

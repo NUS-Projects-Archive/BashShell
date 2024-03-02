@@ -29,7 +29,8 @@ import sg.edu.nus.comp.cs4218.app.GrepInterface;
 import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
 import sg.edu.nus.comp.cs4218.exception.GrepException;
 
-public class GrepApplication implements GrepInterface {
+public class GrepApplication implements GrepInterface { //NOPMD - suppressed GodClass - EF2 not implemented
+
     public static final String INVALID_PATTERN = "Invalid pattern syntax";
     public static final String EMPTY_PATTERN = "Pattern should not be empty.";
     public static final String IS_DIRECTORY = "Is a directory";
@@ -58,10 +59,10 @@ public class GrepApplication implements GrepInterface {
 
         String results = "";
         if (isCountLines) {
-            results = countResults.toString() + STRING_NEWLINE;
+            results = countResults + STRING_NEWLINE;
         } else {
             if (!lineResults.toString().isEmpty()) {
-                results = lineResults.toString() + STRING_NEWLINE;
+                results = lineResults + STRING_NEWLINE;
             }
         }
         return results;
@@ -122,17 +123,17 @@ public class GrepApplication implements GrepInterface {
                 }
                 reader.close();
             } catch (PatternSyntaxException pse) {
-                throw new GrepException(ERR_INVALID_REGEX);
+                throw new GrepException(ERR_INVALID_REGEX, pse);
             } catch (FileNotFoundException e) {
-                throw new GrepException(ERR_FILE_NOT_FOUND);
+                throw new GrepException(ERR_FILE_NOT_FOUND, e);
             } catch (IOException e) {
-                throw new GrepException(ERR_IO_EXCEPTION);
+                throw new GrepException(ERR_IO_EXCEPTION, e);
             } finally {
                 if (reader != null) {
                     try {
                         reader.close();
                     } catch (IOException e) {
-                        throw new GrepException(ERR_IO_EXCEPTION);
+                        throw new GrepException(ERR_IO_EXCEPTION, e);
                     }
                 }
             }
@@ -167,7 +168,7 @@ public class GrepApplication implements GrepInterface {
      */
     private String convertPathToSystemPath(String path) {
         String convertedPath = path;
-        String pathIdentifier = "\\" + Character.toString(CHAR_FILE_SEP);
+        String pathIdentifier = "\\" + CHAR_FILE_SEP;
         convertedPath = convertedPath.replaceAll("(\\\\)+", pathIdentifier);
         convertedPath = convertedPath.replaceAll("/+", pathIdentifier);
 
@@ -202,13 +203,13 @@ public class GrepApplication implements GrepInterface {
             }
             reader.close();
         } catch (PatternSyntaxException pse) {
-            throw new GrepException(ERR_INVALID_REGEX);
+            throw new GrepException(ERR_INVALID_REGEX, pse);
         } catch (NullPointerException npe) {
             // try-catch not catching more specifically, anything that is not supposed to be null including stdin
             // will execute this line, which is wrong.
-            throw new GrepException(ERR_FILE_NOT_FOUND);
+            throw new GrepException(ERR_FILE_NOT_FOUND, npe);
         } catch (IOException e) {
-            throw new GrepException(ERR_IO_EXCEPTION);
+            throw new GrepException(ERR_IO_EXCEPTION, e);
         }
 
         String results = "";
@@ -216,7 +217,7 @@ public class GrepApplication implements GrepInterface {
             results = count + STRING_NEWLINE;
         } else {
             if (!stringJoiner.toString().isEmpty()) {
-                results = stringJoiner.toString() + STRING_NEWLINE;
+                results = stringJoiner + STRING_NEWLINE;
             }
         }
         return results;
@@ -253,7 +254,7 @@ public class GrepApplication implements GrepInterface {
         } catch (GrepException grepException) {
             throw grepException;
         } catch (Exception e) {
-            throw new GrepException(e.getMessage());
+            throw new GrepException(e.getMessage(), e);
         }
     }
 

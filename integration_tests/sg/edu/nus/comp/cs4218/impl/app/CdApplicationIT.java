@@ -40,7 +40,7 @@ class CdApplicationIT { //NOPMD - Follows naming convention
 
     private static String childDirAbsPath;
 
-    private static CdApplication cdApplication;
+    private static CdApplication app;
 
     static Stream<Arguments> validDirs() {
         return Stream.of(
@@ -55,7 +55,7 @@ class CdApplicationIT { //NOPMD - Follows naming convention
 
     @BeforeAll
     static void setUp() {
-        cdApplication = new CdApplication();
+        app = new CdApplication();
 
         parentDirAbsPath = parentDir.toString();
 
@@ -85,7 +85,7 @@ class CdApplicationIT { //NOPMD - Follows naming convention
         InputStream mockInputStream = mock(InputStream.class);
         OutputStream mockOutputStream = mock(OutputStream.class);
 
-        CdException result = assertThrows(CdException.class, () -> cdApplication.run(null, mockInputStream, mockOutputStream));
+        CdException result = assertThrows(CdException.class, () -> app.run(null, mockInputStream, mockOutputStream));
         assertEquals("cd: " + ERR_NULL_ARGS, result.getMessage());
     }
 
@@ -97,7 +97,7 @@ class CdApplicationIT { //NOPMD - Follows naming convention
         InputStream mockInputStream = mock(InputStream.class);
         OutputStream mockOutputStream = mock(OutputStream.class);
 
-        CdException result = assertThrows(CdException.class, () -> cdApplication.run(new String[]{"a", "b"},
+        CdException result = assertThrows(CdException.class, () -> app.run(new String[]{"a", "b"},
                 mockInputStream, mockOutputStream));
         assertEquals(String.format("cd: %s", ERR_TOO_MANY_ARGS), result.getMessage());
     }
@@ -110,7 +110,7 @@ class CdApplicationIT { //NOPMD - Follows naming convention
         InputStream mockInputStream = mock(InputStream.class);
         OutputStream mockOutputStream = mock(OutputStream.class);
 
-        assertDoesNotThrow(() -> cdApplication.run(new String[]{}, mockInputStream, mockOutputStream));
+        assertDoesNotThrow(() -> app.run(new String[]{}, mockInputStream, mockOutputStream));
         assertEquals(Environment.currentDirectory, Environment.currentDirectory);
     }
 
@@ -124,7 +124,7 @@ class CdApplicationIT { //NOPMD - Follows naming convention
         InputStream mockInputStream = mock(InputStream.class);
         OutputStream mockOutputStream = mock(OutputStream.class);
 
-        assertDoesNotThrow(() -> cdApplication.run(new String[]{validDir}, mockInputStream, mockOutputStream));
+        assertDoesNotThrow(() -> app.run(new String[]{validDir}, mockInputStream, mockOutputStream));
         assertEquals(expectedDir.toString(), Environment.currentDirectory);
     }
 }

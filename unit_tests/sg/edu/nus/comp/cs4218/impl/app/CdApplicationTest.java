@@ -33,16 +33,16 @@ class CdApplicationTest {
     private static final String DIR_NAME = "tempDir";
     private static final String CHILD_DIR_NAME = "tempChildDir";
 
-    @TempDir
-    static Path parentDir;
-    private static String parentDirAbsPath;
-
     private static Path dir;
     private static String dirAbsPath;
 
     private static String childDirAbsPath;
 
     private static CdApplication cdApplication;
+
+    @TempDir
+    private static Path parentDir;
+    private static String parentDirAbsPath;
 
     static Stream<Arguments> validDirs() {
         return Stream.of(

@@ -4,16 +4,6 @@ import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_NOT_FOUND
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_INVALID_FLAG;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IO_EXCEPTION;
 
-import sg.edu.nus.comp.cs4218.app.CatInterface;
-import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
-import sg.edu.nus.comp.cs4218.exception.CatException;
-import sg.edu.nus.comp.cs4218.exception.InvalidArgsException;
-import sg.edu.nus.comp.cs4218.exception.ShellException;
-import sg.edu.nus.comp.cs4218.impl.parser.CatArgsParser;
-import sg.edu.nus.comp.cs4218.impl.util.ArgumentResolver;
-import sg.edu.nus.comp.cs4218.impl.util.IORedirectionHandler;
-import sg.edu.nus.comp.cs4218.impl.util.StringUtils;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -23,6 +13,16 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.util.List;
+
+import sg.edu.nus.comp.cs4218.app.CatInterface;
+import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
+import sg.edu.nus.comp.cs4218.exception.CatException;
+import sg.edu.nus.comp.cs4218.exception.InvalidArgsException;
+import sg.edu.nus.comp.cs4218.exception.ShellException;
+import sg.edu.nus.comp.cs4218.impl.parser.CatArgsParser;
+import sg.edu.nus.comp.cs4218.impl.util.ArgumentResolver;
+import sg.edu.nus.comp.cs4218.impl.util.IORedirectionHandler;
+import sg.edu.nus.comp.cs4218.impl.util.StringUtils;
 
 public class CatApplication implements CatInterface {
     public static final String ERR_WRITE_STREAM = "Could not write to output stream";
@@ -43,7 +43,7 @@ public class CatApplication implements CatInterface {
         try {
             parser.parse(args);
         } catch (InvalidArgsException e) {
-            throw new CatException(ERR_INVALID_FLAG + " " + e.getMessage());
+            throw new CatException(ERR_INVALID_FLAG + " " + e.getMessage(), e);
         }
         final Boolean isLineNumber = parser.isLineNumber();
         final List<String> nonFlagArgs = parser.getNonFlagArgs();
@@ -55,7 +55,7 @@ public class CatApplication implements CatInterface {
             try {
                 stdout.write(output.getBytes());
             } catch (IOException e) {
-                throw new CatException(ERR_WRITE_STREAM + " " + e.getMessage());
+                throw new CatException(ERR_WRITE_STREAM + " " + e.getMessage(), e);
             }
         } else {
             // all other cases
@@ -63,21 +63,21 @@ public class CatApplication implements CatInterface {
             try {
                 redirHandler.extractRedirOptions();
             } catch (ShellException | FileNotFoundException | AbstractApplicationException e) {
-                throw new CatException(e.getMessage());
+                throw new CatException(e.getMessage(), e);
             }
             List<String> noRedirArgsList = redirHandler.getNoRedirArgsList();
             String[] noRedirArgsArray = noRedirArgsList.toArray(String[]::new);
             try {
-                if (noRedirArgsList.size() > 0) {
+                if (noRedirArgsList.isEmpty()) {
+                    // Input redirect cannot be ignored, get from redirect handler
+                    output = catStdin(isLineNumber, redirHandler.getInputStream());
+                } else {
                     // Input redirect is not relevant
                     if (nonFlagArgs.contains("-")) {
                         output = catFileAndStdin(isLineNumber, stdin, noRedirArgsArray);
                     } else {
                         output = catFiles(isLineNumber, noRedirArgsArray);
                     }
-                } else {
-                    // Input redirect cannot be ignored, get from redirect handler
-                    output = catStdin(isLineNumber, redirHandler.getInputStream());
                 }
                 byte[] bytes = output.getBytes();
                 if (nonFlagArgs.contains(">")) {
@@ -88,7 +88,7 @@ public class CatApplication implements CatInterface {
                     stdout.write(bytes);
                 }
             } catch (IOException e) {
-                throw new CatException(ERR_WRITE_STREAM + " " + e.getMessage());
+                throw new CatException(ERR_WRITE_STREAM + " " + e.getMessage(), e);
             }
         }
     }
@@ -111,13 +111,13 @@ public class CatApplication implements CatInterface {
                             result.append(StringUtils.STRING_NEWLINE);
                         }
                     } catch (AbstractApplicationException | ShellException | FileNotFoundException e) {
-                        throw new CatException(ERR_FILE_NOT_FOUND);
+                        throw new CatException(ERR_FILE_NOT_FOUND, e);
                     }
                 } else {
                     result.append(readFile(isLineNumber, new File(fileName)));
                 }
             } catch (IOException e) {
-                throw new CatException(ERR_IO_EXCEPTION + " " + e.getMessage());
+                throw new CatException(ERR_IO_EXCEPTION + " " + e.getMessage(), e);
             }
         }
         return result.toString();
@@ -150,13 +150,13 @@ public class CatApplication implements CatInterface {
                             result.append(StringUtils.STRING_NEWLINE);
                         }
                     } catch (AbstractApplicationException | ShellException | FileNotFoundException e) {
-                        throw new CatException(ERR_FILE_NOT_FOUND);
+                        throw new CatException(ERR_FILE_NOT_FOUND, e);
                     }
                 } else {
                     result.append(readFile(isLineNumber, new File(fileName)));
                 }
             } catch (IOException e) {
-                throw new CatException(ERR_IO_EXCEPTION + " " + e.getMessage());
+                throw new CatException(ERR_IO_EXCEPTION + " " + e.getMessage(), e);
             }
         }
         return result.toString();
@@ -176,7 +176,7 @@ public class CatApplication implements CatInterface {
                     userInput.append(StringUtils.STRING_NEWLINE);
                 }
             } catch (IOException e) {
-                throw new CatException(ERR_IO_EXCEPTION + " " + e.getMessage());
+                throw new CatException(ERR_IO_EXCEPTION + " " + e.getMessage(), e);
             }
             if (isLineNumber) {
                 userInput.append(lineNumber).append(' ');
@@ -200,7 +200,7 @@ public class CatApplication implements CatInterface {
                 content.append(line).append(StringUtils.STRING_NEWLINE);
             }
         } catch (FileNotFoundException e) {
-            throw new CatException(ERR_FILE_NOT_FOUND + " " + e.getMessage());
+            throw new CatException(ERR_FILE_NOT_FOUND + " " + e.getMessage(), e);
         }
         return content.toString();
     }

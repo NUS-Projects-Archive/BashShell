@@ -26,9 +26,9 @@ import sg.edu.nus.comp.cs4218.impl.util.StringUtils;
 public class PasteApplicationIT {
     private static final String FILE_NAME_A = "A.txt";
     private static final String FILE_NAME_B = "B.txt";
-    private static final String PASTE_EXCEPTION_MSG = "paste: ";
+    private static final String PASTE_EX_MSG = "paste: ";
     private static final String STDIN = "-";
-    private PasteApplication pasteApplication;
+    private PasteApplication app;
     private ByteArrayOutputStream outputStream;
 
     @TempDir
@@ -38,8 +38,8 @@ public class PasteApplicationIT {
 
     @BeforeEach
     void setUp() throws IOException {
-        this.pasteApplication = new PasteApplication();
-        this.outputStream = new ByteArrayOutputStream();
+        app = new PasteApplication();
+        outputStream = new ByteArrayOutputStream();
 
         Path pathA = pasteTestDir.resolve(FILE_NAME_A);
         Path pathB = pasteTestDir.resolve(FILE_NAME_B);
@@ -57,17 +57,17 @@ public class PasteApplicationIT {
     @Test
     void run_NullStdin_ThrowsPasteException() {
         Throwable result = assertThrows(PasteException.class, () -> {
-            pasteApplication.run(new String[]{filePathA}, null, System.out);
+            app.run(new String[]{filePathA}, null, System.out);
         });
-        assertEquals(PASTE_EXCEPTION_MSG + ERR_NO_ISTREAM, result.getMessage());
+        assertEquals(PASTE_EX_MSG + ERR_NO_ISTREAM, result.getMessage());
     }
 
     @Test
     void run_NullStdout_ThrowsPasteException() {
         Throwable result = assertThrows(PasteException.class, () -> {
-            pasteApplication.run(new String[]{filePathA}, System.in, null);
+            app.run(new String[]{filePathA}, System.in, null);
         });
-        assertEquals(PASTE_EXCEPTION_MSG + ERR_NULL_STREAMS, result.getMessage());
+        assertEquals(PASTE_EX_MSG + ERR_NULL_STREAMS, result.getMessage());
     }
 
     @Test
@@ -77,8 +77,8 @@ public class PasteApplicationIT {
                 StringUtils.STRING_NEWLINE + "D" +
                 StringUtils.STRING_NEWLINE + "E" + StringUtils.STRING_NEWLINE;
 
-        assertDoesNotThrow(() -> this.pasteApplication.run(new String[]{filePathA}, System.in, this.outputStream));
-        assertEquals(expected, this.outputStream.toString());
+        assertDoesNotThrow(() -> app.run(new String[]{filePathA}, System.in, outputStream));
+        assertEquals(expected, outputStream.toString());
     }
 
     @Test
@@ -89,8 +89,8 @@ public class PasteApplicationIT {
                 StringUtils.STRING_NEWLINE + "D" + StringUtils.STRING_TAB + "4" +
                 StringUtils.STRING_NEWLINE + "E" + StringUtils.STRING_TAB + "5" + StringUtils.STRING_NEWLINE;
 
-        assertDoesNotThrow(() -> this.pasteApplication.run(new String[]{filePathA, filePathB}, System.in, this.outputStream));
-        assertEquals(expected, this.outputStream.toString());
+        assertDoesNotThrow(() -> app.run(new String[]{filePathA, filePathB}, System.in, outputStream));
+        assertEquals(expected, outputStream.toString());
     }
 
 
@@ -101,8 +101,8 @@ public class PasteApplicationIT {
                 StringUtils.STRING_TAB + "D" +
                 StringUtils.STRING_TAB + "E" + StringUtils.STRING_NEWLINE;
 
-        assertDoesNotThrow(() -> this.pasteApplication.run(new String[]{filePathA, "-s"}, System.in, this.outputStream));
-        assertEquals(expected, this.outputStream.toString());
+        assertDoesNotThrow(() -> app.run(new String[]{filePathA, "-s"}, System.in, outputStream));
+        assertEquals(expected, outputStream.toString());
     }
 
     @Test
@@ -113,8 +113,8 @@ public class PasteApplicationIT {
                 StringUtils.STRING_TAB + "2" + StringUtils.STRING_TAB + "3" +
                 StringUtils.STRING_TAB + "4" + StringUtils.STRING_TAB + "5" + StringUtils.STRING_NEWLINE;
 
-        assertDoesNotThrow(() -> this.pasteApplication.run(new String[]{filePathA, filePathB, "-s"}, System.in, this.outputStream));
-        assertEquals(expected, this.outputStream.toString());
+        assertDoesNotThrow(() -> app.run(new String[]{filePathA, filePathB, "-s"}, System.in, outputStream));
+        assertEquals(expected, outputStream.toString());
     }
 
     @Test
@@ -125,8 +125,8 @@ public class PasteApplicationIT {
                 StringUtils.STRING_NEWLINE + "E" + StringUtils.STRING_NEWLINE;
 
         try (InputStream inputStream = IOUtils.openInputStream(filePathA)) {
-            assertDoesNotThrow(() -> this.pasteApplication.run(new String[]{}, inputStream, this.outputStream));
-            assertEquals(expected, this.outputStream.toString());
+            assertDoesNotThrow(() -> app.run(new String[]{}, inputStream, outputStream));
+            assertEquals(expected, outputStream.toString());
         } catch (IOException | ShellException e) {
             e.printStackTrace();
         }
@@ -140,8 +140,8 @@ public class PasteApplicationIT {
                 StringUtils.STRING_TAB + "E" + StringUtils.STRING_NEWLINE;
 
         try (InputStream inputStream = IOUtils.openInputStream(filePathA)) {
-            assertDoesNotThrow(() -> this.pasteApplication.run(new String[]{"-s"}, inputStream, this.outputStream));
-            assertEquals(expected, this.outputStream.toString());
+            assertDoesNotThrow(() -> app.run(new String[]{"-s"}, inputStream, outputStream));
+            assertEquals(expected, outputStream.toString());
         } catch (IOException | ShellException e) {
             e.printStackTrace();
         }
@@ -157,8 +157,8 @@ public class PasteApplicationIT {
                 StringUtils.STRING_TAB + StringUtils.STRING_NEWLINE;
 
         try (InputStream inputStream = IOUtils.openInputStream(filePathA)) {
-            assertDoesNotThrow(() -> this.pasteApplication.run(new String[]{STDIN, filePathB, STDIN}, inputStream, this.outputStream));
-            assertEquals(expected, this.outputStream.toString());
+            assertDoesNotThrow(() -> app.run(new String[]{STDIN, filePathB, STDIN}, inputStream, outputStream));
+            assertEquals(expected, outputStream.toString());
         } catch (IOException | ShellException e) {
             e.printStackTrace();
         }
@@ -174,8 +174,8 @@ public class PasteApplicationIT {
                 StringUtils.STRING_NEWLINE;
 
         try (InputStream inputStream = IOUtils.openInputStream(filePathA)) {
-            assertDoesNotThrow(() -> this.pasteApplication.run(new String[]{STDIN, filePathB, STDIN, "-s"}, inputStream, this.outputStream));
-            assertEquals(expected, this.outputStream.toString());
+            assertDoesNotThrow(() -> app.run(new String[]{STDIN, filePathB, STDIN, "-s"}, inputStream, outputStream));
+            assertEquals(expected, outputStream.toString());
         } catch (IOException | ShellException e) {
             e.printStackTrace();
         }

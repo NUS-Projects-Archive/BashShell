@@ -60,51 +60,21 @@ public class ApplicationRunner {
         Application application;
 
         switch (app) {
-            case APP_ECHO:
-                application = new EchoApplication();
-                break;
-            case APP_CD:
-                application = new CdApplication();
-                break;
-            case APP_WC:
-                application = new WcApplication();
-                break;
-            case APP_MKDIR:
-                application = new MkdirApplication();
-                break;
-            case APP_SORT:
-                application = new SortApplication();
-                break;
-            case APP_CAT:
-                application = new CatApplication();
-                break;
-            case APP_EXIT:
-                application = new ExitApplication();
-                break;
-            case APP_LS:
-                application = new LsApplication();
-                break;
-            case APP_PASTE:
-                application = new PasteApplication();
-                break;
-            case APP_UNIQ:
-                application = new UniqApplication();
-                break;
-            case APP_MV:
-                application = new MvApplication();
-                break;
-            case APP_CUT:
-                application = new CutApplication();
-                break;
-            case APP_RM:
-                application = new RmApplication();
-                break;
-            case APP_TEE:
-                application = new TeeApplication();
-                break;
-            case APP_GREP:
-                application = new GrepApplication();
-                break;
+            case APP_ECHO:  application = new EchoApplication();    break;
+            case APP_CD:    application = new CdApplication();      break;
+            case APP_WC:    application = new WcApplication();      break;
+            case APP_MKDIR: application = new MkdirApplication();   break;
+            case APP_SORT:  application = new SortApplication();    break;
+            case APP_CAT:   application = new CatApplication();     break;
+            case APP_EXIT:  application = new ExitApplication();    break;
+            case APP_LS:    application = new LsApplication();      break;
+            case APP_PASTE: application = new PasteApplication();   break;
+            case APP_UNIQ:  application = new UniqApplication();    break;
+            case APP_MV:    application = new MvApplication();      break;
+            case APP_CUT:   application = new CutApplication();     break;
+            case APP_RM:    application = new RmApplication();      break;
+            case APP_TEE:   application = new TeeApplication();     break;
+            case APP_GREP:  application = new GrepApplication();    break;
             default:
                 throw new ShellException(app + ": " + ERR_INVALID_APP);
         }

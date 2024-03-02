@@ -37,7 +37,7 @@ public class WcApplicationIT {
     private static final String NUMBER_FORMAT = " %7d";
     private static final String STRING_FORMAT = " %s";
     private ByteArrayOutputStream outputStream;
-    private WcApplication wcApplication;
+    private WcApplication app;
     @TempDir
     private Path wcTestDir;
     private String filePathA;
@@ -60,8 +60,8 @@ public class WcApplicationIT {
 
     @BeforeEach
     void setUp() throws IOException {
-        this.wcApplication = new WcApplication();
-        this.outputStream = new ByteArrayOutputStream();
+        app = new WcApplication();
+        outputStream = new ByteArrayOutputStream();
 
         Path pathA = wcTestDir.resolve(FILE_NAME_A);
         Path pathB = wcTestDir.resolve(FILE_NAME_B);
@@ -78,7 +78,7 @@ public class WcApplicationIT {
     @Test
     void run_NullStdin_ThrowsWcException() {
         Throwable result = assertThrows(WcException.class, () -> {
-            wcApplication.run(new String[]{filePathA}, null, System.out);
+            app.run(new String[]{filePathA}, null, System.out);
         });
         assertEquals(WC_EXCEPTION_MSG + ERR_NO_ISTREAM, result.getMessage());
     }
@@ -86,7 +86,7 @@ public class WcApplicationIT {
     @Test
     void run_NullStdout_ThrowsWcException() {
         Throwable result = assertThrows(WcException.class, () -> {
-            wcApplication.run(new String[]{filePathA}, System.in, null);
+            app.run(new String[]{filePathA}, System.in, null);
         });
         assertEquals(WC_EXCEPTION_MSG + ERR_NULL_STREAMS, result.getMessage());
     }
@@ -95,7 +95,7 @@ public class WcApplicationIT {
     void run_InvalidFlags_ThrowsException() {
         String expected = WC_EXCEPTION_MSG + "illegal option -- W";
         WcException exception = assertThrowsExactly(WcException.class, () -> {
-            this.wcApplication.run(new String[]{"-W"}, System.in, System.out);
+            app.run(new String[]{"-W"}, System.in, System.out);
         });
         assertEquals(expected, exception.getMessage());
     }
@@ -109,9 +109,9 @@ public class WcApplicationIT {
         expectedList.add("");
         String expected = String.join(STRING_NEWLINE, expectedList);
         assertDoesNotThrow(() -> {
-            this.wcApplication.run(new String[]{NON_EXISTENT_FILE, filePathA}, System.in, this.outputStream);
+            app.run(new String[]{NON_EXISTENT_FILE, filePathA}, System.in, outputStream);
         });
-        assertEquals(expected, this.outputStream.toString());
+        assertEquals(expected, outputStream.toString());
     }
 
 
@@ -125,9 +125,9 @@ public class WcApplicationIT {
         String expected = String.join(STRING_NEWLINE, expectedList);
 
         assertDoesNotThrow(() -> {
-            this.wcApplication.run(new String[]{filePathA, filePathB}, System.in, this.outputStream);
+            app.run(new String[]{filePathA, filePathB}, System.in, outputStream);
         });
-        assertEquals(expected, this.outputStream.toString());
+        assertEquals(expected, outputStream.toString());
     }
 
     @Test
@@ -140,9 +140,9 @@ public class WcApplicationIT {
         String expected = String.join(STRING_NEWLINE, expectedList);
 
         assertDoesNotThrow(() -> {
-            this.wcApplication.run(new String[]{"-c", "-l", filePathA, filePathB}, System.in, this.outputStream);
+            app.run(new String[]{"-c", "-l", filePathA, filePathB}, System.in, outputStream);
         });
-        assertEquals(expected, this.outputStream.toString());
+        assertEquals(expected, outputStream.toString());
     }
 
     @Test
@@ -155,9 +155,9 @@ public class WcApplicationIT {
         String expected = String.join(STRING_NEWLINE, expectedList);
 
         assertDoesNotThrow(() -> {
-            this.wcApplication.run(new String[]{"-w", filePathA, filePathB}, System.in, this.outputStream);
+            app.run(new String[]{"-w", filePathA, filePathB}, System.in, outputStream);
         });
-        assertEquals(expected, this.outputStream.toString());
+        assertEquals(expected, outputStream.toString());
     }
 
     @Test
@@ -169,9 +169,9 @@ public class WcApplicationIT {
 
         try (InputStream inputStream = IOUtils.openInputStream(filePathA)) {
             assertDoesNotThrow(() -> {
-                this.wcApplication.run(new String[]{}, inputStream, this.outputStream);
+                app.run(new String[]{}, inputStream, outputStream);
             });
-            assertEquals(expected, this.outputStream.toString());
+            assertEquals(expected, outputStream.toString());
         } catch (IOException | ShellException e) {
             e.printStackTrace();
         }
@@ -186,9 +186,9 @@ public class WcApplicationIT {
 
         try (InputStream inputStream = IOUtils.openInputStream(filePathA)) {
             assertDoesNotThrow(() -> {
-                this.wcApplication.run(new String[]{"-c", "-w"}, inputStream, this.outputStream);
+                app.run(new String[]{"-c", "-w"}, inputStream, outputStream);
             });
-            assertEquals(expected, this.outputStream.toString());
+            assertEquals(expected, outputStream.toString());
         } catch (IOException | ShellException e) {
             e.printStackTrace();
         }
@@ -205,9 +205,9 @@ public class WcApplicationIT {
 
         try (InputStream inputStream = IOUtils.openInputStream(filePathA)) {
             assertDoesNotThrow(() -> {
-                this.wcApplication.run(new String[]{STDIN, filePathB}, inputStream, this.outputStream);
+                app.run(new String[]{STDIN, filePathB}, inputStream, outputStream);
             });
-            assertEquals(expected, this.outputStream.toString());
+            assertEquals(expected, outputStream.toString());
         } catch (IOException | ShellException e) {
             e.printStackTrace();
         }
@@ -224,9 +224,9 @@ public class WcApplicationIT {
 
         try (InputStream inputStream = IOUtils.openInputStream(filePathA)) {
             assertDoesNotThrow(() -> {
-                this.wcApplication.run(new String[]{"-w", "-l", STDIN, filePathB}, inputStream, this.outputStream);
+                app.run(new String[]{"-w", "-l", STDIN, filePathB}, inputStream, outputStream);
             });
-            assertEquals(expected, this.outputStream.toString());
+            assertEquals(expected, outputStream.toString());
         } catch (IOException | ShellException e) {
             e.printStackTrace();
         }
@@ -243,9 +243,9 @@ public class WcApplicationIT {
 
         try (InputStream inputStream = IOUtils.openInputStream(filePathA)) {
             assertDoesNotThrow(() -> {
-                this.wcApplication.run(new String[]{STDIN, NON_EXISTENT_FILE}, inputStream, this.outputStream);
+                app.run(new String[]{STDIN, NON_EXISTENT_FILE}, inputStream, outputStream);
             });
-            assertEquals(expected, this.outputStream.toString());
+            assertEquals(expected, outputStream.toString());
         } catch (IOException | ShellException e) {
             e.printStackTrace();
         }
@@ -263,8 +263,8 @@ public class WcApplicationIT {
 
         InputStream mockedInputStream = new ByteArrayInputStream("".getBytes());
         assertDoesNotThrow(() -> {
-            this.wcApplication.run(new String[]{STDIN, filePathA}, mockedInputStream, this.outputStream);
+            app.run(new String[]{STDIN, filePathA}, mockedInputStream, outputStream);
         });
-        assertEquals(expected, this.outputStream.toString());
+        assertEquals(expected, outputStream.toString());
     }
 }

@@ -100,7 +100,7 @@ class LsApplicationTest {
      */
     @BeforeEach
     void setUp() {
-        this.app = new LsApplication();
+        app = new LsApplication();
     }
 
     /**

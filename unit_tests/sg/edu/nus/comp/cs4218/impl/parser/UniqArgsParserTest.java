@@ -16,7 +16,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import sg.edu.nus.comp.cs4218.exception.InvalidArgsException;
 
 class UniqArgsParserTest {
-    UniqArgsParser parser;
+    UniqArgsParser uniqArgsParser;
 
     private static Stream<Arguments> validFlags() {
         return Stream.of(
@@ -32,24 +32,24 @@ class UniqArgsParserTest {
 
     @BeforeEach
     void setUp() {
-        parser = new UniqArgsParser();
+        uniqArgsParser = new UniqArgsParser();
     }
 
     @ParameterizedTest
     @MethodSource("validFlags")
     void parse_ValidFlags_CorrectMatchingFlags(String args, boolean... expectedResults) {
-        assertDoesNotThrow(() -> parser.parse(args));
+        assertDoesNotThrow(() -> uniqArgsParser.parse(args));
         assertArrayEquals(expectedResults, new boolean[]{
-                parser.isPrefixWithOccurrencesCount(),
-                parser.isPrintDuplicateOncePerGroup(),
-                parser.isPrintAllDuplicate()
+                uniqArgsParser.isPrefixWithOccurrencesCount(),
+                uniqArgsParser.isPrintDuplicateOncePerGroup(),
+                uniqArgsParser.isPrintAllDuplicate()
         });
     }
 
     @ParameterizedTest
     @ValueSource(strings = {"-C", "--", "-p", "-r"})
     void parse_InvalidFlags_ThrowsInvalidArgsException(String args) {
-        Throwable thrown = assertThrows(InvalidArgsException.class, () -> parser.parse(args));
+        Throwable thrown = assertThrows(InvalidArgsException.class, () -> uniqArgsParser.parse(args));
 
         String illegalFlag = args.substring(1);
         assertEquals(String.format("illegal option -- %s", illegalFlag), thrown.getMessage());

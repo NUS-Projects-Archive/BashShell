@@ -47,7 +47,7 @@ class MvArgsParserTest {
 
     @BeforeEach
     void setUp() {
-        this.mvArgsParser = new MvArgsParser();
+        mvArgsParser = new MvArgsParser();
     }
 
     @ParameterizedTest

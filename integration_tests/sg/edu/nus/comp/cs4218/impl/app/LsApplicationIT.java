@@ -149,7 +149,7 @@ class LsApplicationIT { //NOPMD - suppressed ClassNamingConventions - Following 
      */
     @BeforeEach
     void setUp() {
-        this.app = new LsApplication();
+        app = new LsApplication();
         outContent = new ByteArrayOutputStream();
         System.setOut(new PrintStream(outContent));
     }

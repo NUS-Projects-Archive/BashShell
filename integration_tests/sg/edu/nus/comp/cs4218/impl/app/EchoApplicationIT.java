@@ -1,11 +1,13 @@
 package sg.edu.nus.comp.cs4218.impl.app;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NULL_ARGS;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IO_EXCEPTION;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_OSTREAM;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 
 import java.io.ByteArrayOutputStream;
@@ -18,9 +20,10 @@ import org.junit.jupiter.api.Test;
 
 import sg.edu.nus.comp.cs4218.exception.EchoException;
 
-class EchoApplicationTest {
+@SuppressWarnings("PMD.ClassNamingConventions")
+public class EchoApplicationIT {
 
-    private static final String ECHO_EXCEPTION = "echo: ";
+    private static final String ECHO_EX_MSG = "echo: ";
     private EchoApplication app;
 
     private OutputStream outThrowException;
@@ -41,25 +44,28 @@ class EchoApplicationTest {
     }
 
     @Test
-    void constructResult_NullArgs_ThrowsEchoException() {
+    void run_NullOutputStream_ThrowsEchoException() {
         Throwable result = assertThrows(EchoException.class, () -> {
-            app.constructResult(null);
+            app.run(new String[]{"A", "B", "C"}, null, null);
         });
-        assertEquals(ECHO_EXCEPTION + ERR_NULL_ARGS, result.getMessage());
+        assertEquals(ECHO_EX_MSG + ERR_NO_OSTREAM, result.getMessage());
     }
 
     @Test
-    void constructResult_NoArgs_ReturnsNewLine() throws EchoException {
-        assertEquals(STRING_NEWLINE, app.constructResult(new String[0]));
+    void run_IOExceptionWhenWritingByteBuffer_ThrowsEchoException() {
+        Throwable result = assertThrows(EchoException.class, () -> {
+            app.run(new String[]{"A", "B", "C"}, null, outThrowException);
+        });
+        assertEquals(ECHO_EX_MSG + ERR_IO_EXCEPTION, result.getMessage());
     }
 
     @Test
-    void constructResult_OneArg_JoinsArgAndNewLine() throws EchoException {
-        assertEquals("OneArg" + STRING_NEWLINE, app.constructResult(new String[]{"OneArg"}));
-    }
-
-    @Test
-    void constructResult_ManyArgs_JoinsArgsAndNewLine() throws EchoException {
-        assertEquals("Many" + " " + "Args" + STRING_NEWLINE, app.constructResult(new String[]{"Many", "Args"}));
+    void run_ValidByteBuffers_PrintsCorrectValues() {
+        // Given
+        String[] tokens = new String[]{"Hello", "World!"};
+        // When
+        assertDoesNotThrow(() -> app.run(tokens, null, out));
+        // Then
+        assertEquals("Hello World!" + STRING_NEWLINE, out.toString());
     }
 }

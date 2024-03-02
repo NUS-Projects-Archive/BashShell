@@ -60,7 +60,7 @@ public class PasteApplication implements PasteInterface {
         try {
             pasteArgsParser.parse(args);
         } catch (InvalidArgsException e) {
-            throw new PasteException(e.getMessage());
+            throw new PasteException(e.getMessage(), e);
         }
 
         List<String> nonFlagArgs = pasteArgsParser.getNonFlagArgs();
@@ -84,39 +84,39 @@ public class PasteApplication implements PasteInterface {
                 stdout.write(result.getBytes());
                 stdout.write(STRING_NEWLINE.getBytes());
             } catch (IOException e) {
-                throw new PasteException(ERR_WRITE_STREAM);
+                throw new PasteException(ERR_WRITE_STREAM, e);
             }
         }
 
         if (isRedirect) {
-            IORedirectionHandler redirectionHandler = new IORedirectionHandler(nonFlagArgs, stdin, stdout, new ArgumentResolver());
+            IORedirectionHandler redirHandler = new IORedirectionHandler(nonFlagArgs, stdin, stdout, new ArgumentResolver());
             try {
-                redirectionHandler.extractRedirOptions();
+                redirHandler.extractRedirOptions();
             } catch (Exception e) {
-                throw new PasteException(e.getMessage());
+                throw new PasteException(e.getMessage(), e);
             }
 
-            List<String> noRedirectionArgsList = redirectionHandler.getNoRedirArgsList();
-            if (noRedirectionArgsList.size() > 0) {
-                if (nonFlagArgs.contains("-")) {
-                    result = mergeFileAndStdin(isSerial, stdin, noRedirectionArgsList.toArray(new String[0]));
-                } else {
-                    result = mergeFile(isSerial, noRedirectionArgsList.toArray(new String[0]));
-                }
+            List<String> noRedirArgsList = redirHandler.getNoRedirArgsList();
+            if (noRedirArgsList.isEmpty()) {
+                result = mergeStdin(isSerial, redirHandler.getInputStream());
             } else {
-                result = mergeStdin(isSerial, redirectionHandler.getInputStream());
+                if (nonFlagArgs.contains("-")) {
+                    result = mergeFileAndStdin(isSerial, stdin, noRedirArgsList.toArray(new String[0]));
+                } else {
+                    result = mergeFile(isSerial, noRedirArgsList.toArray(new String[0]));
+                }
             }
 
             try {
                 if (nonFlagArgs.contains(">")) {
                     byte[] bytes = result.getBytes();
-                    redirectionHandler.getOutputStream().write(bytes);
+                    redirHandler.getOutputStream().write(bytes);
                 } else {
                     stdout.write(result.getBytes());
                     stdout.write(STRING_NEWLINE.getBytes());
                 }
             } catch (Exception e) {
-                throw new PasteException(e.getMessage());
+                throw new PasteException(e.getMessage(), e);
             }
         }
     }
@@ -140,7 +140,7 @@ public class PasteApplication implements PasteInterface {
             data = IOUtils.getLinesFromInputStream(stdin);
             tempListResult.add(data);
         } catch (Exception e) {
-            throw new PasteException(e.getMessage());
+            throw new PasteException(e.getMessage(), e);
         }
         maxFileLength = Math.max(maxFileLength, data.size());
 
@@ -181,7 +181,7 @@ public class PasteApplication implements PasteInterface {
                 fileData = IOUtils.getLinesFromInputStream(input);
                 IOUtils.closeInputStream(input);
             } catch (ShellException | IOException e) {
-                throw new PasteException(e.getMessage());
+                throw new PasteException(e.getMessage(), e);
             }
 
             maxFileLength = Math.max(maxFileLength, fileData.size());
@@ -224,7 +224,7 @@ public class PasteApplication implements PasteInterface {
         try {
             data = IOUtils.getLinesFromInputStream(stdin);
         } catch (IOException e) {
-            throw new PasteException(e.getMessage());
+            throw new PasteException(e.getMessage(), e);
         }
 
         int numOfDash = 0;
@@ -235,9 +235,9 @@ public class PasteApplication implements PasteInterface {
         }
 
         if (numOfDash != 0) {
-            maxFileLength = Math.max(maxFileLength, (int) (data.size() / numOfDash));
+            maxFileLength = Math.max(maxFileLength, data.size() / numOfDash);
             if (data.size() % numOfDash != 0) {
-                maxFileLength = Math.max(maxFileLength, (int) (data.size() / numOfDash) + 1);
+                maxFileLength = Math.max(maxFileLength, (data.size() / numOfDash) + 1);
             }
         }
 

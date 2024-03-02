@@ -27,7 +27,8 @@ import org.junit.jupiter.api.Test;
 
 import sg.edu.nus.comp.cs4218.exception.GrepException;
 
-class GrepApplicationIT { //NOPMD - suppressed ClassNamingConventions - Following the class name convention for IT
+@SuppressWarnings("PMD.ClassNamingConventions")
+class GrepApplicationIT {
     private static final String VALID_PATTERN_A_B = "ab";
     private static final String GREP_STRING = "grep: ";
     private static final String COLON_SPACE = ": ";

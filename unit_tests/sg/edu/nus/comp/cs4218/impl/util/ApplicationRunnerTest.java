@@ -18,7 +18,7 @@ class ApplicationRunnerTest {
 
     @BeforeEach
     void setUp() {
-        this.appRunner = new ApplicationRunner();
+        appRunner = new ApplicationRunner();
     }
 
     @ParameterizedTest
