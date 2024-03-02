@@ -22,18 +22,20 @@ import sg.edu.nus.comp.cs4218.Environment;
 // To give a meaningful variable name
 @SuppressWarnings("PMD.LongVariable")
 class LsApplicationHelperTest {
+
     private static final String DIR_A_NAME = "dirA";
-    private final String[] CWD_NON_DIRS = {"a.z", "z.a", "z"};
-    private final String[] CWD_DIRS = {DIR_A_NAME};
-    private final String UNSORTED_CWD_CONTENTS = String.join(STRING_NEWLINE, getCwdContents());
-    private final String UNSORTED_CWD_CONTENTS_WITH_HEADER = String.join(STRING_NEWLINE, ".:", UNSORTED_CWD_CONTENTS);
-    private final String[] DIR_A_NON_DIRS = {"0"};
-    private final String UNSORTED_DIR_A_CONTENTS_WITH_HEADER = String.join(STRING_NEWLINE,
+    private static final String[] CWD_NON_DIRS = {"a.z", "z.a", "z"};
+    private static final String[] CWD_DIRS = {DIR_A_NAME};
+    private static final String UNSORTED_CWD_CONTENTS = String.join(STRING_NEWLINE, getCwdContents());
+    private static final String UNSORTED_CWD_CONTENTS_WITH_HEADER = String.join(STRING_NEWLINE, ".:",
+            UNSORTED_CWD_CONTENTS);
+    private static final String[] DIR_A_NON_DIRS = {"0"};
+    private static final String UNSORTED_DIR_A_CONTENTS_WITH_HEADER = String.join(STRING_NEWLINE,
             String.format(".%s%s:", CHAR_FILE_SEP, DIR_A_NAME), getDirAContents());
-    private final String SORTED_DIR_A_CONTENTS_WITH_HEADER = UNSORTED_DIR_A_CONTENTS_WITH_HEADER;
-    private final String TWO_LINE_SEPARATOR = STRING_NEWLINE + STRING_NEWLINE;
-    private final String SORTED_CWD_CONTENTS_STRING = String.join(STRING_NEWLINE, "dirA", "z", "z.a", "a.z");
-    private final String SORTED_CWD_CONTENTS_STRING_WITH_HEADER = String.join(STRING_NEWLINE, ".:",
+    private static final String SORTED_DIR_A_CONTENTS_WITH_HEADER = UNSORTED_DIR_A_CONTENTS_WITH_HEADER;
+    private static final String TWO_LINE_SEPARATOR = STRING_NEWLINE + STRING_NEWLINE;
+    private static final String SORTED_CWD_CONTENTS_STRING = String.join(STRING_NEWLINE, "dirA", "z", "z.a", "a.z");
+    private static final String SORTED_CWD_CONTENTS_STRING_WITH_HEADER = String.join(STRING_NEWLINE, ".:",
             SORTED_CWD_CONTENTS_STRING);
 
     // Main temporary dir
@@ -42,14 +44,14 @@ class LsApplicationHelperTest {
     // Temporary dir A is in main temporary dir
     private Path dirAPath;
 
-    private String getCwdContents() {
+    private static String getCwdContents() {
         List<String> fileList = Stream.concat(Arrays.stream(CWD_NON_DIRS), Arrays.stream(CWD_DIRS))
                 .sorted()
                 .collect(Collectors.toList());
         return String.join(STRING_NEWLINE, fileList);
     }
 
-    private String getDirAContents() {
+    private static String getDirAContents() {
         return String.join(STRING_NEWLINE, DIR_A_NON_DIRS) + STRING_NEWLINE;
     }
 
@@ -60,7 +62,7 @@ class LsApplicationHelperTest {
      * @param isSortByExt Boolean to indicate if output should be sorted by
      *                    extension.
      */
-    void testListCwdContent(String expected, boolean isSortByExt) {
+    private void testListCwdContent(String expected, boolean isSortByExt) {
         // When
         String actual = assertDoesNotThrow(() -> LsApplicationHelper.listCwdContent(isSortByExt));
 
@@ -88,6 +90,17 @@ class LsApplicationHelperTest {
         dirAPath = Paths.get(cwdPathName, DIR_A_NAME);
         // Set current working directory to cwdPath
         Environment.currentDirectory = cwdPathName;
+    }
+
+    /**
+     * Tests if listCwdContent returns unsorted contents when isSortByExt is false.
+     */
+    @Test
+    void listCwdContent_IsSortByExtIsFalse_ReturnsUnsortedCwdContents() {
+        // Given
+        String expected = String.join(STRING_NEWLINE, UNSORTED_CWD_CONTENTS);
+
+        testListCwdContent(expected, false);
     }
 
     /**
@@ -150,15 +163,32 @@ class LsApplicationHelperTest {
         testListCwdContent(expected, true);
     }
 
-    /**
-     * Tests if listCwdContent returns unsorted contents when isSortByExt is false.
-     */
     @Test
-    void listCwdContent_IsSortByExtIsFalse_ReturnsUnsortedCwdContents() {
+    void formatContents_IsSortByExtIsTrue_ReturnsSortedFormattedContents() {
         // Given
-        String expected = String.join(STRING_NEWLINE, UNSORTED_CWD_CONTENTS);
+        String expected = String.join(STRING_NEWLINE, "z", "z.a", "a.z");
+        List<Path> contents = Arrays.stream(CWD_NON_DIRS)
+                .map(Paths::get)
+                .collect(Collectors.toList());
+        // When
+        String actual = LsApplicationHelper.formatContents(contents, true);
 
-        testListCwdContent(expected, false);
+        // Then
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void formatContents_IsSortByExtIsFalse_ReturnsFormattedContents() {
+        // Given
+        String expected = String.join(STRING_NEWLINE, "a.z", "z", "z.a");
+        List<Path> contents = Arrays.stream(CWD_NON_DIRS)
+                .map(Paths::get)
+                .collect(Collectors.toList());
+        // When
+        String actual = LsApplicationHelper.formatContents(contents, false);
+
+        // Then
+        assertEquals(expected, actual);
     }
 
     /***

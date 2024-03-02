@@ -47,23 +47,24 @@ public class LsApplication implements LsInterface {
             directories[0] = Environment.currentDirectory;
             paths = resolvePaths(directories);
         } else {
-            List<Path> directories = new ArrayList<>();
+            paths = resolvePaths(folderName);
             resolvePaths(folderName).forEach(folder -> {
-                if (folder.toFile().isDirectory()) {
-                    directories.add(folder);
-                } else {
+                if (!folder.toFile().isDirectory()) {
                     files.add(folder);
                 }
             });
-            paths = directories;
         }
 
         // End of output should not have newline
         String output = buildResult(paths, isRecursive, isSortByExt, hasFolder).trim();
-        if (!files.isEmpty()) {
-            output = formatContents(files, isSortByExt) + output;
+        String formattedFiles = formatContents(files, isSortByExt);
+        if (files.isEmpty()) {
+            return output;
         }
-        return output;
+        if (output.isEmpty()) {
+            return formattedFiles;
+        }
+        return formattedFiles + StringUtils.STRING_NEWLINE + StringUtils.STRING_NEWLINE + output;
     }
 
     @Override
