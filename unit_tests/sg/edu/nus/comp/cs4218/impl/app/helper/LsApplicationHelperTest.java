@@ -1,5 +1,9 @@
 package sg.edu.nus.comp.cs4218.impl.app.helper;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_FILE_SEP;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -13,19 +17,15 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_FILE_SEP;
-
 // To give a meaningful variable name
 @SuppressWarnings("PMD.LongVariable")
 class LsApplicationHelperTest {
     // Main temporary dir
     @TempDir
     private static Path cwdPath;
-    private static final String[] CWD_NON_DIRS = { "a.z", "z.a", "z" };
+    private static final String[] CWD_NON_DIRS = {"a.z", "z.a", "z"};
     private static final String DIR_A_NAME = "dirA";
-    private static final String[] CWD_DIRS = { DIR_A_NAME };
+    private static final String[] CWD_DIRS = {DIR_A_NAME};
     private static final String UNSORTED_CWD_CONTENTS = joinStringsBySystemLineSeparator(getCwdContents());
     private static final String UNSORTED_CWD_CONTENTS_WITH_HEADER = joinStringsBySystemLineSeparator(".:",
             UNSORTED_CWD_CONTENTS);
@@ -36,7 +36,7 @@ class LsApplicationHelperTest {
 
     // Temporary dir A in main temporary dir
     private static Path dirAPath;
-    private static final String[] DIR_A_NON_DIRS = { "0" };
+    private static final String[] DIR_A_NON_DIRS = {"0"};
     private static final String UNSORTED_DIR_A_CONTENTS_WITH_HEADER = joinStringsBySystemLineSeparator(
             String.format(".%s%s:", CHAR_FILE_SEP, DIR_A_NAME), getDirAContents());
     private static final String SORTED_DIR_A_CONTENTS_WITH_HEADER = UNSORTED_DIR_A_CONTENTS_WITH_HEADER;

@@ -1,15 +1,16 @@
 package sg.edu.nus.comp.cs4218.impl.util;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
-import sg.edu.nus.comp.cs4218.exception.ShellException;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
+
+import sg.edu.nus.comp.cs4218.exception.ShellException;
 
 class ApplicationRunnerTest {
 

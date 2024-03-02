@@ -1,5 +1,10 @@
 package sg.edu.nus.comp.cs4218.impl;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_INVALID_APP;
+
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.util.stream.Stream;
@@ -11,11 +16,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import sg.edu.nus.comp.cs4218.exception.ShellException;
-
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_INVALID_APP;
 
 class ShellImplTest {
     private ShellImpl shellImpl;
@@ -57,14 +57,14 @@ class ShellImplTest {
      * @param commandString String with some sort of invalid back quotes content
      */
     @ParameterizedTest
-    @ValueSource(strings = { "\"`echdo testing`\"", "`edcho testing`" })
+    @ValueSource(strings = {"\"`echdo testing`\"", "`edcho testing`"})
     void parseAndEvaluate_InvalidCommandWithinBackQuotes_ThrowsShellException(String commandString) {
         // Given
         String invalidAppName = commandString.split(" ")[0].replace("`", "").replace("\"", "");
 
         // When
         ShellException result = assertThrows(ShellException.class,
-                () -> shellImpl.parseAndEvaluate(commandString, System.out));
+            () -> shellImpl.parseAndEvaluate(commandString, System.out));
 
         // Then
         assertEquals(String.format("shell: %s: %s", invalidAppName, ERR_INVALID_APP), result.getMessage());

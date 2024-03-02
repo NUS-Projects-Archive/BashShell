@@ -1,6 +1,17 @@
 package sg.edu.nus.comp.cs4218.impl.app;
 
-import sg.edu.nus.comp.cs4218.exception.LsException;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.fail;
+import static org.mockito.Mockito.doThrow;
+import static sg.edu.nus.comp.cs4218.impl.parser.ArgsParser.ILLEGAL_FLAG_MSG;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_NOT_FOUND;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_OSTREAM;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_PERM;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NULL_ARGS;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_WRITE_STREAM;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_FILE_SEP;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -30,18 +41,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mockito;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.fail;
-import static org.mockito.Mockito.doThrow;
-import static sg.edu.nus.comp.cs4218.impl.parser.ArgsParser.ILLEGAL_FLAG_MSG;
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_NOT_FOUND;
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_OSTREAM;
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NULL_ARGS;
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_PERM;
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_WRITE_STREAM;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_FILE_SEP;
+import sg.edu.nus.comp.cs4218.exception.LsException;
 
 // To give a meaningful variable name
 @SuppressWarnings("PMD.LongVariable")
@@ -51,12 +51,12 @@ class LsApplicationTest {
     private static Path cwdPath;
     private static String cwdName;
     private static String cwdPathName;
-    private static final String[] CWD_NON_DIRS = { "a.z", "z.a", "z" };
+    private static final String[] CWD_NON_DIRS = {"a.z", "z.a", "z"};
     private static final String DIR_A_NAME = "dirA";
-    private static final String[] CWD_DIRS = { DIR_A_NAME };
+    private static final String[] CWD_DIRS = {DIR_A_NAME};
 
     // Temporary dir A in main temporary dir
-    private static final String[] DIR_A_NON_DIRS = { "0" };
+    private static final String[] DIR_A_NON_DIRS = {"0"};
 
     private LsApplication app;
     private ByteArrayOutputStream outContent;
@@ -86,12 +86,12 @@ class LsApplicationTest {
                 System.lineSeparator());
         String listedDirAContents = DIR_A_NAME + joinStringsByLineSeparator(":", getDirAContents());
         return Stream.of(
-            // Relative paths
-            Arguments.of(new String[] { "." }, listedCwdContents),
-            Arguments.of(new String[] { String.format("..%s%s", CHAR_FILE_SEP, cwdName) }, listedCwdContents),
-            Arguments.of(new String[] { DIR_A_NAME }, listedDirAContents),
-            // Absolute path
-            Arguments.of(new String[] { cwdPathName }, listedCwdContents)
+                // Relative paths
+                Arguments.of(new String[]{"."}, listedCwdContents),
+                Arguments.of(new String[]{String.format("..%s%s", CHAR_FILE_SEP, cwdName)}, listedCwdContents),
+                Arguments.of(new String[]{DIR_A_NAME}, listedDirAContents),
+                // Absolute path
+                Arguments.of(new String[]{cwdPathName}, listedCwdContents)
         );
     }
 
@@ -101,9 +101,9 @@ class LsApplicationTest {
      */
     static Stream<Arguments> provideInvalidFlags() {
         return Stream.of(
-            Arguments.of(new String[] { "-a" }, "a"),
-            Arguments.of(new String[] { "-abc", "-X" }, "a"),
-            Arguments.of(new String[] { "-Ra" }, "a")
+                Arguments.of(new String[]{"-a"}, "a"),
+                Arguments.of(new String[]{"-abc", "-X"}, "a"),
+                Arguments.of(new String[]{"-Ra"}, "a")
         );
     }
 
@@ -210,7 +210,7 @@ class LsApplicationTest {
         InputStream mockedInputStream = new ByteArrayInputStream("".getBytes());
 
         // When
-        assertDoesNotThrow(() -> app.run(new String[] { fileName }, mockedInputStream, System.out));
+        assertDoesNotThrow(() -> app.run(new String[]{fileName}, mockedInputStream, System.out));
 
         // Then
         String actual = outContent.toString();
@@ -229,7 +229,7 @@ class LsApplicationTest {
         InputStream mockedInputStream = new ByteArrayInputStream("".getBytes());
 
         // When
-        assertDoesNotThrow(() -> app.run(new String[] { nonExistentDirName }, mockedInputStream, System.out));
+        assertDoesNotThrow(() -> app.run(new String[]{nonExistentDirName}, mockedInputStream, System.out));
 
         // Then
         String actual = outContent.toString();
@@ -255,7 +255,7 @@ class LsApplicationTest {
             Files.deleteIfExists(noReadPermissionDirPath);
             return;
         }
-        
+
         // When
         assertDoesNotThrow(() -> app.run(new String[]{noReadPermissionDirName}, mockedInputStream, System.out));
 
@@ -270,7 +270,7 @@ class LsApplicationTest {
 
     /**
      * To test run to throw Ls exception when invalid flags are entered as arguments.
-     * 
+     *
      * @param args             The invalid flags.
      * @param invalidArgOutput The first invalid flag.
      */

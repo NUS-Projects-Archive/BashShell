@@ -1,23 +1,23 @@
 package sg.edu.nus.comp.cs4218.impl.app;
 
-import sg.edu.nus.comp.cs4218.Environment;
-import sg.edu.nus.comp.cs4218.app.LsInterface;
-import sg.edu.nus.comp.cs4218.exception.InvalidArgsException;
-import sg.edu.nus.comp.cs4218.exception.LsException;
-import sg.edu.nus.comp.cs4218.impl.parser.LsArgsParser;
-import sg.edu.nus.comp.cs4218.impl.util.StringUtils;
-
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.nio.file.Path;
-import java.util.List;
-
 import static sg.edu.nus.comp.cs4218.impl.app.helper.LsApplicationHelper.buildResult;
 import static sg.edu.nus.comp.cs4218.impl.app.helper.LsApplicationHelper.listCwdContent;
 import static sg.edu.nus.comp.cs4218.impl.app.helper.LsApplicationHelper.resolvePaths;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_OSTREAM;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NULL_ARGS;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_WRITE_STREAM;
+
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.file.Path;
+import java.util.List;
+
+import sg.edu.nus.comp.cs4218.Environment;
+import sg.edu.nus.comp.cs4218.app.LsInterface;
+import sg.edu.nus.comp.cs4218.exception.InvalidArgsException;
+import sg.edu.nus.comp.cs4218.exception.LsException;
+import sg.edu.nus.comp.cs4218.impl.parser.LsArgsParser;
+import sg.edu.nus.comp.cs4218.impl.util.StringUtils;
 
 public class LsApplication implements LsInterface {
     @Override

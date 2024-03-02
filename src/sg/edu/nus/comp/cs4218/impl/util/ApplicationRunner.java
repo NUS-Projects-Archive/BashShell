@@ -1,5 +1,10 @@
 package sg.edu.nus.comp.cs4218.impl.util;
 
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_INVALID_APP;
+
+import java.io.InputStream;
+import java.io.OutputStream;
+
 import sg.edu.nus.comp.cs4218.Application;
 import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
 import sg.edu.nus.comp.cs4218.exception.ShellException;
@@ -18,11 +23,6 @@ import sg.edu.nus.comp.cs4218.impl.app.SortApplication;
 import sg.edu.nus.comp.cs4218.impl.app.TeeApplication;
 import sg.edu.nus.comp.cs4218.impl.app.UniqApplication;
 import sg.edu.nus.comp.cs4218.impl.app.WcApplication;
-
-import java.io.InputStream;
-import java.io.OutputStream;
-
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_INVALID_APP;
 
 
 public class ApplicationRunner {

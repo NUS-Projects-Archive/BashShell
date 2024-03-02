@@ -1,7 +1,5 @@
 package sg.edu.nus.comp.cs4218.impl.parser;
 
-import sg.edu.nus.comp.cs4218.impl.parser.ArgsParser;
-
 import java.util.List;
 
 public class CutArgsParser extends ArgsParser {

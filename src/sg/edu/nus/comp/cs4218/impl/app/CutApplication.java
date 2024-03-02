@@ -1,11 +1,11 @@
 package sg.edu.nus.comp.cs4218.impl.app;
 
-import sg.edu.nus.comp.cs4218.app.CutInterface;
-import sg.edu.nus.comp.cs4218.exception.CutException;
-
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
+
+import sg.edu.nus.comp.cs4218.app.CutInterface;
+import sg.edu.nus.comp.cs4218.exception.CutException;
 
 public class CutApplication implements CutInterface {
     @Override

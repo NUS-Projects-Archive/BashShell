@@ -1,6 +1,10 @@
 package sg.edu.nus.comp.cs4218.impl.parser;
 
-import sg.edu.nus.comp.cs4218.exception.InvalidArgsException;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -15,7 +19,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
-import static org.junit.jupiter.api.Assertions.*;
+import sg.edu.nus.comp.cs4218.exception.InvalidArgsException;
 
 class LsArgsParserTest {
 
@@ -38,26 +42,26 @@ class LsArgsParserTest {
         final List<String> nonFlagArgs = List.of(EXAMPLE);
 
         return Stream.of(
-                Arguments.of(new String[] {}, emptyValidFlags, emptyNonFlagArgs),
-                Arguments.of(new String[] { FLAG_R }, validRFlag, emptyNonFlagArgs),
-                Arguments.of(new String[] { FLAG_X }, validXFlag, emptyNonFlagArgs),
-                Arguments.of(new String[] { FLAG_R, FLAG_X }, validFlags, emptyNonFlagArgs),
-                Arguments.of(new String[] { FLAG_RX }, validFlags, emptyNonFlagArgs),
-                Arguments.of(new String[] { FLAG_XR }, validFlags, emptyNonFlagArgs),
-                Arguments.of(new String[] { EXAMPLE }, emptyValidFlags, nonFlagArgs),
-                Arguments.of(new String[] { EXAMPLE, FLAG_R }, validRFlag, nonFlagArgs),
-                Arguments.of(new String[] { EXAMPLE, FLAG_X }, validXFlag, nonFlagArgs),
-                Arguments.of(new String[] { EXAMPLE, FLAG_R, FLAG_X }, validFlags, nonFlagArgs),
-                Arguments.of(new String[] { EXAMPLE, FLAG_RX }, validFlags, nonFlagArgs),
-                Arguments.of(new String[] { EXAMPLE, FLAG_XR }, validFlags, nonFlagArgs));
+                Arguments.of(new String[]{}, emptyValidFlags, emptyNonFlagArgs),
+                Arguments.of(new String[]{FLAG_R}, validRFlag, emptyNonFlagArgs),
+                Arguments.of(new String[]{FLAG_X}, validXFlag, emptyNonFlagArgs),
+                Arguments.of(new String[]{FLAG_R, FLAG_X}, validFlags, emptyNonFlagArgs),
+                Arguments.of(new String[]{FLAG_RX}, validFlags, emptyNonFlagArgs),
+                Arguments.of(new String[]{FLAG_XR}, validFlags, emptyNonFlagArgs),
+                Arguments.of(new String[]{EXAMPLE}, emptyValidFlags, nonFlagArgs),
+                Arguments.of(new String[]{EXAMPLE, FLAG_R}, validRFlag, nonFlagArgs),
+                Arguments.of(new String[]{EXAMPLE, FLAG_X}, validXFlag, nonFlagArgs),
+                Arguments.of(new String[]{EXAMPLE, FLAG_R, FLAG_X}, validFlags, nonFlagArgs),
+                Arguments.of(new String[]{EXAMPLE, FLAG_RX}, validFlags, nonFlagArgs),
+                Arguments.of(new String[]{EXAMPLE, FLAG_XR}, validFlags, nonFlagArgs));
     }
 
     private static Stream<Arguments> invalidSyntax() {
         return Stream.of(
-                Arguments.of((Object) new String[] { FLAG_P }),
-                Arguments.of((Object) new String[] { "--" }),
-                Arguments.of((Object) new String[] { "-r", FLAG_X }),
-                Arguments.of((Object) new String[] { FLAG_R, FLAG_X, FLAG_P }));
+                Arguments.of((Object) new String[]{FLAG_P}),
+                Arguments.of((Object) new String[]{"--"}),
+                Arguments.of((Object) new String[]{"-r", FLAG_X}),
+                Arguments.of((Object) new String[]{FLAG_R, FLAG_X, FLAG_P}));
     }
 
     @BeforeEach
@@ -81,14 +85,14 @@ class LsArgsParserTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = { FLAG_R, FLAG_RX, FLAG_XR })
+    @ValueSource(strings = {FLAG_R, FLAG_RX, FLAG_XR})
     void isRecursive_ValidFlag_ReturnsTrue(String args) {
         assertDoesNotThrow(() -> lsArgsParser.parse(args));
         assertTrue(lsArgsParser.isRecursive());
     }
 
     @ParameterizedTest
-    @ValueSource(strings = { FLAG_X, EXAMPLE })
+    @ValueSource(strings = {FLAG_X, EXAMPLE})
     void isRecursive_InvalidFlag_ReturnsFalse(String args) {
         assertDoesNotThrow(() -> lsArgsParser.parse(args));
         assertFalse(lsArgsParser.isRecursive());
@@ -101,14 +105,14 @@ class LsArgsParserTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = { FLAG_X, FLAG_RX, FLAG_XR })
+    @ValueSource(strings = {FLAG_X, FLAG_RX, FLAG_XR})
     void isSortByExt_ValidFlag_ReturnsTrue(String args) {
         assertDoesNotThrow(() -> lsArgsParser.parse(args));
         assertTrue(lsArgsParser.isSortByExt());
     }
 
     @ParameterizedTest
-    @ValueSource(strings = { FLAG_R, EXAMPLE })
+    @ValueSource(strings = {FLAG_R, EXAMPLE})
     void isSortByExt_InvalidFlag_ReturnsFalse(String args) {
         assertDoesNotThrow(() -> lsArgsParser.parse(args));
         assertFalse(lsArgsParser.isSortByExt());
@@ -142,7 +146,7 @@ class LsArgsParserTest {
     @Test
     void getDirectories_WithArgsThatHasNonFlagArgs_ReturnsNonFlagArgs() {
         // Given
-        String[] args = new String[] { EXAMPLE, FLAG_R, FLAG_X };
+        String[] args = new String[]{EXAMPLE, FLAG_R, FLAG_X};
         List<String> expected = List.of(EXAMPLE);
 
         // When
