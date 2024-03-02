@@ -3,13 +3,20 @@ package sg.edu.nus.comp.cs4218.impl.app;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
-import sg.edu.nus.comp.cs4218.exception.PasteException;
 
+import sg.edu.nus.comp.cs4218.exception.PasteException;
+import sg.edu.nus.comp.cs4218.exception.ShellException;
+import sg.edu.nus.comp.cs4218.impl.util.IOUtils;
+import sg.edu.nus.comp.cs4218.impl.util.StringUtils;
+
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_ISTREAM;
@@ -22,6 +29,8 @@ public class PasteApplicationIT {
     private static final String PASTE_EXCEPTION_MSG = "paste: ";
     private static final String STDIN = "-";
     private PasteApplication pasteApplication;
+    private ByteArrayOutputStream outputStream;
+
     @TempDir
     private Path pasteTestDir;
     private String filePathA;
@@ -30,7 +39,7 @@ public class PasteApplicationIT {
     @BeforeEach
     void setUp() throws IOException {
         this.pasteApplication = new PasteApplication();
-        pasteTestDir = Files.createTempDirectory("pasteTestDir");
+        this.outputStream = new ByteArrayOutputStream();
 
         Path pathA = pasteTestDir.resolve(FILE_NAME_A);
         Path pathB = pasteTestDir.resolve(FILE_NAME_B);
@@ -46,9 +55,8 @@ public class PasteApplicationIT {
 
     }
 
-
     @Test
-    void run_NullStdin_ShouldThrowPasteException() {
+    void run_NullStdin_ThrowsPasteException() {
         Throwable result = assertThrows(PasteException.class, () -> {
             pasteApplication.run(new String[]{filePathA}, null, System.out);
         });
@@ -56,11 +64,134 @@ public class PasteApplicationIT {
     }
 
     @Test
-    void run_NullStdout_ShouldThrowPasteException() {
+    void run_NullStdout_ThrowsPasteException() {
         Throwable result = assertThrows(PasteException.class, () -> {
             pasteApplication.run(new String[]{filePathA}, System.in, null);
         });
         assertEquals(PASTE_EXCEPTION_MSG + ERR_NULL_STREAMS, result.getMessage());
+    }
+
+    @Test
+    void run_NoFlagsAndOneFile_PrintsFileInParallel() {
+        String[] args = {filePathA};
+
+        String expected = "A" + StringUtils.STRING_NEWLINE + "B" +
+                StringUtils.STRING_NEWLINE + "C" +
+                StringUtils.STRING_NEWLINE + "D" +
+                StringUtils.STRING_NEWLINE + "E" + StringUtils.STRING_NEWLINE;
+
+        assertDoesNotThrow(() -> this.pasteApplication.run(args, System.in, this.outputStream));
+        assertEquals(expected, this.outputStream.toString());
+    }
+
+    @Test
+    void run_NoFlagsAndMultipleFiles_PrintsFilesInParallel() {
+        String[] args = {filePathA, filePathB};
+
+        String expected = "A" + StringUtils.STRING_TAB + "1" +
+                StringUtils.STRING_NEWLINE + "B" + StringUtils.STRING_TAB + "2" +
+                StringUtils.STRING_NEWLINE + "C" + StringUtils.STRING_TAB + "3" +
+                StringUtils.STRING_NEWLINE + "D" + StringUtils.STRING_TAB + "4" +
+                StringUtils.STRING_NEWLINE + "E" + StringUtils.STRING_TAB + "5" + StringUtils.STRING_NEWLINE;
+
+        assertDoesNotThrow(() -> this.pasteApplication.run(args, System.in, this.outputStream));
+        assertEquals(expected, this.outputStream.toString());
+    }
+
+
+    @Test
+    void run_SerialFlagAndOneFile_PrintsFileInSerial() {
+        String[] args = {filePathA, "-s"};
+
+        String expected = "A" + StringUtils.STRING_TAB + "B" +
+                StringUtils.STRING_TAB + "C" +
+                StringUtils.STRING_TAB + "D" +
+                StringUtils.STRING_TAB + "E" + StringUtils.STRING_NEWLINE;
+
+        assertDoesNotThrow(() -> this.pasteApplication.run(args, System.in, this.outputStream));
+        assertEquals(expected, this.outputStream.toString());
+    }
+
+    @Test
+    void run_SerialFlagAndMultipleFiles_PrintsFilesInSerial() {
+        String[] args = {filePathA, filePathB, "-s"};
+
+        String expected = "A" + StringUtils.STRING_TAB + "B" +
+                StringUtils.STRING_TAB + "C" + StringUtils.STRING_TAB + "D" +
+                StringUtils.STRING_TAB + "E" + StringUtils.STRING_NEWLINE + "1" +
+                StringUtils.STRING_TAB + "2" + StringUtils.STRING_TAB + "3" +
+                StringUtils.STRING_TAB + "4" + StringUtils.STRING_TAB + "5" + StringUtils.STRING_NEWLINE;
+
+        assertDoesNotThrow(() -> this.pasteApplication.run(args, System.in, this.outputStream));
+        assertEquals(expected, this.outputStream.toString());
+    }
+
+    @Test
+    void run_NoFlagAndStdin_PrintsStdinInParallel() {
+        String[] args = {};
+        String expected = "A" + StringUtils.STRING_NEWLINE + "B" +
+                StringUtils.STRING_NEWLINE + "C" +
+                StringUtils.STRING_NEWLINE + "D" +
+                StringUtils.STRING_NEWLINE + "E" + StringUtils.STRING_NEWLINE;
+
+        try (InputStream inputStream = IOUtils.openInputStream(filePathA)) {
+            assertDoesNotThrow(() -> this.pasteApplication.run(args, inputStream, this.outputStream));
+            assertEquals(expected, this.outputStream.toString());
+        } catch (IOException | ShellException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    void run_ValidFlagAndStdin_PrintsStdinInSerial() {
+        String[] args = {"-s"};
+        String expected = "A" + StringUtils.STRING_TAB + "B" +
+                StringUtils.STRING_TAB + "C" +
+                StringUtils.STRING_TAB + "D" +
+                StringUtils.STRING_TAB + "E" + StringUtils.STRING_NEWLINE;
+
+        try (InputStream inputStream = IOUtils.openInputStream(filePathA)) {
+            assertDoesNotThrow(() -> this.pasteApplication.run(args, inputStream, this.outputStream));
+            assertEquals(expected, this.outputStream.toString());
+        } catch (IOException | ShellException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    void run_NoFlagStdinAndFile_PrintsStdinAndFileInParallel() {
+        String[] args = {STDIN, filePathB, STDIN};
+        String expected = "A" + StringUtils.STRING_TAB + "1" + StringUtils.STRING_TAB + "B" +
+                StringUtils.STRING_NEWLINE + "C" + StringUtils.STRING_TAB + "2" + StringUtils.STRING_TAB + "D" +
+                StringUtils.STRING_NEWLINE + "E" + StringUtils.STRING_TAB + "3" +
+                StringUtils.STRING_TAB + StringUtils.STRING_NEWLINE + StringUtils.STRING_TAB + "4" +
+                StringUtils.STRING_TAB + StringUtils.STRING_NEWLINE + StringUtils.STRING_TAB + "5" +
+                StringUtils.STRING_TAB + StringUtils.STRING_NEWLINE;
+
+        try (InputStream inputStream = IOUtils.openInputStream(filePathA)) {
+            assertDoesNotThrow(() -> this.pasteApplication.run(args, inputStream, this.outputStream));
+            assertEquals(expected, this.outputStream.toString());
+        } catch (IOException | ShellException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    void run_ValidFlagStdinAndFile_PrintsStdinAndFileInSerial() {
+        String[] args = {STDIN, filePathB, STDIN, "-s"};
+        String expected = "A" + StringUtils.STRING_TAB + "B" +
+                StringUtils.STRING_TAB + "C" + StringUtils.STRING_TAB + "D" +
+                StringUtils.STRING_TAB + "E" + StringUtils.STRING_NEWLINE + "1" +
+                StringUtils.STRING_TAB + "2" + StringUtils.STRING_TAB + "3" +
+                StringUtils.STRING_TAB + "4" + StringUtils.STRING_TAB + "5" + StringUtils.STRING_NEWLINE +
+                StringUtils.STRING_NEWLINE;
+
+        try (InputStream inputStream = IOUtils.openInputStream(filePathA)) {
+            assertDoesNotThrow(() -> this.pasteApplication.run(args, inputStream, this.outputStream));
+            assertEquals(expected, this.outputStream.toString());
+        } catch (IOException | ShellException e) {
+            e.printStackTrace();
+        }
     }
 
 }

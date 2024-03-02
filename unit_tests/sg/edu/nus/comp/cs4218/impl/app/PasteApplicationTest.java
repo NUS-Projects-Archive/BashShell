@@ -2,6 +2,9 @@ package sg.edu.nus.comp.cs4218.impl.app;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -13,6 +16,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
+import sg.edu.nus.comp.cs4218.exception.PasteException;
 import sg.edu.nus.comp.cs4218.exception.ShellException;
 import sg.edu.nus.comp.cs4218.impl.util.IOUtils;
 import sg.edu.nus.comp.cs4218.impl.util.StringUtils;
@@ -20,6 +24,7 @@ import sg.edu.nus.comp.cs4218.impl.util.StringUtils;
 public class PasteApplicationTest {
     private static final String FILE_NAME_A = "A.txt";
     private static final String FILE_NAME_B = "B.txt";
+    private static final String NONEXISTENT_FILE = "NonExistent.txt";
     private static final String STDIN = "-";
     private PasteApplication pasteApplication;
     @TempDir
@@ -47,7 +52,7 @@ public class PasteApplicationTest {
     }
 
     @Test
-    void mergeStdin_StdinWithoutFlag_ShouldMergeStdinInParallel() {
+    void mergeStdin_StdinWithoutFlag_MergesStdinInParallel() {
         String expected = "A" + StringUtils.STRING_NEWLINE + "B" +
                 StringUtils.STRING_NEWLINE + "C" +
                 StringUtils.STRING_NEWLINE + "D" +
@@ -64,7 +69,7 @@ public class PasteApplicationTest {
     }
 
     @Test
-    void mergeStdin_StdinWithFlag_ShouldMergeStdinInSerial() {
+    void mergeStdin_StdinWithFlag_MergesStdinInSerial() {
         String expected = "A" + StringUtils.STRING_TAB + "B" +
                 StringUtils.STRING_TAB + "C" +
                 StringUtils.STRING_TAB + "D" +
@@ -81,7 +86,12 @@ public class PasteApplicationTest {
     }
 
     @Test
-    void mergeFile_FilesWithoutFlag_ShouldMergeFilesInParallel() {
+    void mergeStdin_NullStdin_ThrowsNullStreamsException() {
+        assertThrowsExactly(PasteException.class, () -> pasteApplication.mergeStdin(false, null));
+    }
+
+    @Test
+    void mergeFile_FilesWithoutFlag_MergesFilesInParallel() {
         String expected = "A" + StringUtils.STRING_TAB + "1" +
                 StringUtils.STRING_NEWLINE + "B" + StringUtils.STRING_TAB + "2" +
                 StringUtils.STRING_NEWLINE + "C" + StringUtils.STRING_TAB + "3" +
@@ -94,7 +104,7 @@ public class PasteApplicationTest {
     }
 
     @Test
-    void mergeFile_FilesWithFlag_ShouldMergeFilesInSerial() {
+    void mergeFile_FilesWithFlag_MergesFilesInSerial() {
         String expected = "A" + StringUtils.STRING_TAB + "B" +
                 StringUtils.STRING_TAB + "C" + StringUtils.STRING_TAB + "D" +
                 StringUtils.STRING_TAB + "E" + StringUtils.STRING_NEWLINE + "1" +
@@ -107,7 +117,12 @@ public class PasteApplicationTest {
     }
 
     @Test
-    void mergeFileAndStdin_FileAndStdinWithoutFlag_ShouldMergeFileAndStdinInParallel() {
+    void mergeFile_NonExistentFile_ThrowsFileNotFoundException() {
+        assertThrowsExactly(PasteException.class, () -> pasteApplication.mergeFile(false, NONEXISTENT_FILE));
+    }
+
+    @Test
+    void mergeFileAndStdin_FileAndStdinWithoutFlag_MergesFileAndStdinInParallel() {
         String expected = "A" + StringUtils.STRING_TAB + "1" + StringUtils.STRING_TAB + "B" +
                 StringUtils.STRING_NEWLINE + "C" + StringUtils.STRING_TAB + "2" + StringUtils.STRING_TAB + "D" +
                 StringUtils.STRING_NEWLINE + "E" + StringUtils.STRING_TAB + "3" +
@@ -126,7 +141,7 @@ public class PasteApplicationTest {
     }
 
     @Test
-    void mergeFileAndStdin_FileAndStdinWithFlag_ShouldMergeFileAndStdinInSerial() {
+    void mergeFileAndStdin_FileAndStdinWithFlag_MergesFileAndStdinInSerial() {
         String expected = "A" + StringUtils.STRING_TAB + "B" +
                 StringUtils.STRING_TAB + "C" + StringUtils.STRING_TAB + "D" +
                 StringUtils.STRING_TAB + "E" + StringUtils.STRING_NEWLINE + "1" +
@@ -138,6 +153,15 @@ public class PasteApplicationTest {
                 String result = pasteApplication.mergeFileAndStdin(true, inputStream, STDIN, filePathB, STDIN);
                 assertEquals(expected, result);
             });
+        } catch (IOException | ShellException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    void mergeFileAndStdin_NonExistentFileAndStdin_ThrowsFileNotFoundException() {
+        try (InputStream inputStream = IOUtils.openInputStream(filePathA)) {
+            assertThrowsExactly(PasteException.class, () -> pasteApplication.mergeFileAndStdin(false, inputStream, NONEXISTENT_FILE));
         } catch (IOException | ShellException e) {
             e.printStackTrace();
         }

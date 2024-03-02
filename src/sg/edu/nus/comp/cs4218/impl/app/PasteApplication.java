@@ -113,7 +113,6 @@ public class PasteApplication implements PasteInterface {
                     redirectionHandler.getOutputStream().write(bytes);
                 } else {
                     stdout.write(result.getBytes());
-                    stdout.write(STRING_NEWLINE.getBytes());
                 }
             } catch (Exception e) {
                 throw new PasteException(e.getMessage());
@@ -203,6 +202,21 @@ public class PasteApplication implements PasteInterface {
     public String mergeFileAndStdin(Boolean isSerial, InputStream stdin, String... fileName) throws PasteException {
         if (stdin == null && fileName == null) {
             throw new PasteException(ERR_GENERAL);
+        }
+
+        for (String file : fileName) {
+            if (!file.equals("-")) {
+                File node = IOUtils.resolveFilePath(file).toFile();
+                if (!node.exists()) {
+                    throw new PasteException(ERR_FILE_NOT_FOUND);
+                }
+                if (node.isDirectory()) {
+                    throw new PasteException(ERR_IS_DIR);
+                }
+                if (!node.canRead()) {
+                    throw new PasteException(ERR_NO_PERM);
+                }
+            }
         }
 
         List<String> data;
