@@ -63,7 +63,7 @@ class RegexArgumentTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"regexString1", "regexString2", "regexString3"})
+    @ValueSource(strings = {"regexStr1", "regexStr2", "regexStr3"})
     void constructor_GivenString_ReturnsCorrectRegexArgument(String str) {
         this.regexArg = new RegexArgument(str);
         assertRegexArgument(str, Pattern.quote(str), false);

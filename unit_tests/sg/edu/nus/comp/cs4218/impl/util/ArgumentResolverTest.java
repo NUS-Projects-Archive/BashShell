@@ -25,7 +25,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import sg.edu.nus.comp.cs4218.Environment;
 import sg.edu.nus.comp.cs4218.exception.ShellException;
 
-// TODO: Globing and command substitution tests are not implemented yet
+// TODO: Command substitution tests are not implemented yet
 class ArgumentResolverTest {
 
     private static final Map<String, List<String>> VALID_QUOTE_CONTENTS = new HashMap<>() {{
@@ -63,7 +63,7 @@ class ArgumentResolverTest {
     }
 
     /**
-     * Quoting unit test case for parsing arguments any of the provided arguments are invalid.
+     * Quoting unit test case for parsing arguments if any of the provided arguments are invalid.
      */
     @Test
     void parseArguments_InvalidQuotingArgsList_ThrowsShellException() {
@@ -145,7 +145,7 @@ class ArgumentResolverTest {
             "\"```\"",      // "```"
     })
     void resolveOneArgument_InvalidDoubleQuoteContentsWithUnmatchedBackQuote_ThrowsShellException
-    (String invalidQuoteContent) {
+            (String invalidQuoteContent) {
         Throwable result = assertThrows(ShellException.class,
                 () -> argumentResolver.resolveOneArgument(invalidQuoteContent));
         assertEquals(String.format("shell: %s", ERR_SYNTAX), result.getMessage());
