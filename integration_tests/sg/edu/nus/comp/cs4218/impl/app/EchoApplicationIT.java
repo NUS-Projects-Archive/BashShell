@@ -1,5 +1,6 @@
 package sg.edu.nus.comp.cs4218.impl.app;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -59,11 +60,11 @@ public class EchoApplicationIT {
     }
 
     @Test
-    void run_ValidByteBuffers_PrintsCorrectValues() throws EchoException {
+    void run_ValidByteBuffers_PrintsCorrectValues() {
         // Given
         String[] tokens = new String[]{"Hello", "World!"};
         // When
-        app.run(tokens, null, out);
+        assertDoesNotThrow(() -> app.run(tokens, null, out));
         // Then
         assertEquals("Hello World!" + STRING_NEWLINE, out.toString());
     }
