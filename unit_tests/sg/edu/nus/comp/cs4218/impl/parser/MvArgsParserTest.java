@@ -20,12 +20,12 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 import sg.edu.nus.comp.cs4218.exception.InvalidArgsException;
 
-@SuppressWarnings("PMD.AvoidDuplicateLiterals")
 class MvArgsParserTest {
 
     private final Set<Character> VALID_FLAGS = Set.of('n');
     private MvArgsParser mvArgsParser;
 
+    @SuppressWarnings("PMD.AvoidDuplicateLiterals")
     private static Stream<Arguments> validSyntax() {
         return Stream.of(
                 Arguments.of((Object) new String[]{}),

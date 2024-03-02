@@ -20,11 +20,13 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 import sg.edu.nus.comp.cs4218.exception.InvalidArgsException;
 
+
 public class TeeArgsParserTest {
 
     private final Set<Character> VALID_FLAGS = Set.of('a');
     private TeeArgsParser teeArgsParser;
 
+    @SuppressWarnings("PMD.AvoidDuplicateLiterals")
     private static Stream<Arguments> validSyntax() {
         return Stream.of(
                 Arguments.of((Object) new String[]{"-a"}),

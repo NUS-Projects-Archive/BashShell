@@ -26,6 +26,8 @@ class TeeApplicationTest {
     private static final String FILE_A = "A.txt";
     private static final String FILE_B = "B.txt";
     private static final String EMPTY_FILE = "empty.txt";
+    private static final String CONTENT_FILE_A = "A\nB\nC\nD\nE";
+    private static final String CONTENT_FILE_B = "1\n2\n3\n4\n5";
     private TeeApplication app;
 
     @TempDir
@@ -49,10 +51,8 @@ class TeeApplicationTest {
         fileB = fileBPath.toString();
         emptyFile = emptyFilePath.toString();
 
-        String contentFileA = "A\nB\nC\nD\nE";
-        Files.write(fileAPath, List.of(contentFileA.split("\n")));
-        String contentFileB = "1\n2\n3\n4\n5";
-        Files.write(fileBPath, List.of(contentFileB.split("\n")));
+        Files.write(fileAPath, List.of(CONTENT_FILE_A.split("\n")));
+        Files.write(fileBPath, List.of(CONTENT_FILE_B.split("\n")));
         Files.createFile(emptyFilePath);
     }
 
@@ -114,7 +114,7 @@ class TeeApplicationTest {
 
     @Test
     void teeFromStdin_OnlyStdin_ReturnsCorrectString() {
-        String expected = "A\nB\nC\nD\nE" + StringUtils.STRING_NEWLINE;
+        String expected = CONTENT_FILE_A + StringUtils.STRING_NEWLINE;
         String[] filenames = {};
         InputStream inputStream = assertDoesNotThrow(() -> IOUtils.openInputStream(fileA));
         String outputStdOut = assertDoesNotThrow(() -> app.teeFromStdin(false, inputStream, filenames));
@@ -123,7 +123,7 @@ class TeeApplicationTest {
 
     @Test
     void teeFromStdin_OneFile_WritesToFile() {
-        String expected = "A\nB\nC\nD\nE" + StringUtils.STRING_NEWLINE;
+        String expected = CONTENT_FILE_A + StringUtils.STRING_NEWLINE;
         InputStream inputStream = assertDoesNotThrow(() -> IOUtils.openInputStream(fileA));
         String outputStdOut = assertDoesNotThrow(() -> app.teeFromStdin(false, inputStream, emptyFile));
         String outputFile = assertDoesNotThrow(() -> Files.readString(emptyFilePath));
@@ -133,7 +133,7 @@ class TeeApplicationTest {
 
     @Test
     void teeFromStdin_OneFileAndValidFlag_AppendsToFile() {
-        String expected = "1\n2\n3\n4\n5" + StringUtils.STRING_NEWLINE + "A\nB\nC\nD\nE" + StringUtils.STRING_NEWLINE;
+        String expected = CONTENT_FILE_B + StringUtils.STRING_NEWLINE + CONTENT_FILE_A + StringUtils.STRING_NEWLINE;
         InputStream inputStream = assertDoesNotThrow(() -> IOUtils.openInputStream(fileA));
         String outputStdOut = assertDoesNotThrow(() -> app.teeFromStdin(true, inputStream, fileB));
         String outputFile = assertDoesNotThrow(() -> Files.readString(fileBPath));

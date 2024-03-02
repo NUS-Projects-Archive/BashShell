@@ -24,6 +24,7 @@ public class WcArgsParserTest {
     private final Set<Character> VALID_FLAGS = Set.of('c', 'l', 'w');
     private WcArgsParser wcArgsParser;
 
+    @SuppressWarnings("PMD.AvoidDuplicateLiterals")
     private static Stream<Arguments> validSyntax() {
         return Stream.of(
                 Arguments.of((Object) new String[]{}),

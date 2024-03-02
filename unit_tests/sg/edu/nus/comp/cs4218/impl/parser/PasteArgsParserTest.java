@@ -25,6 +25,7 @@ public class PasteArgsParserTest {
     private final Set<Character> VALID_FLAGS = Set.of('s');
     private PasteArgsParser pasteArgsParser;
 
+    @SuppressWarnings("PMD.AvoidDuplicateLiterals")
     private static Stream<Arguments> validSyntax() {
         return Stream.of(
                 Arguments.of((Object) new String[]{}),
