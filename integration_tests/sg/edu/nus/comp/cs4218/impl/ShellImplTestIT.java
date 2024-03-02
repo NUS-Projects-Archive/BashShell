@@ -17,15 +17,20 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 import sg.edu.nus.comp.cs4218.exception.ShellException;
 
-class ShellImplTest {
+class ShellImplTestIT { //NOPMD - suppressed ClassNamingConventions - Follow naming convention
     private ShellImpl shellImpl;
     private ByteArrayOutputStream outContent;
 
-    @BeforeEach
-    void setUp() {
-        shellImpl = new ShellImpl();
-        outContent = new ByteArrayOutputStream();
-        System.setOut(new PrintStream(outContent));
+    /**
+     * Returns valid quote contents to be used as test input and output.
+     *
+     * @return
+     */
+    static Stream<Arguments> validQuoteContents() {
+        return Stream.of(
+                Arguments.of("echo \"`echo testing`\"", String.format("testing %s", System.lineSeparator())),
+                Arguments.of("echo `echo testing`", String.format("testing%s", System.lineSeparator()))
+        );
     }
 
     static Stream<Arguments> getValidQuoteContents() {
@@ -35,8 +40,16 @@ class ShellImplTest {
         );
     }
 
+    @BeforeEach
+    void setUp() {
+        shellImpl = new ShellImpl();
+        outContent = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(outContent));
+    }
+
     /**
-     * Quoting integration tests for commandStrings with some sort of valid back quotes content and expects the correct output from the command.
+     * Quoting integration tests for commandStrings with some sort of valid back quotes content and
+     * expects the correct output from the command.
      *
      * @param commandString String with some sort of valid back quotes content
      */

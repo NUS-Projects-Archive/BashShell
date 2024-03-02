@@ -204,6 +204,8 @@ public class GrepApplication implements GrepInterface {
         } catch (PatternSyntaxException pse) {
             throw new GrepException(ERR_INVALID_REGEX);
         } catch (NullPointerException npe) {
+            // try-catch not catching more specifically, anything that is not supposed to be null including stdin
+            // will execute this line, which is wrong.
             throw new GrepException(ERR_FILE_NOT_FOUND);
         } catch (IOException e) {
             throw new GrepException(ERR_IO_EXCEPTION);
