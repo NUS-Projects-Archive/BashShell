@@ -32,6 +32,7 @@ public class WcApplicationTest {
     private static final String WC_EXCEPTION_MSG = "wc: ";
     private static final String NUMBER_FORMAT = " %7d";
     private static final String STRING_FORMAT = " %s";
+    private static final String TOTAL_LAST_LINE = " total";
     private WcApplication app;
 
     @TempDir
@@ -83,7 +84,7 @@ public class WcApplicationTest {
         List<String> expectedList = new ArrayList<>();
         expectedList.add(WC_EXCEPTION_MSG + ERR_FILE_NOT_FOUND);
         expectedList.add(appendString(3, 11, 57, String.format(STRING_FORMAT, filePathA)));
-        expectedList.add(appendString(3, 11, 57, " total"));
+        expectedList.add(appendString(3, 11, 57, TOTAL_LAST_LINE));
         String expected = String.join(STRING_NEWLINE, expectedList);
         assertDoesNotThrow(() -> {
             String result = app.countFromFiles(true, true, true, NON_EXISTENT_FILE, filePathA);
@@ -96,7 +97,7 @@ public class WcApplicationTest {
         List<String> expectedList = new ArrayList<>();
         expectedList.add(appendString(3, 11, 57, String.format(STRING_FORMAT, filePathA)));
         expectedList.add(appendString(3, 12, 75, String.format(STRING_FORMAT, filePathB)));
-        expectedList.add(appendString(6, 23, 132, " total"));
+        expectedList.add(appendString(6, 23, 132, TOTAL_LAST_LINE));
         String expected = String.join(STRING_NEWLINE, expectedList);
         assertDoesNotThrow(() -> {
             String result = app.countFromFiles(true, true, true, filePathA, filePathB);
@@ -109,7 +110,7 @@ public class WcApplicationTest {
         List<String> expectedList = new ArrayList<>();
         expectedList.add(appendString(3, 11, -1, String.format(STRING_FORMAT, filePathA)));
         expectedList.add(appendString(3, 12, -1, String.format(STRING_FORMAT, filePathB)));
-        expectedList.add(appendString(6, 23, -1, " total"));
+        expectedList.add(appendString(6, 23, -1, TOTAL_LAST_LINE));
         String expected = String.join(STRING_NEWLINE, expectedList);
         assertDoesNotThrow(() -> {
             String result = app.countFromFiles(false, true, true, filePathA, filePathB);
@@ -171,7 +172,7 @@ public class WcApplicationTest {
         List<String> expectedList = new ArrayList<>();
         expectedList.add(appendString(3, 11, 57, " -"));
         expectedList.add(appendString(3, 12, 75, String.format(STRING_FORMAT, filePathB)));
-        expectedList.add(appendString(6, 23, 132, " total"));
+        expectedList.add(appendString(6, 23, 132, TOTAL_LAST_LINE));
         String expected = String.join(STRING_NEWLINE, expectedList);
         try (InputStream inputStream = IOUtils.openInputStream(filePathA)) {
             assertDoesNotThrow(() -> {
@@ -188,7 +189,7 @@ public class WcApplicationTest {
         List<String> expectedList = new ArrayList<>();
         expectedList.add(appendString(3, -1, 57, " -"));
         expectedList.add(appendString(3, -1, 75, String.format(STRING_FORMAT, filePathB)));
-        expectedList.add(appendString(6, -1, 132, " total"));
+        expectedList.add(appendString(6, -1, 132, TOTAL_LAST_LINE));
         String expected = String.join(STRING_NEWLINE, expectedList);
         try (InputStream inputStream = IOUtils.openInputStream(filePathA)) {
             assertDoesNotThrow(() -> {
