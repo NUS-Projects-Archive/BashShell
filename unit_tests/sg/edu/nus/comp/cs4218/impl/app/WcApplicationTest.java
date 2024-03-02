@@ -140,7 +140,7 @@ public class WcApplicationTest {
         List<String> expectedList = new ArrayList<>();
         expectedList.add(appendString(3, 11, 57, ""));
         String expected = String.join(STRING_NEWLINE, expectedList);
-        try (InputStream inputStream = IOUtils.openInputStream(filePathA);) {
+        try (InputStream inputStream = IOUtils.openInputStream(filePathA)) {
             assertDoesNotThrow(() -> {
                 String result = wcApplication.countFromStdin(true, true, true, inputStream);
                 assertEquals(expected, result);
