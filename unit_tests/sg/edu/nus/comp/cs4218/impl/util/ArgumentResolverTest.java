@@ -22,10 +22,12 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
+import sg.edu.nus.comp.cs4218.Environment;
 import sg.edu.nus.comp.cs4218.exception.ShellException;
 
 // TODO: Globing and command substitution tests are not implemented yet
 class ArgumentResolverTest {
+
     private static final Map<String, List<String>> VALID_QUOTE_CONTENTS = new HashMap<>() {{
         put("'\"'", List.of("\""));                     // '"'
         put("'\"\"'", List.of("\"\""));                 // '""'
@@ -40,10 +42,6 @@ class ArgumentResolverTest {
         put("'\"`\"\"`\"'", List.of("\"`\"\"`\""));     // '"`""`"'
     }};
     private ArgumentResolver argumentResolver;
-
-    private static final Map<String, List<String>> VALID_GLOB_CONTENTS = new HashMap<>() {{
-
-    }};
 
     static Stream<Arguments> getValidQuoteContents() {
         return VALID_QUOTE_CONTENTS.entrySet().stream().map(entry -> Arguments.of(entry.getKey(), entry.getValue()));
@@ -61,8 +59,7 @@ class ArgumentResolverTest {
     void parseArguments_ValidQuotingArgsList_ReturnsEntireParsedArgsList() {
         List<String> argsList = new ArrayList<>(VALID_QUOTE_CONTENTS.keySet());
         List<String> result = assertDoesNotThrow(() -> argumentResolver.parseArguments(argsList));
-        assertEquals(VALID_QUOTE_CONTENTS.values().stream().flatMap(List::stream).collect(Collectors.toList()),
-                result);
+        assertEquals(VALID_QUOTE_CONTENTS.values().stream().flatMap(List::stream).collect(Collectors.toList()), result);
     }
 
     /**
@@ -79,42 +76,53 @@ class ArgumentResolverTest {
     /**
      * Globbing unit test case for parsing globbing arguments when the paths exist.
      *
-     * @param tempDir Temporary directory
+     * @param tempDir Temporary directory's path
      */
     @Test
     void parseArguments_GlobbingArgsListExists_ReturnsAllPathsFound(@TempDir Path tempDir) {
         // Set current working directory to the temporary dir
-        System.setProperty("user.dir", tempDir.toString());
+        Environment.currentDirectory = tempDir.toString();
 
-        Path subDir = tempDir.resolve("subdirectory");
-        assertDoesNotThrow(() -> Files.createDirectories(subDir));
-        assertDoesNotThrow(() -> subDir.resolve("file1.txt").toFile().createNewFile());
-        assertDoesNotThrow(() -> subDir.resolve("file2.txt").toFile().createNewFile());
-        assertDoesNotThrow(() -> subDir.resolve("file3.txt").toFile().createNewFile());
+        // Create directory structure and files
+        Path parent = tempDir.resolve("parent");
+        assertDoesNotThrow(() -> Files.createDirectories(parent));
 
-        List<String> argList = List.of("subdirectory/*");
+        Path childOne = parent.resolve("child1");
+        assertDoesNotThrow(() -> Files.createDirectories(childOne));
+
+        Path childTwo = parent.resolve("child2");
+        assertDoesNotThrow(() -> Files.createDirectories(childTwo));
+
+        assertDoesNotThrow(() -> childOne.resolve("file1.txt").toFile().createNewFile());
+        assertDoesNotThrow(() -> childOne.resolve("file2.txt").toFile().createNewFile());
+        assertDoesNotThrow(() -> childTwo.resolve("file3.txt").toFile().createNewFile());
+        assertDoesNotThrow(() -> childTwo.resolve("file4.txt").toFile().createNewFile());
+
+        List<String> argList = List.of("parent/child1/*", "parent/child2/*");
+        List<String> expected = List.of("parent/child1/file1.txt", "parent/child1/file2.txt",
+                "parent/child2/file3.txt", "parent/child2/file4.txt");
         List<String> result = assertDoesNotThrow(() -> argumentResolver.parseArguments(argList));
-        assertEquals(List.of("subdirectory/file1.txt", "subdirectory/file2.txt", "subdirectory/file3.txt"), result);
+        assertEquals(expected, result);
     }
 
     /**
      * Globbing unit test case for parsing globbing arguments when the paths do not exist.
      *
-     * @param tempDir Temporary directory
+     * @param args    The globbing arguments to be parsed
+     * @param tempDir Temporary directory's path
      */
     @ParameterizedTest
     @ValueSource(strings = {"parent/*", "parent/child/*", "parent/child/grandchild/*"})
     void parseArguments_GlobbingArgsListDoNotExists_ReturnsGivenArgsList(String args, @TempDir Path tempDir) {
         // Set current working directory to the temporary dir
-        System.setProperty("user.dir", tempDir.toString());
-
+        Environment.currentDirectory = tempDir.toString();
         List<String> argList = List.of(args);
         List<String> result = assertDoesNotThrow(() -> argumentResolver.parseArguments(argList));
         assertEquals(argList, result);
     }
 
     /**
-     * Quoting unit test case to test resolveOneArgument returns the quote contents passed into the method if it is valid.
+     * Quoting unit test case to verify that the quote contents are returned when they are valid.
      *
      * @param validQuoteContent The valid quote content to test
      * @param expected          The expected result
@@ -127,7 +135,7 @@ class ArgumentResolverTest {
     }
 
     /**
-     * Quoting unit test case to test resolveOneArgument throws ShellException if the quote content passed into the method is invalid.
+     * Quoting unit test case to throw ShellException when the quote contents are invalid.
      *
      * @param invalidQuoteContent The invalid quote content to test
      */
@@ -141,5 +149,38 @@ class ArgumentResolverTest {
         Throwable result = assertThrows(ShellException.class,
                 () -> argumentResolver.resolveOneArgument(invalidQuoteContent));
         assertEquals(String.format("shell: %s", ERR_SYNTAX), result.getMessage());
+    }
+
+    /**
+     * Globbing unit test case to resolve one globbing argument when the paths exist.
+     *
+     * @param tempDir Temporary directory's path
+     */
+    @Test
+    void resolveOneArgument_GlobbingArgExists_ReturnsAllExistingPaths(@TempDir Path tempDir) {
+        // Set current working directory to the temporary dir
+        Environment.currentDirectory = tempDir.toString();
+
+        Path subDir = tempDir.resolve("subdirectory");
+        assertDoesNotThrow(() -> Files.createDirectories(subDir));
+        assertDoesNotThrow(() -> subDir.resolve("file1.txt").toFile().createNewFile());
+        assertDoesNotThrow(() -> subDir.resolve("file2.txt").toFile().createNewFile());
+        assertDoesNotThrow(() -> subDir.resolve("file3.txt").toFile().createNewFile());
+
+        List<String> result = assertDoesNotThrow(() -> argumentResolver.resolveOneArgument("subdirectory/*"));
+        assertEquals(List.of("subdirectory/file1.txt", "subdirectory/file2.txt", "subdirectory/file3.txt"), result);
+    }
+
+    /**
+     * Globbing unit test case to resolve one globbing argument when the paths do not exist.
+     *
+     * @param tempDir Temporary directory's path
+     */
+    @Test
+    void resolveOneArgument_GlobbingArgDoNotExists_ReturnsGivenArg(@TempDir Path tempDir) {
+        // Set current working directory to the temporary dir
+        Environment.currentDirectory = tempDir.toString();
+        List<String> result = assertDoesNotThrow(() -> argumentResolver.resolveOneArgument("subdirectory/*"));
+        assertEquals(List.of("subdirectory/*"), result);
     }
 }
