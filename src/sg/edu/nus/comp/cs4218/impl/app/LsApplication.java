@@ -22,7 +22,7 @@ import sg.edu.nus.comp.cs4218.impl.parser.LsArgsParser;
 import sg.edu.nus.comp.cs4218.impl.util.StringUtils;
 
 /**
- * The ls command list information about files.
+ * The ls command lists information about files.
  *
  * <p>
  * <b>Command format:</b> <code>ls [Options][FILES]</code>
@@ -34,9 +34,9 @@ public class LsApplication implements LsInterface {
      * Runs the ls application with the specified arguments.
      *
      * @param args   Array of arguments for the application. Each array element is the path to
-     *               a file (non-folders or folders).
-     * @param stdin  An InputStream, not used.
-     * @param stdout An OutputStream. The output of the command is written to this OutputStream.
+     *               a file (non-folders or folders)
+     * @param stdin  An InputStream, not used
+     * @param stdout An OutputStream. The output of the command is written to this OutputStream
      * @throws LsException
      */
     @Override
@@ -71,13 +71,13 @@ public class LsApplication implements LsInterface {
     }
 
     /**
-     * Return the string listing the folder content of the specified folders. If no folder names are
+     * Returns the string listing the folder content of the specified folders. If no folder names are
      * specified, list the content of the current folder.
      *
      * @param isRecursive Boolean option to recursively list the folder contents (traversing
      *                    through all folders inside the specified folder)
      * @param isSortByExt Boolean option to sort folder contents alphabetically by file extension
-     *                    (characters after the last '.' (without quotes)) Files with no extension are sorted first.
+     *                    (characters after the last '.' (without quotes)) Files with no extension are sorted first
      * @param folderName  Array of String of folder names
      * @throws LsException
      */

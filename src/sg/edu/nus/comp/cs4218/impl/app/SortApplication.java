@@ -43,11 +43,11 @@ public class SortApplication implements SortInterface {
      * Runs the sort application with the specified arguments.
      *
      * @param args   Array of arguments for the application. Each array element is the path to a
-     *               file. If no files are specified stdin is used.
+     *               file. If no files are specified stdin is used
      * @param stdin  An InputStream. The input for the command is read from this InputStream if no
-     *               files are specified.
+     *               files are specified
      * @param stdout An OutputStream. The output of the command is written to this OutputStream
-     * @throws SortException If an I/O exception occurs.
+     * @throws SortException If an I/O exception occurs
      */
     @Override
     public void run(String[] args, InputStream stdin, OutputStream stdout) throws SortException {
