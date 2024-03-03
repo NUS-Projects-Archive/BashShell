@@ -22,6 +22,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import sg.edu.nus.comp.cs4218.Environment;
 import sg.edu.nus.comp.cs4218.exception.ShellException;
 
+@SuppressWarnings("PMD.ClassNamingConventions")
 public class ArgumentResolverIT {
 
     private static final String STRING_ECHO = "echo";
