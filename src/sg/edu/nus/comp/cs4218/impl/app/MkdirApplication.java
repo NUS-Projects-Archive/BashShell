@@ -57,8 +57,8 @@ public class MkdirApplication implements MkdirInterface {
         }
 
         for (String folder : directories) {
-            String folderAbsolutePath = getAbsolutePath(folder);
-            File file = new File(folderAbsolutePath);
+            String folderAbsPath = getAbsolutePath(folder);
+            File file = new File(folderAbsPath);
 
             if ((!isCreateParent && isAnyTopLevelFolderMissing(file))) {
                 throw new MkdirException(ERR_TOP_LEVEL_MISSING);
@@ -79,8 +79,8 @@ public class MkdirApplication implements MkdirInterface {
     @Override
     public void createFolder(String... folderName) {
         for (String folder : folderName) {
-            String folderAbsolutePath = getAbsolutePath(folder);
-            File file = new File(folderAbsolutePath);
+            String folderAbsPath = getAbsolutePath(folder);
+            File file = new File(folderAbsPath);
             file.mkdirs();
         }
     }
