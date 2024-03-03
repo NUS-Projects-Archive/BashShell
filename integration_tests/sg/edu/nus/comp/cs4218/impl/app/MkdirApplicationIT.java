@@ -30,7 +30,6 @@ public class MkdirApplicationIT {
 
     @TempDir
     private Path tempDir;
-    private Path tempFilePath;
     private String tempFile;
 
     @BeforeEach
@@ -38,7 +37,7 @@ public class MkdirApplicationIT {
         app = new MkdirApplication();
 
         // Create temporary file, automatically deletes after test execution
-        tempFilePath = tempDir.resolve(TEMP_FILE);
+        Path tempFilePath = tempDir.resolve(TEMP_FILE);
         tempFile = tempFilePath.toString();
         Files.createFile(tempFilePath);
     }
