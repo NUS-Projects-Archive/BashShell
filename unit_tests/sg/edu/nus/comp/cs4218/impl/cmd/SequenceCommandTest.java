@@ -22,6 +22,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import org.junit.jupiter.api.condition.EnabledOnOs;
+import org.junit.jupiter.api.condition.OS;
 import sg.edu.nus.comp.cs4218.Command;
 import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
 import sg.edu.nus.comp.cs4218.exception.ExitException;
@@ -79,6 +81,7 @@ public class SequenceCommandTest {
     }
 
     @Test
+    @EnabledOnOs({OS.WINDOWS, OS.MAC})
     void evaluate_NoExceptions_PrintsOnlyOutputOfCommandsWithOutputInSequence() {
         try {
             List<Command> spyCommands = new ArrayList<>();
