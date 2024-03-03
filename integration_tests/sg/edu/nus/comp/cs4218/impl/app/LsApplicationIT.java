@@ -50,7 +50,8 @@ import sg.edu.nus.comp.cs4218.Environment;
 import sg.edu.nus.comp.cs4218.exception.InvalidDirectoryLsException;
 import sg.edu.nus.comp.cs4218.exception.LsException;
 
-class LsApplicationIT { //NOPMD - suppressed ClassNamingConventions - Following naming convention
+@SuppressWarnings("PMD.ClassNamingConventions")
+class LsApplicationIT {
     private static final String[] CWD_NON_DIRS = {"a.z", "z.a", "z"};
     private static final String DIR_A_NAME = "dirA";
     private static final String[] CWD_DIRS = {DIR_A_NAME};
