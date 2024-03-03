@@ -22,19 +22,26 @@ import sg.edu.nus.comp.cs4218.exception.InvalidArgsException;
 
 class MvArgsParserTest {
 
+    private final static String FLAG_OVERWRITE = "-n";
+    private final static String FILE_ONE = "file1";
+    private final static String FILE_TWO = "file2";
+    private final static String FILE_THREE = "file3";
+
     private final Set<Character> VALID_FLAGS = Set.of('n');
     private MvArgsParser mvArgsParser;
 
-    @SuppressWarnings("PMD.AvoidDuplicateLiterals")
     private static Stream<Arguments> validSyntax() {
         return Stream.of(
                 Arguments.of((Object) new String[]{}),
-                Arguments.of((Object) new String[]{"-n"}),
-                Arguments.of((Object) new String[]{"example"}),
-                Arguments.of((Object) new String[]{"-n", "example"}),
-                Arguments.of((Object) new String[]{"example1, example2"}),
-                Arguments.of((Object) new String[]{"-n", "example1, example2"}),
-                Arguments.of((Object) new String[]{"example1", "example2", "-n"})
+                Arguments.of((Object) new String[]{FLAG_OVERWRITE}),
+                Arguments.of((Object) new String[]{FILE_ONE}),
+                Arguments.of((Object) new String[]{FLAG_OVERWRITE, FILE_ONE}),
+                Arguments.of((Object) new String[]{FILE_ONE, FLAG_OVERWRITE}),
+                Arguments.of((Object) new String[]{FILE_ONE, FILE_TWO}),
+                Arguments.of((Object) new String[]{FLAG_OVERWRITE, FILE_ONE, FILE_TWO}),
+                Arguments.of((Object) new String[]{FILE_ONE, FILE_TWO, FLAG_OVERWRITE}),
+                Arguments.of((Object) new String[]{FLAG_OVERWRITE, FILE_ONE, FILE_TWO, FILE_THREE}),
+                Arguments.of((Object) new String[]{FILE_ONE, FILE_TWO, FILE_THREE, FLAG_OVERWRITE})
         );
     }
 
@@ -65,7 +72,7 @@ class MvArgsParserTest {
 
     @Test
     void parse_ValidFlag_ReturnsGivenMatchingFlag() {
-        assertDoesNotThrow(() -> mvArgsParser.parse("-n"));
+        assertDoesNotThrow(() -> mvArgsParser.parse(FLAG_OVERWRITE));
         assertEquals(VALID_FLAGS, mvArgsParser.flags, "Flags do not match");
     }
 
@@ -98,13 +105,13 @@ class MvArgsParserTest {
 
     @Test
     void isOverwrite_ValidFlag_ReturnsFalse() {
-        assertDoesNotThrow(() -> mvArgsParser.parse("-n"));
+        assertDoesNotThrow(() -> mvArgsParser.parse(FLAG_OVERWRITE));
         assertFalse(mvArgsParser.isOverwrite());
     }
 
     @Test
     void isOverwrite_OnlyNonFlagArg_ReturnsFalse() {
-        assertDoesNotThrow(() -> mvArgsParser.parse("example"));
+        assertDoesNotThrow(() -> mvArgsParser.parse(FILE_ONE));
         assertTrue(mvArgsParser.isOverwrite());
     }
 
@@ -116,7 +123,7 @@ class MvArgsParserTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"example", "-n example"})
+    @ValueSource(strings = {"file1", "-n file2"})
     void getSourceDirectories_OneNonFlagArg_ReturnsEmptyList(String args) {
         assertDoesNotThrow(() -> mvArgsParser.parse(splitArgs(args)));
         List<String> expected = List.of();
@@ -125,19 +132,19 @@ class MvArgsParserTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"example1 example2", "-n example1 example2"})
+    @ValueSource(strings = {"file1 file2", "-n file1 file2"})
     void getSourceDirectories_TwoNonFlagArgs_ReturnsFirstDirectory(String args) {
         assertDoesNotThrow(() -> mvArgsParser.parse(splitArgs(args)));
-        List<String> expected = List.of("example1");
+        List<String> expected = List.of(FILE_ONE);
         List<String> result = mvArgsParser.getSourceDirectories();
         assertEquals(expected, result);
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"example1 example2 example3", "-n example1 example2 example3"})
+    @ValueSource(strings = {"file1 file2 file3", "-n file1 file2 file3"})
     void getSourceDirectories_MultipleNonFlagArgs_ReturnsAllDirectoriesExceptLast(String args) {
         assertDoesNotThrow(() -> mvArgsParser.parse(splitArgs(args)));
-        List<String> expected = List.of("example1", "example2");
+        List<String> expected = List.of(FILE_ONE, FILE_TWO);
         List<String> result = mvArgsParser.getSourceDirectories();
         assertEquals(expected, result);
     }
@@ -150,29 +157,26 @@ class MvArgsParserTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"example", "-n example"})
+    @ValueSource(strings = {"file1", "-n file1"})
     void getDestinationDirectory_OneNonFlagArg_ReturnsLastDirectory(String args) {
         assertDoesNotThrow(() -> mvArgsParser.parse(splitArgs(args)));
-        String expected = "example";
         String result = mvArgsParser.getDestinationDirectory();
-        assertEquals(expected, result);
+        assertEquals(FILE_ONE, result);
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"example1 example2", "-n example1 example2"})
+    @ValueSource(strings = {"file1 file2", "-n file1 file2"})
     void getDestinationDirectory_TwoNonFlagArgs_ReturnsLastDirectory(String args) {
         assertDoesNotThrow(() -> mvArgsParser.parse(splitArgs(args)));
-        String expected = "example2";
         String result = mvArgsParser.getDestinationDirectory();
-        assertEquals(expected, result);
+        assertEquals(FILE_TWO, result);
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"example1 example2 example3", "-n example1 example2 example3"})
+    @ValueSource(strings = {"file1 file2 file3", "-n file1 file2 file3"})
     void getDestinationDirectory_MultipleNonFlagArgs_ReturnsReturnsLastDirectory(String args) {
         assertDoesNotThrow(() -> mvArgsParser.parse(splitArgs(args)));
-        String expected = "example3";
         String result = mvArgsParser.getDestinationDirectory();
-        assertEquals(expected, result);
+        assertEquals(FILE_THREE, result);
     }
 }
