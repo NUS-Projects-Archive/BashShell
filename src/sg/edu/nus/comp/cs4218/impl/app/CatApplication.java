@@ -24,6 +24,13 @@ import sg.edu.nus.comp.cs4218.impl.util.ArgumentResolver;
 import sg.edu.nus.comp.cs4218.impl.util.IORedirectionHandler;
 import sg.edu.nus.comp.cs4218.impl.util.StringUtils;
 
+/**
+ * The cat command concatenates its input arguments and writes the output on the standard output, or to an output file.
+ *
+ * <p>
+ * <b>Command format:</b> <code>cat [ARGS]...</code>
+ * </p>
+ */
 public class CatApplication implements CatInterface {
     public static final String ERR_WRITE_STREAM = "Could not write to output stream";
 
@@ -93,6 +100,15 @@ public class CatApplication implements CatInterface {
         }
     }
 
+    /**
+     * Concatenate files.
+     *
+     * @param isLineNumber   Boolean. If true, concatenate files with line numbering.
+     *                       If false, concatenate files without line numbering.
+     * @param fileNames  Array of file names to be concatenated. An array element may be used to
+     *                   specify multiple file names using * as wildcard.
+     * @throws CatException If the file(s) specified do not exist or are unreadable.
+     */
     @Override
     public String catFiles(Boolean isLineNumber, String... fileNames) throws CatException {
         StringBuilder result = new StringBuilder();
@@ -123,12 +139,31 @@ public class CatApplication implements CatInterface {
         return result.toString();
     }
 
+    /**
+     * Concatenate from standard input.
+     *
+     * @param isLineNumber   Boolean. If true, concatenates from standard input with line numbering.
+     *                       If false, concatenates from standard input without line numbering.
+     * @param stdin         InputStream to be read from for concatenation.
+     * @throws CatException If an I/O error occurs when standard input is read.
+     */
     @Override
     public String catStdin(Boolean isLineNumber, InputStream stdin) throws CatException {
         BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(stdin));
         return readStdIn(isLineNumber, bufferedReader);
     }
 
+    /**
+     * Concatenate files as well as from standard input.
+     *
+     * @param isLineNumber   Boolean. If true, concatenates with line numbering.
+     *                       If false, concatenates without line numbering.
+     * @param stdin         InputStream to be read from for concatenation.
+     * @param fileNames     Array of file names to be concatenated. An array element may be used to
+     *                      specify multiple file names using * as wildcard.
+     * @throws CatException If an I/O error occurs when standard input is read, or if the file(s) specified
+     *                      do not exist or are unreadable.
+     */
     @Override
     public String catFileAndStdin(Boolean isLineNumber, InputStream stdin, String... fileNames) throws CatException {
         StringBuilder result = new StringBuilder();
@@ -162,6 +197,15 @@ public class CatApplication implements CatInterface {
         return result.toString();
     }
 
+    /**
+     * Reads from a Buffered Reader line by line until an empty line is encountered, and returns a concatenated
+     * String of inputs that were read.
+     *
+     * @param isLineNumber   Boolean. If true, concatenates with line numbering.
+     *                       If false, concatenates without line numbering.
+     * @param bufferedReader A buffering character-input stream that uses a default-sized input buffer.
+     * @throws CatException If an I/O error occurs when bufferedReader is read.
+     */
     public String readStdIn(Boolean isLineNumber, BufferedReader bufferedReader) throws CatException {
         StringBuilder userInput = new StringBuilder();
         String line;
@@ -187,6 +231,15 @@ public class CatApplication implements CatInterface {
         return userInput.append(StringUtils.STRING_NEWLINE).toString();
     }
 
+    /**
+     * Reads from a file line by line until an empty line is encountered, and returns a concatenated
+     * String of file contents that were read.
+     *
+     * @param isLineNumber   Boolean. If true, concatenates with line numbering.
+     *                       If false, concatenates without line numbering.
+     * @param file          A File object to be read.
+     * @throws CatException If the file specified does not exist or is unreadable.
+     */
     public String readFile(Boolean isLineNumber, File file) throws IOException, CatException {
         StringBuilder content = new StringBuilder();
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
