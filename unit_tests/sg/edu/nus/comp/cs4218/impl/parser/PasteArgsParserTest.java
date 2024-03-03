@@ -22,17 +22,31 @@ import sg.edu.nus.comp.cs4218.exception.InvalidArgsException;
 
 public class PasteArgsParserTest {
 
-    private final Set<Character> VALID_FLAGS = Set.of('s');
+    private static final Set<Character> VALID_FLAGS = Set.of('s');
+    private static final String FLAG_SERIAL = "-s";
+    private static final String FILE_ONE = "file1";
+    private static final String FILE_TWO = "file2";
+    private static final String FILE_THREE = "file3";
+    private static final String STDIN = "-";
     private PasteArgsParser pasteArgsParser;
 
-    @SuppressWarnings("PMD.AvoidDuplicateLiterals")
     private static Stream<Arguments> validSyntax() {
         return Stream.of(
                 Arguments.of((Object) new String[]{}),
-                Arguments.of((Object) new String[]{"-s"}),
-                Arguments.of((Object) new String[]{"example"}),
-                Arguments.of((Object) new String[]{"-s", "example"}),
-                Arguments.of((Object) new String[]{"example", "-s"})
+                Arguments.of((Object) new String[]{FLAG_SERIAL}),
+                Arguments.of((Object) new String[]{FILE_ONE}),
+                Arguments.of((Object) new String[]{STDIN}),
+                Arguments.of((Object) new String[]{FLAG_SERIAL, FILE_ONE}),
+                Arguments.of((Object) new String[]{FILE_ONE, FLAG_SERIAL}),
+                Arguments.of((Object) new String[]{FLAG_SERIAL, FILE_ONE, STDIN}),
+                Arguments.of((Object) new String[]{STDIN, FILE_ONE, FLAG_SERIAL}),
+                Arguments.of((Object) new String[]{FILE_ONE, FILE_TWO}),
+                Arguments.of((Object) new String[]{FLAG_SERIAL, FILE_ONE, FILE_TWO}),
+                Arguments.of((Object) new String[]{FILE_ONE, FILE_TWO, FLAG_SERIAL}),
+                Arguments.of((Object) new String[]{STDIN, FILE_ONE, FILE_TWO}),
+                Arguments.of((Object) new String[]{FILE_ONE, FILE_TWO, STDIN}),
+                Arguments.of((Object) new String[]{FLAG_SERIAL, FILE_ONE, FILE_TWO, STDIN}),
+                Arguments.of((Object) new String[]{STDIN, FILE_ONE, FILE_TWO, FLAG_SERIAL})
         );
     }
 
@@ -77,19 +91,19 @@ public class PasteArgsParserTest {
 
     @Test
     void isSerial_ValidFlag_ReturnsTrue() throws InvalidArgsException {
-        pasteArgsParser.parse("-s");
+        pasteArgsParser.parse(FLAG_SERIAL);
         assertTrue(pasteArgsParser.isSerial());
     }
 
     @Test
     void isSerial_ValidFlagAndNonFlagArg_ReturnsTrue() throws InvalidArgsException {
-        pasteArgsParser.parse("-s", "example");
+        pasteArgsParser.parse(FLAG_SERIAL, FILE_ONE);
         assertTrue(pasteArgsParser.isSerial());
     }
 
     @Test
     void isSerial_OnlyNonFlagArg_ReturnsFalse() throws InvalidArgsException {
-        pasteArgsParser.parse("example");
+        pasteArgsParser.parse(FILE_ONE);
         assertFalse(pasteArgsParser.isSerial());
     }
 
@@ -102,26 +116,25 @@ public class PasteArgsParserTest {
 
     @Test
     void getNonFlagArgs_OneNonFlagArg_ReturnsOneNonFlagArg() throws InvalidArgsException {
-        pasteArgsParser.parse("example");
+        pasteArgsParser.parse(FILE_ONE);
         List<String> result = pasteArgsParser.getNonFlagArgs();
-        List<String> expected = List.of("example");
+        List<String> expected = List.of(FILE_ONE);
         assertEquals(expected, result);
     }
 
     @Test
     void getNonFlagArgs_MultipleNonFlagArgs_ReturnsMultipleNonFlagArgs() throws InvalidArgsException {
-        pasteArgsParser.parse("example1", "example2", "example3");
-        List<String> expected = List.of("example1", "example2", "example3");
+        pasteArgsParser.parse(FILE_ONE, FILE_TWO, FILE_THREE);
+        List<String> expected = List.of(FILE_ONE, FILE_TWO, FILE_THREE);
         List<String> result = pasteArgsParser.getNonFlagArgs();
         assertEquals(expected, result);
     }
 
     @Test
     void getNonFlagArgs_ValidFlagAndOneNonFlagArg_ReturnsOneNonFlagArg() throws InvalidArgsException {
-        pasteArgsParser.parse("-s", "example");
-        List<String> expected = List.of("example");
+        pasteArgsParser.parse(FLAG_SERIAL, FILE_ONE);
+        List<String> expected = List.of(FILE_ONE);
         List<String> result = pasteArgsParser.getNonFlagArgs();
         assertEquals(expected, result);
     }
-
 }
