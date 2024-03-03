@@ -25,34 +25,47 @@ public class ShellImpl implements Shell {
      */
     public static void main(String... args) {
         String commandString;
-        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
         Shell shell = new ShellImpl();
+        BufferedReader reader = null;
 
-        // Forever loop to maintain shell until ExitCommand
-        while (true) {
-            try {
-                System.out.print(Environment.currentDirectory + "$ ");
+        try {
+            reader = new BufferedReader(new InputStreamReader(System.in));
 
-                // Read input from user
+            // Forever loop to maintain shell until ExitCommand
+            while (true) {
                 try {
-                    commandString = reader.readLine();
+                    System.out.print(Environment.currentDirectory + "$ ");
+
+                    // Read input from user
+                    try {
+                        commandString = reader.readLine();
+                    } catch (IOException e) {
+                        System.out.println(e.getMessage());
+                        System.exit(1); // Streams are closed, terminate process with non-zero exit code
+                        return;
+                    }
+
+                    // Exit loop if Ctrl+D or EOF is encountered
+                    if (commandString == null) {
+                        new ExitApplication().terminateExecution(); // Let ExitApplication terminate gracefully
+                    }
+
+                    // Process given input
+                    if (!StringUtils.isBlank(commandString)) {
+                        shell.parseAndEvaluate(commandString, System.out);
+                    }
+                } catch (Exception e) {
+                    System.out.println(e.getMessage());
+                }
+            }
+        } finally {
+            if (reader != null) {
+                try {
+                    reader.close();
                 } catch (IOException e) {
                     System.out.println(e.getMessage());
                     System.exit(1); // Streams are closed, terminate process with non-zero exit code
-                    return;
                 }
-
-                // Exit loop if Ctrl+D or EOF is encountered
-                if (commandString == null) {
-                    new ExitApplication().terminateExecution(); // Let ExitApplication terminate gracefully
-                }
-
-                // Process given input
-                if (!StringUtils.isBlank(commandString)) {
-                    shell.parseAndEvaluate(commandString, System.out);
-                }
-            } catch (Exception e) {
-                System.out.println(e.getMessage());
             }
         }
     }

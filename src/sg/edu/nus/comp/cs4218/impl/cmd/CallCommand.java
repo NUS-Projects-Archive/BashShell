@@ -20,6 +20,7 @@ import sg.edu.nus.comp.cs4218.impl.util.IOUtils;
  * <p>
  * Command format: (<non-keyword> or <quoted>) *
  */
+
 public class CallCommand implements Command {
     private final List<String> argsList;
     private final ApplicationRunner appRunner;
@@ -31,6 +32,7 @@ public class CallCommand implements Command {
         this.argumentResolver = argumentResolver;
     }
 
+    @SuppressWarnings("PMD.CloseResource")
     @Override
     public void evaluate(InputStream stdin, OutputStream stdout)
             throws AbstractApplicationException, ShellException, FileNotFoundException {
@@ -51,6 +53,9 @@ public class CallCommand implements Command {
             String app = parsedArgsList.remove(0);
             appRunner.runApp(app, parsedArgsList.toArray(new String[0]), inputStream, outputStream);
         }
+
+        IOUtils.closeInputStream(inputStream);
+        IOUtils.closeOutputStream(outputStream);
     }
 
     @Override

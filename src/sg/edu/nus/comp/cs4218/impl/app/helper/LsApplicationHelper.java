@@ -20,9 +20,11 @@ import sg.edu.nus.comp.cs4218.exception.InvalidDirectoryLsException;
 import sg.edu.nus.comp.cs4218.exception.LsException;
 import sg.edu.nus.comp.cs4218.impl.util.StringUtils;
 
-public class LsApplicationHelper {
-    private final static String PATH_CURR_DIR = STRING_CURR_DIR + CHAR_FILE_SEP;
-    private final static String COLON_NEW_LINE = ":" + StringUtils.STRING_NEWLINE;
+public final class LsApplicationHelper {
+    private static final String PATH_CURR_DIR = STRING_CURR_DIR + CHAR_FILE_SEP;
+    private static final String COLON_NEW_LINE = ":" + StringUtils.STRING_NEWLINE;
+
+    private LsApplicationHelper() { /* Does nothing*/ }
 
     /**
      * Lists only the current directory's content and RETURNS.
