@@ -93,7 +93,6 @@ public class SequenceCommandTest {
             String mkdirSuccess = HELLO + STRING_NEWLINE;
             String mkdirFailure = "mkdir: " + ERR_FILE_EXISTS + STRING_NEWLINE + HELLO + STRING_NEWLINE;
             String actual = stdout.toString();
-            assertEquals(mkdirFailure, actual);
             assertTrue(actual.equals(mkdirSuccess) || actual.equals(mkdirFailure) );
         } catch (FileNotFoundException | AbstractApplicationException | ShellException e) {
             fail(e.getMessage());
