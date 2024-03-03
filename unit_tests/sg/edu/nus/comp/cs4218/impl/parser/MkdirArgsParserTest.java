@@ -23,7 +23,9 @@ import sg.edu.nus.comp.cs4218.exception.InvalidArgsException;
 class MkdirArgsParserTest {
 
     private final static String FLAG_CR_PARENT = "-p";
-    private final static String NON_FLAG_ARG = "example";
+    private final static String FILE_ONE = "file1";
+    private final static String FILE_TWO = "file2";
+    private final static String FILE_THREE = "file3";
     private final Set<Character> VALID_FLAGS = Set.of('p');
     private MkdirArgsParser mkdirArgsParser;
 
@@ -31,9 +33,14 @@ class MkdirArgsParserTest {
         return Stream.of(
                 Arguments.of((Object) new String[]{}),
                 Arguments.of((Object) new String[]{FLAG_CR_PARENT}),
-                Arguments.of((Object) new String[]{NON_FLAG_ARG}),
-                Arguments.of((Object) new String[]{FLAG_CR_PARENT, NON_FLAG_ARG}),
-                Arguments.of((Object) new String[]{NON_FLAG_ARG, FLAG_CR_PARENT})
+                Arguments.of((Object) new String[]{FILE_ONE}),
+                Arguments.of((Object) new String[]{FLAG_CR_PARENT, FILE_ONE}),
+                Arguments.of((Object) new String[]{FILE_ONE, FLAG_CR_PARENT}),
+                Arguments.of((Object) new String[]{FILE_ONE, FILE_TWO}),
+                Arguments.of((Object) new String[]{FLAG_CR_PARENT, FILE_ONE, FILE_TWO}),
+                Arguments.of((Object) new String[]{FILE_ONE, FILE_TWO, FLAG_CR_PARENT}),
+                Arguments.of((Object) new String[]{FLAG_CR_PARENT, FILE_ONE, FILE_TWO, FILE_THREE}),
+                Arguments.of((Object) new String[]{FILE_ONE, FILE_TWO, FILE_THREE, FLAG_CR_PARENT})
         );
     }
 
@@ -99,13 +106,13 @@ class MkdirArgsParserTest {
 
     @Test
     void isCreateParent_ValidFlagAndNonFlagArg_ReturnsTrue() {
-        assertDoesNotThrow(() -> mkdirArgsParser.parse(FLAG_CR_PARENT, NON_FLAG_ARG));
+        assertDoesNotThrow(() -> mkdirArgsParser.parse(FLAG_CR_PARENT, FILE_ONE));
         assertTrue(mkdirArgsParser.isCreateParent());
     }
 
     @Test
     void isCreateParent_OnlyNonFlagArg_ReturnsFalse() {
-        assertDoesNotThrow(() -> mkdirArgsParser.parse(NON_FLAG_ARG));
+        assertDoesNotThrow(() -> mkdirArgsParser.parse(FILE_ONE));
         assertFalse(mkdirArgsParser.isCreateParent());
     }
 
@@ -118,24 +125,24 @@ class MkdirArgsParserTest {
 
     @Test
     void getDirectories_OneNonFlagArg_ReturnsOneFolder() {
-        assertDoesNotThrow(() -> mkdirArgsParser.parse(NON_FLAG_ARG));
-        List<String> expected = List.of(NON_FLAG_ARG);
+        assertDoesNotThrow(() -> mkdirArgsParser.parse(FILE_ONE));
+        List<String> expected = List.of(FILE_ONE);
         List<String> result = mkdirArgsParser.getDirectories();
         assertEquals(expected, result);
     }
 
     @Test
     void getDirectories_MultipleNonFlagArg_ReturnsMultipleFolder() {
-        assertDoesNotThrow(() -> mkdirArgsParser.parse("example1", "example2", "example3"));
-        List<String> expected = List.of("example1", "example2", "example3");
+        assertDoesNotThrow(() -> mkdirArgsParser.parse(FILE_ONE, FILE_TWO, FILE_THREE));
+        List<String> expected = List.of(FILE_ONE, FILE_TWO, FILE_THREE);
         List<String> result = mkdirArgsParser.getDirectories();
         assertEquals(expected, result);
     }
 
     @Test
     void getDirectories_ValidFlagAndOneNonFlagArg_ReturnsOneFolder() {
-        assertDoesNotThrow(() -> mkdirArgsParser.parse(FLAG_CR_PARENT, NON_FLAG_ARG));
-        List<String> expected = List.of(NON_FLAG_ARG);
+        assertDoesNotThrow(() -> mkdirArgsParser.parse(FLAG_CR_PARENT, FILE_ONE));
+        List<String> expected = List.of(FILE_ONE);
         List<String> result = mkdirArgsParser.getDirectories();
         assertEquals(expected, result);
     }
