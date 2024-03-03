@@ -1,9 +1,6 @@
 package sg.edu.nus.comp.cs4218.impl.cmd;
 
-import sg.edu.nus.comp.cs4218.Command;
-import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
-import sg.edu.nus.comp.cs4218.exception.ExitException;
-import sg.edu.nus.comp.cs4218.exception.ShellException;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
@@ -13,7 +10,10 @@ import java.io.OutputStream;
 import java.util.LinkedList;
 import java.util.List;
 
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
+import sg.edu.nus.comp.cs4218.Command;
+import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
+import sg.edu.nus.comp.cs4218.exception.ExitException;
+import sg.edu.nus.comp.cs4218.exception.ShellException;
 
 /**
  * A Sequence Command is a sub-command consisting of two Commands separated with a semicolon.
@@ -27,6 +27,16 @@ public class SequenceCommand implements Command {
         this.commands = commands;
     }
 
+    /**
+     * Writes the order-preserved output of a series of sub commands to stdout, including exception messages if any.
+     *
+     * @param stdin   An InputStream. The first sub command processing an InputStream will be evaluated with this as its
+     *                initial InputStream.
+     * @param stdout  An OutputStream for the order-preserved output of the sub commands to be written to.
+     * @throws ExitException If ExitException is thrown from any sub-commands. The ExitException is only thrown at the
+     *                       end of execution, even if the exception did not come from the last sub-command.
+     * @throws ShellException If an I/O exception occurs when writing to stdout.
+     */
     @Override
     public void evaluate(InputStream stdin, OutputStream stdout)
             throws AbstractApplicationException, ShellException, FileNotFoundException {
@@ -54,7 +64,7 @@ public class SequenceCommand implements Command {
             try {
                 stdout.write(outputLine.getBytes());
             } catch (IOException e) {
-                throw new ShellException(e.getMessage());
+                throw new ShellException(e.getMessage(), e);
             }
         }
 

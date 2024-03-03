@@ -4,6 +4,7 @@ package sg.edu.nus.comp.cs4218.impl.util;
 public class ErrorConstants {
 
     // Streams related
+    public static final String ERR_READ_STREAM = "Could not read from input stream";
     public static final String ERR_WRITE_STREAM = "Could not write to output stream";
     public static final String ERR_NULL_STREAMS = "Null Pointer Exception";
     public static final String ERR_CLOSING_STREAMS = "Unable to close streams";

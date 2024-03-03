@@ -1,6 +1,6 @@
 package sg.edu.nus.comp.cs4218.impl.util;
 
-import sg.edu.nus.comp.cs4218.Environment;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_ASTERISK;
 
 import java.io.File;
 import java.nio.file.Paths;
@@ -10,19 +10,18 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_ASTERISK;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_FILE_SEP;
+import sg.edu.nus.comp.cs4218.Environment;
 
 @SuppressWarnings("PMD.AvoidStringBufferField")
 public final class RegexArgument {
-    private StringBuilder plaintext;
-    private StringBuilder regex;
-    private boolean isRegex;
+    private final StringBuilder plaintext;
+    private final StringBuilder regex;
+    private boolean hasAsterisk;
 
     public RegexArgument() {
         this.plaintext = new StringBuilder();
         this.regex = new StringBuilder();
-        this.isRegex = false;
+        this.hasAsterisk = false;
     }
 
     public RegexArgument(String str) {
@@ -32,10 +31,10 @@ public final class RegexArgument {
 
     // Used for `find` command.
     // `text` here corresponds to the folder that we want to look in.
-    public RegexArgument(String str, String text, boolean isRegex) {
+    public RegexArgument(String str, String text, boolean hasAsterisk) {
         this();
         this.plaintext.append(text);
-        this.isRegex = isRegex;
+        this.hasAsterisk = hasAsterisk;
         this.regex.append(".*"); // We want to match filenames
         for (char c : str.toCharArray()) {
             if (c == CHAR_ASTERISK) {
@@ -53,14 +52,14 @@ public final class RegexArgument {
 
     public void appendAsterisk() {
         plaintext.append(CHAR_ASTERISK);
-        regex.append("[^" + StringUtils.fileSeparator() + "]*");
-        isRegex = true;
+        regex.append("[^").append(StringUtils.fileSeparator()).append("]*");
+        hasAsterisk = true;
     }
 
     public void merge(RegexArgument other) {
         plaintext.append(other.plaintext);
         regex.append(other.regex);
-        isRegex = isRegex || other.isRegex;
+        hasAsterisk = this.hasAsterisk || other.hasAsterisk;
     }
 
     public void merge(String str) {
@@ -71,19 +70,25 @@ public final class RegexArgument {
     public List<String> globFiles() {
         List<String> globbedFiles = new LinkedList<>();
 
-        if (isRegex) {
+        if (hasAsterisk) {
             Pattern regexPattern = Pattern.compile(regex.toString());
             String dir = "";
-            String tokens[] = plaintext.toString().replaceAll("\\\\", "/").split("/");
+            String[] tokens = plaintext.toString().replaceAll("\\\\", "/").split("/");
             for (int i = 0; i < tokens.length - 1; i++) {
                 dir += tokens[i] + File.separator;
             }
 
             File currentDir = Paths.get(Environment.currentDirectory + File.separator + dir).toFile();
+            String[] files = currentDir.list();
 
-            for (String candidate : currentDir.list()) {
-                if (regexPattern.matcher(candidate).matches()) {
-                    globbedFiles.add(dir + candidate);
+            if (files != null) {
+                for (String candidate : files) {
+                    // Replace any platform-specific File.separator with forward slash '/'
+                    // Ensure compatibility with regexPattern, which matches directory separators using forward slash '/'
+                    candidate = (dir + candidate).replace(File.separator, "/");
+                    if (regexPattern.matcher(candidate).matches()) {
+                        globbedFiles.add(candidate);
+                    }
                 }
             }
 
@@ -133,7 +138,7 @@ public final class RegexArgument {
     }
 
     public boolean isRegex() {
-        return isRegex;
+        return hasAsterisk;
     }
 
     public boolean isEmpty() {

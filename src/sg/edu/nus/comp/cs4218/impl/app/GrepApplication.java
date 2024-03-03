@@ -1,11 +1,22 @@
 package sg.edu.nus.comp.cs4218.impl.app;
 
-import sg.edu.nus.comp.cs4218.Environment;
-import sg.edu.nus.comp.cs4218.app.GrepInterface;
-import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
-import sg.edu.nus.comp.cs4218.exception.GrepException;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_NOT_FOUND;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_INVALID_REGEX;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IO_EXCEPTION;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_INPUT;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_SYNTAX;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_FILE_SEP;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_FLAG_PREFIX;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.StringJoiner;
@@ -13,12 +24,15 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.*;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_FILE_SEP;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_FLAG_PREFIX;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
+import sg.edu.nus.comp.cs4218.Environment;
+import sg.edu.nus.comp.cs4218.app.GrepInterface;
+import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
+import sg.edu.nus.comp.cs4218.exception.GrepException;
 
+// Suppressed as this is an EF2 app, not implemented yet
+@SuppressWarnings({"PMD.ExcessiveMethodLength", "PMD.GodClass"})
 public class GrepApplication implements GrepInterface {
+
     public static final String INVALID_PATTERN = "Invalid pattern syntax";
     public static final String EMPTY_PATTERN = "Pattern should not be empty.";
     public static final String IS_DIRECTORY = "Is a directory";
@@ -47,10 +61,10 @@ public class GrepApplication implements GrepInterface {
 
         String results = "";
         if (isCountLines) {
-            results = countResults.toString() + STRING_NEWLINE;
+            results = countResults + STRING_NEWLINE;
         } else {
             if (!lineResults.toString().isEmpty()) {
-                results = lineResults.toString() + STRING_NEWLINE;
+                results = lineResults + STRING_NEWLINE;
             }
         }
         return results;
@@ -111,17 +125,17 @@ public class GrepApplication implements GrepInterface {
                 }
                 reader.close();
             } catch (PatternSyntaxException pse) {
-                throw new GrepException(ERR_INVALID_REGEX);
+                throw new GrepException(ERR_INVALID_REGEX, pse);
             } catch (FileNotFoundException e) {
-                throw new GrepException(ERR_FILE_NOT_FOUND);
+                throw new GrepException(ERR_FILE_NOT_FOUND, e);
             } catch (IOException e) {
-                throw new GrepException(ERR_IO_EXCEPTION);
+                throw new GrepException(ERR_IO_EXCEPTION, e);
             } finally {
                 if (reader != null) {
                     try {
                         reader.close();
                     } catch (IOException e) {
-                        throw new GrepException(ERR_IO_EXCEPTION);
+                        throw new GrepException(ERR_IO_EXCEPTION, e);
                     }
                 }
             }
@@ -156,7 +170,7 @@ public class GrepApplication implements GrepInterface {
      */
     private String convertPathToSystemPath(String path) {
         String convertedPath = path;
-        String pathIdentifier = "\\" + Character.toString(CHAR_FILE_SEP);
+        String pathIdentifier = "\\" + CHAR_FILE_SEP;
         convertedPath = convertedPath.replaceAll("(\\\\)+", pathIdentifier);
         convertedPath = convertedPath.replaceAll("/+", pathIdentifier);
 
@@ -191,11 +205,13 @@ public class GrepApplication implements GrepInterface {
             }
             reader.close();
         } catch (PatternSyntaxException pse) {
-            throw new GrepException(ERR_INVALID_REGEX);
+            throw new GrepException(ERR_INVALID_REGEX, pse);
         } catch (NullPointerException npe) {
-            throw new GrepException(ERR_FILE_NOT_FOUND);
+            // try-catch not catching more specifically, anything that is not supposed to be null including stdin
+            // will execute this line, which is wrong.
+            throw new GrepException(ERR_FILE_NOT_FOUND, npe);
         } catch (IOException e) {
-            throw new GrepException(ERR_IO_EXCEPTION);
+            throw new GrepException(ERR_IO_EXCEPTION, e);
         }
 
         String results = "";
@@ -203,7 +219,7 @@ public class GrepApplication implements GrepInterface {
             results = count + STRING_NEWLINE;
         } else {
             if (!stringJoiner.toString().isEmpty()) {
-                results = stringJoiner.toString() + STRING_NEWLINE;
+                results = stringJoiner + STRING_NEWLINE;
             }
         }
         return results;
@@ -240,7 +256,7 @@ public class GrepApplication implements GrepInterface {
         } catch (GrepException grepException) {
             throw grepException;
         } catch (Exception e) {
-            throw new GrepException(e.getMessage());
+            throw new GrepException(e.getMessage(), e);
         }
     }
 
@@ -265,17 +281,17 @@ public class GrepApplication implements GrepInterface {
                     arg = Arrays.copyOfRange(arg, 1, arg.length);
                     for (char c : arg) {
                         switch (c) {
-                            case CASE_INSEN_IDENT:
-                                grepFlags[CASE_INSEN_IDX] = true;
-                                break;
-                            case COUNT_IDENT:
-                                grepFlags[COUNT_INDEX] = true;
-                                break;
-                            case PREFIX_FN:
-                                grepFlags[PREFIX_FN_IDX] = true;
-                                break;
-                            default:
-                                throw new GrepException(ERR_SYNTAX);
+                        case CASE_INSEN_IDENT:
+                            grepFlags[CASE_INSEN_IDX] = true;
+                            break;
+                        case COUNT_IDENT:
+                            grepFlags[COUNT_INDEX] = true;
+                            break;
+                        case PREFIX_FN:
+                            grepFlags[PREFIX_FN_IDX] = true;
+                            break;
+                        default:
+                            throw new GrepException(ERR_SYNTAX);
                         }
                     }
                 } else { // pattern must come before file names
