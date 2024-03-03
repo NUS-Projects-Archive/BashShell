@@ -22,6 +22,12 @@ import sg.edu.nus.comp.cs4218.exception.EchoException;
  */
 public class EchoApplication implements EchoInterface {
 
+    /**
+     * Returns a String joining all arguments with an empty space as delimiter, terminated with a line separator.
+     *
+     * @param args   Array of String arguments for joining.
+     * @throws EchoException If args is null.
+     */
     @Override
     public String constructResult(String[] args) throws EchoException {
         if (args == null) {
