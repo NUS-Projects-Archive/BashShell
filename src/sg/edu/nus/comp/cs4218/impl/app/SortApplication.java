@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 
 import sg.edu.nus.comp.cs4218.app.SortInterface;
 import sg.edu.nus.comp.cs4218.exception.InvalidArgsException;
@@ -116,7 +117,9 @@ public class SortApplication implements SortInterface {
                 throw new SortException(PROB_SORT_FILE + e.getMessage(), e);
             } finally {
                 try {
-                    if (input != null) { input.close(); }
+                    if (input != null) {
+                        input.close();
+                    }
                 } catch (IOException e) {
                     throw new SortException(PROB_SORT_FILE + e.getMessage(), e);
                 }
@@ -164,8 +167,8 @@ public class SortApplication implements SortInterface {
         Collections.sort(input, new Comparator<String>() {
             @Override
             public int compare(String str1, String str2) {
-                String temp1 = isCaseIndependent && !isFirstWordNumber ? str1.toLowerCase() : str1;//NOPMD
-                String temp2 = isCaseIndependent && !isFirstWordNumber ? str2.toLowerCase() : str2;//NOPMD
+                String temp1 = isCaseIndependent && !isFirstWordNumber ? str1.toLowerCase(Locale.ROOT) : str1;
+                String temp2 = isCaseIndependent && !isFirstWordNumber ? str2.toLowerCase(Locale.ROOT) : str2;
 
                 // Extract the first group of numbers if possible.
                 if (isFirstWordNumber && !temp1.isEmpty() && !temp2.isEmpty()) {
