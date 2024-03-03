@@ -217,7 +217,7 @@ public class PasteApplication implements PasteInterface {
             throw new PasteException(ERR_GENERAL);
         }
         for (String file : fileName) {
-            if (fille != null && file.compareTo("-") == 0) {
+            if (file == null || file.compareTo("-") == 0) {
                 continue;
             }
 
