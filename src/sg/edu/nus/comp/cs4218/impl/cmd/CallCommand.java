@@ -1,25 +1,27 @@
 package sg.edu.nus.comp.cs4218.impl.cmd;
 
-import sg.edu.nus.comp.cs4218.Command;
-import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
-import sg.edu.nus.comp.cs4218.exception.ShellException;
-import sg.edu.nus.comp.cs4218.impl.util.ApplicationRunner;
-import sg.edu.nus.comp.cs4218.impl.util.ArgumentResolver;
-import sg.edu.nus.comp.cs4218.impl.util.IORedirectionHandler;
-import sg.edu.nus.comp.cs4218.impl.util.IOUtils;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_SYNTAX;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
 
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_SYNTAX;
+import sg.edu.nus.comp.cs4218.Command;
+import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
+import sg.edu.nus.comp.cs4218.exception.EchoException;
+import sg.edu.nus.comp.cs4218.exception.ShellException;
+import sg.edu.nus.comp.cs4218.impl.util.ApplicationRunner;
+import sg.edu.nus.comp.cs4218.impl.util.ArgumentResolver;
+import sg.edu.nus.comp.cs4218.impl.util.IORedirectionHandler;
+import sg.edu.nus.comp.cs4218.impl.util.IOUtils;
 
 /**
  * A Call Command is a sub-command consisting of at least one non-keyword or quoted.
  * <p>
  * Command format: (<non-keyword> or <quoted>) *
  */
+
 public class CallCommand implements Command {
     private final List<String> argsList;
     private final ApplicationRunner appRunner;
@@ -31,6 +33,19 @@ public class CallCommand implements Command {
         this.argumentResolver = argumentResolver;
     }
 
+    /**
+     * Parses the sub-command's argsList to identify the redirected InputStream, redirected OutputStream, and actual
+     * list of args after accounting for possible changes from quoting, globbing, and substitution.
+     *
+     * Starts the call command's ApplicationRunner.
+     *
+     * @param stdin   An InputStream. If there is no input redirection, the call command's ApplicationRunner will be
+     *                provided with the same InputStream as stdin.
+     * @param stdout  An OutputStream. If there is no output redirection, the call command's ApplicationRunner will be
+     *                provided with the same OutputStream as stdout.
+     * @throws ShellException If argsList attribute is null or empty.
+     */
+    @SuppressWarnings("PMD.CloseResource")
     @Override
     public void evaluate(InputStream stdin, OutputStream stdout)
             throws AbstractApplicationException, ShellException, FileNotFoundException {
@@ -52,6 +67,8 @@ public class CallCommand implements Command {
             appRunner.runApp(app, parsedArgsList.toArray(new String[0]), inputStream, outputStream);
         }
 
+        IOUtils.closeInputStream(inputStream);
+        IOUtils.closeOutputStream(outputStream);
     }
 
     @Override

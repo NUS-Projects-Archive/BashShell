@@ -3,9 +3,11 @@ package sg.edu.nus.comp.cs4218.impl.util;
 import java.io.File;
 import java.math.BigInteger;
 import java.util.Arrays;
+import java.util.Locale;
 
 public final class StringUtils {
     public static final String STRING_NEWLINE = System.lineSeparator();
+    public static final String STRING_TAB = "\t";
     public static final String STRING_CURR_DIR = ".";
     public static final String STRING_PARENT_DIR = "..";
     public static final char CHAR_FILE_SEP = File.separatorChar;
@@ -21,8 +23,7 @@ public final class StringUtils {
     public static final char CHAR_ASTERISK = '*';
     public static final char CHAR_FLAG_PREFIX = '-';
 
-    private StringUtils() {
-    }
+    private StringUtils() {}
 
     /**
      * Returns the file separator defined for a particular system.
@@ -32,7 +33,7 @@ public final class StringUtils {
      */
     public static String fileSeparator() {
         // We need to escape \ in Windows...
-        if (System.getProperty("os.name").toLowerCase().contains("win")) {//NOPMD
+        if (System.getProperty("os.name").toLowerCase(Locale.ROOT).contains("win")) {
             return '\\' + File.separator;
         }
         return File.separator;
@@ -102,5 +103,17 @@ public final class StringUtils {
             return false;
         }
         return !bigInt.toString().isEmpty();
+    }
+
+    /**
+     * Remove trailing instances of given sequence.
+     *
+     * @param str      String to remove sequence from
+     * @param sequence String of sequence to remove
+     * @return String of result with trailing sequence removed
+     */
+    public static String removeTrailing(String str, String sequence) {
+        String result = str.substring(0, str.length() - sequence.length());
+        return str.endsWith(sequence) ? removeTrailing(result, sequence) : str;
     }
 }

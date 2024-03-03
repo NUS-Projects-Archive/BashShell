@@ -1,15 +1,16 @@
 package sg.edu.nus.comp.cs4218.impl.app;
 
-import sg.edu.nus.comp.cs4218.app.EchoInterface;
-import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
-import sg.edu.nus.comp.cs4218.exception.EchoException;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IO_EXCEPTION;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_OSTREAM;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NULL_ARGS;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.*;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
+import sg.edu.nus.comp.cs4218.app.EchoInterface;
+import sg.edu.nus.comp.cs4218.exception.EchoException;
 
 /**
  * The echo command writes its arguments separated by spaces and terminates by a newline on the
@@ -21,8 +22,14 @@ import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
  */
 public class EchoApplication implements EchoInterface {
 
+    /**
+     * Returns a String joining all arguments with an empty space as delimiter, terminated with a line separator.
+     *
+     * @param args   Array of String arguments for joining.
+     * @throws EchoException If args is null.
+     */
     @Override
-    public String constructResult(String[] args) throws AbstractApplicationException {
+    public String constructResult(String[] args) throws EchoException {
         if (args == null) {
             throw new EchoException(ERR_NULL_ARGS);
         }
@@ -31,7 +38,7 @@ public class EchoApplication implements EchoInterface {
         if (args.length == 0) {
             result = STRING_NEWLINE;
         } else {
-            result = String.join(" ", args);
+            result = String.join(" ", args) + STRING_NEWLINE;
         }
 
         return result;
@@ -46,7 +53,7 @@ public class EchoApplication implements EchoInterface {
      *               space character.
      * @throws EchoException If an I/O exception occurs.
      */
-    public void run(String[] args, InputStream stdin, OutputStream stdout) throws AbstractApplicationException {
+    public void run(String[] args, InputStream stdin, OutputStream stdout) throws EchoException {
         if (stdout == null) {
             throw new EchoException(ERR_NO_OSTREAM);
         }
@@ -55,7 +62,7 @@ public class EchoApplication implements EchoInterface {
         try {
             stdout.write(result.getBytes());
         } catch (IOException e) {
-            throw new EchoException(ERR_IO_EXCEPTION);
+            throw new EchoException(ERR_IO_EXCEPTION, e);
         }
     }
 }
