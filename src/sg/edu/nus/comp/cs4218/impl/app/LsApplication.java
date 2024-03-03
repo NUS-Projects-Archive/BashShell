@@ -21,7 +21,66 @@ import sg.edu.nus.comp.cs4218.exception.LsException;
 import sg.edu.nus.comp.cs4218.impl.parser.LsArgsParser;
 import sg.edu.nus.comp.cs4218.impl.util.StringUtils;
 
+/**
+ * The ls command list information about files.
+ *
+ * <p>
+ * <b>Command format:</b> <code>ls [Options][FILES]</code>
+ * </p>
+ */
 public class LsApplication implements LsInterface {
+
+    /**
+     * Runs the ls application with the specified arguments.
+     *
+     * @param args   Array of arguments for the application. Each array element is the path to
+     *               a file (non-folders or folders).
+     * @param stdin  An InputStream, not used.
+     * @param stdout An OutputStream. The output of the command is written to this OutputStream.
+     * @throws LsException
+     */
+    @Override
+    public void run(String[] args, InputStream stdin, OutputStream stdout)
+            throws LsException {
+        if (args == null) {
+            throw new LsException(ERR_NULL_ARGS);
+        }
+
+        if (stdout == null) {
+            throw new LsException(ERR_NO_OSTREAM);
+        }
+
+        LsArgsParser parser = new LsArgsParser();
+        try {
+            parser.parse(args);
+        } catch (InvalidArgsException e) {
+            throw new LsException(e.getMessage(), e);
+        }
+
+        Boolean recursive = parser.isRecursive();
+        Boolean sortByExt = parser.isSortByExt();
+        String[] directories = parser.getDirectories()
+                .toArray(new String[parser.getDirectories().size()]);
+        String result = listFolderContent(recursive, sortByExt, directories);
+        try {
+            stdout.write(result.getBytes());
+            stdout.write(StringUtils.STRING_NEWLINE.getBytes());
+        } catch (Exception e) {
+            throw new LsException(ERR_WRITE_STREAM, e);
+        }
+    }
+
+    /**
+     * Return the string listing the folder content of the specified folders. If no folder names are
+     * specified, list the content of the current folder.
+     *
+     * @param isRecursive Boolean option to recursively list the folder contents (traversing
+     *                    through all folders inside the specified folder)
+     * @param isSortByExt Boolean option to sort folder contents alphabetically by file extension
+     *                    (characters after the last '.' (without quotes)) Files with no extension are sorted first.
+     * @param folderName  Array of String of folder names
+     * @throws LsException
+     */
     @Override
     public String listFolderContent(Boolean isRecursive, Boolean isSortByExt,
                                     String... folderName) throws LsException {
@@ -65,36 +124,5 @@ public class LsApplication implements LsInterface {
             return formattedFiles;
         }
         return formattedFiles + StringUtils.STRING_NEWLINE + StringUtils.STRING_NEWLINE + output;
-    }
-
-    @Override
-    public void run(String[] args, InputStream stdin, OutputStream stdout)
-            throws LsException {
-        if (args == null) {
-            throw new LsException(ERR_NULL_ARGS);
-        }
-
-        if (stdout == null) {
-            throw new LsException(ERR_NO_OSTREAM);
-        }
-
-        LsArgsParser parser = new LsArgsParser();
-        try {
-            parser.parse(args);
-        } catch (InvalidArgsException e) {
-            throw new LsException(e.getMessage(), e);
-        }
-
-        Boolean recursive = parser.isRecursive();
-        Boolean sortByExt = parser.isSortByExt();
-        String[] directories = parser.getDirectories()
-                .toArray(new String[parser.getDirectories().size()]);
-        String result = listFolderContent(recursive, sortByExt, directories);
-        try {
-            stdout.write(result.getBytes());
-            stdout.write(StringUtils.STRING_NEWLINE.getBytes());
-        } catch (Exception e) {
-            throw new LsException(ERR_WRITE_STREAM, e);
-        }
     }
 }
