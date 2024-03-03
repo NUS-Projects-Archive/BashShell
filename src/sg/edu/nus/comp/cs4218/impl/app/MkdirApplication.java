@@ -18,7 +18,7 @@ import sg.edu.nus.comp.cs4218.exception.MkdirException;
 import sg.edu.nus.comp.cs4218.impl.parser.MkdirArgsParser;
 
 /**
- * The mkdir command create new folders, if they do not already exist.
+ * The mkdir command creates new folders, if they do not already exist.
  *
  * <p>
  * <b>Command format:</b> <code>mkdir [Option] DIRECTORIES...</code>
@@ -29,11 +29,11 @@ public class MkdirApplication implements MkdirInterface {
     /**
      * Runs the mkdir application with the specified arguments.
      *
-     * @param args   Array of arguments for the application. Each array element is the path to a file.
-     * @param stdin  An InputStream, not used.
-     * @param stdout An OutputStream, not used.
+     * @param args   Array of arguments for the application. Each array element is the path to a file
+     * @param stdin  An InputStream, not used
+     * @param stdout An OutputStream, not used
      * @throws MkdirException If the arguments are null or an empty array,
-     *                        or if there is an issue parsing or creating directories.
+     *                        or if there is an issue parsing or creating directories
      */
     @Override
     public void run(String[] args, InputStream stdin, OutputStream stdout) throws MkdirException {
@@ -73,8 +73,8 @@ public class MkdirApplication implements MkdirInterface {
     /**
      * Creates folders specified by the given folder names.
      *
-     * @param folderName Array of string of folder names to be created.
-     * @throws MkdirException If folder already exists.
+     * @param folderName Array of string of folder names to be created
+     * @throws MkdirException If folder already exists
      */
     @Override
     public void createFolder(String... folderName) {
@@ -88,8 +88,8 @@ public class MkdirApplication implements MkdirInterface {
     /**
      * Checks if any top-level folder in the parent hierarchy of the given file is missing.
      *
-     * @param file The file to start the check from.
-     * @return true if any top-level folder is missing; Otherwise, false.
+     * @param file The file to start the check from
+     * @return true if any top-level folder is missing; Otherwise, false
      */
     private boolean isAnyTopLevelFolderMissing(File file) {
         File parentFile = file.getParentFile();
@@ -109,8 +109,8 @@ public class MkdirApplication implements MkdirInterface {
     /**
      * Returns the absolute path for the given folder name.
      *
-     * @param folderName The folder name.
-     * @return The absolute path.
+     * @param folderName The folder name
+     * @return The absolute path
      */
     private String getAbsolutePath(String folderName) {
         Path currentDirectory = Paths.get(Environment.currentDirectory);
