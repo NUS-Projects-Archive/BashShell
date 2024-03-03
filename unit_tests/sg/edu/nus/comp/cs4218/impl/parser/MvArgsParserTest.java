@@ -22,10 +22,10 @@ import sg.edu.nus.comp.cs4218.exception.InvalidArgsException;
 
 class MvArgsParserTest {
 
-    private final static String FLAG_OVERWRITE = "-n";
-    private final static String FILE_ONE = "file1";
-    private final static String FILE_TWO = "file2";
-    private final static String FILE_THREE = "file3";
+    private static final String FLAG_OVERWRITE = "-n";
+    private static final String FILE_ONE = "file1";
+    private static final String FILE_TWO = "file2";
+    private static final String FILE_THREE = "file3";
 
     private final Set<Character> VALID_FLAGS = Set.of('n');
     private MvArgsParser mvArgsParser;

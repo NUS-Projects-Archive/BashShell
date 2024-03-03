@@ -22,11 +22,11 @@ import sg.edu.nus.comp.cs4218.exception.InvalidArgsException;
 
 class MkdirArgsParserTest {
 
-    private final static String FLAG_CR_PARENT = "-p";
-    private final static String FILE_ONE = "file1";
-    private final static String FILE_TWO = "file2";
-    private final static String FILE_THREE = "file3";
-    private final Set<Character> VALID_FLAGS = Set.of('p');
+    private static final Set<Character> VALID_FLAGS = Set.of('p');
+    private static final String FLAG_CR_PARENT = "-p";
+    private static final String FILE_ONE = "file1";
+    private static final String FILE_TWO = "file2";
+    private static final String FILE_THREE = "file3";
     private MkdirArgsParser mkdirArgsParser;
 
     private static Stream<Arguments> validSyntax() {
