@@ -55,7 +55,7 @@ public class MkdirApplication implements MkdirInterface {
 
         for (String folder : directories) {
             File file = new File(folder);
-            if ((!isCreateParent && isAnyTopLevelFolderMissing(file)) || isStartFromRoot(file)) {
+            if ((!isCreateParent && isAnyTopLevelFolderMissing(file))) {
                 throw new MkdirException(ERR_TOP_LEVEL_MISSING);
             }
             createFolder(folder);
@@ -98,17 +98,6 @@ public class MkdirApplication implements MkdirInterface {
             parentFile = parentFile.getParentFile();
         }
         return false;
-    }
-
-    /**
-     * Checks if the given file starts from the root directory.
-     *
-     * @param file The file to check.
-     * @return true if the file paths starts with the root symbol ("/"); Otherwise, false.
-     */
-    private boolean isStartFromRoot(File file) {
-        String filePath = file.getPath();
-        return filePath.startsWith(File.separator);
     }
 
     private boolean isFileMissing(File file) {
