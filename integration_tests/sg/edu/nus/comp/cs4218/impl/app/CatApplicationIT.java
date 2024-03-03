@@ -44,16 +44,13 @@ public class CatApplicationIT {
         return Arrays.asList(PARAM_TEST_VALUES);
     }
 
-    @TempDir
-    private Path testDir;
-
     @BeforeEach
     void setUp() throws IOException {
         app = new CatApplication();
         out = new ByteArrayOutputStream();
         inputStreamMock = mock(InputStream.class);
-        testDir = Files.createTempDirectory("testDir");
 
+        Path testDir = Files.createTempDirectory("testDir");
         Path pathA = testDir.resolve("A.txt");
         Path pathB = testDir.resolve("B.txt");
         Path pathC = testDir.resolve("C.txt");
