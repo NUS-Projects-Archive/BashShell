@@ -25,7 +25,6 @@ public class ExitApplication implements ExitInterface {
      */
     @Override
     public void run(String[] args, InputStream stdin, OutputStream stdout) throws ExitException {
-        // Format: exit
         terminateExecution();
     }
 

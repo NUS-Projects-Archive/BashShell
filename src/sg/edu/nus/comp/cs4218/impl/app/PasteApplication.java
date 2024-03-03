@@ -26,10 +26,18 @@ import sg.edu.nus.comp.cs4218.impl.util.ArgumentResolver;
 import sg.edu.nus.comp.cs4218.impl.util.IORedirectionHandler;
 import sg.edu.nus.comp.cs4218.impl.util.IOUtils;
 
+/**
+ * The paste command merge lines of files, write to standard output lines consisting of
+ * sequentially corresponding lines of each given file, separated by a TAB character.
+ *
+ * <p>
+ * <b>Command format:</b> <code>paste [Option] [FILES]...</code>
+ * </p>
+ */
 public class PasteApplication implements PasteInterface {
 
     private int maxFileLength = 0;
-    List<List<String>> tempListResult;
+    private final List<List<String>> tempListResult;
 
     public PasteApplication() {
         this.tempListResult = new ArrayList<>();

@@ -22,6 +22,14 @@ import sg.edu.nus.comp.cs4218.exception.InvalidArgsException;
 import sg.edu.nus.comp.cs4218.exception.UniqException;
 import sg.edu.nus.comp.cs4218.impl.parser.UniqArgsParser;
 
+/**
+ * The uniq command filters adjacent matching lines from INPUT_FILE (or standard input)
+ * and writes to an OUTPUT_FILE (or to standard output).
+ *
+ * <p>
+ * <b>Command format:</b> <code>uniq [Options] [INPUT_FILE [OUTPUT_FILE]]<code>
+ * </p>
+ */
 public class UniqApplication implements UniqInterface {
 
     /**
@@ -37,8 +45,6 @@ public class UniqApplication implements UniqInterface {
      */
     @Override
     public void run(String[] args, InputStream stdin, OutputStream stdout) throws UniqException {
-        // Format: uniq [Options] [INPUT_FILE [OUTPUT_FILE]]
-
         // Parse argument(s) provided
         final UniqArgsParser parser = new UniqArgsParser();
         try {
