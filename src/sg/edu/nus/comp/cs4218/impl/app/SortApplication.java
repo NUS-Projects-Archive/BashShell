@@ -30,6 +30,13 @@ import sg.edu.nus.comp.cs4218.exception.SortException;
 import sg.edu.nus.comp.cs4218.impl.parser.SortArgsParser;
 import sg.edu.nus.comp.cs4218.impl.util.IOUtils;
 
+/**
+ * The sort command orders the lines of the specified files or input and prints the same lines but in sorted order.
+ *
+ * <p>
+ * <b>Command format:</b> <code>sort [Options] [FILES]</code>
+ * </p>
+ */
 public class SortApplication implements SortInterface {
 
     /**
@@ -44,7 +51,6 @@ public class SortApplication implements SortInterface {
      */
     @Override
     public void run(String[] args, InputStream stdin, OutputStream stdout) throws SortException {
-        // Format: sort [-nrf] [FILES]
         if (stdout == null) {
             throw new SortException(ERR_NO_OSTREAM);
         }

@@ -14,6 +14,13 @@ import sg.edu.nus.comp.cs4218.exception.InvalidArgsException;
 import sg.edu.nus.comp.cs4218.exception.MkdirException;
 import sg.edu.nus.comp.cs4218.impl.parser.MkdirArgsParser;
 
+/**
+ * The mkdir command create new folders, if they do not already exist.
+ *
+ * <p>
+ * <b>Command format:</b> <code>mkdir [Option] DIRECTORIES...</code>
+ * </p>
+ */
 public class MkdirApplication implements MkdirInterface {
 
     /**

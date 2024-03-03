@@ -26,6 +26,15 @@ import sg.edu.nus.comp.cs4218.exception.MvException;
 import sg.edu.nus.comp.cs4218.impl.parser.MvArgsParser;
 import sg.edu.nus.comp.cs4218.impl.util.IOUtils;
 
+/**
+ * The mv command move files or directories from one place to another.
+ * By default, it will overwrite an existing file.
+ *
+ * <p>
+ * <b>Command format:</b> <code>mv [Option] SOURCE TARGET</code>
+ *                        <code>mv [Option] SOURCE ... DIRECTORY</code>
+ * </p>
+ */
 public class MvApplication implements MvInterface {
 
     /**
