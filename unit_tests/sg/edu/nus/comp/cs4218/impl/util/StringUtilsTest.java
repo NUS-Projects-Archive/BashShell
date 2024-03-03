@@ -1,13 +1,12 @@
 package sg.edu.nus.comp.cs4218.impl.util;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.isBlank;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.isBlank;
 
 public class StringUtilsTest {
 
@@ -17,15 +16,15 @@ public class StringUtilsTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = { "", " ", "      " })
-    void isBlank_blankString_returnsTrue(String s) {
-        assertTrue(isBlank(s));
+    @ValueSource(strings = {"", " ", "      "})
+    void isBlank_blankString_returnsTrue(String string) {
+        assertTrue(isBlank(string));
     }
 
     @ParameterizedTest
-    @ValueSource(strings = { "1", "a", "ABC", " xyz ", "> <", "!@#$%^&*()_+=~`?/\\|,." })
-    void isBlank_nonBlankString_returnsFalse(String s) {
-        assertFalse(isBlank(s));
+    @ValueSource(strings = {"1", "a", "ABC", " xyz ", "> <", "!@#$%^&*()_+=~`?/\\|,."})
+    void isBlank_nonBlankString_returnsFalse(String string) {
+        assertFalse(isBlank(string));
     }
 
 }
