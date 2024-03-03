@@ -8,7 +8,10 @@ import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_TOP_LEVEL_MISS
 import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
+import sg.edu.nus.comp.cs4218.Environment;
 import sg.edu.nus.comp.cs4218.app.MkdirInterface;
 import sg.edu.nus.comp.cs4218.exception.InvalidArgsException;
 import sg.edu.nus.comp.cs4218.exception.MkdirException;
@@ -54,9 +57,14 @@ public class MkdirApplication implements MkdirInterface {
         }
 
         for (String folder : directories) {
-            File file = new File(folder);
+            String folderAbsolutePath = getAbsolutePath(folder);
+            File file = new File(folderAbsolutePath);
+
             if ((!isCreateParent && isAnyTopLevelFolderMissing(file))) {
                 throw new MkdirException(ERR_TOP_LEVEL_MISSING);
+            }
+            if (!isCreateParent && file.exists()) {
+                throw new MkdirException(ERR_FILE_EXISTS);
             }
             createFolder(folder);
         }
@@ -69,17 +77,11 @@ public class MkdirApplication implements MkdirInterface {
      * @throws MkdirException If folder already exists.
      */
     @Override
-    public void createFolder(String... folderName) throws MkdirException {
+    public void createFolder(String... folderName) {
         for (String folder : folderName) {
-            File file = new File(folder);
-
-            if (file.exists()) {
-                throw new MkdirException(ERR_FILE_EXISTS);
-            }
-
-            if (!file.mkdirs()) {
-                throw new MkdirException("Failed to create folder: " + file);
-            }
+            String folderAbsolutePath = getAbsolutePath(folder);
+            File file = new File(folderAbsolutePath);
+            file.mkdirs();
         }
     }
 
@@ -102,5 +104,16 @@ public class MkdirApplication implements MkdirInterface {
 
     private boolean isFileMissing(File file) {
         return !file.exists();
+    }
+
+    /**
+     * Returns the absolute path for the given folder name.
+     *
+     * @param folderName The folder name.
+     * @return The absolute path.
+     */
+    private String getAbsolutePath(String folderName) {
+        Path currentDirectory = Paths.get(Environment.currentDirectory);
+        return currentDirectory.resolve(folderName).toString();
     }
 }
