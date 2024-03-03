@@ -58,8 +58,7 @@ public class CdApplication implements CdInterface {
     public void changeToDirectory(String path) throws CdException {
         Environment.currentDirectory = getNormalizedAbsolutePath(path);
     }
-
-
+    
     /**
      * Returns the normalized absolute path for the given path string.
      *
