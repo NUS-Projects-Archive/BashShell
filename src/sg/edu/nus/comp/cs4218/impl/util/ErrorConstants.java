@@ -6,10 +6,6 @@ package sg.edu.nus.comp.cs4218.impl.util;
 @SuppressWarnings("PMD.LongVariable")
 public final class ErrorConstants {
 
-    private ErrorConstants() {
-        // empty private constructor to make this a utility class
-    }
-
     // Streams related
     public static final String ERR_READ_STREAM = "Could not read from input stream";
     public static final String ERR_WRITE_STREAM = "Could not write to output stream";
@@ -68,4 +64,7 @@ public final class ErrorConstants {
     public static final String ERR_GENERAL = "Exception Caught";
     public static final String ERR_IO_EXCEPTION = "IOException";
 
+    private ErrorConstants() {
+        // empty private constructor to make this a utility class
+    }
 }
