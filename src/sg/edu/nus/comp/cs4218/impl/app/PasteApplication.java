@@ -58,7 +58,6 @@ public class PasteApplication implements PasteInterface {
         if (stdout == null) {
             throw new PasteException(ERR_NULL_STREAMS);
         }
-
         if (stdin == null) {
             throw new PasteException(ERR_NO_ISTREAM);
         }
@@ -100,22 +99,18 @@ public class PasteApplication implements PasteInterface {
             IORedirectionHandler redirHandler = new IORedirectionHandler(nonFlagArgs, stdin, stdout, new ArgumentResolver());
             try {
                 redirHandler.extractRedirOptions();
-            } catch (Exception e) {
-                throw new PasteException(e.getMessage(), e);
-            }
 
-            List<String> noRedirArgsList = redirHandler.getNoRedirArgsList();
-            if (noRedirArgsList.isEmpty()) {
-                result = mergeStdin(isSerial, redirHandler.getInputStream());
-            } else {
-                if (nonFlagArgs.contains("-")) {
-                    result = mergeFileAndStdin(isSerial, stdin, noRedirArgsList.toArray(new String[0]));
+                List<String> noRedirArgsList = redirHandler.getNoRedirArgsList();
+                if (noRedirArgsList.isEmpty()) {
+                    result = mergeStdin(isSerial, redirHandler.getInputStream());
                 } else {
-                    result = mergeFile(isSerial, noRedirArgsList.toArray(new String[0]));
+                    if (nonFlagArgs.contains("-")) {
+                        result = mergeFileAndStdin(isSerial, stdin, noRedirArgsList.toArray(new String[0]));
+                    } else {
+                        result = mergeFile(isSerial, noRedirArgsList.toArray(new String[0]));
+                    }
                 }
-            }
 
-            try {
                 if (nonFlagArgs.contains(">")) {
                     byte[] bytes = result.getBytes();
                     redirHandler.getOutputStream().write(bytes);
@@ -221,17 +216,19 @@ public class PasteApplication implements PasteInterface {
         }
 
         for (String file : fileName) {
-            if (!("-").equals(file)) {
-                File node = IOUtils.resolveFilePath(file).toFile();
-                if (!node.exists()) {
-                    throw new PasteException(ERR_FILE_NOT_FOUND);
-                }
-                if (node.isDirectory()) {
-                    throw new PasteException(ERR_IS_DIR);
-                }
-                if (!node.canRead()) {
-                    throw new PasteException(ERR_NO_PERM);
-                }
+            if (file.compareTo("-") == 0) {
+                continue;
+            }
+
+            File node = IOUtils.resolveFilePath(file).toFile();
+            if (!node.exists()) {
+                throw new PasteException(ERR_FILE_NOT_FOUND);
+            }
+            if (node.isDirectory()) {
+                throw new PasteException(ERR_IS_DIR);
+            }
+            if (!node.canRead()) {
+                throw new PasteException(ERR_NO_PERM);
             }
         }
 
