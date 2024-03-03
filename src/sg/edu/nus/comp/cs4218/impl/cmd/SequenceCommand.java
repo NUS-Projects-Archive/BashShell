@@ -27,6 +27,16 @@ public class SequenceCommand implements Command {
         this.commands = commands;
     }
 
+    /**
+     * Writes the order-preserved output of a series of sub commands to stdout, including exception messages if any.
+     *
+     * @param stdin   An InputStream. The first sub command processing an InputStream will be evaluated with this as its
+     *                initial InputStream.
+     * @param stdout  An OutputStream for the order-preserved output of the sub commands to be written to.
+     * @throws ExitException If ExitException is thrown from any sub-commands. The ExitException is only thrown at the
+     *                       end of execution, even if the exception did not come from the last sub-command.
+     * @throws ShellException If an I/O exception occurs when writing to stdout.
+     */
     @Override
     public void evaluate(InputStream stdin, OutputStream stdout)
             throws AbstractApplicationException, ShellException, FileNotFoundException {
