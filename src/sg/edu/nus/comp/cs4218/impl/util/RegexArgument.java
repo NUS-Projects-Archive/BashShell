@@ -32,7 +32,7 @@ public final class RegexArgument {
 
     /**
      * Constructor for RegexArgument with a string argument. Initializes plaintext, regex, and hasAsterisk.
-     * @param str
+     * @param str String as the starting pattern of regex
      */
     public RegexArgument(String str) {
         this();
@@ -54,7 +54,7 @@ public final class RegexArgument {
         this.regex.append(".*"); // We want to match filenames
         for (char c : str.toCharArray()) {
             if (c == CHAR_ASTERISK) {
-                this.regex.append("[^" + StringUtils.fileSeparator() + "]*");
+                this.regex.append("[^").append(StringUtils.fileSeparator()).append("]*");
             } else {
                 this.regex.append(Pattern.quote(String.valueOf(c)));
             }
@@ -74,8 +74,6 @@ public final class RegexArgument {
     /**
      * Appends an asterisk to the plaintext and regex.
      * Updates hasAsterisk to true.
-     * 
-     * @param chr  The character to append
      */
     public void appendAsterisk() {
         plaintext.append(CHAR_ASTERISK);
@@ -108,22 +106,21 @@ public final class RegexArgument {
     /**
      * Returns a list of matching file paths if the string contains an asterisk, 
      * or the plaintext if no files match or the string does not contain an asterisk.
-     * 
-     * @param hasAsterisk A boolean indicating whether the string contains an asterisk (*).
-     * @param regex A StringBuilder containing the regex pattern compiled from the glob pattern.
-     * @param plaintext A StringBuilder containing the original string.
-     * @return 
+     *
+     * @return A List of files that matches the file path
      */
     public List<String> globFiles() {
         List<String> globbedFiles = new LinkedList<>();
 
         if (hasAsterisk) {
             Pattern regexPattern = Pattern.compile(regex.toString());
-            String dir = "";
+            String dir;
             String[] tokens = plaintext.toString().replaceAll("\\\\", "/").split("/");
+            StringBuilder dirBuilder = new StringBuilder();
             for (int i = 0; i < tokens.length - 1; i++) {
-                dir += tokens[i] + File.separator;
+                dirBuilder.append(tokens[i]).append(File.separator);
             }
+            dir = dirBuilder.toString();
 
             File currentDir = Paths.get(Environment.currentDirectory + File.separator + dir).toFile();
             String[] files = currentDir.list();
@@ -187,7 +184,7 @@ public final class RegexArgument {
     /**
      * Returns whether the string is a regex.
      * 
-     * @return
+     * @return True if the string is a regex; otherwise false
      */
     public boolean isRegex() {
         return hasAsterisk;
@@ -196,7 +193,7 @@ public final class RegexArgument {
     /**
      * Returns whether the string is empty.
      * 
-     * @return
+     * @return True if the string is empty; otherwise false
      */
     public boolean isEmpty() {
         return plaintext.length() == 0;
@@ -205,7 +202,7 @@ public final class RegexArgument {
     /**
      * Returns the plaintext.
      * 
-     * @return
+     * @return {code plaintext of this {@code RegexArgument}
      */
     public String toString() {
         return plaintext.toString();

@@ -8,7 +8,6 @@ public class UniqException extends AbstractApplicationException {
     public static final String COUNT_ALL_DUP_ERR = "printing all duplicated lines and repeat " +
             "counts is meaningless";
 
-
     public UniqException(final String message) {
         super("uniq: " + message);
     }
