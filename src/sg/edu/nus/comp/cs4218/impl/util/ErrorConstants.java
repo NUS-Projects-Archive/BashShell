@@ -1,10 +1,14 @@
 package sg.edu.nus.comp.cs4218.impl.util;
 
 /**
- * ErrorConstants is a class to store all error messages.
+ * ErrorConstants is a utility class to store all error messages.
  */
-@SuppressWarnings({"PMD.ExcessiveMethodLength", "PMD.ClassNamingConventions", "PMD.LongVariable"})
-public class ErrorConstants {
+@SuppressWarnings("PMD.LongVariable")
+public final class ErrorConstants {
+
+    private ErrorConstants() {
+        // empty private constructor to make this a utility class
+    }
 
     // Streams related
     public static final String ERR_READ_STREAM = "Could not read from input stream";
