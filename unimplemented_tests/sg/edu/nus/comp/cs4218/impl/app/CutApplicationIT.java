@@ -86,7 +86,7 @@ public class CutApplicationIT {
     void run_FailsToReadFromInputStream_ThrowsCutException() {
         String expectedMsg = "cut: Could not read from input stream";
         Throwable result = assertThrows(CutException.class, () -> {
-            String[] args = {"-c", "1-5", tempFilePath.toString()};
+            String[] args = {"-c", "1-10", tempFilePath.toString()};
             InputStream mockedStdin = mock(InputStream.class);
             doThrow(new IOException()).when(mockedStdin).read(any(byte[].class));
             OutputStream mockedStdout = mock(OutputStream.class);
@@ -99,7 +99,7 @@ public class CutApplicationIT {
     void run_FailsToWriteToOutputStream_ThrowsCutException() {
         String expectedMsg = "cut: Could not write to output stream";
         Throwable result = assertThrows(CutException.class, () -> {
-            String[] args = {"-c", "1-5", tempFilePath.toString()};
+            String[] args = {"-c", "1-10", tempFilePath.toString()};
             InputStream mockedStdin = mock(InputStream.class);
             OutputStream mockedStdout = mock(OutputStream.class);
             doThrow(new IOException()).when(mockedStdout).write(any(byte[].class));
