@@ -4,7 +4,7 @@ import java.util.List;
 
 public class CatArgsParser extends ArgsParser {
 
-    private final static char FLAG_LINE_NUMBER = 'n';
+    private static final char FLAG_LINE_NUMBER = 'n';
 
     public CatArgsParser() {
         super();

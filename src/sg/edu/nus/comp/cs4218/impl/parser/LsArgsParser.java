@@ -3,8 +3,8 @@ package sg.edu.nus.comp.cs4218.impl.parser;
 import java.util.List;
 
 public class LsArgsParser extends ArgsParser {
-    private final static char FLAG_RECURSIVE = 'R';
-    private final static char FLAG_SORT_BY_EXT = 'X';
+    private static final char FLAG_RECURSIVE = 'R';
+    private static final char FLAG_SORT_BY_EXT = 'X';
 
     public LsArgsParser() {
         super();

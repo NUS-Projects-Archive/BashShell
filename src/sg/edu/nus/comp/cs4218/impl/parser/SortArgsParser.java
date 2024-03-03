@@ -6,7 +6,7 @@ public class SortArgsParser extends ArgsParser {
     public static final char FLAG_FIRST_NUM = 'n';
     public static final char FLAG_REV_ORDER = 'r';
     public static final char FLAG_CASE_IGNORE = 'f';
-    private final static int INDEX_FILES = 0;
+    private static final int INDEX_FILES = 0;
 
     public SortArgsParser() {
         super();

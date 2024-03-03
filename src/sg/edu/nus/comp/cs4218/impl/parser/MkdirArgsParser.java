@@ -4,7 +4,7 @@ import java.util.List;
 
 public class MkdirArgsParser extends ArgsParser {
 
-    private final static char FLAG_CR_PARENT = 'p';
+    private static final char FLAG_CR_PARENT = 'p';
 
     public MkdirArgsParser() {
         super();
