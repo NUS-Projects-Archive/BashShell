@@ -134,7 +134,7 @@ public class CatApplication implements CatInterface {
         StringBuilder result = new StringBuilder();
         for (String fileName : fileNames) {
             try {
-                if (fileName.equals("-")) {
+                if (("-").equals(fileName)) {
                     BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(stdin));
                     result.append(readStdIn(isLineNumber, bufferedReader));
                 } else if (fileName.contains("*")) {
