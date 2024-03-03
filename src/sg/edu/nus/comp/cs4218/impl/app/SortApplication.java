@@ -5,6 +5,7 @@ import static sg.edu.nus.comp.cs4218.exception.SortException.PROB_SORT_STDIN;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_NOT_FOUND;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IO_EXCEPTION;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IS_DIR;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_OSTREAM;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_PERM;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NULL_ARGS;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NULL_STREAMS;
@@ -29,23 +30,30 @@ import sg.edu.nus.comp.cs4218.exception.SortException;
 import sg.edu.nus.comp.cs4218.impl.parser.SortArgsParser;
 import sg.edu.nus.comp.cs4218.impl.util.IOUtils;
 
+/**
+ * The sort command orders the lines of the specified files or input
+ * and prints the same lines but in sorted order.
+ *
+ * <p>
+ * <b>Command format:</b> <code>sort [Options] [FILES]</code>
+ * </p>
+ */
 public class SortApplication implements SortInterface {
 
     /**
      * Runs the sort application with the specified arguments.
      *
      * @param args   Array of arguments for the application. Each array element is the path to a
-     *               file. If no files are specified stdin is used.
+     *               file. If no files are specified stdin is used
      * @param stdin  An InputStream. The input for the command is read from this InputStream if no
-     *               files are specified.
-     * @param stdout An OutputStream. The output of the command is written to this OutputStream.
-     * @throws SortException
+     *               files are specified
+     * @param stdout An OutputStream. The output of the command is written to this OutputStream
+     * @throws SortException If an I/O exception occurs
      */
     @Override
     public void run(String[] args, InputStream stdin, OutputStream stdout) throws SortException {
-        // Format: sort [-nrf] [FILES]
         if (stdout == null) {
-            throw new SortException(ERR_NULL_STREAMS);
+            throw new SortException(ERR_NO_OSTREAM);
         }
         SortArgsParser sortArgsParser = new SortArgsParser();
         try {
@@ -87,7 +95,8 @@ public class SortApplication implements SortInterface {
      * @param isReverseOrder    Boolean option to sort in reverse order
      * @param isCaseIndependent Boolean option to perform case-independent sorting
      * @param fileNames         Array of String of file names
-     * @throws Exception
+     * @throws SortException If there are issues sorting lines, e.g., null arguments, file not found,
+     *                       encountering a directory, lack of read permissions, or I/O errors
      */
     @Override
     public String sortFromFiles(Boolean isFirstWordNumber, Boolean isReverseOrder, Boolean isCaseIndependent,
@@ -136,7 +145,7 @@ public class SortApplication implements SortInterface {
      * @param isReverseOrder    Boolean option to sort in reverse order
      * @param isCaseIndependent Boolean option to perform case-independent sorting
      * @param stdin             InputStream containing arguments from Stdin
-     * @throws Exception
+     * @throws SortException If null stream or I/O error occurs
      */
     @Override
     public String sortFromStdin(Boolean isFirstWordNumber, Boolean isReverseOrder, Boolean isCaseIndependent,
@@ -147,7 +156,7 @@ public class SortApplication implements SortInterface {
         List<String> lines = null;
         try {
             lines = IOUtils.getLinesFromInputStream(stdin);
-        } catch (Exception e) {
+        } catch (IOException e) {
             throw new SortException(PROB_SORT_STDIN + ERR_IO_EXCEPTION, e);
         }
         sortInputString(isFirstWordNumber, isReverseOrder, isCaseIndependent, lines);
@@ -200,6 +209,7 @@ public class SortApplication implements SortInterface {
      * Extracts a chunk of numbers or non-numbers from str starting from index 0.
      *
      * @param str Input string to read from
+     * @return A string representing the extracted chunk
      */
     private String getChunk(String str) {
         int startIndexLocal = 0;

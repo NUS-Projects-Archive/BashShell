@@ -1,9 +1,9 @@
 package sg.edu.nus.comp.cs4218.impl.parser;
 
 public class GrepArgsParser extends ArgsParser {
-    private final static char FLAG_IS_INVERT = 'v';
-    private final static int INDEX_PATTERN = 0;
-    private final static int INDEX_FILES = 1;
+    private static final char FLAG_IS_INVERT = 'v';
+    private static final int INDEX_PATTERN = 0;
+    private static final int INDEX_FILES = 1;
 
     public GrepArgsParser() {
         super();

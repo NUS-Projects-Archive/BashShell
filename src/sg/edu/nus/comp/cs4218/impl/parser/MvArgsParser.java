@@ -4,13 +4,18 @@ import java.util.List;
 
 public class MvArgsParser extends ArgsParser {
 
-    private final static char FLAG_NO_OVERWRITE = 'n';
+    private static final char FLAG_NO_OVERWRITE = 'n';
 
     public MvArgsParser() {
         super();
         legalFlags.add(FLAG_NO_OVERWRITE);
     }
 
+    /**
+     * Checks mv command needs to overwrite or not.
+     * 
+     * @return true if no overwrite flag is not present, false otherwise
+     */
     public Boolean isOverwrite() {
         return !flags.contains(FLAG_NO_OVERWRITE);
     }

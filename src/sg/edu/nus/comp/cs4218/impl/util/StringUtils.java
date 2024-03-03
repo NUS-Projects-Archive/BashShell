@@ -5,6 +5,9 @@ import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.Locale;
 
+/**
+ * The StringUtils class provides string utility functions for use in the shell.
+ */
 public final class StringUtils {
     public static final String STRING_NEWLINE = System.lineSeparator();
     public static final String STRING_TAB = "\t";
@@ -40,7 +43,7 @@ public final class StringUtils {
     }
 
     /**
-     * Check if string contains only whitespace
+     * Checks if string contains only whitespace.
      *
      * @param str String to be checked
      * @return true under any one of the 3 conditions:
@@ -63,7 +66,7 @@ public final class StringUtils {
     }
 
     /**
-     * Performs c * n (as in python)
+     * Performs c * n (as in python).
      *
      * @param character char to be multiplied
      * @param num       if num is < 0, num is assumed to be 0
@@ -77,7 +80,7 @@ public final class StringUtils {
     }
 
     /**
-     * Tokenize a string delimited by whitespace
+     * Tokenizes a string delimited by whitespace.
      *
      * @param str String to be tokenized
      * @return String array containing the tokens
@@ -106,7 +109,7 @@ public final class StringUtils {
     }
 
     /**
-     * Remove trailing instances of given sequence.
+     * Removes trailing instances of given sequence.
      *
      * @param str      String to remove sequence from
      * @param sequence String of sequence to remove

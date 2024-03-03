@@ -12,25 +12,41 @@ import java.util.regex.Pattern;
 
 import sg.edu.nus.comp.cs4218.Environment;
 
+/**
+ * RegexArgument is a class to handle regex matching and globbing.
+ */
 @SuppressWarnings("PMD.AvoidStringBufferField")
 public final class RegexArgument {
     private final StringBuilder plaintext;
     private final StringBuilder regex;
     private boolean hasAsterisk;
 
+    /**
+     * Constructor for RegexArgument without arguments. Initializes plaintext, regex, and hasAsterisk.
+     */
     public RegexArgument() {
         this.plaintext = new StringBuilder();
         this.regex = new StringBuilder();
         this.hasAsterisk = false;
     }
 
+    /**
+     * Constructor for RegexArgument with a string argument. Initializes plaintext, regex, and hasAsterisk.
+     * @param str
+     */
     public RegexArgument(String str) {
         this();
         merge(str);
     }
 
-    // Used for `find` command.
-    // `text` here corresponds to the folder that we want to look in.
+    /**
+     * Constructor for RegexArgument with two string and a boolean argument. Initializes plaintext, regex, and hasAsterisk.
+     * Used for `find` command. `text` here corresponds to the folder that we want to look in.
+     * 
+     * @param str           The string to match
+     * @param text          The folder to look in
+     * @param hasAsterisk   Boolean to indicate if the string contains an asterisk
+     */
     public RegexArgument(String str, String text, boolean hasAsterisk) {
         this();
         this.plaintext.append(text);
@@ -45,28 +61,59 @@ public final class RegexArgument {
         }
     }
 
+    /**
+     * Appends a character to the plaintext and regex.
+     * 
+     * @param chr  The character to append
+     */
     public void append(char chr) {
         plaintext.append(chr);
         regex.append(Pattern.quote(String.valueOf(chr)));
     }
 
+    /**
+     * Appends an asterisk to the plaintext and regex.
+     * Updates hasAsterisk to true.
+     * 
+     * @param chr  The character to append
+     */
     public void appendAsterisk() {
         plaintext.append(CHAR_ASTERISK);
         regex.append("[^").append(StringUtils.fileSeparator()).append("]*");
         hasAsterisk = true;
     }
 
+    /**
+     * Merges the given RegexArgument with the current plaintext and regex.
+     * Updates hasAsterisk to true if either the current or the given RegexArgument has an asterisk.
+     * 
+     * @param other The RegexArgument to merge with
+     */
     public void merge(RegexArgument other) {
         plaintext.append(other.plaintext);
         regex.append(other.regex);
         hasAsterisk = this.hasAsterisk || other.hasAsterisk;
     }
 
+    /**
+     * Merges the given string with the current plaintext and regex.
+     * 
+     * @param str The string to merge with
+     */
     public void merge(String str) {
         plaintext.append(str);
         regex.append(Pattern.quote(str));
     }
 
+    /**
+     * Returns a list of matching file paths if the string contains an asterisk, 
+     * or the plaintext if no files match or the string does not contain an asterisk.
+     * 
+     * @param hasAsterisk A boolean indicating whether the string contains an asterisk (*).
+     * @param regex A StringBuilder containing the regex pattern compiled from the glob pattern.
+     * @param plaintext A StringBuilder containing the original string.
+     * @return 
+     */
     public List<String> globFiles() {
         List<String> globbedFiles = new LinkedList<>();
 
@@ -137,14 +184,29 @@ public final class RegexArgument {
         return matches;
     }
 
+    /**
+     * Returns whether the string is a regex.
+     * 
+     * @return
+     */
     public boolean isRegex() {
         return hasAsterisk;
     }
 
+    /**
+     * Returns whether the string is empty.
+     * 
+     * @return
+     */
     public boolean isEmpty() {
         return plaintext.length() == 0;
     }
 
+    /**
+     * Returns the plaintext.
+     * 
+     * @return
+     */
     public String toString() {
         return plaintext.toString();
     }

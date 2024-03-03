@@ -6,6 +6,13 @@ import java.io.OutputStream;
 import sg.edu.nus.comp.cs4218.app.ExitInterface;
 import sg.edu.nus.comp.cs4218.exception.ExitException;
 
+/**
+ * The exit command terminates the execution.
+ *
+ * <p>
+ * <b>Command format:</b> <code>exit</code>
+ * </p>
+ */
 public class ExitApplication implements ExitInterface {
 
     /**
@@ -18,12 +25,11 @@ public class ExitApplication implements ExitInterface {
      */
     @Override
     public void run(String[] args, InputStream stdin, OutputStream stdout) throws ExitException {
-        // Format: exit
         terminateExecution();
     }
 
     /**
-     * Terminate shell.
+     * Terminates shell.
      *
      * @throws ExitException Not used.
      */

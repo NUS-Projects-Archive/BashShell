@@ -95,12 +95,12 @@ public class CatApplication implements CatInterface {
     }
 
     /**
-     * Concatenate files.
+     * Concatenates files.
      *
-     * @param isLineNumber   Boolean. If true, concatenate files with line numbering.
-     *                       If false, concatenate files without line numbering.
-     * @param fileNames  Array of file names to be concatenated. An array element may be used to
-     *                   specify multiple file names using * as wildcard.
+     * @param isLineNumber  Boolean. If true, concatenate files with line numbering.
+    *                       If false, concatenate files without line numbering.
+     * @param fileNames     Array of file names to be concatenated. An array element may be used to
+     *                      specify multiple file names using * as wildcard.
      * @throws CatException If the file(s) specified do not exist or are unreadable.
      */
     @Override
@@ -134,10 +134,10 @@ public class CatApplication implements CatInterface {
     }
 
     /**
-     * Concatenate from standard input.
+     * Concatenates from standard input.
      *
-     * @param isLineNumber   Boolean. If true, concatenates from standard input with line numbering.
-     *                       If false, concatenates from standard input without line numbering.
+     * @param isLineNumber  Boolean. If true, concatenates from standard input with line numbering.
+    *                       If false, concatenates from standard input without line numbering.
      * @param stdin         InputStream to be read from for concatenation.
      * @throws CatException If an I/O error occurs when standard input is read.
      */
@@ -148,10 +148,10 @@ public class CatApplication implements CatInterface {
     }
 
     /**
-     * Concatenate files as well as from standard input.
+     * Concatenates files as well as from standard input.
      *
-     * @param isLineNumber   Boolean. If true, concatenates with line numbering.
-     *                       If false, concatenates without line numbering.
+     * @param isLineNumber  Boolean. If true, concatenates with line numbering.
+     *                      If false, concatenates without line numbering.
      * @param stdin         InputStream to be read from for concatenation.
      * @param fileNames     Array of file names to be concatenated. An array element may be used to
      *                      specify multiple file names using * as wildcard.
@@ -198,7 +198,7 @@ public class CatApplication implements CatInterface {
      * @param isLineNumber   Boolean. If true, concatenates with line numbering.
      *                       If false, concatenates without line numbering.
      * @param bufferedReader A buffering character-input stream that uses a default-sized input buffer.
-     * @throws CatException If an I/O error occurs when bufferedReader is read.
+     * @throws CatException  If an I/O error occurs when bufferedReader is read.
      */
     public String readStdIn(Boolean isLineNumber, BufferedReader bufferedReader) throws CatException {
         StringBuilder userInput = new StringBuilder();
@@ -231,8 +231,8 @@ public class CatApplication implements CatInterface {
      *
      * @param isLineNumber   Boolean. If true, concatenates with line numbering.
      *                       If false, concatenates without line numbering.
-     * @param file          A File object to be read.
-     * @throws CatException If the file specified does not exist or is unreadable.
+     * @param file           A File object to be read.
+     * @throws CatException  If the file specified does not exist or is unreadable.
      */
     public String readFile(Boolean isLineNumber, File file) throws IOException, CatException {
         StringBuilder content = new StringBuilder();

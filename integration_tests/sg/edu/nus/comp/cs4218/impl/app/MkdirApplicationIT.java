@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_EXISTS;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_FOLDERS;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NULL_ARGS;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_TOP_LEVEL_MISSING;
@@ -29,13 +30,15 @@ public class MkdirApplicationIT {
 
     @TempDir
     private Path tempDir;
+    private String tempFile;
 
     @BeforeEach
     void setUp() throws IOException {
         app = new MkdirApplication();
 
-        // Create temporary file
-        Path tempFilePath = tempDir.resolve(TEMP_FILE); // automatically deletes after test execution
+        // Create temporary file, automatically deletes after test execution
+        Path tempFilePath = tempDir.resolve(TEMP_FILE);
+        tempFile = tempFilePath.toString();
         Files.createFile(tempFilePath);
     }
 
@@ -68,11 +71,45 @@ public class MkdirApplicationIT {
 
     @Test
     void run_RootDirectory_ThrowsMkdirException() {
-        String[] args = {"-p", "/"};
+        String[] args = {"/"};
         Throwable result = assertThrows(MkdirException.class, () -> {
             app.run(args, null, null);
         });
-        assertEquals(MKDIR_EX_MSG + ERR_TOP_LEVEL_MISSING, result.getMessage());
+        assertEquals(MKDIR_EX_MSG + ERR_FILE_EXISTS, result.getMessage());
+    }
+
+    @Test
+    void run_FolderExists_ThrowsMkdirException() {
+        String[] args = {tempFile};
+        Throwable result = assertThrows(MkdirException.class, () -> {
+            app.run(args, null, null);
+        });
+        assertEquals(MKDIR_EX_MSG + ERR_FILE_EXISTS, result.getMessage());
+    }
+
+    @Test
+    void run_MissingTopLevelAndIsCreateParent_CreateFolderSuccessfully() {
+        Path missTopLevelPath = tempDir.resolve("missingTopLevel/" + TEMP_FILE);
+        String[] args = {"-p", missTopLevelPath.toString()};
+        assertDoesNotThrow(() -> app.run(args, null, null));
+        File file = new File(missTopLevelPath.toString());
+        assertTrue(file.exists());
+    }
+
+    @Test
+    void run_RootDirectoryAndIsCreateParent_CreateFolderSuccessfully() {
+        String[] args = {"-p", "/"};
+        assertDoesNotThrow(() -> app.run(args, null, null));
+        File file = new File("/");
+        assertTrue(file.exists());
+    }
+
+    @Test
+    void run_FolderExistsAndIsCreateParent_CreateFolderSuccessfully() {
+        String[] args = {"-p", tempFile};
+        assertDoesNotThrow(() -> app.run(args, null, null));
+        File file = new File(tempFile);
+        assertTrue(file.exists());
     }
 
     @Test

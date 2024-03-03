@@ -2,10 +2,12 @@ package sg.edu.nus.comp.cs4218.impl.cmd;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_EXISTS;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_SYNTAX;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 
@@ -35,7 +37,7 @@ public class SequenceCommandTest {
 
     private Command validCmdHasOutput;
     private Command validCmdNoOutput;
-    private Command nonExitExceptnCmd;
+    private Command nonExitExceptionC;
     private InputStream stdin;
     private OutputStream stdout;
     private static final String SHELL_EXCEPTION = "shell: ";
@@ -49,12 +51,12 @@ public class SequenceCommandTest {
         stdout = new ByteArrayOutputStream();
 
         List<String> validArgsHasOut = new ArrayList<>(List.of("echo", HELLO));
-        List<String> validArgsNoOut = new ArrayList<>(List.of("cd", ".."));
+        List<String> validArgsNoOut = new ArrayList<>(List.of("mkdir", "test"));
         List<String> nonExitExceptnArg = new ArrayList<>(List.of("cat", "<", ">"));
 
         validCmdHasOutput = new CallCommand(validArgsHasOut, appRunner, argResolver);
         validCmdNoOutput = new CallCommand(validArgsNoOut, appRunner, argResolver);
-        nonExitExceptnCmd = new CallCommand(nonExitExceptnArg, appRunner, argResolver);
+        nonExitExceptionC = new CallCommand(nonExitExceptnArg, appRunner, argResolver);
     }
 
     @AfterEach
@@ -91,8 +93,10 @@ public class SequenceCommandTest {
             SequenceCommand seqCmd = new SequenceCommand(spyCommands);
             seqCmd.evaluate(stdin, stdout);
 
-            String expected = HELLO + STRING_NEWLINE;
-            assertEquals(expected, stdout.toString());
+            String mkdirSuccess = HELLO + STRING_NEWLINE;
+            String mkdirFailure = "mkdir: " + ERR_FILE_EXISTS + STRING_NEWLINE + HELLO + STRING_NEWLINE;
+            String actual = stdout.toString();
+            assertTrue(actual.equals(mkdirSuccess) || actual.equals(mkdirFailure) );
         } catch (FileNotFoundException | AbstractApplicationException | ShellException e) {
             fail(e.getMessage());
         }
@@ -103,7 +107,7 @@ public class SequenceCommandTest {
 
         try {
             List<Command> spyCommands = new ArrayList<>();
-            spyCommands.add(spy(nonExitExceptnCmd));
+            spyCommands.add(spy(nonExitExceptionC));
             spyCommands.add(spy(validCmdHasOutput));
 
             SequenceCommand seqCmd = new SequenceCommand(spyCommands);

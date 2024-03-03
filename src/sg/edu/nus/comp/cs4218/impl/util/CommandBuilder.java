@@ -18,6 +18,9 @@ import sg.edu.nus.comp.cs4218.impl.cmd.CallCommand;
 import sg.edu.nus.comp.cs4218.impl.cmd.PipeCommand;
 import sg.edu.nus.comp.cs4218.impl.cmd.SequenceCommand;
 
+/**
+ * CommandBuilder is a utility class to parse and tokenize the provided command string into command(s) and arguments.
+ */
 @SuppressWarnings({"PMD.ExcessiveMethodLength", "PMD.ClassNamingConventions"})
 public final class CommandBuilder {
     /**
@@ -35,8 +38,7 @@ public final class CommandBuilder {
     private static final Pattern ARGUMENT_REGEX = Pattern
             .compile("([^'\"`|<>;\\s]+|'[^']*'|\"([^\"`]*`.*?`[^\"`]*)+\"|\"[^\"]*\"|`[^`]*`)+");
 
-    private CommandBuilder() {
-    }
+    private CommandBuilder() { /* Does nothing */}
 
     /**
      * Parses and tokenizes the provided command string into command(s) and arguments.

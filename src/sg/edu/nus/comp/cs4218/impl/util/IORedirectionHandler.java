@@ -14,6 +14,9 @@ import java.util.ListIterator;
 import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
 import sg.edu.nus.comp.cs4218.exception.ShellException;
 
+/**
+ * IORedirectionHandler handles input and output redirection for a list of arguments.
+ */
 public class IORedirectionHandler {
     private final List<String> argsList;
     private final ArgumentResolver argumentResolver;
@@ -21,6 +24,14 @@ public class IORedirectionHandler {
     private InputStream inputStream;
     private OutputStream outputStream;
 
+    /**
+     * Constructor for IORedirectionHandler.
+     * 
+     * @param argsList         List of arguments for the command
+     * @param origInputStream  Original InputStream
+     * @param origOutputStream Original OutputStream
+     * @param argumentResolver ArgumentResolver to resolve the arguments
+     */
     public IORedirectionHandler(List<String> argsList, InputStream origInputStream,
                                 OutputStream origOutputStream, ArgumentResolver argumentResolver) {
         this.argsList = argsList;
@@ -29,6 +40,19 @@ public class IORedirectionHandler {
         this.argumentResolver = argumentResolver;
     }
 
+    /**
+     * Extracts redirection options from the arguments list. This method identifies and processes
+     * input and output redirection operators ("<" and ">") in the arguments list. It replaces
+     * the existing input and output streams with new streams based on the specified files.
+     * 
+     * This method also handles quoting, globing, and command substitution in the file argument.
+     * If the file argument resolves to more than one parsed argument, it throws a ShellException
+     * for ambiguous redirect.
+     *
+     * @throws AbstractApplicationException If an application-specific exception occurs.
+     * @throws ShellException If a shell-specific exception occurs, such as invalid syntax or ambiguous redirect.
+     * @throws FileNotFoundException If an operation attempts to open a file that does not exist.
+     */
     public void extractRedirOptions() throws AbstractApplicationException, ShellException, FileNotFoundException {
         if (argsList == null || argsList.isEmpty()) {
             throw new ShellException(ERR_SYNTAX);
@@ -73,14 +97,29 @@ public class IORedirectionHandler {
         }
     }
 
+    /**
+     * Returns the list of arguments for the command without redirection operators.
+     * 
+     * @return
+     */
     public List<String> getNoRedirArgsList() {
         return noRedirArgsList;
     }
 
+    /**
+     * Returns the InputStream.
+     * 
+     * @return
+     */
     public InputStream getInputStream() {
         return inputStream;
     }
 
+    /**
+     * Returns the OutputStream.
+     * 
+     * @return
+     */
     public OutputStream getOutputStream() {
         return outputStream;
     }

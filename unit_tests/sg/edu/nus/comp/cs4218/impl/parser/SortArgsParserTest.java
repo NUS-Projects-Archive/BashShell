@@ -20,30 +20,37 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 import sg.edu.nus.comp.cs4218.exception.InvalidArgsException;
 
-@SuppressWarnings("PMD.AvoidDuplicateLiterals")
 class SortArgsParserTest {
 
-    private final Set<Character> VALID_FLAGS = Set.of('n', 'r', 'f');
+    private static final Set<Character> VALID_FLAGS = Set.of('n', 'r', 'f');
+    private static final String FLAG_FIRST_NUM = "-n";
+    private static final String FLAG_REV_ORDER = "-r";
+    private static final String FLAG_CASE_IGNORE = "-f";
+    private static final String FLAG_ALL = "-nrf";
+    private static final String FILE_ONE = "file1";
+    private static final String FILE_TWO = "file2";
+    private static final String FILE_THREE = "file3";
+    private static final String DASH = "-";
     private SortArgsParser sortArgsParser;
 
     private static Stream<Arguments> validSyntax() {
         return Stream.of(
                 Arguments.of((Object) new String[]{}),
-                Arguments.of((Object) new String[]{"-n"}),
-                Arguments.of((Object) new String[]{"-r"}),
-                Arguments.of((Object) new String[]{"-f"}),
-                Arguments.of((Object) new String[]{"-n", "example"}),
-                Arguments.of((Object) new String[]{"-r", "example"}),
-                Arguments.of((Object) new String[]{"-f", "example"}),
-                Arguments.of((Object) new String[]{"-n", "-"}),
-                Arguments.of((Object) new String[]{"-r", "-"}),
-                Arguments.of((Object) new String[]{"-f", "-"}),
-                Arguments.of((Object) new String[]{"-n", "-r", "-f"}),
-                Arguments.of((Object) new String[]{"-n", "-r", "-f", "example"}),
-                Arguments.of((Object) new String[]{"-n", "-r", "-f", "-"}), // dash is treated as a file
-                Arguments.of((Object) new String[]{"-nrf"}),
-                Arguments.of((Object) new String[]{"-nrf", "example"}),
-                Arguments.of((Object) new String[]{"-nrf", "-"})
+                Arguments.of((Object) new String[]{FLAG_FIRST_NUM}),
+                Arguments.of((Object) new String[]{FLAG_REV_ORDER}),
+                Arguments.of((Object) new String[]{FLAG_CASE_IGNORE}),
+                Arguments.of((Object) new String[]{FLAG_FIRST_NUM, FILE_ONE}),
+                Arguments.of((Object) new String[]{FLAG_REV_ORDER, FILE_ONE}),
+                Arguments.of((Object) new String[]{FLAG_CASE_IGNORE, FILE_ONE}),
+                Arguments.of((Object) new String[]{FLAG_FIRST_NUM, DASH}), // dash is treated as a file
+                Arguments.of((Object) new String[]{FLAG_REV_ORDER, DASH}),
+                Arguments.of((Object) new String[]{FLAG_CASE_IGNORE, DASH}),
+                Arguments.of((Object) new String[]{FLAG_FIRST_NUM, FLAG_REV_ORDER, FLAG_CASE_IGNORE}),
+                Arguments.of((Object) new String[]{FLAG_FIRST_NUM, FLAG_REV_ORDER, FLAG_CASE_IGNORE, FILE_ONE}),
+                Arguments.of((Object) new String[]{FLAG_FIRST_NUM, FLAG_REV_ORDER, FLAG_CASE_IGNORE, DASH}),
+                Arguments.of((Object) new String[]{FLAG_ALL}),
+                Arguments.of((Object) new String[]{FLAG_ALL, FILE_ONE}),
+                Arguments.of((Object) new String[]{FLAG_ALL, DASH})
         );
     }
 
@@ -72,7 +79,7 @@ class SortArgsParserTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"-n", "-r", "-f"})
+    @ValueSource(strings = {FLAG_FIRST_NUM, FLAG_REV_ORDER, FLAG_CASE_IGNORE})
     void parse_ValidFlag_ShouldMatchGivenFlags(String args) {
         assertDoesNotThrow(() -> sortArgsParser.parse(args));
 
@@ -85,7 +92,7 @@ class SortArgsParserTest {
 
     @Test
     void parse_AllValidFlags_ReturnsGivenMatchingFlags() {
-        assertDoesNotThrow(() -> sortArgsParser.parse("-n", "-r", "-f"));
+        assertDoesNotThrow(() -> sortArgsParser.parse(FLAG_FIRST_NUM, FLAG_REV_ORDER, FLAG_CASE_IGNORE));
         assertEquals(VALID_FLAGS, sortArgsParser.flags, "Flags do not match");
     }
 
@@ -125,19 +132,19 @@ class SortArgsParserTest {
 
     @Test
     void isFirstWordNumber_ValidFlag_ReturnsTrue() {
-        assertDoesNotThrow(() -> sortArgsParser.parse("-n"));
+        assertDoesNotThrow(() -> sortArgsParser.parse(FLAG_FIRST_NUM));
         assertTrue(sortArgsParser.isFirstWordNumber());
     }
 
     @Test
     void isFirstWordNumber_ValidFlagAndNonFlagArg_ReturnsTrue() {
-        assertDoesNotThrow(() -> sortArgsParser.parse("-n", "example"));
+        assertDoesNotThrow(() -> sortArgsParser.parse(FLAG_FIRST_NUM, FILE_ONE));
         assertTrue(sortArgsParser.isFirstWordNumber());
     }
 
     @Test
     void isFirstWordNumber_OnlyNonFlagArg_ReturnsFalse() {
-        assertDoesNotThrow(() -> sortArgsParser.parse("example"));
+        assertDoesNotThrow(() -> sortArgsParser.parse(FILE_ONE));
         assertFalse(sortArgsParser.isFirstWordNumber());
     }
 
@@ -149,19 +156,19 @@ class SortArgsParserTest {
 
     @Test
     void isReverseOrder_ValidFlag_ReturnsTrue() {
-        assertDoesNotThrow(() -> sortArgsParser.parse("-r"));
+        assertDoesNotThrow(() -> sortArgsParser.parse(FLAG_REV_ORDER));
         assertTrue(sortArgsParser.isReverseOrder());
     }
 
     @Test
     void isReverseOrder_ValidFlagAndNonFlagArg_ReturnsTrue() {
-        assertDoesNotThrow(() -> sortArgsParser.parse("-r", "example"));
+        assertDoesNotThrow(() -> sortArgsParser.parse(FLAG_REV_ORDER, FILE_ONE));
         assertTrue(sortArgsParser.isReverseOrder());
     }
 
     @Test
     void isReverseOrder_OnlyNonFlagArg_ReturnsFalse() {
-        assertDoesNotThrow(() -> sortArgsParser.parse("example"));
+        assertDoesNotThrow(() -> sortArgsParser.parse(FILE_ONE));
         assertFalse(sortArgsParser.isReverseOrder());
     }
 
@@ -173,19 +180,19 @@ class SortArgsParserTest {
 
     @Test
     void isCaseIndependent_ValidFlag_ReturnsTrue() {
-        assertDoesNotThrow(() -> sortArgsParser.parse("-f"));
+        assertDoesNotThrow(() -> sortArgsParser.parse(FLAG_CASE_IGNORE));
         assertTrue(sortArgsParser.isCaseIndependent());
     }
 
     @Test
     void isCaseIndependent_ValidFlagAndNonFlagArg_ReturnsTrue() {
-        assertDoesNotThrow(() -> sortArgsParser.parse("-f", "example"));
+        assertDoesNotThrow(() -> sortArgsParser.parse(FLAG_CASE_IGNORE, FILE_ONE));
         assertTrue(sortArgsParser.isCaseIndependent());
     }
 
     @Test
     void isCaseIndependent_OnlyNonFlagArg_ReturnsFalse() {
-        assertDoesNotThrow(() -> sortArgsParser.parse("example"));
+        assertDoesNotThrow(() -> sortArgsParser.parse(FILE_ONE));
         assertFalse(sortArgsParser.isCaseIndependent());
     }
 
@@ -198,24 +205,24 @@ class SortArgsParserTest {
 
     @Test
     void getFileNames_OneNonFlagArg_ReturnsOneFile() {
-        assertDoesNotThrow(() -> sortArgsParser.parse("example"));
-        List<String> expected = List.of("example");
+        assertDoesNotThrow(() -> sortArgsParser.parse(FILE_ONE));
+        List<String> expected = List.of(FILE_ONE);
         List<String> result = sortArgsParser.getFileNames();
         assertEquals(expected, result);
     }
 
     @Test
     void getFileNames_MultipleNonFlagArg_ReturnsMultipleFiles() {
-        assertDoesNotThrow(() -> sortArgsParser.parse("example1", "example2", "example3"));
-        List<String> expected = List.of("example1", "example2", "example3");
+        assertDoesNotThrow(() -> sortArgsParser.parse(FILE_ONE, FILE_TWO, FILE_THREE));
+        List<String> expected = List.of(FILE_ONE, FILE_TWO, FILE_THREE);
         List<String> result = sortArgsParser.getFileNames();
         assertEquals(expected, result);
     }
 
     @Test
     void getFileNames_ValidFlagsAndOneNonFlagArg_ReturnsOneFile() {
-        assertDoesNotThrow(() -> sortArgsParser.parse("-n", "-r", "-f", "example"));
-        List<String> expected = List.of("example");
+        assertDoesNotThrow(() -> sortArgsParser.parse(FLAG_FIRST_NUM, FLAG_REV_ORDER, FLAG_CASE_IGNORE, FILE_ONE));
+        List<String> expected = List.of(FILE_ONE);
         List<String> result = sortArgsParser.getFileNames();
         assertEquals(expected, result);
     }

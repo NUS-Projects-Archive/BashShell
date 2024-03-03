@@ -22,6 +22,9 @@ import sg.edu.nus.comp.cs4218.Command;
 import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
 import sg.edu.nus.comp.cs4218.exception.ShellException;
 
+/**
+ * ArgumentResolver handles quoting, globing, and command substitution for a list of arguments.
+ */
 // Suppressed as subCommand is always reinitialised before use in resolveOneArgument
 @SuppressWarnings("PMD.AvoidStringBufferField")
 public class ArgumentResolver {
@@ -32,16 +35,24 @@ public class ArgumentResolver {
     private RegexArgument parsedArg;
     private StringBuilder subCommand;
 
+    /**
+     * Constructor for ArgumentResolver. Initializes applicationRunner.
+     */
     public ArgumentResolver() {
         applicationRunner = new ApplicationRunner();
     }
 
+    /**
+     * Returns the ApplicationRunner.
+     * 
+     * @return ApplicationRunner
+     */
     public ApplicationRunner getAppRunner() {
         return applicationRunner;
     }
 
     /**
-     * Handle quoting + globing + command substitution for a list of arguments.
+     * Handles quoting + globing + command substitution for a list of arguments.
      *
      * @param argsList The original list of arguments
      * @return The list of parsed arguments
@@ -193,10 +204,21 @@ public class ArgumentResolver {
         }
     }
 
+    /**
+     * Returns a new RegexArgument.
+     * 
+     * @return RegexArgument
+     */
     public RegexArgument makeRegexArgument() {
         return new RegexArgument();
     }
 
+    /**
+     * Returns a new RegexArgument with the given string.
+     * 
+     * @param str String to be set in the new RegexArgument
+     * @return RegexArgument
+     */
     public RegexArgument makeRegexArgument(String str) {
         return new RegexArgument(str);
     }
