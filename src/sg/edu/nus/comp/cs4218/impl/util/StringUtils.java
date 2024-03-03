@@ -68,12 +68,12 @@ public final class StringUtils {
     /**
      * Performs c * n (as in python).
      *
-     * @param character char to be multiplied
-     * @param num       if num is < 0, num is assumed to be 0
+     * @param character Character to be multiplied
+     * @param num       Ff num is < 0, num is assumed to be 0
      * @return String result of c * n
      */
     public static String multiplyChar(char character, int num) {
-        int length = num <= 0 ? 0 : num;
+        int length = Math.max(num, 0);
         char[] arr = new char[length];
         Arrays.fill(arr, character);
         return new String(arr);
@@ -94,6 +94,8 @@ public final class StringUtils {
 
     /**
      * Checks if a string can be represented as a number.
+     * Leading and trailing whitespace are ignored.
+     * String that "looks" like numbers (e.g. "1,000") will not be considered as number.
      *
      * @param str String possibly representing a number
      * @return true if str can be represented as a number
@@ -101,7 +103,7 @@ public final class StringUtils {
     public static boolean isNumber(String str) {
         BigInteger bigInt;
         try {
-            bigInt = new BigInteger(str);
+            bigInt = new BigInteger(str.trim());
         } catch (Exception ex) {
             return false;
         }
