@@ -47,7 +47,7 @@ public class PasteApplication implements PasteInterface {
      * @param stdout An OutputStream. The output of the command is written to this OutputStream.
      */
     @Override
-    public void run(String[] args, InputStream stdin, OutputStream stdout) throws PasteException {
+    public void run(String[] args, InputStream stdin, OutputStream stdout) throws PasteException { //NOPMD
         if (stdout == null) {
             throw new PasteException(ERR_NULL_STREAMS);
         }
