@@ -31,7 +31,8 @@ import sg.edu.nus.comp.cs4218.impl.parser.SortArgsParser;
 import sg.edu.nus.comp.cs4218.impl.util.IOUtils;
 
 /**
- * The sort command orders the lines of the specified files or input and prints the same lines but in sorted order.
+ * The sort command orders the lines of the specified files or input
+ * and prints the same lines but in sorted order.
  *
  * <p>
  * <b>Command format:</b> <code>sort [Options] [FILES]</code>
@@ -95,7 +96,7 @@ public class SortApplication implements SortInterface {
      * @param isCaseIndependent Boolean option to perform case-independent sorting
      * @param fileNames         Array of String of file names
      * @throws SortException If there are issues sorting lines, e.g., null arguments, file not found,
-     *                       encountering a directory,lack of read permissions, or I/O errors
+     *                       encountering a directory, lack of read permissions, or I/O errors
      */
     @Override
     public String sortFromFiles(Boolean isFirstWordNumber, Boolean isReverseOrder, Boolean isCaseIndependent,

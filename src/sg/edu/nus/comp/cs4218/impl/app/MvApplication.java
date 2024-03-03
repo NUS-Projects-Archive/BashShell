@@ -31,8 +31,9 @@ import sg.edu.nus.comp.cs4218.impl.util.IOUtils;
  * By default, it will overwrite an existing file.
  *
  * <p>
- * <b>Command format:</b> <code>mv [Option] SOURCE TARGET</code>
- *                        <code>mv [Option] SOURCE ... DIRECTORY</code>
+ * <b>Command format:</b> <br>
+ * <code>mv [Option] SOURCE TARGET</code> <br>
+ * <code>mv [Option] SOURCE ... DIRECTORY</code>
  * </p>
  */
 public class MvApplication implements MvInterface {

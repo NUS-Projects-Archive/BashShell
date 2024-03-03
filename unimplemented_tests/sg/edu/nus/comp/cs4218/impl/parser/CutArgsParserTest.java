@@ -22,72 +22,85 @@ import sg.edu.nus.comp.cs4218.exception.InvalidArgsException;
 
 public class CutArgsParserTest {
 
-    private final Set<Character> VALID_FLAGS = Set.of('c', 'b');
+    private static final Set<Character> VALID_FLAGS = Set.of('c', 'b');
+    private static final String FLAG_CUT_BY_CHAR = "-c";
+    private static final String FLAG_CUT_BY_BYTE = "-b";
+    private static final String SINGLE_NUM = "1";
+    private static final String MULTI_NUM = "1,5";
+    private static final String RANGE_OF_NUM = "1-5";
+    private static final String MULTI_AND_RANGE = "1,5,10-15";
+    private static final String FILE_ONE = "file1";
+    private static final String FILE_TWO = "file2";
+    private static final String STDIN = "-";
     private CutArgsParser cutArgsParser;
 
-    @SuppressWarnings("PMD.AvoidDuplicateLiterals")
     private static Stream<Arguments> validSyntax() {
         return Stream.of(
-                Arguments.of((Object) new String[]{"-c", "1"}),
-                Arguments.of((Object) new String[]{"-b", "1"}),
-                Arguments.of((Object) new String[]{"-c", "1", "-"}),
-                Arguments.of((Object) new String[]{"-b", "1", "-"}),
-                Arguments.of((Object) new String[]{"-c", "1", "example.txt"}),
-                Arguments.of((Object) new String[]{"-b", "1", "example.txt"}),
-                Arguments.of((Object) new String[]{"-c", "1-5", "example.txt"}),
-                Arguments.of((Object) new String[]{"-b", "1-5", "example.txt"}),
-                Arguments.of((Object) new String[]{"-c", "1,5", "example.txt"}),
-                Arguments.of((Object) new String[]{"-b", "1,5", "example.txt"}),
-                Arguments.of((Object) new String[]{"-c", "1-5,10,15", "example.txt"}),
-                Arguments.of((Object) new String[]{"-b", "1-5,10,15", "example.txt"}),
-                Arguments.of((Object) new String[]{"-c", "1,5,10-15", "example.txt"}),
-                Arguments.of((Object) new String[]{"-b", "1,5,10-15", "example.txt"}),
-                Arguments.of((Object) new String[]{"-c", "1", "-"}),
-                Arguments.of((Object) new String[]{"-b", "1", "-"}),
-                Arguments.of((Object) new String[]{"-c", "1", "example.txt", "-"}),
-                Arguments.of((Object) new String[]{"-b", "1", "example.txt", "-"}),
-                Arguments.of((Object) new String[]{"-c", "1", "-", "-"}),
-                Arguments.of((Object) new String[]{"-b", "1", "-", "-"}),
-                Arguments.of((Object) new String[]{"-c", "1", "example1.txt", "example2.txt"}),
-                Arguments.of((Object) new String[]{"-b", "1", "example1.txt", "example2.txt"})
+                Arguments.of((Object) new String[]{FLAG_CUT_BY_CHAR, SINGLE_NUM}),
+                Arguments.of((Object) new String[]{FLAG_CUT_BY_BYTE, SINGLE_NUM}),
+                Arguments.of((Object) new String[]{FLAG_CUT_BY_CHAR, SINGLE_NUM, STDIN}),
+                Arguments.of((Object) new String[]{FLAG_CUT_BY_BYTE, SINGLE_NUM, STDIN}),
+                Arguments.of((Object) new String[]{FLAG_CUT_BY_CHAR, SINGLE_NUM, FILE_ONE}),
+                Arguments.of((Object) new String[]{FLAG_CUT_BY_BYTE, SINGLE_NUM, FILE_ONE}),
+                Arguments.of((Object) new String[]{FLAG_CUT_BY_CHAR, MULTI_NUM, FILE_ONE}),
+                Arguments.of((Object) new String[]{FLAG_CUT_BY_BYTE, MULTI_NUM, FILE_ONE}),
+                Arguments.of((Object) new String[]{FLAG_CUT_BY_CHAR, RANGE_OF_NUM, FILE_ONE}),
+                Arguments.of((Object) new String[]{FLAG_CUT_BY_BYTE, RANGE_OF_NUM, FILE_ONE}),
+                Arguments.of((Object) new String[]{FLAG_CUT_BY_CHAR, MULTI_AND_RANGE, FILE_ONE}),
+                Arguments.of((Object) new String[]{FLAG_CUT_BY_BYTE, MULTI_AND_RANGE, FILE_ONE}),
+                Arguments.of((Object) new String[]{FLAG_CUT_BY_CHAR, MULTI_AND_RANGE, FILE_ONE}),
+                Arguments.of((Object) new String[]{FLAG_CUT_BY_BYTE, MULTI_AND_RANGE, FILE_ONE}),
+                Arguments.of((Object) new String[]{FLAG_CUT_BY_CHAR, SINGLE_NUM, STDIN}),
+                Arguments.of((Object) new String[]{FLAG_CUT_BY_BYTE, SINGLE_NUM, STDIN}),
+                Arguments.of((Object) new String[]{FLAG_CUT_BY_CHAR, SINGLE_NUM, FILE_ONE, STDIN}),
+                Arguments.of((Object) new String[]{FLAG_CUT_BY_BYTE, SINGLE_NUM, FILE_ONE, STDIN}),
+                Arguments.of((Object) new String[]{FLAG_CUT_BY_CHAR, SINGLE_NUM, STDIN, STDIN}),
+                Arguments.of((Object) new String[]{FLAG_CUT_BY_BYTE, SINGLE_NUM, STDIN, STDIN}),
+                Arguments.of((Object) new String[]{FLAG_CUT_BY_CHAR, SINGLE_NUM, FILE_ONE, FILE_TWO}),
+                Arguments.of((Object) new String[]{FLAG_CUT_BY_BYTE, SINGLE_NUM, FILE_ONE, FILE_TWO})
         );
     }
 
     private static Stream<Arguments> invalidSyntax() {
         return Stream.of(
                 Arguments.of((Object) new String[]{}),
-                Arguments.of((Object) new String[]{"1", "example.txt"}),
-                Arguments.of((Object) new String[]{"-c", "example.txt"}),
-                Arguments.of((Object) new String[]{"-b", "example.txt"}),
-                Arguments.of((Object) new String[]{"-c", "-b", "1", "example.txt"}),
-                Arguments.of((Object) new String[]{"-b", "-c", "1", "example.txt"}),
-                Arguments.of((Object) new String[]{"-C", "1", "example.txt"}),
-                Arguments.of((Object) new String[]{"-B", "1", "example.txt"}),
-                Arguments.of((Object) new String[]{"-c", "0", "example.txt"}),
-                Arguments.of((Object) new String[]{"-c", "0-5", "example.txt"}),
-                Arguments.of((Object) new String[]{"-c", "0,5", "example.txt"}),
-                Arguments.of((Object) new String[]{"-c", "-1", "example.txt"}),
-                Arguments.of((Object) new String[]{"-c", "-1-5", "example.txt"}),
-                Arguments.of((Object) new String[]{"-c", "-1,5", "example.txt"})
+                Arguments.of((Object) new String[]{SINGLE_NUM, FILE_ONE}), // lacking flag
+                Arguments.of((Object) new String[]{FLAG_CUT_BY_CHAR, FILE_ONE}), // lacking range
+                Arguments.of((Object) new String[]{FLAG_CUT_BY_BYTE, FILE_ONE}), // lacking range
+                Arguments.of((Object) new String[]{FLAG_CUT_BY_CHAR, FLAG_CUT_BY_BYTE, SINGLE_NUM, FILE_ONE}), // only 1 flag
+                Arguments.of((Object) new String[]{FLAG_CUT_BY_BYTE, FLAG_CUT_BY_CHAR, SINGLE_NUM, FILE_ONE}), // only 1 flag
+                Arguments.of((Object) new String[]{"-C", SINGLE_NUM, FILE_ONE}),
+                Arguments.of((Object) new String[]{"-B", SINGLE_NUM, FILE_ONE}),
+                Arguments.of((Object) new String[]{FLAG_CUT_BY_CHAR, "0", FILE_ONE}),
+                Arguments.of((Object) new String[]{FLAG_CUT_BY_CHAR, "0-5", FILE_ONE}),
+                Arguments.of((Object) new String[]{FLAG_CUT_BY_CHAR, "0,5", FILE_ONE}),
+                Arguments.of((Object) new String[]{FLAG_CUT_BY_CHAR, "-1", FILE_ONE}),
+                Arguments.of((Object) new String[]{FLAG_CUT_BY_CHAR, "-1-5", FILE_ONE}),
+                Arguments.of((Object) new String[]{FLAG_CUT_BY_CHAR, "-1,5", FILE_ONE})
         );
     }
 
     static Stream<Arguments> validRangeList() {
         return Stream.of(
-                Arguments.of(new String[]{"-c", "1", "example.txt"}, List.of(new int[]{1, 1})),
-                Arguments.of(new String[]{"-c", "1-5", "example.txt"}, List.of(new int[]{1, 5})),
-                Arguments.of(new String[]{"-c", "1,5", "example.txt"}, List.of(new int[]{1, 1}, new int[]{1, 5})),
-                Arguments.of(new String[]{"-c", "1-5", "example.txt"}, List.of(new int[]{1, 5})),
-                Arguments.of(new String[]{"-c", "1,5,10-15", "example.txt"},
+                Arguments.of(new String[]{FLAG_CUT_BY_CHAR, SINGLE_NUM, FILE_ONE},
+                        List.of(new int[]{1, 1})),
+                Arguments.of(new String[]{FLAG_CUT_BY_CHAR, MULTI_NUM, FILE_ONE},
+                        List.of(new int[]{1, 1}, new int[]{1, 5})),
+                Arguments.of(new String[]{FLAG_CUT_BY_CHAR, RANGE_OF_NUM, FILE_ONE},
+                        List.of(new int[]{1, 5})),
+                Arguments.of(new String[]{FLAG_CUT_BY_CHAR, "1,5,10-15", FILE_ONE},
                         List.of(new int[]{1, 1}, new int[]{1, 5}), new int[]{10, 15}),
-                Arguments.of(new String[]{"-c", "10-15,5,1", "example.txt"},
+                Arguments.of(new String[]{FLAG_CUT_BY_CHAR, "10-15,5,1", FILE_ONE},
                         List.of(new int[]{1, 1}, new int[]{1, 5}), new int[]{10, 15}),
-                Arguments.of(new String[]{"-c", "1", "-"}, List.of(new int[]{1, 1})),
-                Arguments.of(new String[]{"-c", "1-5", "-"}, List.of(new int[]{1, 5})),
-                Arguments.of(new String[]{"-c", "1,5", "-"}, List.of(new int[]{1, 1}, new int[]{1, 5})),
-                Arguments.of(new String[]{"-c", "1,5,10-15", "-"},
+                Arguments.of(new String[]{FLAG_CUT_BY_CHAR, SINGLE_NUM, "-"},
+                        List.of(new int[]{1, 1})),
+                Arguments.of(new String[]{FLAG_CUT_BY_CHAR, MULTI_NUM, "-"},
+                        List.of(new int[]{1, 1}, new int[]{1, 5})),
+                Arguments.of(new String[]{FLAG_CUT_BY_CHAR, RANGE_OF_NUM, "-"},
+                        List.of(new int[]{1, 5})),
+                Arguments.of(new String[]{FLAG_CUT_BY_CHAR, "1,5,10-15", "-"},
                         List.of(new int[]{1, 1}, new int[]{1, 5}), new int[]{10, 15}),
-                Arguments.of(new String[]{"-c", "10-15,5,1", "-"},
+                Arguments.of(new String[]{FLAG_CUT_BY_CHAR, "10-15,5,1", "-"},
                         List.of(new int[]{1, 1}, new int[]{1, 5}), new int[]{10, 15})
         );
     }
@@ -106,7 +119,7 @@ public class CutArgsParserTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"-c", "-b"})
+    @ValueSource(strings = {FLAG_CUT_BY_CHAR, FLAG_CUT_BY_BYTE})
     void parse_ValidFlag_ShouldMatchGivenFlags(String args) {
         assertDoesNotThrow(() -> cutArgsParser.parse(args));
 
@@ -122,7 +135,7 @@ public class CutArgsParserTest {
     void parse_InvalidFlag_ThrowsInvalidArgsException(String args) {
         String expectedMsg = String.format("illegal option -- %s", args.charAt(1));
         InvalidArgsException exception = assertThrowsExactly(InvalidArgsException.class, () -> {
-            cutArgsParser.parse(args, "1", "example.txt");
+            cutArgsParser.parse(args, SINGLE_NUM, FILE_ONE);
         });
         assertEquals(expectedMsg, exception.getMessage());
     }
@@ -131,7 +144,7 @@ public class CutArgsParserTest {
     void parse_NoFlags_ThrowsInvalidArgsException() {
         String expectedMsg = "Invalid syntax"; // one valid flag is expected
         InvalidArgsException exception = assertThrowsExactly(InvalidArgsException.class, () -> {
-            cutArgsParser.parse("1", "example.txt");
+            cutArgsParser.parse(SINGLE_NUM, FILE_ONE);
         });
         assertEquals(expectedMsg, exception.getMessage());
     }
@@ -151,25 +164,25 @@ public class CutArgsParserTest {
 
     @Test
     void isCharPo_ValidFlagAndSyntax_ReturnsTrue() {
-        assertDoesNotThrow(() -> cutArgsParser.parse("-c", "1", "example.txt"));
+        assertDoesNotThrow(() -> cutArgsParser.parse(FLAG_CUT_BY_CHAR, SINGLE_NUM, FILE_ONE));
         assertTrue(cutArgsParser.isCharPo());
     }
 
     @Test
     void isCharPo_DifferentValidFlagAndSyntax_ReturnsFalse() {
-        assertDoesNotThrow(() -> cutArgsParser.parse("-b", "1", "example.txt"));
+        assertDoesNotThrow(() -> cutArgsParser.parse(FLAG_CUT_BY_BYTE, SINGLE_NUM, FILE_ONE));
         assertFalse(cutArgsParser.isCharPo());
     }
 
     @Test
     void isBytePo_ValidFlagAndSyntax_ReturnsTrue() {
-        assertDoesNotThrow(() -> cutArgsParser.parse("-b", "1", "example.txt"));
+        assertDoesNotThrow(() -> cutArgsParser.parse(FLAG_CUT_BY_BYTE, SINGLE_NUM, FILE_ONE));
         assertTrue(cutArgsParser.isBytePo());
     }
 
     @Test
     void isBytePo_DifferentValidFlagAndSyntax_ReturnsTrue() {
-        assertDoesNotThrow(() -> cutArgsParser.parse("-c", "1", "example.txt"));
+        assertDoesNotThrow(() -> cutArgsParser.parse(FLAG_CUT_BY_CHAR, SINGLE_NUM, FILE_ONE));
         assertFalse(cutArgsParser.isBytePo());
     }
 

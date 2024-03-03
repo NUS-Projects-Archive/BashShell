@@ -23,17 +23,20 @@ import sg.edu.nus.comp.cs4218.exception.InvalidArgsException;
 
 public class TeeArgsParserTest {
 
-    private final Set<Character> VALID_FLAGS = Set.of('a');
+    private static final Set<Character> VALID_FLAGS = Set.of('a');
+    private static final String FLAG_APPEND = "-a";
+    private static final String FILE_ONE = "file1";
+    private static final String FILE_TWO = "file2";
+    private static final String FILE_THREE = "file3";
     private TeeArgsParser teeArgsParser;
 
-    @SuppressWarnings("PMD.AvoidDuplicateLiterals")
     private static Stream<Arguments> validSyntax() {
         return Stream.of(
-                Arguments.of((Object) new String[]{"-a"}),
-                Arguments.of((Object) new String[]{"-a", "example.txt"}),
-                Arguments.of((Object) new String[]{"example.txt", "-a"}),
                 Arguments.of((Object) new String[]{}),
-                Arguments.of((Object) new String[]{"example.txt"})
+                Arguments.of((Object) new String[]{FLAG_APPEND}),
+                Arguments.of((Object) new String[]{FILE_ONE}),
+                Arguments.of((Object) new String[]{FLAG_APPEND, FILE_ONE}),
+                Arguments.of((Object) new String[]{FILE_ONE, FLAG_APPEND})
         );
     }
 
@@ -51,7 +54,7 @@ public class TeeArgsParserTest {
 
     @Test
     void parse_ValidFlag_ReturnsGivenMatchingFlag() {
-        assertDoesNotThrow(() -> teeArgsParser.parse("-a"));
+        assertDoesNotThrow(() -> teeArgsParser.parse(FLAG_APPEND));
         assertEquals(VALID_FLAGS, teeArgsParser.flags, "Flags do not match");
     }
 
@@ -79,13 +82,13 @@ public class TeeArgsParserTest {
 
     @Test
     void isAppend_ValidFlag_ReturnsTrue() {
-        assertDoesNotThrow(() -> teeArgsParser.parse("-a"));
+        assertDoesNotThrow(() -> teeArgsParser.parse(FLAG_APPEND));
         assertTrue(teeArgsParser.isAppend());
     }
 
     @Test
     void isAppend_OnlyNonFlagArg_ReturnsFalse() {
-        assertDoesNotThrow(() -> teeArgsParser.parse("example.txt"));
+        assertDoesNotThrow(() -> teeArgsParser.parse(FILE_ONE));
         assertFalse(teeArgsParser.isAppend());
     }
 
@@ -98,24 +101,24 @@ public class TeeArgsParserTest {
 
     @Test
     void getFileNames_OneNonFlagArg_ReturnsOneNonFlagArg() {
-        assertDoesNotThrow(() -> teeArgsParser.parse("example.txt"));
+        assertDoesNotThrow(() -> teeArgsParser.parse(FILE_ONE));
         List<String> result = teeArgsParser.getFileNames();
-        List<String> expected = List.of("example");
+        List<String> expected = List.of(FILE_ONE);
         assertEquals(expected, result);
     }
 
     @Test
     void getFileNames_MultipleNonFlagArgs_ReturnsMultipleNonFlagArgs() {
-        assertDoesNotThrow(() -> teeArgsParser.parse("example1.txt", "example2.txt", "example3.txt"));
-        List<String> expected = List.of("example1.txt", "example2.txt", "example3.txt");
+        assertDoesNotThrow(() -> teeArgsParser.parse(FILE_ONE, FILE_TWO, FILE_THREE));
+        List<String> expected = List.of(FILE_ONE, FILE_TWO, FILE_THREE);
         List<String> result = teeArgsParser.getFileNames();
         assertEquals(expected, result);
     }
 
     @Test
     void getFileNames_ValidFlagAndOneNonFlagArg_ReturnsOneNonFlagArg() {
-        assertDoesNotThrow(() -> teeArgsParser.parse("-a", "example.txt"));
-        List<String> expected = List.of("example.txt");
+        assertDoesNotThrow(() -> teeArgsParser.parse(FLAG_APPEND, FILE_ONE));
+        List<String> expected = List.of(FILE_ONE);
         List<String> result = teeArgsParser.getFileNames();
         assertEquals(expected, result);
     }
