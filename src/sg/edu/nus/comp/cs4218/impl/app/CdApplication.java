@@ -19,12 +19,14 @@ import sg.edu.nus.comp.cs4218.app.CdInterface;
 import sg.edu.nus.comp.cs4218.exception.CdException;
 import sg.edu.nus.comp.cs4218.impl.util.StringUtils;
 
+/**
+ * The mkdir command changes the current working folder.
+ *
+ * <p>
+ * <b>Command format:</b> <code>cd PATH</code>
+ * </p>
+ */
 public class CdApplication implements CdInterface {
-
-    @Override
-    public void changeToDirectory(String path) throws CdException {
-        Environment.currentDirectory = getNormalizedAbsolutePath(path);
-    }
 
     /**
      * Runs the cd application with the specified arguments.
@@ -46,6 +48,25 @@ public class CdApplication implements CdInterface {
         }
     }
 
+    /**
+     * Change the environment context to a different directory.
+     *
+     * @param path String of the path to a directory
+     * @throws CdException
+     */
+    @Override
+    public void changeToDirectory(String path) throws CdException {
+        Environment.currentDirectory = getNormalizedAbsolutePath(path);
+    }
+
+
+    /**
+     * Returns the normalized absolute path for the given path string.
+     *
+     * @param pathStr The input path string to be normalized
+     * @return The normalized absolute path as a string
+     * @throws CdException
+     */
     private String getNormalizedAbsolutePath(String pathStr) throws CdException {
         if (StringUtils.isBlank(pathStr)) {
             throw new CdException(ERR_NO_ARGS);
