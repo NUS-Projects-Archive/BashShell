@@ -45,7 +45,7 @@ public class CatApplicationIT {
     }
 
     @TempDir
-    Path testDir;
+    private Path testDir;
 
     @BeforeEach
     void setUp() throws IOException {
