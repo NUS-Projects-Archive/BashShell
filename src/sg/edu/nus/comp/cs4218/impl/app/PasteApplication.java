@@ -212,7 +212,7 @@ public class PasteApplication implements PasteInterface {
      * @throws PasteException
      */
     @Override
-    public String mergeFileAndStdin(Boolean isSerial, InputStream stdin, String... fileName) throws PasteException {
+    public String mergeFileAndStdin(Boolean isSerial, InputStream stdin, String... fileName) throws PasteException { //NOPMD
         if (stdin == null && fileName == null) {
             throw new PasteException(ERR_GENERAL);
         }

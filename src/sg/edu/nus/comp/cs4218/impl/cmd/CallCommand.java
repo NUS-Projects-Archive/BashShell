@@ -9,7 +9,6 @@ import java.util.List;
 
 import sg.edu.nus.comp.cs4218.Command;
 import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
-import sg.edu.nus.comp.cs4218.exception.EchoException;
 import sg.edu.nus.comp.cs4218.exception.ShellException;
 import sg.edu.nus.comp.cs4218.impl.util.ApplicationRunner;
 import sg.edu.nus.comp.cs4218.impl.util.ArgumentResolver;
@@ -36,13 +35,13 @@ public class CallCommand implements Command {
     /**
      * Parses the sub-command's argsList to identify the redirected InputStream, redirected OutputStream, and actual
      * list of args after accounting for possible changes from quoting, globbing, and substitution.
-     *
+     * <p>
      * Starts the call command's ApplicationRunner.
      *
-     * @param stdin   An InputStream. If there is no input redirection, the call command's ApplicationRunner will be
-     *                provided with the same InputStream as stdin.
-     * @param stdout  An OutputStream. If there is no output redirection, the call command's ApplicationRunner will be
-     *                provided with the same OutputStream as stdout.
+     * @param stdin  An InputStream. If there is no input redirection, the call command's ApplicationRunner will be
+     *               provided with the same InputStream as stdin.
+     * @param stdout An OutputStream. If there is no output redirection, the call command's ApplicationRunner will be
+     *               provided with the same OutputStream as stdout.
      * @throws ShellException If argsList attribute is null or empty.
      */
     @SuppressWarnings("PMD.CloseResource")
