@@ -45,7 +45,7 @@ public class SequenceCommandTest {
         stdout = new ByteArrayOutputStream();
 
         List<String> validArgsHasOut = new ArrayList<>(List.of("echo", HELLO));
-        List<String> validArgsNoOut = new ArrayList<>(List.of("cd", "."));
+        List<String> validArgsNoOut = new ArrayList<>(List.of("cd", ".."));
         List<String> nonExitExceptnArg = new ArrayList<>(List.of("cat", "<", ">"));
 
         validCmdHasOutput = new CallCommand(validArgsHasOut, appRunner, argResolver);
