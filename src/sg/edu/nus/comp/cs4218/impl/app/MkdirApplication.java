@@ -22,7 +22,8 @@ public class MkdirApplication implements MkdirInterface {
      * @param args   Array of arguments for the application. Each array element is the path to a file.
      * @param stdin  An InputStream, not used.
      * @param stdout An OutputStream, not used.
-     * @throws MkdirException
+     * @throws MkdirException If the arguments are null or an empty array,
+     *                        or if there is an issue parsing or creating directories.
      */
     @Override
     public void run(String[] args, InputStream stdin, OutputStream stdout) throws MkdirException {
