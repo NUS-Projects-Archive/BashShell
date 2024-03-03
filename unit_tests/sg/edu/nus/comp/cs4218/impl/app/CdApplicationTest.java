@@ -30,6 +30,7 @@ import sg.edu.nus.comp.cs4218.Environment;
 import sg.edu.nus.comp.cs4218.exception.CdException;
 
 class CdApplicationTest {
+
     private static final String DIR_NAME = "tempDir";
     private static final String CHILD_DIR_NAME = "tempChildDir";
 
@@ -38,7 +39,7 @@ class CdApplicationTest {
 
     private static String childDirAbsPath;
 
-    private static CdApplication cdApplication;
+    private static CdApplication app;
 
     @TempDir
     private static Path parentDir;
@@ -57,7 +58,7 @@ class CdApplicationTest {
 
     @BeforeAll
     static void setUp() {
-        cdApplication = new CdApplication();
+        app = new CdApplication();
 
         parentDirAbsPath = parentDir.toString();
 
@@ -89,7 +90,7 @@ class CdApplicationTest {
     @ParameterizedTest
     @MethodSource("validDirs")
     void changeToDirectory_ValidDirectory_ChangeCurrentDirectoryToValidDirectory(String validDir, Path expectedDir) {
-        assertDoesNotThrow(() -> cdApplication.changeToDirectory(validDir));
+        assertDoesNotThrow(() -> app.changeToDirectory(validDir));
         assertEquals(expectedDir.toString(), Environment.currentDirectory);
     }
 
@@ -99,7 +100,7 @@ class CdApplicationTest {
      */
     @Test
     void changeToDirectory_NullPathStr_ThrowsErrNoArgs() {
-        CdException result = assertThrows(CdException.class, () -> cdApplication.changeToDirectory(null));
+        CdException result = assertThrows(CdException.class, () -> app.changeToDirectory(null));
         assertEquals(String.format("cd: %s", ERR_NO_ARGS), result.getMessage());
     }
 
@@ -109,7 +110,7 @@ class CdApplicationTest {
      */
     @Test
     void changeToDirectory_EmptyPathStr_ThrowsErrNoArgs() {
-        CdException result = assertThrows(CdException.class, () -> cdApplication.changeToDirectory(""));
+        CdException result = assertThrows(CdException.class, () -> app.changeToDirectory(""));
         assertEquals(String.format("cd: %s", ERR_NO_ARGS), result.getMessage());
     }
 
@@ -131,7 +132,7 @@ class CdApplicationTest {
         }
 
         // When
-        CdException result = assertThrows(CdException.class, () -> cdApplication.changeToDirectory(dirName));
+        CdException result = assertThrows(CdException.class, () -> app.changeToDirectory(dirName));
 
         // Then
         assertEquals(String.format("cd: %s: %s", dirName, ERR_NO_PERM), result.getMessage());
@@ -149,7 +150,7 @@ class CdApplicationTest {
         String dirName = "nonExistentDirectory";
 
         // When
-        CdException result = assertThrows(CdException.class, () -> cdApplication.changeToDirectory(dirName));
+        CdException result = assertThrows(CdException.class, () -> app.changeToDirectory(dirName));
 
         // Then
         assertEquals(String.format("cd: %s: %s", dirName, ERR_FILE_NOT_FOUND), result.getMessage());
@@ -168,7 +169,7 @@ class CdApplicationTest {
                 "IOException occurred during test setup");
 
         // When
-        CdException result = assertThrows(CdException.class, () -> cdApplication.changeToDirectory(fileName));
+        CdException result = assertThrows(CdException.class, () -> app.changeToDirectory(fileName));
 
         // Then
         assertEquals(String.format("cd: %s: %s", fileName, ERR_IS_NOT_DIR), result.getMessage());

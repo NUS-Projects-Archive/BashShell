@@ -20,6 +20,7 @@ import sg.edu.nus.comp.cs4218.impl.util.IOUtils;
 import sg.edu.nus.comp.cs4218.impl.util.StringUtils;
 
 public class PasteApplicationTest {
+
     private static final String FILE_NAME_A = "A.txt";
     private static final String FILE_NAME_B = "B.txt";
     private static final String NON_EXISTENT_FILE = "NonExistentFile.txt";

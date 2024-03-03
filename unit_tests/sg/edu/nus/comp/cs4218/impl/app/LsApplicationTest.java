@@ -29,6 +29,7 @@ import sg.edu.nus.comp.cs4218.Environment;
 // To give a meaningful variable name
 @SuppressWarnings("PMD.LongVariable")
 class LsApplicationTest {
+
     private static final String[] CWD_NON_DIRS = {"a.z", "z.a", "z"};
     private static final String DIR_A_NAME = "dirA";
     private static final String[] CWD_DIRS = {DIR_A_NAME};
