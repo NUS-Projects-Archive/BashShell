@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import sg.edu.nus.comp.cs4218.app.PasteInterface;
@@ -50,11 +51,9 @@ public class PasteApplication implements PasteInterface {
         if (stdout == null) {
             throw new PasteException(ERR_NULL_STREAMS);
         }
-
         if (stdin == null) {
             throw new PasteException(ERR_NO_ISTREAM);
         }
-
         PasteArgsParser pasteArgsParser = new PasteArgsParser();
 
         try {
@@ -185,7 +184,9 @@ public class PasteApplication implements PasteInterface {
                 throw new PasteException(e.getMessage(), e);
             } finally {
                 try {
-                    if (input != null) { input.close(); }
+                    if (input != null) {
+                        input.close();
+                    }
                 } catch (IOException e) {
                     throw new PasteException(e.getMessage(), e);
                 }
@@ -211,9 +212,8 @@ public class PasteApplication implements PasteInterface {
         if (stdin == null && fileName == null) {
             throw new PasteException(ERR_GENERAL);
         }
-
         for (String file : fileName) {
-            if (!("-").equals(file)) {
+            if (file != null && !("-").equals(file)) {
                 File node = IOUtils.resolveFilePath(file).toFile();
                 if (!node.exists()) {
                     throw new PasteException(ERR_FILE_NOT_FOUND);
@@ -226,32 +226,22 @@ public class PasteApplication implements PasteInterface {
                 }
             }
         }
-
         List<String> data;
         try {
             data = IOUtils.getLinesFromInputStream(stdin);
         } catch (IOException e) {
             throw new PasteException(e.getMessage(), e);
         }
-
-        int numOfDash = 0;
-        for (String s : fileName) {
-            if (s != null && s.equals("-")) {
-                numOfDash++;
-            }
-        }
-
+        int numOfDash = (int) Arrays.stream(fileName).filter("-"::equals).count();
         if (numOfDash != 0) {
             maxFileLength = Math.max(maxFileLength, data.size() / numOfDash);
             if (data.size() % numOfDash != 0) {
                 maxFileLength = Math.max(maxFileLength, (data.size() / numOfDash) + 1);
             }
         }
-
         if (isSerial) {
             numOfDash = 1;
         }
-
         int currStdin = 0;
         for (String file : fileName) {
             if (file != null && file.equals("-")) {
