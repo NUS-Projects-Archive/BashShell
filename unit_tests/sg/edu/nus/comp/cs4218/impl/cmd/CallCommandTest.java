@@ -2,6 +2,7 @@ package sg.edu.nus.comp.cs4218.impl.cmd;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -32,7 +33,6 @@ import java.util.List;
 
 public class CallCommandTest {
 
-    private CallCommand callCommand;
     private ArgumentResolver argResolverMock;
     private ApplicationRunner appRunnerMock;
     private IORedirectionHandler ioRedirMock;
@@ -52,14 +52,14 @@ public class CallCommandTest {
 
     @AfterEach
     void tearDown() throws IOException {
-        this.inputStream.close();
-        this.outputStream.close();
+        inputStream.close();
+        outputStream.close();
     }
 
     @Test
     void evaluate_ArgsListIsEmpty_ThrowsShellException() {
         List<String> emptyArgsList = Collections.emptyList();
-        callCommand = new CallCommand(emptyArgsList, appRunnerMock, argResolverMock);
+        CallCommand callCommand = new CallCommand(emptyArgsList, appRunnerMock, argResolverMock);
         Throwable result = assertThrows(ShellException.class, () -> {
             callCommand.evaluate(inputStream, outputStream);
         });
@@ -68,7 +68,7 @@ public class CallCommandTest {
 
     @Test
     void evaluate_ArgsListIsNull_ThrowsShellException() {
-        callCommand = new CallCommand(null, appRunnerMock, argResolverMock);
+        CallCommand callCommand = new CallCommand(null, appRunnerMock, argResolverMock);
         Throwable result = assertThrows(ShellException.class, () -> {
             callCommand.evaluate(inputStream, outputStream);
         });
@@ -76,19 +76,23 @@ public class CallCommandTest {
     }
 
     @Test
-    void evaluate_HasArgs_CallsCorrectAppRunner() throws FileNotFoundException, AbstractApplicationException, ShellException {
-        List<String> argsList = new ArrayList<>(List.of("echo", "hello"));
-        callCommand = new CallCommand(argsList, appRunnerMock, argResolverMock);
-        when(ioRedirMock.getNoRedirArgsList()).thenReturn(argsList);
-        when(argResolverMock.parseArguments(argsList)).thenReturn(argsList);
-        callCommand.evaluate(inputStream, outputStream);
-        verify(appRunnerMock, times(1)).runApp(eq("echo"), any(), any(), any());
-        verify(appRunnerMock, times(0)).runApp(eq("ls"), any(), any(), any());
-        verify(appRunnerMock, times(0)).runApp(eq("grep"), any(), any(), any());
-        verify(appRunnerMock, times(0)).runApp(eq("cd"), any(), any(), any());
-        verify(appRunnerMock, times(0)).runApp(eq("mkdir"), any(), any(), any());
-        verify(appRunnerMock, times(0)).runApp(eq("cat"), any(), any(), any());
-        verify(appRunnerMock, times(0)).runApp(eq("paste"), any(), any(), any());
-        verify(appRunnerMock, times(0)).runApp(eq("exit"), any(), any(), any());
+    void evaluate_HasArgs_CallsCorrectAppRunner() {
+        try {
+            List<String> argsList = new ArrayList<>(List.of("echo", "hello"));
+            CallCommand callCommand = new CallCommand(argsList, appRunnerMock, argResolverMock);
+            when(ioRedirMock.getNoRedirArgsList()).thenReturn(argsList);
+            when(argResolverMock.parseArguments(argsList)).thenReturn(argsList);
+            callCommand.evaluate(inputStream, outputStream);
+            verify(appRunnerMock, times(1)).runApp(eq("echo"), any(), any(), any());
+            verify(appRunnerMock, times(0)).runApp(eq("ls"), any(), any(), any());
+            verify(appRunnerMock, times(0)).runApp(eq("grep"), any(), any(), any());
+            verify(appRunnerMock, times(0)).runApp(eq("cd"), any(), any(), any());
+            verify(appRunnerMock, times(0)).runApp(eq("mkdir"), any(), any(), any());
+            verify(appRunnerMock, times(0)).runApp(eq("cat"), any(), any(), any());
+            verify(appRunnerMock, times(0)).runApp(eq("paste"), any(), any(), any());
+            verify(appRunnerMock, times(0)).runApp(eq("exit"), any(), any(), any());
+        } catch (FileNotFoundException | AbstractApplicationException | ShellException e ) {
+            fail(e.getMessage());
+        }
     }
 }
