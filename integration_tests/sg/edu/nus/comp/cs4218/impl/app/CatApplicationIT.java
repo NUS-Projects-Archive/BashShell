@@ -15,19 +15,26 @@ import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import sg.edu.nus.comp.cs4218.exception.CatException;
 
 @SuppressWarnings("PMD.ClassNamingConventions")
 public class CatApplicationIT {
-
+    private static final String HELLO_WORLD = "Hello" + STRING_NEWLINE + "World";
+    private static final String L1_HELLO_L2_WORLD = "1 Hello" + STRING_NEWLINE + "2 World";
+    private static final String HEY_JUNIT = "Hey" + STRING_NEWLINE + "Junit";
+    private static final String L1_HEY_L2_JUNIT = "1 Hey" + STRING_NEWLINE + "2 Junit";
+    private static final String FROM_STDIN = "From" + STRING_NEWLINE + "Stdin";
+    private static final String L1_FROM_L2_STDIN = "1 From" + STRING_NEWLINE + "2 Stdin";
+    private static final String[] PARAM_TEST_VALUES = {"", "hello", HELLO_WORLD};
     private CatApplication app;
     private InputStream inputStreamMock;
     private OutputStream out;
@@ -53,18 +60,13 @@ public class CatApplicationIT {
         fileB = pathB.toString();
         fileC = pathC.toString();
 
-        String contentFileA = "Hello" + STRING_NEWLINE + "World";
-        Files.write(pathA, List.of(contentFileA));
-
-        String contentFileB = "Software" + STRING_NEWLINE + "Testing";
-        Files.write(pathB, List.of(contentFileB));
-
-        String contentFileC = "";
-        Files.write(pathC, List.of(contentFileC));
+        Files.write(pathA, List.of(HELLO_WORLD));
+        Files.write(pathB, List.of(HEY_JUNIT));
+        Files.write(pathC, List.of(""));
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"", "Hello", "Hello\r\nWorld"})
+    @MethodSource("getParams")
     void run_NoArgsNoLineNumber_PrintsStdin(String args) {
         // Given
         String[] tokens = new String[0];
@@ -83,15 +85,15 @@ public class CatApplicationIT {
     void run_NoArgsHasLineNumber_PrintsLineNumberedStdin() {
         // Given
         String[] tokens = new String[]{"-n"};
-        inputStreamMock = new ByteArrayInputStream("Hello\r\nWorld".getBytes(StandardCharsets.UTF_8));
+        inputStreamMock = new ByteArrayInputStream(HELLO_WORLD.getBytes(StandardCharsets.UTF_8));
         // When
         assertDoesNotThrow(() -> app.run(tokens, inputStreamMock, out));
         // Then
-        assertEquals("1 Hello\r\n2 World" + STRING_NEWLINE, out.toString());
+        assertEquals(L1_HELLO_L2_WORLD + STRING_NEWLINE, out.toString());
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"", "Hello", "Hello\r\nWorld"})
+    @MethodSource("getParams")
     void run_DashOnlyNoLineNumber_PrintsStdin(String args) {
         // Given
         String[] tokens = new String[]{"-"};
@@ -106,11 +108,11 @@ public class CatApplicationIT {
     void run_DashOnlyHasLineNumber_PrintsLineNumberedStdin() {
         // Given
         String[] tokens = new String[]{"-n", "-"};
-        inputStreamMock = new ByteArrayInputStream("Hello\r\nWorld".getBytes(StandardCharsets.UTF_8));
+        inputStreamMock = new ByteArrayInputStream(HELLO_WORLD.getBytes(StandardCharsets.UTF_8));
         // When
         assertDoesNotThrow(() -> app.run(tokens, inputStreamMock, out));
         // Then
-        assertEquals("1 Hello\r\n2 World" + STRING_NEWLINE, out.toString());
+        assertEquals(L1_HELLO_L2_WORLD + STRING_NEWLINE, out.toString());
     }
 
     @Test
@@ -120,7 +122,7 @@ public class CatApplicationIT {
         // When
         assertDoesNotThrow(() -> app.run(tokens, inputStreamMock, out));
         // Then
-        assertEquals("Hello\r\nWorld\r\nSoftware\r\n" + "Testing" + STRING_NEWLINE, out.toString());
+        assertEquals(HELLO_WORLD + STRING_NEWLINE + HEY_JUNIT + STRING_NEWLINE, out.toString());
     }
 
     @Test
@@ -130,29 +132,29 @@ public class CatApplicationIT {
         // When
         assertDoesNotThrow(() -> app.run(tokens, inputStreamMock, out));
         // Then
-        assertEquals("1 Hello\r\n2 World\r\n1 Software\r\n" + "2 Testing" + STRING_NEWLINE, out.toString());
+        assertEquals(L1_HELLO_L2_WORLD + STRING_NEWLINE + L1_HEY_L2_JUNIT + STRING_NEWLINE, out.toString());
     }
 
     @Test
     void run_FileAndDashNoLineNumber_PrintsConcatenatedContent() {
         // Given
         String[] tokens = new String[]{"-", fileA, fileB};
-        inputStreamMock = new ByteArrayInputStream("From\r\nStdin".getBytes(StandardCharsets.UTF_8));
+        inputStreamMock = new ByteArrayInputStream(FROM_STDIN.getBytes(StandardCharsets.UTF_8));
         // When
         assertDoesNotThrow(() -> app.run(tokens, inputStreamMock, out));
         // Then
-        assertEquals("From\r\nStdin\r\nHello\r\nWorld\r\nSoftware\r\n" + "Testing" + STRING_NEWLINE, out.toString());
+        assertEquals(FROM_STDIN + STRING_NEWLINE + HELLO_WORLD + STRING_NEWLINE + HEY_JUNIT + STRING_NEWLINE, out.toString());
     }
 
     @Test
     void run_FileAndDashHasLineNumber_PrintsLineNumberedConcatenatedContent() {
         // Given
         String[] tokens = new String[]{"-n", "-", fileA, fileB};
-        inputStreamMock = new ByteArrayInputStream("From\r\nStdin".getBytes(StandardCharsets.UTF_8));
+        inputStreamMock = new ByteArrayInputStream(FROM_STDIN.getBytes(StandardCharsets.UTF_8));
         // When
         assertDoesNotThrow(() -> app.run(tokens, inputStreamMock, out));
         // Then
-        assertEquals("1 From\r\n2 Stdin\r\n1 Hello\r\n2 World\r\n1 Software\r\n" + "2 Testing" + STRING_NEWLINE, out.toString());
+        assertEquals(L1_FROM_L2_STDIN + STRING_NEWLINE + L1_HELLO_L2_WORLD + STRING_NEWLINE + L1_HEY_L2_JUNIT + STRING_NEWLINE, out.toString());
     }
 
     @Test
@@ -162,7 +164,7 @@ public class CatApplicationIT {
         // When
         assertDoesNotThrow(() -> app.run(tokens, inputStreamMock, out));
         // Then
-        assertEquals("Hello\r\nWorld" + STRING_NEWLINE, out.toString());
+        assertEquals(HELLO_WORLD + STRING_NEWLINE, out.toString());
     }
 
     @Test
@@ -172,7 +174,7 @@ public class CatApplicationIT {
         // When
         assertDoesNotThrow(() -> app.run(tokens, inputStreamMock, out));
         // Then
-        assertEquals("1 Hello\r\n2 World" + STRING_NEWLINE, out.toString());
+        assertEquals(L1_HELLO_L2_WORLD + STRING_NEWLINE, out.toString());
     }
 
     @Test
@@ -182,7 +184,7 @@ public class CatApplicationIT {
         // When
         assertDoesNotThrow(() -> app.run(tokens, inputStreamMock, out));
         // Then
-        assertEquals("Software\r\nTesting" + STRING_NEWLINE, out.toString());
+        assertEquals(HEY_JUNIT + STRING_NEWLINE, out.toString());
     }
 
     @Test
@@ -192,7 +194,7 @@ public class CatApplicationIT {
         // When
         assertDoesNotThrow(() -> app.run(tokens, inputStreamMock, out));
         // Then
-        assertEquals("1 Software\r\n2 Testing" + STRING_NEWLINE, out.toString());
+        assertEquals(L1_HEY_L2_JUNIT + STRING_NEWLINE, out.toString());
     }
 
     @Test
@@ -202,7 +204,7 @@ public class CatApplicationIT {
         // When
         assertDoesNotThrow(() -> app.run(tokens, inputStreamMock, out));
         // Then
-        assertEquals("Software\r\nTesting" + STRING_NEWLINE, out.toString());
+        assertEquals(HEY_JUNIT + STRING_NEWLINE, out.toString());
     }
 
     @Test
@@ -212,7 +214,7 @@ public class CatApplicationIT {
         // When
         assertDoesNotThrow(() -> app.run(tokens, inputStreamMock, out));
         // Then
-        assertEquals("1 Software\r\n2 Testing" + STRING_NEWLINE, out.toString());
+        assertEquals(L1_HEY_L2_JUNIT + STRING_NEWLINE, out.toString());
     }
 
     @Test
@@ -223,7 +225,7 @@ public class CatApplicationIT {
         assertDoesNotThrow(() -> app.run(tokens, inputStreamMock, out));
         String result = assertDoesNotThrow(() -> app.readFile(false, new File(fileC)));
         // Then
-        assertEquals("Hello\r\nWorld\r\nSoftware\r\n" + "Testing" + STRING_NEWLINE, result);
+        assertEquals(HELLO_WORLD + STRING_NEWLINE + HEY_JUNIT + STRING_NEWLINE, result);
     }
 
     @Test
@@ -234,7 +236,7 @@ public class CatApplicationIT {
         assertDoesNotThrow(() -> app.run(tokens, inputStreamMock, out));
         String result = assertDoesNotThrow(() -> app.readFile(false, new File(fileC)));
         // Then
-        assertEquals("1 Hello\r\n2 World\r\n1 Software\r\n" + "2 Testing" + STRING_NEWLINE, result);
+        assertEquals(L1_HELLO_L2_WORLD + STRING_NEWLINE + L1_HEY_L2_JUNIT + STRING_NEWLINE, result);
     }
 
     @Test
@@ -245,7 +247,7 @@ public class CatApplicationIT {
         assertDoesNotThrow(() -> app.run(tokens, inputStreamMock, out));
         String result = assertDoesNotThrow(() -> app.readFile(false, new File(fileC)));
         // Then
-        assertEquals("Hello\r\nWorld" + STRING_NEWLINE, result);
+        assertEquals(HELLO_WORLD + STRING_NEWLINE, result);
     }
 
     @Test
@@ -256,6 +258,10 @@ public class CatApplicationIT {
         assertDoesNotThrow(() -> app.run(tokens, inputStreamMock, out));
         String result = assertDoesNotThrow(() -> app.readFile(false, new File(fileC)));
         // Then
-        assertEquals("1 Hello\r\n2 World" + STRING_NEWLINE, result);
+        assertEquals(L1_HELLO_L2_WORLD + STRING_NEWLINE, result);
+    }
+
+    private static List<String> getParams() {
+        return Arrays.asList(PARAM_TEST_VALUES);
     }
 }
