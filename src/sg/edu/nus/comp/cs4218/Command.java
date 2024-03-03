@@ -7,6 +7,9 @@ import java.io.OutputStream;
 import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
 import sg.edu.nus.comp.cs4218.exception.ShellException;
 
+/**
+ * The Command is a common interface for all commands such as call, pipe, etc.
+ */
 public interface Command {
 
     /**

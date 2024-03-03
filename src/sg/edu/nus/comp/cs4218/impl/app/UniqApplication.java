@@ -79,7 +79,7 @@ public class UniqApplication implements UniqInterface {
     }
 
     /**
-     * Return filtered unique lines of the specified file
+     * Returns filtered unique lines of the specified file
      *
      * @param isCount        Boolean option to prefix lines by the number of occurrences of adjacent duplicate lines
      * @param isRepeated     Boolean option to print only duplicate lines, one for each group
@@ -126,7 +126,7 @@ public class UniqApplication implements UniqInterface {
     }
 
     /**
-     * Return filtered unique lines from the standard input
+     * Returns filtered unique lines from the standard input
      *
      * @param isCount        Boolean option to prefix lines by the number of occurrences of adjacent duplicate lines
      * @param isRepeated     Boolean option to print only duplicate lines, one for each group

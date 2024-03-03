@@ -183,6 +183,7 @@ public class WcApplication implements WcInterface {
      * @param isWords Boolean option to count the number of words
      * @param stdin   InputStream containing arguments from Stdin
      * @throws WcException
+     * @return String of the results
      */
     @Override
     public String countFromStdin(Boolean isBytes, Boolean isLines, Boolean isWords, InputStream stdin)

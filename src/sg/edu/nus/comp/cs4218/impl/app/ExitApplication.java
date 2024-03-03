@@ -29,7 +29,7 @@ public class ExitApplication implements ExitInterface {
     }
 
     /**
-     * Terminate shell.
+     * Terminates shell.
      *
      * @throws ExitException Not used.
      */

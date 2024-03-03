@@ -11,6 +11,11 @@ public class MvArgsParser extends ArgsParser {
         legalFlags.add(FLAG_NO_OVERWRITE);
     }
 
+    /**
+     * Checks mv command needs to overwrite or not.
+     * 
+     * @return true if no overwrite flag is not present, false otherwise
+     */
     public Boolean isOverwrite() {
         return !flags.contains(FLAG_NO_OVERWRITE);
     }

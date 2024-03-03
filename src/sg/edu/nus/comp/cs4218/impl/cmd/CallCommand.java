@@ -26,6 +26,13 @@ public class CallCommand implements Command {
     private final ApplicationRunner appRunner;
     private final ArgumentResolver argumentResolver;
 
+    /**
+     * Constructor for CallCommand.
+     * 
+     * @param argsList          List of arguments for the command
+     * @param appRunner         ApplicationRunner to run the command
+     * @param argumentResolver  ArgumentResolver to resolve the arguments
+     */
     public CallCommand(List<String> argsList, ApplicationRunner appRunner, ArgumentResolver argumentResolver) {
         this.argsList = argsList;
         this.appRunner = appRunner;
@@ -75,6 +82,11 @@ public class CallCommand implements Command {
         // Unused for now
     }
 
+    /**
+     * Returns the list of arguments for the command.
+     * 
+     * @return
+     */
     public List<String> getArgsList() {
         return argsList;
     }

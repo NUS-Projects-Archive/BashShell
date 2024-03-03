@@ -16,6 +16,10 @@ import sg.edu.nus.comp.cs4218.impl.util.ApplicationRunner;
 import sg.edu.nus.comp.cs4218.impl.util.CommandBuilder;
 import sg.edu.nus.comp.cs4218.impl.util.StringUtils;
 
+/**
+ * The Shell is ann application that reads lines from a user, evaluates the command, and prints the result.
+ * It is similar to the UNIX shell.
+ */
 public class ShellImpl implements Shell {
 
     /**
