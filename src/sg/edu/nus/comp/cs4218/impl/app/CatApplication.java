@@ -56,16 +56,14 @@ public class CatApplication implements CatInterface {
         final List<String> nonFlagArgs = parser.getNonFlagArgs();
         String output;
 
-        if (nonFlagArgs.isEmpty()) {
-            // cat, cat -n
+        if (nonFlagArgs.isEmpty()) { // cat, cat -n
             output = catStdin(isLineNumber, stdin);
             try {
                 stdout.write(output.getBytes());
             } catch (IOException e) {
                 throw new CatException(ERR_WRITE_STREAM + " " + e.getMessage(), e);
             }
-        } else {
-            // all other cases
+        } else { // all other cases
             IORedirectionHandler redirHandler = new IORedirectionHandler(nonFlagArgs, stdin, stdout, new ArgumentResolver());
             try {
                 redirHandler.extractRedirOptions();
@@ -75,11 +73,9 @@ public class CatApplication implements CatInterface {
             List<String> noRedirArgsList = redirHandler.getNoRedirArgsList();
             String[] noRedirArgsArray = noRedirArgsList.toArray(String[]::new);
             try {
-                if (noRedirArgsList.isEmpty()) {
-                    // Input redirect cannot be ignored, get from redirect handler
+                if (noRedirArgsList.isEmpty()) { // Input redirect cannot be ignored, get from redirect handler
                     output = catStdin(isLineNumber, redirHandler.getInputStream());
-                } else {
-                    // Input redirect is not relevant
+                } else { // Input redirect is not relevant
                     if (nonFlagArgs.contains("-")) {
                         output = catFileAndStdin(isLineNumber, stdin, noRedirArgsArray);
                     } else {
@@ -87,11 +83,9 @@ public class CatApplication implements CatInterface {
                     }
                 }
                 byte[] bytes = output.getBytes();
-                if (nonFlagArgs.contains(">")) {
-                    // write to file
+                if (nonFlagArgs.contains(">")) { // write to file
                     redirHandler.getOutputStream().write(bytes);
-                } else {
-                    // no Output redirect, write to shell
+                } else { // no Output redirect, write to shell
                     stdout.write(bytes);
                 }
             } catch (IOException e) {
