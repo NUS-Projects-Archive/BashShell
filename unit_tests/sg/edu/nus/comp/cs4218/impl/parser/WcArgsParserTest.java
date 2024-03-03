@@ -21,20 +21,27 @@ import org.junit.jupiter.params.provider.ValueSource;
 import sg.edu.nus.comp.cs4218.exception.InvalidArgsException;
 
 public class WcArgsParserTest {
-    private final Set<Character> VALID_FLAGS = Set.of('c', 'l', 'w');
+    private static final Set<Character> VALID_FLAGS = Set.of('c', 'l', 'w');
+    public static final String FLAG_BYTE_COUNT = "-c";
+
+    public static final String FLAG_LINE_COUNT = "-l";
+
+    public static final String FLAG_WORD_COUNT = "-w";
+    private static final String FILE_ONE = "file1";
+    private static final String FILE_TWO = "file2";
+    private static final String FILE_THREE = "file3";
     private WcArgsParser wcArgsParser;
 
-    @SuppressWarnings("PMD.AvoidDuplicateLiterals")
     private static Stream<Arguments> validSyntax() {
         return Stream.of(
                 Arguments.of((Object) new String[]{}),
-                Arguments.of((Object) new String[]{"-c"}),
-                Arguments.of((Object) new String[]{"-c", "-l"}),
-                Arguments.of((Object) new String[]{"-c", "-l", "w"}),
-                Arguments.of((Object) new String[]{"example"}),
-                Arguments.of((Object) new String[]{"-c", "example"}),
-                Arguments.of((Object) new String[]{"-c", "-l", "example"}),
-                Arguments.of((Object) new String[]{"example", "-l", "-w"}));
+                Arguments.of((Object) new String[]{FLAG_BYTE_COUNT}),
+                Arguments.of((Object) new String[]{FLAG_BYTE_COUNT, FLAG_LINE_COUNT}),
+                Arguments.of((Object) new String[]{FLAG_BYTE_COUNT, FLAG_LINE_COUNT, FLAG_WORD_COUNT}),
+                Arguments.of((Object) new String[]{FILE_ONE}),
+                Arguments.of((Object) new String[]{FLAG_BYTE_COUNT, FILE_ONE}),
+                Arguments.of((Object) new String[]{FLAG_BYTE_COUNT, FLAG_LINE_COUNT, FILE_ONE}),
+                Arguments.of((Object) new String[]{FILE_ONE, FLAG_LINE_COUNT, FLAG_WORD_COUNT}));
     }
 
     private static Stream<Arguments> invalidSyntax() {
@@ -61,7 +68,7 @@ public class WcArgsParserTest {
 
     @Test
     void parse_ValidFlags_ReturnsGivenMatchingFlags() throws InvalidArgsException {
-        wcArgsParser.parse("-c", "-w", "-l");
+        wcArgsParser.parse(FLAG_BYTE_COUNT, FLAG_WORD_COUNT, FLAG_LINE_COUNT);
         assertEquals(VALID_FLAGS, wcArgsParser.flags, "Flags do not match");
     }
 
@@ -100,25 +107,25 @@ public class WcArgsParserTest {
 
     @Test
     void isByteCount_ValidFlagsExcludingByteFlag_ReturnsFalse() throws InvalidArgsException {
-        wcArgsParser.parse("-w", "-l");
+        wcArgsParser.parse(FLAG_WORD_COUNT, FLAG_LINE_COUNT);
         assertFalse(wcArgsParser.isByteCount());
     }
 
     @Test
     void isByteCount_ValidFlag_ReturnsTrue() throws InvalidArgsException {
-        wcArgsParser.parse("-c");
+        wcArgsParser.parse(FLAG_BYTE_COUNT);
         assertTrue(wcArgsParser.isByteCount());
     }
 
     @Test
     void isByteCount_ValidFlagAndNonFlagArg_ReturnsTrue() throws InvalidArgsException {
-        wcArgsParser.parse("-c", "example");
+        wcArgsParser.parse(FLAG_BYTE_COUNT, FILE_ONE);
         assertTrue(wcArgsParser.isByteCount());
     }
 
     @Test
     void isByteCount_OnlyNonFlagArg_ReturnsTrue() throws InvalidArgsException {
-        wcArgsParser.parse("example");
+        wcArgsParser.parse(FILE_ONE);
         assertTrue(wcArgsParser.isByteCount());
     }
 
@@ -130,25 +137,25 @@ public class WcArgsParserTest {
 
     @Test
     void isLineCount_ValidFlagsExcludingLineFlag_ReturnsFalse() throws InvalidArgsException {
-        wcArgsParser.parse("-w", "-c");
+        wcArgsParser.parse(FLAG_WORD_COUNT, FLAG_BYTE_COUNT);
         assertFalse(wcArgsParser.isLineCount());
     }
 
     @Test
     void isLineCount_ValidFlag_ReturnsTrue() throws InvalidArgsException {
-        wcArgsParser.parse("-l");
+        wcArgsParser.parse(FLAG_LINE_COUNT);
         assertTrue(wcArgsParser.isLineCount());
     }
 
     @Test
     void isLineCount_ValidFlagAndNonFlagArg_ReturnsTrue() throws InvalidArgsException {
-        wcArgsParser.parse("-l", "example");
+        wcArgsParser.parse(FLAG_LINE_COUNT, FILE_ONE);
         assertTrue(wcArgsParser.isLineCount());
     }
 
     @Test
     void isLineCount_OnlyNonFlagArg_ReturnsTrue() throws InvalidArgsException {
-        wcArgsParser.parse("example");
+        wcArgsParser.parse(FILE_ONE);
         assertTrue(wcArgsParser.isLineCount());
     }
 
@@ -160,25 +167,25 @@ public class WcArgsParserTest {
 
     @Test
     void isWordCount_ValidFlagsExcludingWordFlag_ReturnsFalse() throws InvalidArgsException {
-        wcArgsParser.parse("-c", "-l");
+        wcArgsParser.parse(FLAG_BYTE_COUNT, FLAG_LINE_COUNT);
         assertFalse(wcArgsParser.isWordCount());
     }
 
     @Test
     void isWordCount_ValidFlag_ReturnsTrue() throws InvalidArgsException {
-        wcArgsParser.parse("-w");
+        wcArgsParser.parse(FLAG_WORD_COUNT);
         assertTrue(wcArgsParser.isWordCount());
     }
 
     @Test
     void isWordCount_ValidFlagAndNonFlagArg_ReturnsTrue() throws InvalidArgsException {
-        wcArgsParser.parse("-w", "example");
+        wcArgsParser.parse(FLAG_WORD_COUNT, FILE_ONE);
         assertTrue(wcArgsParser.isWordCount());
     }
 
     @Test
     void isWordCount_OnlyNonFlagArg_ReturnsTrue() throws InvalidArgsException {
-        wcArgsParser.parse("example");
+        wcArgsParser.parse(FILE_ONE);
         assertTrue(wcArgsParser.isWordCount());
     }
 
@@ -191,25 +198,25 @@ public class WcArgsParserTest {
 
     @Test
     void getFileNames_OneNonFlagArg_ReturnsOneFileName() throws InvalidArgsException {
-        wcArgsParser.parse("example");
+        wcArgsParser.parse(FILE_ONE);
         List<String> result = wcArgsParser.getFileNames();
-        List<String> expected = List.of("example");
+        List<String> expected = List.of(FILE_ONE);
         assertEquals(expected, result);
     }
 
     @Test
     void getFileNames_MultipleNonFlagArgs_ReturnsMultipleFileNames() throws InvalidArgsException {
-        wcArgsParser.parse("example1", "example2", "example3");
+        wcArgsParser.parse(FILE_ONE, FILE_TWO, FILE_THREE);
         List<String> result = wcArgsParser.getFileNames();
-        List<String> expected = List.of("example1", "example2", "example3");
+        List<String> expected = List.of(FILE_ONE, FILE_TWO, FILE_THREE);
         assertEquals(expected, result);
     }
 
     @Test
     void getFileNames_ValidFlagsAndOneNoFlagArg_ReturnsOneFolder() throws InvalidArgsException {
-        wcArgsParser.parse("-w", "-c", "-l", "example");
+        wcArgsParser.parse(FLAG_WORD_COUNT, FLAG_BYTE_COUNT, FLAG_LINE_COUNT, FILE_ONE);
         List<String> result = wcArgsParser.getFileNames();
-        List<String> expected = List.of("example");
+        List<String> expected = List.of(FILE_ONE);
         assertEquals(expected, result);
     }
 
@@ -221,7 +228,7 @@ public class WcArgsParserTest {
 
     @Test
     void isStdinOnly_OneNonFlagArg_ReturnsFalse() throws InvalidArgsException {
-        wcArgsParser.parse("example");
+        wcArgsParser.parse(FILE_ONE);
         assertFalse(wcArgsParser.isStdinOnly());
     }
 }

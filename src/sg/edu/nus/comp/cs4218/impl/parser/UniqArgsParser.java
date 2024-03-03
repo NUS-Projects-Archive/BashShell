@@ -1,11 +1,17 @@
 package sg.edu.nus.comp.cs4218.impl.parser;
 
+/**
+ * UniqArgsParser is a class to parse the arguments for uniq command.
+ */
 public class UniqArgsParser extends ArgsParser {
     public static final char FLAG_COUNT_OCCUR = 'c';
     public static final char FLAG_DUP_GRP = 'd';
     public static final char FLAG_DUPLICATE = 'D';
     public static final char NO_IN_FILE = '-';
 
+    /**
+     * Constructor for UniqArgsParser. Initializes legal flags for uniq command.
+     */
     public UniqArgsParser() {
         super();
         legalFlags.add(FLAG_COUNT_OCCUR);
@@ -13,6 +19,13 @@ public class UniqArgsParser extends ArgsParser {
         legalFlags.add(FLAG_DUPLICATE);
     }
 
+    /**
+     * Checks if the prefix lines by the number of occurrences of adjacent duplicate lines flag
+     * is present in the parsed flags.
+     * 
+     * @return true if prefix lines by the number of occurrences of adjacent duplicate lines flag is present, 
+     * false otherwise
+     */
     public Boolean isPrefixWithOccurrencesCount() {
         return flags.contains(FLAG_COUNT_OCCUR);
     }

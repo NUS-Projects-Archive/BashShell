@@ -6,6 +6,9 @@ import java.io.OutputStream;
 import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
 import sg.edu.nus.comp.cs4218.exception.ShellException;
 
+/**
+ * The Shell interface is used to parse and evaluate user's command line.
+ */
 public interface Shell {
 
     /**

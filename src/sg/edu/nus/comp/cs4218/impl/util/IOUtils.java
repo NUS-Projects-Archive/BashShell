@@ -20,13 +20,15 @@ import java.util.List;
 import sg.edu.nus.comp.cs4218.Environment;
 import sg.edu.nus.comp.cs4218.exception.ShellException;
 
+/**
+ * IOUtils is a utility class that provides I/O methods for the shell apps to use.
+ */
 @SuppressWarnings("PMD.PreserveStackTrace")
 public final class IOUtils {
-    private IOUtils() {
-    }
+    private IOUtils() { /* Does nothing */}
 
     /**
-     * Open an inputStream based on the file name.
+     * Opens an inputStream based on the file name.
      *
      * @param fileName String containing file name.
      * @return InputStream of file opened.
@@ -46,7 +48,7 @@ public final class IOUtils {
     }
 
     /**
-     * Open an outputStream based on the file name.
+     * Opens an outputStream based on the file name.
      *
      * @param fileName String containing file name.
      * @return OutputStream of file opened.
@@ -63,7 +65,7 @@ public final class IOUtils {
     }
 
     /**
-     * Close an inputStream. If inputStream provided is System.in or null, it will be ignored.
+     * Closes an inputStream. If inputStream provided is System.in or null, it will be ignored.
      *
      * @param inputStream InputStream to be closed.
      * @throws ShellException If inputStream cannot be closed successfully.
@@ -81,7 +83,7 @@ public final class IOUtils {
     }
 
     /**
-     * Close an outputStream. If outputStream provided is System.out or null, it will be ignored.
+     * Closes an outputStream. If outputStream provided is System.out or null, it will be ignored.
      *
      * @param outputStream OutputStream to be closed.
      * @throws ShellException If outputStream cannot be closed successfully.

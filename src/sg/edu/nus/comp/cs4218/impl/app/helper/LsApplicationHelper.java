@@ -20,6 +20,9 @@ import sg.edu.nus.comp.cs4218.exception.InvalidDirectoryLsException;
 import sg.edu.nus.comp.cs4218.exception.LsException;
 import sg.edu.nus.comp.cs4218.impl.util.StringUtils;
 
+/**
+ * A helper class that provides functionality to list the contents of a directory (ls).
+ */
 public final class LsApplicationHelper {
     private static final String PATH_CURR_DIR = STRING_CURR_DIR + CHAR_FILE_SEP;
     private static final String COLON_NEW_LINE = ":" + StringUtils.STRING_NEWLINE;

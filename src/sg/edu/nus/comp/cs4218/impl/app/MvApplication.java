@@ -26,6 +26,16 @@ import sg.edu.nus.comp.cs4218.exception.MvException;
 import sg.edu.nus.comp.cs4218.impl.parser.MvArgsParser;
 import sg.edu.nus.comp.cs4218.impl.util.IOUtils;
 
+/**
+ * The mv command move files or directories from one place to another.
+ * By default, it will overwrite an existing file.
+ *
+ * <p>
+ * <b>Command format:</b> <br>
+ * <code>mv [Option] SOURCE TARGET</code> <br>
+ * <code>mv [Option] SOURCE ... DIRECTORY</code>
+ * </p>
+ */
 public class MvApplication implements MvInterface {
 
     /**
@@ -34,13 +44,11 @@ public class MvApplication implements MvInterface {
      * @param args   Array of arguments for the application. Each array element is the path to a file
      * @param stdin  An InputStream, not used
      * @param stdout An OutputStream. The output of the command is written to this OutputStream
-     * @throws MvException
+     * @throws MvException If the arguments are null or insufficient,
+     *                     or if there is an issue parsing the move operation
      */
     @Override
     public void run(String[] args, InputStream stdin, OutputStream stdout) throws MvException {
-        // Format: mv [Option] SOURCE TARGET
-        //         mv [Option] SOURCE ... DIRECTORY
-
         if (args == null || args.length == 0) {
             throw new MvException(ERR_MISSING_ARG);
         }
@@ -85,8 +93,8 @@ public class MvApplication implements MvInterface {
      * @param isOverwrite Boolean option to perform overwriting
      * @param srcFile     String representing the path to the source file
      * @param destFile    String representing the path to the destination file
-     * @return null.
-     * @throws MvException
+     * @return Null
+     * @throws MvException If moving encounters issues, e.g., file not found, permission errors, or I/O exception
      */
     @Override
     public String mvSrcFileToDestFile(Boolean isOverwrite, String srcFile, String destFile) throws MvException {
@@ -132,7 +140,7 @@ public class MvApplication implements MvInterface {
      * @param destFolder  String representing the path to the destination folder
      * @param fileName    Array of String representing the file names
      * @return Null if successful; otherwise, returns messages related to source file errors
-     * @throws MvException
+     * @throws MvException If moving encounters issues, e.g., file not found, permission errors, or I/O exception
      */
     @Override
     public String mvFilesToFolder(Boolean isOverwrite, String destFolder, String... fileName) throws MvException {

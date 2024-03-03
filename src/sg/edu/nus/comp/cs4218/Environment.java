@@ -1,5 +1,8 @@
 package sg.edu.nus.comp.cs4218;
 
+/**
+ * Environment is a class to store environment related variables.
+ */
 public final class Environment {
 
     /**
@@ -8,8 +11,5 @@ public final class Environment {
      */
     public static volatile String currentDirectory = System.getProperty("user.dir");
 
-
-    private Environment() {
-    }
-
+    private Environment() { /* Does nothing */ }
 }

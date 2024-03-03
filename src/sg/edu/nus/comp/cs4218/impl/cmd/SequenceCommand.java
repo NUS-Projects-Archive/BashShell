@@ -78,6 +78,11 @@ public class SequenceCommand implements Command {
         // Unused for now
     }
 
+    /**
+     * Returns a list of commands.
+     * 
+     * @return
+     */
     public List<Command> getCommands() {
         return commands;
     }

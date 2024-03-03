@@ -18,14 +18,31 @@ import sg.edu.nus.comp.cs4218.impl.util.IOUtils;
  * <p>
  * Command format: <Call> | <Call> or <Pipe> | <Call>
  */
-
 public class PipeCommand implements Command {
     private final List<CallCommand> callCommands;
 
+    /**
+     * Constructor to create a new PipeCommand. The constructor creates a list of CallCommand.
+     * 
+     * @param callCommands  List of CallCommand
+     */
     public PipeCommand(final List<CallCommand> callCommands) {
         this.callCommands = callCommands;
     }
 
+    /**
+     * Evaluates a sequence of piped commands. Each command in the sequence is executed in order,
+     * with the output of one command serving as the input to the next. If any command in the sequence
+     * throws an exception, the remaining commands are terminated.
+     *
+     * @param stdin The input stream to be used as the input for the first command in the sequence.
+     * @param stdout The output stream to be used as the output for the last command in the sequence.
+     * @throws AbstractApplicationException If any command in the sequence throws an AbstractApplicationException,
+     *                                      this exception is thrown at the end of this method.
+     * @throws ShellException If any command in the sequence throws a ShellException,
+     *                        this exception is thrown at the end of this method.
+     * @throws FileNotFoundException If an operation attempts to open a file that does not exist.
+     */
     @SuppressWarnings("PMD.CloseResource")
     @Override
     public void evaluate(final InputStream stdin, final OutputStream stdout)
@@ -76,6 +93,11 @@ public class PipeCommand implements Command {
         // Unused for now
     }
 
+    /**
+     * Returns the list of CallCommand.
+     * 
+     * @return
+     */
     public List<CallCommand> getCallCommands() {
         return callCommands;
     }

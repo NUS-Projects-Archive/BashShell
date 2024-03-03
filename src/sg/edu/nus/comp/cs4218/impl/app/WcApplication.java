@@ -25,6 +25,14 @@ import sg.edu.nus.comp.cs4218.exception.WcException;
 import sg.edu.nus.comp.cs4218.impl.parser.WcArgsParser;
 import sg.edu.nus.comp.cs4218.impl.util.IOUtils;
 
+/**
+ * The wc utility displays the number of lines, words, and bytes contained in each
+ * input file, or standard input (if no file is specified) to the standard output.
+ *
+ * <p>
+ * <b>Command format:</b> <code>wc [Options] [FILES]<code>
+ * </p>
+ */
 public class WcApplication implements WcInterface {
 
     private static final String NUMBER_FORMAT = " %7d";
@@ -44,9 +52,7 @@ public class WcApplication implements WcInterface {
      * @throws WcException
      */
     @Override
-    public void run(String[] args, InputStream stdin, OutputStream stdout)
-            throws WcException {
-        // Format: wc [-clw] [FILES]
+    public void run(String[] args, InputStream stdin, OutputStream stdout) throws WcException {
         if (stdout == null) {
             throw new WcException(ERR_NULL_STREAMS);
         }
@@ -177,6 +183,7 @@ public class WcApplication implements WcInterface {
      * @param isWords Boolean option to count the number of words
      * @param stdin   InputStream containing arguments from Stdin
      * @throws WcException
+     * @return String of the results
      */
     @Override
     public String countFromStdin(Boolean isBytes, Boolean isLines, Boolean isWords, InputStream stdin)

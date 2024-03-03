@@ -46,7 +46,7 @@ public class SortApplicationIT {
 
     @Test
     void run_NoStdout_ThrowsSortException() {
-        String expectedMsg = "sort: Null Pointer Exception";
+        String expectedMsg = "sort: OutputStream not provided";
         SortException exception = assertThrowsExactly(SortException.class, () -> {
             app.run(null, null, null);
         });

@@ -24,7 +24,9 @@ import sg.edu.nus.comp.cs4218.impl.app.TeeApplication;
 import sg.edu.nus.comp.cs4218.impl.app.UniqApplication;
 import sg.edu.nus.comp.cs4218.impl.app.WcApplication;
 
-
+/**
+ * ApplicationRunner is a class to run the application as specified by the application command keyword and arguments.
+ */
 public class ApplicationRunner {
 
     public final static String APP_ECHO = "echo";
@@ -44,7 +46,7 @@ public class ApplicationRunner {
     public final static String APP_GREP = "grep";
 
     /**
-     * Run the application as specified by the application command keyword and arguments.
+     * Runs the application as specified by the application command keyword and arguments.
      *
      * @param app          String containing the keyword that specifies what application to run.
      * @param argsArray    String array containing the arguments to pass to the applications for

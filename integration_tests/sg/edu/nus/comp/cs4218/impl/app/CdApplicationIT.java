@@ -27,7 +27,8 @@ import org.junit.jupiter.params.provider.MethodSource;
 import sg.edu.nus.comp.cs4218.Environment;
 import sg.edu.nus.comp.cs4218.exception.CdException;
 
-class CdApplicationIT { //NOPMD - Follows naming convention
+@SuppressWarnings("PMD.ClassNamingConventions")
+class CdApplicationIT {
     private static final String DIR_NAME = "tempDir";
     private static final String CHILD_DIR_NAME = "tempChildDir";
 
