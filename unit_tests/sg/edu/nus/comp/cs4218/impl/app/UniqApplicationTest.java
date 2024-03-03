@@ -20,6 +20,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import sg.edu.nus.comp.cs4218.exception.UniqException;
 
 class UniqApplicationTest {
+
     private static final String TEST_RESOURCES = "resources/uniq/";
     private static final String TEST_INPUT_FILE = TEST_RESOURCES + "input.txt";
     private static final String TEST_OUTPUT_FILE = "test-output.txt";

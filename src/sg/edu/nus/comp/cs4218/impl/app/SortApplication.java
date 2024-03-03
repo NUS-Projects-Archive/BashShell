@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 
 import sg.edu.nus.comp.cs4218.app.SortInterface;
 import sg.edu.nus.comp.cs4218.exception.InvalidArgsException;
@@ -107,23 +108,22 @@ public class SortApplication implements SortInterface {
                 throw new SortException(PROB_SORT_FILE + ERR_NO_PERM);
             }
             InputStream input = null;
-
             try {
                 input = IOUtils.openInputStream(file);
-            } catch (ShellException e) {
-                throw new SortException(PROB_SORT_FILE + e.getMessage(), e);
-            }
-            try {
                 lines.addAll(IOUtils.getLinesFromInputStream(input));
-            } catch (IOException e) {
-                throw new SortException(PROB_SORT_FILE + ERR_IO_EXCEPTION, e);
-            }
-            try {
                 IOUtils.closeInputStream(input);
-            } catch (ShellException e) {
+                input.close();
+            } catch (ShellException | IOException e) {
                 throw new SortException(PROB_SORT_FILE + e.getMessage(), e);
+            } finally {
+                try {
+                    if (input != null) {
+                        input.close();
+                    }
+                } catch (IOException e) {
+                    throw new SortException(PROB_SORT_FILE + e.getMessage(), e);
+                }
             }
-
         }
         sortInputString(isFirstWordNumber, isReverseOrder, isCaseIndependent, lines);
         return String.join(STRING_NEWLINE, lines);
@@ -167,8 +167,8 @@ public class SortApplication implements SortInterface {
         Collections.sort(input, new Comparator<String>() {
             @Override
             public int compare(String str1, String str2) {
-                String temp1 = isCaseIndependent && !isFirstWordNumber ? str1.toLowerCase() : str1;//NOPMD
-                String temp2 = isCaseIndependent && !isFirstWordNumber ? str2.toLowerCase() : str2;//NOPMD
+                String temp1 = isCaseIndependent && !isFirstWordNumber ? str1.toLowerCase(Locale.ROOT) : str1;
+                String temp2 = isCaseIndependent && !isFirstWordNumber ? str2.toLowerCase(Locale.ROOT) : str2;
 
                 // Extract the first group of numbers if possible.
                 if (isFirstWordNumber && !temp1.isEmpty() && !temp2.isEmpty()) {

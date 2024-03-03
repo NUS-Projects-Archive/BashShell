@@ -25,14 +25,14 @@ public class LsApplicationHelper {
     private final static String COLON_NEW_LINE = ":" + StringUtils.STRING_NEWLINE;
 
     /**
-     * Lists only the current directory's content and RETURNS. This does not account
-     * for recursive
-     * mode in cwd.
+     * Lists only the current directory's content and RETURNS.
+     * This does not account for recursive mode in cwd.
      *
      * @param isSortByExt Sorts folder contents alphabetically by file extension
      *                    (characters after the last ‘.’ (without quotes)). Files
      *                    with no extension are sorted first
-     * @return
+     * @return String containing the current directory's content
+     * @throws LsException If there is an issue accessing or listing the current directory
      */
     public static String listCwdContent(Boolean isSortByExt) throws LsException {
         final String cwd = Environment.currentDirectory;
@@ -110,7 +110,7 @@ public class LsApplicationHelper {
      * @param isSortByExt Sorts folder contents alphabetically by file extension
      *                    (characters after the last ‘.’ (without quotes)). Files
      *                    with no extension are sorted first
-     * @return
+     * @return Formatted string containing the directory's contents
      */
     public static String formatContents(List<Path> contents, Boolean isSortByExt) {
         StringBuilder result = new StringBuilder();
@@ -139,7 +139,7 @@ public class LsApplicationHelper {
      * Gets the contents in a single specified directory.
      *
      * @param directory Directory to get contents from
-     * @return List of files + directories in the passed directory
+     * @return List of files and directories in the specified directory
      */
     private static List<Path> getContents(Path directory)
             throws InvalidDirectoryLsException, DirectoryAccessDeniedLsException {
@@ -164,7 +164,7 @@ public class LsApplicationHelper {
      * Gets the contents of a directory that is readable.
      *
      * @param directory Directory to get contents from
-     * @return List of files and directories in the passed directory
+     * @return List of files and directories in the specified directory
      */
     private static List<Path> getContentsFromReadableDirectory(Path directory) {
         List<Path> result = new ArrayList<>();
@@ -184,7 +184,8 @@ public class LsApplicationHelper {
      * path management.
      *
      * @param directories List of directories to be resolved into Path objects
-     * @return List of java.nio.Path objects
+     * @return List of java.nio.Path objects representing the resolved directories
+     * @throws InvalidDirectoryLsException If any of the specified directories is invalid or inaccessible
      */
     public static List<Path> resolvePaths(String... directories) throws InvalidDirectoryLsException {
         List<Path> paths = new ArrayList<>();
@@ -200,7 +201,8 @@ public class LsApplicationHelper {
      * path provided is an absolute path or already the current directory.
      *
      * @param directory Directory to be converted into a Path object
-     * @return
+     * @return A java.nio.Path object representing the resolved directory
+     * @throws InvalidDirectoryLsException If the specified directory is invalid or inaccessible
      */
     private static Path resolvePath(String directory) throws InvalidDirectoryLsException {
         try {
@@ -227,7 +229,7 @@ public class LsApplicationHelper {
      * Converts a path to a relative path to the current directory.
      *
      * @param path Path to be converted
-     * @return
+     * @return A java.nio.Path object representing the relative path to the current directory
      */
     private static Path getRelativeToCwd(Path path) {
         return Paths.get(Environment.currentDirectory).relativize(path);

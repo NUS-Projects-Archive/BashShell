@@ -16,5 +16,4 @@ class ExitApplicationTest {
         );
         assertEquals(0, exitCode);
     }
-
 }

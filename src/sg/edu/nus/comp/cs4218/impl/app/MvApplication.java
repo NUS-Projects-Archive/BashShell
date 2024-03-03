@@ -95,17 +95,17 @@ public class MvApplication implements MvInterface {
 
         // Ensure that source file exist
         if (!Files.exists(srcPath)) {
-            throw new MvException(String.format(PROB_MV_DEST_FILE + "'%s': " + ERR_FILE_NOT_FOUND, srcFile));
+            throw new MvException(formatMvErrorMessage(PROB_MV_DEST_FILE, ERR_FILE_NOT_FOUND, srcFile));
         }
 
         // Ensure that source file have the required read permission
         if (!Files.isReadable(srcPath)) {
-            throw new MvException(String.format(PROB_MV_DEST_FILE + "'%s': " + ERR_NO_PERM, srcFile));
+            throw new MvException(formatMvErrorMessage(PROB_MV_DEST_FILE, ERR_NO_PERM, srcFile));
         }
 
         // Ensure that destination file have the required write permission
         if (Files.exists(destPath) && !Files.isWritable(destPath)) {
-            throw new MvException(String.format(PROB_MV_DEST_FILE + "'%s': " + ERR_NO_PERM, destFile));
+            throw new MvException(formatMvErrorMessage(PROB_MV_DEST_FILE, ERR_NO_PERM, destFile));
         }
 
         // Append file name to destination directory if destination is a directory
@@ -140,17 +140,17 @@ public class MvApplication implements MvInterface {
 
         // Ensure that destination folder exist
         if (!Files.exists(destFolderPath)) {
-            throw new MvException(String.format(PROB_MV_FOLDER + "'%s': " + ERR_FILE_NOT_FOUND, destFolder));
+            throw new MvException(formatMvErrorMessage(PROB_MV_FOLDER, ERR_FILE_NOT_FOUND, destFolder));
         }
 
         // Ensure that destination folder is a directory
         if (!Files.isDirectory(destFolderPath)) {
-            throw new MvException(String.format(PROB_MV_FOLDER + "'%s': " + ERR_IS_DIR, destFolder));
+            throw new MvException(formatMvErrorMessage(PROB_MV_FOLDER, ERR_IS_DIR, destFolder));
         }
 
         // Ensure that destination folder have the required write permission
         if (!Files.isWritable(destFolderPath)) {
-            throw new MvException(String.format(PROB_MV_FOLDER + "'%s': " + ERR_NO_PERM, destFolder));
+            throw new MvException(formatMvErrorMessage(PROB_MV_FOLDER, ERR_NO_PERM, destFolder));
         }
 
         List<String> result = new ArrayList<>();
@@ -181,5 +181,9 @@ public class MvApplication implements MvInterface {
         }
 
         return result.isEmpty() ? null : String.join(STRING_NEWLINE, result);
+    }
+
+    private String formatMvErrorMessage(String cause, String error, String file) {
+        return String.format("%s'%s': %s", cause, file, error);
     }
 }

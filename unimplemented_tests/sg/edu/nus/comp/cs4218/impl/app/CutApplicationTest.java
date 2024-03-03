@@ -18,11 +18,11 @@ import org.junit.jupiter.api.io.TempDir;
 
 import sg.edu.nus.comp.cs4218.exception.CutException;
 
-@SuppressWarnings("PMD.AvoidDuplicateLiterals")
 class CutApplicationTest {
 
     private static final String TEMP_FILE = "file.txt";
     private static final String TEMP_CONTENT = "1234567890";
+    private static final String ONE_TO_FIVE = "12345";
 
     @TempDir
     private Path tempDir;
@@ -45,18 +45,16 @@ class CutApplicationTest {
     // or the invalidity of the range, as exceptions are expected to be thrown before reaching the cutFromFiles method.
     @Test
     void cutFromFiles_CutByChar_ReturnsCutRange() {
-        String expected = "12345";
         List<int[]> range = List.of(new int[]{1, 5});
         String result = assertDoesNotThrow(() -> app.cutFromFiles(true, false, range, tempFilePath.toString()));
-        assertEquals(expected, result);
+        assertEquals(ONE_TO_FIVE, result);
     }
 
     @Test
     void cutFromFiles_CutByByte_ReturnsCutRange() {
-        String expected = "12345";
         List<int[]> range = List.of(new int[]{1, 5});
         String result = assertDoesNotThrow(() -> app.cutFromFiles(false, true, range, tempFilePath.toString()));
-        assertEquals(expected, result);
+        assertEquals(ONE_TO_FIVE, result);
     }
 
     @Test
@@ -108,20 +106,18 @@ class CutApplicationTest {
 
     @Test
     void cutFromStdin_CutByChar_ReturnsCutRange() {
-        String expected = "12345";
         List<int[]> range = List.of(new int[]{1, 5});
         InputStream stdin = new ByteArrayInputStream(TEMP_CONTENT.getBytes());
         String result = assertDoesNotThrow(() -> app.cutFromStdin(true, false, range, stdin));
-        assertEquals(expected, result);
+        assertEquals(ONE_TO_FIVE, result);
     }
 
     @Test
     void cutFromStdin_CutByByte_ReturnsCutRange() {
-        String expected = "12345";
         List<int[]> range = List.of(new int[]{1, 5});
         InputStream stdin = new ByteArrayInputStream(TEMP_CONTENT.getBytes());
         String result = assertDoesNotThrow(() -> app.cutFromStdin(true, false, range, stdin));
-        assertEquals(expected, result);
+        assertEquals(ONE_TO_FIVE, result);
     }
 
     @Test

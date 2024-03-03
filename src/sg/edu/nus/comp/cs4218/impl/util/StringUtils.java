@@ -3,6 +3,7 @@ package sg.edu.nus.comp.cs4218.impl.util;
 import java.io.File;
 import java.math.BigInteger;
 import java.util.Arrays;
+import java.util.Locale;
 
 public final class StringUtils {
     public static final String STRING_NEWLINE = System.lineSeparator();
@@ -32,7 +33,7 @@ public final class StringUtils {
      */
     public static String fileSeparator() {
         // We need to escape \ in Windows...
-        if (System.getProperty("os.name").toLowerCase().contains("win")) {//NOPMD
+        if (System.getProperty("os.name").toLowerCase(Locale.ROOT).contains("win")) {
             return '\\' + File.separator;
         }
         return File.separator;

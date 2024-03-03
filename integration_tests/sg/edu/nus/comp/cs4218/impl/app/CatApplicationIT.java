@@ -2,7 +2,6 @@ package sg.edu.nus.comp.cs4218.impl.app;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.mock;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 
@@ -24,10 +23,9 @@ import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import sg.edu.nus.comp.cs4218.exception.CatException;
-
 @SuppressWarnings("PMD.ClassNamingConventions")
 public class CatApplicationIT {
+
     private static final String HELLO_WORLD = "Hello" + STRING_NEWLINE + "World";
     private static final String L1_HELLO_L2_WORLD = "1 Hello" + STRING_NEWLINE + "2 World";
     private static final String HEY_JUNIT = "Hey" + STRING_NEWLINE + "Junit";
@@ -42,16 +40,17 @@ public class CatApplicationIT {
     private String fileB;
     private String fileC;
 
-    @TempDir
-    Path testDir;
+    private static List<String> getParams() {
+        return Arrays.asList(PARAM_TEST_VALUES);
+    }
 
     @BeforeEach
     void setUp() throws IOException {
         app = new CatApplication();
         out = new ByteArrayOutputStream();
         inputStreamMock = mock(InputStream.class);
-        testDir = Files.createTempDirectory("testDir");
 
+        Path testDir = Files.createTempDirectory("testDir");
         Path pathA = testDir.resolve("A.txt");
         Path pathB = testDir.resolve("B.txt");
         Path pathC = testDir.resolve("C.txt");
@@ -72,13 +71,9 @@ public class CatApplicationIT {
         String[] tokens = new String[0];
         inputStreamMock = new ByteArrayInputStream(args.getBytes(StandardCharsets.UTF_8));
         // When
-        try {
-            app.run(tokens, inputStreamMock, out);
-            // Then
-            assertEquals(args + STRING_NEWLINE, out.toString());
-        } catch (CatException e) {
-            fail(e.getMessage());
-        }
+        assertDoesNotThrow(() -> app.run(tokens, inputStreamMock, out));
+        // Then
+        assertEquals(args + STRING_NEWLINE, out.toString());
     }
 
     @Test
@@ -259,9 +254,5 @@ public class CatApplicationIT {
         String result = assertDoesNotThrow(() -> app.readFile(false, new File(fileC)));
         // Then
         assertEquals(L1_HELLO_L2_WORLD + STRING_NEWLINE, result);
-    }
-
-    private static List<String> getParams() {
-        return Arrays.asList(PARAM_TEST_VALUES);
     }
 }

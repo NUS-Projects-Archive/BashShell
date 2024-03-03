@@ -30,7 +30,6 @@ public class ShellImpl implements Shell {
 
         // Forever loop to maintain shell until ExitCommand
         while (true) {
-
             try {
                 System.out.print(Environment.currentDirectory + "$ ");
 
@@ -55,7 +54,6 @@ public class ShellImpl implements Shell {
             } catch (Exception e) {
                 System.out.println(e.getMessage());
             }
-
         }
     }
 

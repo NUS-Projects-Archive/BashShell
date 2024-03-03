@@ -24,7 +24,6 @@ import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
@@ -47,16 +46,17 @@ class CatApplicationTest {
     private String fileA;
     private String fileB;
 
-    @TempDir
-    Path testDir;
+    private static List<String> getParams() {
+        return Arrays.asList(PARAM_TEST_VALUES);
+    }
 
     @BeforeEach
     void setUp() throws IOException {
         app = new CatApplication();
         brMock = mock(BufferedReader.class);
         inputStreamMock = mock(InputStream.class);
-        testDir = Files.createTempDirectory("testDir");
 
+        Path testDir = Files.createTempDirectory("testDir");
         Path pathA = testDir.resolve("A.txt");
         Path pathB = testDir.resolve("B.txt");
 
@@ -64,7 +64,6 @@ class CatApplicationTest {
         fileB = pathB.toString();
 
         Files.write(pathA, List.of(HELLO_WORLD));
-
         Files.write(pathB, List.of(HEY_JUNIT));
     }
 
@@ -212,9 +211,5 @@ class CatApplicationTest {
         String result = assertDoesNotThrow(() -> app.catFileAndStdin(true, inputStreamMock, fileA, "-", fileB));
         String expected = L1_HELLO_L2_WORLD + STRING_NEWLINE + L1_FROM_L2_STDIN + STRING_NEWLINE + L1_HEY_L2_JUNIT + STRING_NEWLINE;
         assertEquals(expected, result);
-    }
-
-    private static List<String> getParams() {
-        return Arrays.asList(PARAM_TEST_VALUES);
     }
 }

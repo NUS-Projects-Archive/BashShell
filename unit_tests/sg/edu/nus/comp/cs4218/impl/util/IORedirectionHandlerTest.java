@@ -29,7 +29,6 @@ import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
@@ -44,16 +43,17 @@ public class IORedirectionHandlerTest {
     private String fileB;
     private String fileC;
 
-    @TempDir
-    Path testDir;
+    private String[] splitArgs(String args) {
+        return args.split("\\s+");
+    }
 
     @BeforeEach
     void setUp() throws IOException {
         argResolverMock = mock(ArgumentResolver.class);
         inputStream = new ByteArrayInputStream("origInputStream".getBytes(StandardCharsets.UTF_8));
         outputStream = new ByteArrayOutputStream();
-        testDir = Files.createTempDirectory("testDir");
 
+        Path testDir = Files.createTempDirectory("testDir");
         Path path = testDir.resolve("file.txt");
         Path pathA = testDir.resolve("A.txt");
         Path pathB = testDir.resolve("B.txt");
@@ -85,7 +85,7 @@ public class IORedirectionHandlerTest {
     @ParameterizedTest
     @ValueSource(strings = {"< < input.txt", "> > output.txt", "input.txt < > output.txt", "output.txt > < input.txt"})
     void extractRedirOptions_InvalidSyntax_ThrowsShellException(String args) {
-        List<String> invalidSyntax = Arrays.asList(args.split("\\s+"));
+        List<String> invalidSyntax = List.of(splitArgs(args));
         IORedirectionHandler ioRedirHandler = new IORedirectionHandler(invalidSyntax, inputStream, outputStream, argResolverMock);
         ShellException shellException = assertThrows(ShellException.class, ioRedirHandler::extractRedirOptions);
         assertEquals("shell: " + ERR_SYNTAX, shellException.getMessage());
@@ -93,7 +93,7 @@ public class IORedirectionHandlerTest {
 
     @Test
     void extractRedirOptions_AmbiguousRedirect_ThrowsShellException() {
-        List<String> ambiguousRedirect = Arrays.asList(">", "*.txt");
+        List<String> ambiguousRedirect = List.of(">", "*.txt");
         IORedirectionHandler ioRedirHandler = new IORedirectionHandler(ambiguousRedirect, inputStream, outputStream, argResolverMock);
         try {
             when(argResolverMock.resolveOneArgument("*.txt"))
@@ -109,7 +109,7 @@ public class IORedirectionHandlerTest {
     @ParameterizedTest
     @ValueSource(strings = {"> file.txt", "< file.txt > file.txt", "< file.txt"})
     void extractRedirOptions_IORedirectionOnly_GetNoRedirArgsListIsEmpty(String args) {
-        List<String> ioRedirectsOnly = Arrays.asList(args.split("\\s+"));
+        List<String> ioRedirectsOnly = List.of(splitArgs(args));
         IORedirectionHandler ioRedirHandler = new IORedirectionHandler(ioRedirectsOnly, inputStream, outputStream, argResolverMock);
         try {
             when(argResolverMock.resolveOneArgument("file.txt"))
@@ -124,7 +124,7 @@ public class IORedirectionHandlerTest {
     @ParameterizedTest
     @ValueSource(strings = {"file1.txt", "file2.txt file3.txt", "-"})
     void extractRedirOptions_NoRedirection_GetNoRedirArgsListIsNotEmpty(String args) {
-        List<String> noRedirection = Arrays.asList(args.split("\\s+"));
+        List<String> noRedirection = List.of(splitArgs(args));
         IORedirectionHandler ioRedirHandler = new IORedirectionHandler(noRedirection, inputStream, outputStream, argResolverMock);
         try {
             when(argResolverMock.resolveOneArgument(anyString())).thenReturn(List.of("file1.txt"), List.of("file2.txt"), List.of("file3.txt"), List.of("-"));
@@ -140,7 +140,7 @@ public class IORedirectionHandlerTest {
     @ParameterizedTest
     @ValueSource(strings = {"< A.txt", "B.txt < A.txt"})
     void extractRedirOptions_OneInputRedirection_InputStreamChangesFromOriginal(String args) {
-        List<String> inputs = Arrays.asList(args.split("\\s+"));
+        List<String> inputs = List.of(splitArgs(args));
         IORedirectionHandler ioRedirHandler = new IORedirectionHandler(inputs, inputStream, outputStream, argResolverMock);
         try {
             when(argResolverMock.resolveOneArgument(anyString())).thenReturn(List.of(fileA), List.of(fileB), List.of(fileA));
@@ -172,7 +172,7 @@ public class IORedirectionHandlerTest {
     @ParameterizedTest
     @ValueSource(strings = {"> A.txt", "B.txt > A.txt"})
     void extractRedirOptions_OneOutputRedirection_OutputStreamChangesFromOriginal(String args) {
-        List<String> inputs = Arrays.asList(args.split("\\s+"));
+        List<String> inputs = List.of(splitArgs(args));
         IORedirectionHandler ioRedirHandler = new IORedirectionHandler(inputs, inputStream, outputStream, argResolverMock);
         try {
             when(argResolverMock.resolveOneArgument(anyString())).thenReturn(List.of(fileA), List.of(fileB), List.of(fileA));

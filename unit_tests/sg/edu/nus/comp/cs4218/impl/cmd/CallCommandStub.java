@@ -16,6 +16,7 @@ import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
 import sg.edu.nus.comp.cs4218.exception.ShellException;
 
 public class CallCommandStub extends CallCommand {
+
     private final List<String> argsList;
 
     public CallCommandStub(List<String> argsList) {
@@ -87,7 +88,5 @@ public class CallCommandStub extends CallCommand {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
     }
-
 }

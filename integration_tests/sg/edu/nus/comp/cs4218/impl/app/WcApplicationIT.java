@@ -36,6 +36,7 @@ public class WcApplicationIT {
     private static final String STDIN = "-";
     private static final String NUMBER_FORMAT = " %7d";
     private static final String STRING_FORMAT = " %s";
+    private static final String TOTAL_LAST_LINE = " total";
     private ByteArrayOutputStream outputStream;
     private WcApplication app;
     @TempDir
@@ -44,18 +45,18 @@ public class WcApplicationIT {
     private String filePathB;
 
     private static String appendString(int lineCount, int wordCount, int byteCount, String lastLine) {
-        StringBuilder sb = new StringBuilder(); //NOPMD
+        StringBuilder stringBuilder = new StringBuilder();
         if (lineCount > -1) {
-            sb.append(String.format(NUMBER_FORMAT, lineCount));
+            stringBuilder.append(String.format(NUMBER_FORMAT, lineCount));
         }
         if (wordCount > -1) {
-            sb.append(String.format(NUMBER_FORMAT, wordCount));
+            stringBuilder.append(String.format(NUMBER_FORMAT, wordCount));
         }
         if (byteCount > -1) {
-            sb.append(String.format(NUMBER_FORMAT, byteCount));
+            stringBuilder.append(String.format(NUMBER_FORMAT, byteCount));
         }
-        sb.append(lastLine);
-        return sb.toString();
+        stringBuilder.append(lastLine);
+        return stringBuilder.toString();
     }
 
     @BeforeEach
@@ -105,7 +106,7 @@ public class WcApplicationIT {
         List<String> expectedList = new ArrayList<>();
         expectedList.add(WC_EXCEPTION_MSG + ERR_FILE_NOT_FOUND);
         expectedList.add(appendString(3, 11, 57, String.format(STRING_FORMAT, filePathA)));
-        expectedList.add(appendString(3, 11, 57, " total"));
+        expectedList.add(appendString(3, 11, 57, TOTAL_LAST_LINE));
         expectedList.add("");
         String expected = String.join(STRING_NEWLINE, expectedList);
         assertDoesNotThrow(() -> {
@@ -120,7 +121,7 @@ public class WcApplicationIT {
         List<String> expectedList = new ArrayList<>();
         expectedList.add(appendString(3, 11, 57, String.format(STRING_FORMAT, filePathA)));
         expectedList.add(appendString(3, 12, 75, String.format(STRING_FORMAT, filePathB)));
-        expectedList.add(appendString(6, 23, 132, " total"));
+        expectedList.add(appendString(6, 23, 132, TOTAL_LAST_LINE));
         expectedList.add("");
         String expected = String.join(STRING_NEWLINE, expectedList);
 
@@ -135,7 +136,7 @@ public class WcApplicationIT {
         List<String> expectedList = new ArrayList<>();
         expectedList.add(appendString(3, -1, 57, String.format(STRING_FORMAT, filePathA)));
         expectedList.add(appendString(3, -1, 75, String.format(STRING_FORMAT, filePathB)));
-        expectedList.add(appendString(6, -1, 132, " total"));
+        expectedList.add(appendString(6, -1, 132, TOTAL_LAST_LINE));
         expectedList.add("");
         String expected = String.join(STRING_NEWLINE, expectedList);
 
@@ -150,7 +151,7 @@ public class WcApplicationIT {
         List<String> expectedList = new ArrayList<>();
         expectedList.add(appendString(-1, 11, -1, String.format(STRING_FORMAT, filePathA)));
         expectedList.add(appendString(-1, 12, -1, String.format(STRING_FORMAT, filePathB)));
-        expectedList.add(appendString(-1, 23, -1, " total"));
+        expectedList.add(appendString(-1, 23, -1, TOTAL_LAST_LINE));
         expectedList.add("");
         String expected = String.join(STRING_NEWLINE, expectedList);
 
@@ -199,7 +200,7 @@ public class WcApplicationIT {
         List<String> expectedList = new ArrayList<>();
         expectedList.add(appendString(3, 11, 57, " -"));
         expectedList.add(appendString(3, 12, 75, String.format(STRING_FORMAT, filePathB)));
-        expectedList.add(appendString(6, 23, 132, " total"));
+        expectedList.add(appendString(6, 23, 132, TOTAL_LAST_LINE));
         expectedList.add("");
         String expected = String.join(STRING_NEWLINE, expectedList);
 
@@ -218,7 +219,7 @@ public class WcApplicationIT {
         List<String> expectedList = new ArrayList<>();
         expectedList.add(appendString(3, 11, -1, " -"));
         expectedList.add(appendString(3, 12, -1, String.format(STRING_FORMAT, filePathB)));
-        expectedList.add(appendString(6, 23, -1, " total"));
+        expectedList.add(appendString(6, 23, -1, TOTAL_LAST_LINE));
         expectedList.add("");
         String expected = String.join(STRING_NEWLINE, expectedList);
 
@@ -237,7 +238,7 @@ public class WcApplicationIT {
         List<String> expectedList = new ArrayList<>();
         expectedList.add(appendString(3, 11, 57, " -"));
         expectedList.add(WC_EXCEPTION_MSG + ERR_FILE_NOT_FOUND);
-        expectedList.add(appendString(3, 11, 57, " total"));
+        expectedList.add(appendString(3, 11, 57, TOTAL_LAST_LINE));
         expectedList.add("");
         String expected = String.join(STRING_NEWLINE, expectedList);
 
@@ -257,7 +258,7 @@ public class WcApplicationIT {
         List<String> expectedList = new ArrayList<>();
         expectedList.add(appendString(0, 0, 0, " -"));
         expectedList.add(appendString(3, 11, 57, String.format(STRING_FORMAT, filePathA)));
-        expectedList.add(appendString(3, 11, 57, " total"));
+        expectedList.add(appendString(3, 11, 57, TOTAL_LAST_LINE));
         expectedList.add("");
         String expected = String.join(STRING_NEWLINE, expectedList);
 

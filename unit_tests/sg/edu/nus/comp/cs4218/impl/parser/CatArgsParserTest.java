@@ -22,6 +22,7 @@ import java.util.stream.Stream;
 
 class CatArgsParserTest {
 
+    private static final String NON_FLAG_ARG = "file";
     private final Set<Character> VALID_FLAGS = Set.of('n');
     private CatArgsParser catArgsParser;
 
@@ -100,13 +101,13 @@ class CatArgsParserTest {
 
     @Test
     void isLineNumber_ValidFlagAndNonFlagArg_ReturnsTrue() {
-        assertDoesNotThrow(() -> catArgsParser.parse("-n", "file.txt"));
+        assertDoesNotThrow(() -> catArgsParser.parse("-n", NON_FLAG_ARG));
         assertTrue(catArgsParser.isLineNumber());
     }
 
     @Test
     void isLineNumber_OnlyNonFlagArg_ReturnsFalse() {
-        assertDoesNotThrow(() -> catArgsParser.parse("file.txt"));
+        assertDoesNotThrow(() -> catArgsParser.parse(NON_FLAG_ARG));
         assertFalse(catArgsParser.isLineNumber());
     }
 
@@ -119,8 +120,8 @@ class CatArgsParserTest {
 
     @Test
     void getNonFlagArgs_OneNonFlagArg_ReturnsOneArg() {
-        assertDoesNotThrow(() -> catArgsParser.parse("file"));
-        List<String> expected = List.of("file");
+        assertDoesNotThrow(() -> catArgsParser.parse(NON_FLAG_ARG));
+        List<String> expected = List.of(NON_FLAG_ARG);
         List<String> result = catArgsParser.getNonFlagArgs();
         assertEquals(expected, result);
     }
@@ -135,8 +136,8 @@ class CatArgsParserTest {
 
     @Test
     void getNonFlagArgs_ValidFlagAndOneNonFlagArg_ReturnsOneArg() {
-        assertDoesNotThrow(() -> catArgsParser.parse("-n", "file.txt"));
-        List<String> expected = List.of("file.txt");
+        assertDoesNotThrow(() -> catArgsParser.parse("-n", NON_FLAG_ARG));
+        List<String> expected = List.of(NON_FLAG_ARG);
         List<String> result = catArgsParser.getNonFlagArgs();
         assertEquals(expected, result);
     }

@@ -50,8 +50,6 @@ import sg.edu.nus.comp.cs4218.Environment;
 import sg.edu.nus.comp.cs4218.exception.InvalidDirectoryLsException;
 import sg.edu.nus.comp.cs4218.exception.LsException;
 
-// To give a meaningful variable name
-@SuppressWarnings("PMD.LongVariable")
 class LsApplicationIT { //NOPMD - suppressed ClassNamingConventions - Following naming convention
     private static final String[] CWD_NON_DIRS = {"a.z", "z.a", "z"};
     private static final String DIR_A_NAME = "dirA";
@@ -83,16 +81,16 @@ class LsApplicationIT { //NOPMD - suppressed ClassNamingConventions - Following 
      * Provides valid arguments and expected output for run_ValidArgs_PrintsCorrectDirectoryContents.
      */
     static Stream<Arguments> validArgs() {
-        String listedCwdContents = String.format("%s%s", String.join(STRING_NEWLINE, ".:", getCwdContents()),
+        String listCwdContents = String.format("%s%s", String.join(STRING_NEWLINE, ".:", getCwdContents()),
                 STRING_NEWLINE);
-        String listedDirAContents = DIR_A_NAME + String.join(STRING_NEWLINE, ":", getDirAContents());
+        String listDirAContents = DIR_A_NAME + String.join(STRING_NEWLINE, ":", getDirAContents());
         return Stream.of(
                 // Relative paths
-                Arguments.of(new String[]{"."}, listedCwdContents),
-                Arguments.of(new String[]{String.format("..%s%s", CHAR_FILE_SEP, cwdName)}, listedCwdContents),
-                Arguments.of(new String[]{DIR_A_NAME}, listedDirAContents),
+                Arguments.of(new String[]{"."}, listCwdContents),
+                Arguments.of(new String[]{String.format("..%s%s", CHAR_FILE_SEP, cwdName)}, listCwdContents),
+                Arguments.of(new String[]{DIR_A_NAME}, listDirAContents),
                 // Absolute path
-                Arguments.of(new String[]{cwdPathName}, listedCwdContents)
+                Arguments.of(new String[]{cwdPathName}, listCwdContents)
         );
     }
 
@@ -235,13 +233,13 @@ class LsApplicationIT { //NOPMD - suppressed ClassNamingConventions - Following 
     @Test
     void run_NonExistentDir_ThrowsInvalidDirectoryLsException() {
         // Given
-        String nonExistentDirName = "nonExistentDir";
-        String expected = String.format("ls: cannot access '%s': %s", nonExistentDirName, ERR_FILE_NOT_FOUND);
+        String nonExistDirName = "nonExistDir";
+        String expected = String.format("ls: cannot access '%s': %s", nonExistDirName, ERR_FILE_NOT_FOUND);
         InputStream mockedInputStream = new ByteArrayInputStream("".getBytes());
 
         // When
         InvalidDirectoryLsException exception = assertThrowsExactly(InvalidDirectoryLsException.class, () -> {
-            app.run(new String[]{nonExistentDirName}, mockedInputStream, System.out);
+            app.run(new String[]{nonExistDirName}, mockedInputStream, System.out);
         });
 
         // Then
@@ -258,25 +256,25 @@ class LsApplicationIT { //NOPMD - suppressed ClassNamingConventions - Following 
     void run_NoReadPermissionDir_PrintsPermDeniedError() {
         // Given
         InputStream mockedInputStream = new ByteArrayInputStream("".getBytes());
-        String noReadPermissionDirName = "noReadPermissionDir";
-        Path noReadPermissionDirPath = createNewDirectory(cwdPath, noReadPermissionDirName);
-        boolean isSetReadableSuccess = noReadPermissionDirPath.toFile().setReadable(false);
-        if (!isSetReadableSuccess) {
+        String noReadPermDir = "noReadPermissionDir";
+        Path noReadPermDirPath = createNewDirectory(cwdPath, noReadPermDir);
+        boolean isSetReadable = noReadPermDirPath.toFile().setReadable(false);
+        if (!isSetReadable) {
             fail("Failed to set read permission for directory to test.");
-            deleteFileOrDirectory(noReadPermissionDirPath);
+            deleteFileOrDirectory(noReadPermDirPath);
             return;
         }
 
         // When
-        assertDoesNotThrow(() -> app.run(new String[]{noReadPermissionDirName}, mockedInputStream, System.out));
+        assertDoesNotThrow(() -> app.run(new String[]{noReadPermDir}, mockedInputStream, System.out));
 
         // Then
         String actual = outContent.toString();
-        String expected = String.format("ls: cannot open directory '%s': %s%s", noReadPermissionDirName, ERR_NO_PERM,
+        String expected = String.format("ls: cannot open directory '%s': %s%s", noReadPermDir, ERR_NO_PERM,
                 STRING_NEWLINE);
         assertEquals(expected, actual);
 
-        deleteFileOrDirectory(noReadPermissionDirPath);
+        deleteFileOrDirectory(noReadPermDirPath);
     }
 
     /**
