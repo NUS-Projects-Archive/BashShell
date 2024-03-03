@@ -29,7 +29,9 @@ import sg.edu.nus.comp.cs4218.app.GrepInterface;
 import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
 import sg.edu.nus.comp.cs4218.exception.GrepException;
 
-public class GrepApplication implements GrepInterface { //NOPMD - suppressed GodClass - EF2 not implemented
+// Suppressed as this is an EF2 app, not implemented yet
+@SuppressWarnings({"PMD.ExcessiveMethodLength", "PMD.GodClass"})
+public class GrepApplication implements GrepInterface {
 
     public static final String INVALID_PATTERN = "Invalid pattern syntax";
     public static final String EMPTY_PATTERN = "Pattern should not be empty.";
@@ -279,17 +281,17 @@ public class GrepApplication implements GrepInterface { //NOPMD - suppressed God
                     arg = Arrays.copyOfRange(arg, 1, arg.length);
                     for (char c : arg) {
                         switch (c) {
-                            case CASE_INSEN_IDENT:
-                                grepFlags[CASE_INSEN_IDX] = true;
-                                break;
-                            case COUNT_IDENT:
-                                grepFlags[COUNT_INDEX] = true;
-                                break;
-                            case PREFIX_FN:
-                                grepFlags[PREFIX_FN_IDX] = true;
-                                break;
-                            default:
-                                throw new GrepException(ERR_SYNTAX);
+                        case CASE_INSEN_IDENT:
+                            grepFlags[CASE_INSEN_IDX] = true;
+                            break;
+                        case COUNT_IDENT:
+                            grepFlags[COUNT_INDEX] = true;
+                            break;
+                        case PREFIX_FN:
+                            grepFlags[PREFIX_FN_IDX] = true;
+                            break;
+                        default:
+                            throw new GrepException(ERR_SYNTAX);
                         }
                     }
                 } else { // pattern must come before file names

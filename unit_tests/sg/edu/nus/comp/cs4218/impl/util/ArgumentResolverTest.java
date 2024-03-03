@@ -27,6 +27,7 @@ import sg.edu.nus.comp.cs4218.exception.ShellException;
 
 class ArgumentResolverTest {
 
+    private static final String STRING_ECHO = "echo";
     private static final Map<String, List<String>> VALID_QUOTES = new HashMap<>() {{
         put("'\"'", List.of("\""));                     // '"'
         put("'\"\"'", List.of("\"\""));                 // '""'
@@ -187,8 +188,8 @@ class ArgumentResolverTest {
      */
     @Test
     void resolveArgument_CommandSubstitutionWithSingleQuote_ReturnsCorrectArgs() {
-        List<String> argList = List.of("echo", "`echo 'hello world'`");
-        List<String> expected = List.of("echo", "hello", "world");
+        List<String> argList = List.of(STRING_ECHO, "`echo 'hello world'`");
+        List<String> expected = List.of(STRING_ECHO, "hello", "world");
         List<String> result = assertDoesNotThrow(() -> argumentResolver.parseArguments(argList));
         assertEquals(expected, result);
     }
@@ -198,8 +199,8 @@ class ArgumentResolverTest {
      */
     @Test
     void resolveArguments_CommandSubstitutionWithMixedQuotes_ReturnsCorrectArgs() {
-        List<String> argList = List.of("echo", "`echo \"'quote is not interpreted as special character'\"`");
-        List<String> expected = List.of("echo", "'quote", "is", "not", "interpreted", "as", "special", "character'");
+        List<String> argList = List.of(STRING_ECHO, "`echo \"'quote is not interpreted as special character'\"`");
+        List<String> expected = List.of(STRING_ECHO, "'quote", "is", "not", "interpreted", "as", "special", "character'");
         List<String> result = assertDoesNotThrow(() -> argumentResolver.parseArguments(argList));
         assertEquals(expected, result);
     }
@@ -218,7 +219,7 @@ class ArgumentResolverTest {
      */
     @Test
     void resolveArguments_CommandSubstitutionContainsNewline_ThrowsShellException() {
-        List<String> argList = List.of("echo", "`echo hello" + System.lineSeparator() + "`");
+        List<String> argList = List.of(STRING_ECHO, "`echo hello" + System.lineSeparator() + "`");
         assertThrows(ShellException.class, () -> argumentResolver.parseArguments(argList));
     }
 }

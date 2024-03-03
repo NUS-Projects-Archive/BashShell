@@ -24,7 +24,10 @@ import sg.edu.nus.comp.cs4218.Environment;
 class LsApplicationHelperTest {
 
     private static final String DIR_A_NAME = "dirA";
-    private static final String[] CWD_NON_DIRS = {"a.z", "z.a", "z"};
+    private static final String STRING_AZ = "a.z";
+    private static final String STRING_ZA = "z.a";
+    private static final String STRING_Z = "z";
+    private static final String[] CWD_NON_DIRS = {STRING_AZ, STRING_ZA, STRING_Z};
     private static final String[] CWD_DIRS = {DIR_A_NAME};
     private static final String UNSORTED_CWD_CONTENTS = String.join(STRING_NEWLINE, getCwdContents());
     private static final String UNSORTED_CWD_CONTENTS_WITH_HEADER = String.join(STRING_NEWLINE, ".:",
@@ -34,7 +37,7 @@ class LsApplicationHelperTest {
             String.format(".%s%s:", CHAR_FILE_SEP, DIR_A_NAME), getDirAContents());
     private static final String SORTED_DIR_A_CONTENTS_WITH_HEADER = UNSORTED_DIR_A_CONTENTS_WITH_HEADER;
     private static final String TWO_LINE_SEPARATOR = STRING_NEWLINE + STRING_NEWLINE;
-    private static final String SORTED_CWD_CONTENTS_STRING = String.join(STRING_NEWLINE, "dirA", "z", "z.a", "a.z");
+    private static final String SORTED_CWD_CONTENTS_STRING = String.join(STRING_NEWLINE, "dirA", STRING_Z, STRING_ZA, STRING_AZ);
     private static final String SORTED_CWD_CONTENTS_STRING_WITH_HEADER = String.join(STRING_NEWLINE, ".:",
             SORTED_CWD_CONTENTS_STRING);
 
@@ -166,7 +169,7 @@ class LsApplicationHelperTest {
     @Test
     void formatContents_IsSortByExtIsTrue_ReturnsSortedFormattedContents() {
         // Given
-        String expected = String.join(STRING_NEWLINE, "z", "z.a", "a.z");
+        String expected = String.join(STRING_NEWLINE, STRING_Z, STRING_ZA, STRING_AZ);
         List<Path> contents = Arrays.stream(CWD_NON_DIRS)
                 .map(Paths::get)
                 .collect(Collectors.toList());
@@ -180,7 +183,7 @@ class LsApplicationHelperTest {
     @Test
     void formatContents_IsSortByExtIsFalse_ReturnsFormattedContents() {
         // Given
-        String expected = String.join(STRING_NEWLINE, "a.z", "z", "z.a");
+        String expected = String.join(STRING_NEWLINE, STRING_AZ, STRING_Z, STRING_ZA);
         List<Path> contents = Arrays.stream(CWD_NON_DIRS)
                 .map(Paths::get)
                 .collect(Collectors.toList());

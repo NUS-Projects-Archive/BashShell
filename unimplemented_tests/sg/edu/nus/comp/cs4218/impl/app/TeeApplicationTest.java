@@ -9,6 +9,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -24,6 +25,7 @@ class TeeApplicationTest {
     private static final String CONTENT_FILE_B = "1\n2\n3\n4\n5";
     private TeeApplication app;
 
+    private InputStream inputStream;
     @TempDir
     private Path tempDir;
     private Path fileBPath;
@@ -47,13 +49,19 @@ class TeeApplicationTest {
         Files.write(fileAPath, List.of(CONTENT_FILE_A.split("\n")));
         Files.write(fileBPath, List.of(CONTENT_FILE_B.split("\n")));
         Files.createFile(emptyFilePath);
+
+        inputStream = assertDoesNotThrow(() -> IOUtils.openInputStream(fileA));
+    }
+
+    @AfterEach
+    void tearDown() throws IOException {
+        inputStream.close();
     }
 
     @Test
     void teeFromStdin_OnlyStdin_ReturnsCorrectString() {
         String expected = CONTENT_FILE_A + StringUtils.STRING_NEWLINE;
         String[] filenames = {};
-        InputStream inputStream = assertDoesNotThrow(() -> IOUtils.openInputStream(fileA));
         String outputStdOut = assertDoesNotThrow(() -> app.teeFromStdin(false, inputStream, filenames));
         assertEquals(expected, outputStdOut);
     }
@@ -61,7 +69,6 @@ class TeeApplicationTest {
     @Test
     void teeFromStdin_OneFile_WritesToFile() {
         String expected = CONTENT_FILE_A + StringUtils.STRING_NEWLINE;
-        InputStream inputStream = assertDoesNotThrow(() -> IOUtils.openInputStream(fileA));
         String outputStdOut = assertDoesNotThrow(() -> app.teeFromStdin(false, inputStream, emptyFile));
         String outputFile = assertDoesNotThrow(() -> Files.readString(emptyFilePath));
         assertEquals(expected, outputStdOut);
@@ -71,7 +78,6 @@ class TeeApplicationTest {
     @Test
     void teeFromStdin_OneFileAndValidFlag_AppendsToFile() {
         String expected = CONTENT_FILE_B + StringUtils.STRING_NEWLINE + CONTENT_FILE_A + StringUtils.STRING_NEWLINE;
-        InputStream inputStream = assertDoesNotThrow(() -> IOUtils.openInputStream(fileA));
         String outputStdOut = assertDoesNotThrow(() -> app.teeFromStdin(true, inputStream, fileB));
         String outputFile = assertDoesNotThrow(() -> Files.readString(fileBPath));
         assertEquals(expected, outputStdOut);

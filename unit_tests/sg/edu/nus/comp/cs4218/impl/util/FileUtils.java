@@ -5,7 +5,9 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-public class FileUtils {
+public final class FileUtils {
+    private FileUtils() { /* Does nothing */}
+
     /**
      * Create a temporary file with the given contents.
      *
