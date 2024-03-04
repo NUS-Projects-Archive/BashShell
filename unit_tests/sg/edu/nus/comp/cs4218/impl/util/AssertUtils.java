@@ -3,11 +3,11 @@ package sg.edu.nus.comp.cs4218.impl.util;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
 
-import java.io.BufferedInputStream;
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 
 public final class AssertUtils {
 
@@ -18,57 +18,30 @@ public final class AssertUtils {
 
     /**
      * Assert that the 2 files contain the same thing.
-     * Data is compared character by character.
-     *
-     * @param expected {@code Path} to file containing the expected data
-     * @param actual   {@code Path} to file containing the actual data
-     */
-    public static void assertFileMatch(Path expected, Path actual) {
-        int expectedChar, actualChar;
-        BufferedInputStream streamOfExpected = null;
-        BufferedInputStream streamOfActual = null;
-
-        try {
-            streamOfExpected = new BufferedInputStream(new FileInputStream(expected.toFile()));
-            streamOfActual = new BufferedInputStream(new FileInputStream(actual.toFile()));
-
-            do {
-                expectedChar = streamOfExpected.read();
-                actualChar = streamOfActual.read();
-
-                if (expectedChar != actualChar) {
-                    break;
-                }
-            } while (expectedChar != -1);
-
-            if (expectedChar != actualChar) {
-                fail(String.format("Expected '%c' but got '%c'", expectedChar, actualChar));
-            }
-        } catch (IOException e) {
-            fail(e.getMessage());
-        } finally {
-            try {
-                if (streamOfExpected != null) {
-                    streamOfExpected.close();
-                }
-                if (streamOfActual != null) {
-                    streamOfActual.close();
-                }
-            } catch (IOException e) {
-                fail(e.getMessage());
-            }
-        }
-    }
-
-    /**
-     * Assert that the 2 files contain the same thing.
-     * Data is compared character by character.
+     * Data is compared line by line.
      *
      * @param expected {@code String} of path to file containing the expected data
      * @param actual   {@code String} of path to file containing the actual data
      */
-    public static void assertFileMatch(String expected, String actual) {
-        assertFileMatch(Paths.get(expected), Paths.get(actual));
+    public static void assertFileContentMatch(String expected, String actual) {
+        assertFileContentMatch(Paths.get(expected), Paths.get(actual));
+    }
+
+    /**
+     * Assert that the 2 files contain the same thing.
+     * Data is compared line by line.
+     *
+     * @param expected {@code Path} to file containing the expected data
+     * @param actual   {@code Path} to file containing the actual data
+     */
+    public static void assertFileContentMatch(Path expected, Path actual) {
+        try {
+            List<String> expectedContent = Files.readAllLines(expected);
+            List<String> actualContent = Files.readAllLines(actual);
+            assertEquals(expectedContent, actualContent);
+        } catch (IOException e) {
+            fail(e.getMessage());
+        }
     }
 
     /**

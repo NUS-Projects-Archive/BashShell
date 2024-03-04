@@ -3,7 +3,6 @@ package sg.edu.nus.comp.cs4218.impl.app;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 import static org.junit.jupiter.api.Assertions.fail;
-import static sg.edu.nus.comp.cs4218.impl.util.AssertUtils.assertFileMatch;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -18,6 +17,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import sg.edu.nus.comp.cs4218.exception.UniqException;
+import sg.edu.nus.comp.cs4218.impl.util.AssertUtils;
 
 class UniqApplicationTest {
 
@@ -57,7 +57,7 @@ class UniqApplicationTest {
         assertDoesNotThrow(() ->
                 app.uniqFromFile(isCount, isRepeated, isAllRepeated, TEST_INPUT_FILE, outputFile)
         );
-        assertFileMatch(expectedFile, outputFile);
+        AssertUtils.assertFileContentMatch(expectedFile, outputFile);
     }
 
     @ParameterizedTest
@@ -79,7 +79,7 @@ class UniqApplicationTest {
             assertDoesNotThrow(() ->
                     app.uniqFromStdin(isCount, isRepeated, isAllRepeated, inputStream, outputFile)
             );
-            assertFileMatch(expectedFile, outputFile);
+            AssertUtils.assertFileContentMatch(expectedFile, outputFile);
         } catch (IOException e) {
             fail(e.getMessage());
         }

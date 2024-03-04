@@ -64,6 +64,9 @@ public final class ErrorConstants {
     public static final String ERR_GENERAL = "Exception Caught";
     public static final String ERR_IO_EXCEPTION = "IOException";
 
+    /**
+     * Private constructor to prevent instantiation.
+     */
     private ErrorConstants() {
         // empty private constructor to make this a utility class
     }
