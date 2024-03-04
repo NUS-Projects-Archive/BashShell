@@ -17,6 +17,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,6 +27,8 @@ import org.junit.jupiter.api.Test;
 
 import org.junit.jupiter.api.condition.EnabledOnOs;
 import org.junit.jupiter.api.condition.OS;
+import org.junit.jupiter.api.io.TempDir;
+
 import sg.edu.nus.comp.cs4218.Command;
 import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
 import sg.edu.nus.comp.cs4218.exception.ExitException;
@@ -44,14 +47,15 @@ public class SequenceCommandTest {
     private static final String HELLO = "hello";
 
     @BeforeEach
-    public void setUp() throws Exception {
+    public void setUp(@TempDir Path tempDir) throws Exception {
         ArgumentResolver argResolver = new ArgumentResolver();
         ApplicationRunner appRunner = new ApplicationRunner();
+        String testFile = tempDir.resolve("test").toString();
         stdin = new ByteArrayInputStream("test".getBytes());
         stdout = new ByteArrayOutputStream();
 
         List<String> validArgsHasOut = new ArrayList<>(List.of("echo", HELLO));
-        List<String> validArgsNoOut = new ArrayList<>(List.of("mkdir", "test"));
+        List<String> validArgsNoOut = new ArrayList<>(List.of("mkdir", testFile));
         List<String> nonExitExceptnArg = new ArrayList<>(List.of("cat", "<", ">"));
 
         validCmdHasOutput = new CallCommand(validArgsHasOut, appRunner, argResolver);
