@@ -46,27 +46,27 @@ class SortApplicationTest {
     @Test
     void sortFromFiles_EmptyFiles_ThrowsSortException() {
         String expectedMsg = "sort: Problem sort from file: Null arguments";
-        SortException result = assertThrowsExactly(SortException.class, () -> {
-            app.sortFromFiles(false, false, false, null);
-        });
+        SortException result = assertThrowsExactly(SortException.class, () ->
+                app.sortFromFiles(false, false, false, null)
+        );
         assertEquals(expectedMsg, result.getMessage());
     }
 
     @Test
     void sortFromFiles_FileDoNotExist_ThrowsSortException() {
         String nonExistFile = tempDir.resolve("nonExistFile.txt").toString();
-        SortException result = assertThrowsExactly(SortException.class, () -> {
-            app.sortFromFiles(false, false, false, nonExistFile);
-        });
+        SortException result = assertThrowsExactly(SortException.class, () ->
+                app.sortFromFiles(false, false, false, nonExistFile)
+        );
         String expected = "sort: Problem sort from file: No such file or directory";
         assertEquals(expected, result.getMessage());
     }
 
     @Test
     void sortFromFiles_FileGivenAsDirectory_ThrowsSortException() {
-        SortException result = assertThrowsExactly(SortException.class, () -> {
-            app.sortFromFiles(false, false, false, tempDir.toString());
-        });
+        SortException result = assertThrowsExactly(SortException.class, () ->
+                app.sortFromFiles(false, false, false, tempDir.toString())
+        );
         String expected = "sort: Problem sort from file: This is a directory";
         assertEquals(expected, result.getMessage());
     }
@@ -79,9 +79,9 @@ class SortApplicationTest {
             fail("Failed to set read permission to false for test");
         }
 
-        SortException result = assertThrowsExactly(SortException.class, () -> {
-            app.sortFromFiles(false, false, false, file);
-        });
+        SortException result = assertThrowsExactly(SortException.class, () ->
+                app.sortFromFiles(false, false, false, file)
+        );
         String expected = "sort: Problem sort from file: Permission denied";
         assertEquals(expected, result.getMessage());
     }
@@ -90,8 +90,7 @@ class SortApplicationTest {
     void sortFromFiles_NoFlags_ReturnsSortedList() {
         String content = joinStringsBySystemLineSeparator("a", "c", "b", "A");
         assertDoesNotThrow(() -> Files.write(filePath, content.getBytes()));
-        String result = assertDoesNotThrow(() ->
-                app.sortFromFiles(false, false, false, file));
+        String result = assertDoesNotThrow(() -> app.sortFromFiles(false, false, false, file));
         String expected = joinStringsBySystemLineSeparator("A", "a", "b", "c");
         assertEquals(expected, result);
     }
