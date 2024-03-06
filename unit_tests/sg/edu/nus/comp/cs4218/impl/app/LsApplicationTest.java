@@ -109,12 +109,8 @@ class LsApplicationTest {
      */
     @Test
     void listFolderContent_NoDirNameSpecifiedAndNotRecursive_ReturnsCwdContent() {
-        String expected = getCwdContents();
-
-        // When
         String actual = assertDoesNotThrow(() -> app.listFolderContent(false, false));
-
-        // Then
+        String expected = getCwdContents();
         assertEquals(expected, actual);
     }
 
@@ -123,12 +119,8 @@ class LsApplicationTest {
      */
     @Test
     void listFolderContent_OneValidDirNameSpecified_ReturnsDirContent() {
-        String expected = String.join(STRING_NEWLINE, DIR_A_NAME + ":", getDirAContents());
-
-        // When
         String actual = assertDoesNotThrow(() -> app.listFolderContent(false, false, DIR_A_NAME));
-
-        // Then
+        String expected = String.join(STRING_NEWLINE, DIR_A_NAME + ":", getDirAContents());
         assertEquals(expected, actual);
     }
 
@@ -137,10 +129,7 @@ class LsApplicationTest {
      */
     @Test
     void listFolderContent_OneValidFileNameSpecified_ReturnsFileName() {
-        // When
         String actual = assertDoesNotThrow(() -> app.listFolderContent(false, false, CWD_NON_DIRS[0]));
-
-        // Then
         assertEquals(CWD_NON_DIRS[0], actual);
     }
 
@@ -151,11 +140,8 @@ class LsApplicationTest {
     @Test
     @EnabledOnOs(OS.WINDOWS)
     void listFolderContent_NoDirNameSpecifiedAndIsRecursiveOnWindows_ReturnsAllItems() {
-        String expected = getCwdContentsRecursively("\\");
-
-        // When
         String actual = assertDoesNotThrow(() -> app.listFolderContent(true, false));
-        // Then
+        String expected = getCwdContentsRecursively("\\");
         assertEquals(expected, actual);
     }
 
@@ -166,10 +152,8 @@ class LsApplicationTest {
     @Test
     @EnabledOnOs({OS.LINUX, OS.MAC})
     void listFolderContent_NoDirNameSpecifiedAndIsRecursiveOnUnix_ReturnsAllItems() {
-        String expected = getCwdContentsRecursively("/");
-        // When
         String actual = assertDoesNotThrow(() -> app.listFolderContent(true, false));
-        // Then
+        String expected = getCwdContentsRecursively("/");
         assertEquals(expected, actual);
     }
 }

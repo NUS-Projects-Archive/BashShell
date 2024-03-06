@@ -61,9 +61,9 @@ class LsApplicationHelperTest {
     /**
      * Tests if listCwdContent returns expected output given isSortByExt.
      *
-     * @param expected    Expected output.
+     * @param expected    Expected output
      * @param isSortByExt Boolean to indicate if output should be sorted by
-     *                    extension.
+     *                    extension
      */
     private void testListCwdContent(String expected, boolean isSortByExt) {
         // When

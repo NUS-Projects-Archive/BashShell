@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static sg.edu.nus.comp.cs4218.impl.parser.ArgsParser.ILLEGAL_FLAG_MSG;
 
@@ -63,15 +64,15 @@ public class PasteArgsParserTest {
     }
 
     @Test
-    void parse_ValidFlag_ReturnsGivenMatchingFlag() throws InvalidArgsException {
-        pasteArgsParser.parse("-s");
+    void parse_ValidFlag_ReturnsGivenMatchingFlag() {
+        assertDoesNotThrow(() -> pasteArgsParser.parse("-s"));
         assertEquals(VALID_FLAGS, pasteArgsParser.flags, "Flags do not match");
     }
 
     @ParameterizedTest
     @ValueSource(strings = {"-a", "-1", "-!", "-S", "--"})
     void parse_InvalidFlag_ThrowsInvalidArgsException(String args) {
-        Throwable result = assertThrows(InvalidArgsException.class, () -> {
+        InvalidArgsException result = assertThrowsExactly(InvalidArgsException.class, () -> {
             pasteArgsParser.parse(args);
         });
         assertEquals(ILLEGAL_FLAG_MSG + args.charAt(1), result.getMessage());
@@ -90,51 +91,51 @@ public class PasteArgsParserTest {
     }
 
     @Test
-    void isSerial_ValidFlag_ReturnsTrue() throws InvalidArgsException {
-        pasteArgsParser.parse(FLAG_SERIAL);
+    void isSerial_ValidFlag_ReturnsTrue() {
+        assertDoesNotThrow(() -> pasteArgsParser.parse(FLAG_SERIAL));
         assertTrue(pasteArgsParser.isSerial());
     }
 
     @Test
-    void isSerial_ValidFlagAndNonFlagArg_ReturnsTrue() throws InvalidArgsException {
-        pasteArgsParser.parse(FLAG_SERIAL, FILE_ONE);
+    void isSerial_ValidFlagAndNonFlagArg_ReturnsTrue() {
+        assertDoesNotThrow(() -> pasteArgsParser.parse(FLAG_SERIAL, FILE_ONE));
         assertTrue(pasteArgsParser.isSerial());
     }
 
     @Test
-    void isSerial_OnlyNonFlagArg_ReturnsFalse() throws InvalidArgsException {
-        pasteArgsParser.parse(FILE_ONE);
+    void isSerial_OnlyNonFlagArg_ReturnsFalse() {
+        assertDoesNotThrow(() -> pasteArgsParser.parse(FILE_ONE));
         assertFalse(pasteArgsParser.isSerial());
     }
 
     @Test
-    void getNonFlagArgs_NoArg_ReturnsEmpty() throws InvalidArgsException {
-        pasteArgsParser.parse();
+    void getNonFlagArgs_NoArg_ReturnsEmpty() {
+        assertDoesNotThrow(() -> pasteArgsParser.parse());
         List<String> result = pasteArgsParser.getNonFlagArgs();
         assertTrue(result.isEmpty());
     }
 
     @Test
-    void getNonFlagArgs_OneNonFlagArg_ReturnsOneNonFlagArg() throws InvalidArgsException {
-        pasteArgsParser.parse(FILE_ONE);
+    void getNonFlagArgs_OneNonFlagArg_ReturnsOneNonFlagArg() {
+        assertDoesNotThrow(() -> pasteArgsParser.parse(FILE_ONE));
         List<String> result = pasteArgsParser.getNonFlagArgs();
         List<String> expected = List.of(FILE_ONE);
         assertEquals(expected, result);
     }
 
     @Test
-    void getNonFlagArgs_MultipleNonFlagArgs_ReturnsMultipleNonFlagArgs() throws InvalidArgsException {
-        pasteArgsParser.parse(FILE_ONE, FILE_TWO, FILE_THREE);
+    void getNonFlagArgs_MultipleNonFlagArgs_ReturnsMultipleNonFlagArgs() {
+        assertDoesNotThrow(() -> pasteArgsParser.parse(FILE_ONE, FILE_TWO, FILE_THREE));
+        List<String> result = pasteArgsParser.getNonFlagArgs();
         List<String> expected = List.of(FILE_ONE, FILE_TWO, FILE_THREE);
-        List<String> result = pasteArgsParser.getNonFlagArgs();
         assertEquals(expected, result);
     }
 
     @Test
-    void getNonFlagArgs_ValidFlagAndOneNonFlagArg_ReturnsOneNonFlagArg() throws InvalidArgsException {
-        pasteArgsParser.parse(FLAG_SERIAL, FILE_ONE);
-        List<String> expected = List.of(FILE_ONE);
+    void getNonFlagArgs_ValidFlagAndOneNonFlagArg_ReturnsOneNonFlagArg() {
+        assertDoesNotThrow(() -> pasteArgsParser.parse(FLAG_SERIAL, FILE_ONE));
         List<String> result = pasteArgsParser.getNonFlagArgs();
+        List<String> expected = List.of(FILE_ONE);
         assertEquals(expected, result);
     }
 }

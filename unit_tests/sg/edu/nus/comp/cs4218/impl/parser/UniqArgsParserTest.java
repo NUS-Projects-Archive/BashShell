@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 
 import java.util.stream.Stream;
 
@@ -49,10 +50,9 @@ class UniqArgsParserTest {
     @ParameterizedTest
     @ValueSource(strings = {"-C", "--", "-p", "-r"})
     void parse_InvalidFlags_ThrowsInvalidArgsException(String args) {
-        Throwable thrown = assertThrows(InvalidArgsException.class, () -> uniqArgsParser.parse(args));
+        InvalidArgsException thrown = assertThrowsExactly(InvalidArgsException.class, () -> uniqArgsParser.parse(args));
 
         String illegalFlag = args.substring(1);
         assertEquals(String.format("illegal option -- %s", illegalFlag), thrown.getMessage());
     }
-
 }

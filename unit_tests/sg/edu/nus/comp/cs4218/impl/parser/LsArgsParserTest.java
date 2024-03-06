@@ -22,6 +22,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import sg.edu.nus.comp.cs4218.exception.InvalidArgsException;
 
 class LsArgsParserTest {
+
     private static final String FLAG_R = "-R";
     private static final String FLAG_X = "-X";
     private static final String FLAG_XR = "-XR";
@@ -80,9 +81,9 @@ class LsArgsParserTest {
     /**
      * Tests if parse sets the flags and non-flag arguments correctly.
      *
-     * @param args          Arguments to parse.
-     * @param expectedFlags Expected flags.
-     * @param expectedNFA   Expected non-flag arguments.
+     * @param args          Arguments to parse
+     * @param expectedFlags Expected flags
+     * @param expectedNFA   Expected non-flag arguments
      */
     @ParameterizedTest
     @MethodSource("validSyntax")
@@ -96,7 +97,7 @@ class LsArgsParserTest {
     /**
      * Tests if parse throws InvalidArgsException when given invalid syntax.
      *
-     * @param args Arguments to parse.
+     * @param args Arguments to parse
      */
     @ParameterizedTest
     @MethodSource("invalidSyntax")
@@ -107,7 +108,7 @@ class LsArgsParserTest {
     /**
      * Tests if isRecursive returns true when -R flag is present in args.
      *
-     * @param args Arguments with -R to parse.
+     * @param args Arguments with -R to parse
      */
     @ParameterizedTest
     @ValueSource(strings = {FLAG_R, FLAG_RX, FLAG_XR})
@@ -119,7 +120,7 @@ class LsArgsParserTest {
     /**
      * Tests if isRecursive returns false when -R flag is not present in args.
      *
-     * @param args Arguments without -R to parse.
+     * @param args Arguments without -R to parse
      */
     @ParameterizedTest
     @ValueSource(strings = {FLAG_X, EXAMPLE})
@@ -140,7 +141,7 @@ class LsArgsParserTest {
     /**
      * Tests if isSortByExt returns true when -X flag is present in args.
      *
-     * @param args Arguments with -X to parse.
+     * @param args Arguments with -X to parse
      */
     @ParameterizedTest
     @ValueSource(strings = {FLAG_X, FLAG_RX, FLAG_XR})
@@ -152,7 +153,7 @@ class LsArgsParserTest {
     /**
      * Tests if isSortByExt returns false when -X flag is not present in args.
      *
-     * @param args Arguments without -X to parse.
+     * @param args Arguments without -X to parse
      */
     @ParameterizedTest
     @ValueSource(strings = {FLAG_R, EXAMPLE})
@@ -193,13 +194,13 @@ class LsArgsParserTest {
     void getDirectories_WithArgsThatHasNonFlagArgs_ReturnsNonFlagArgs() {
         // Given
         String[] args = new String[]{EXAMPLE, FLAG_R, FLAG_X};
-        List<String> expected = List.of(EXAMPLE);
 
         // When
         assertDoesNotThrow(() -> lsArgsParser.parse(args));
         List<String> result = lsArgsParser.getDirectories();
 
         // Then
+        List<String> expected = List.of(EXAMPLE);
         assertEquals(expected, result);
     }
 }

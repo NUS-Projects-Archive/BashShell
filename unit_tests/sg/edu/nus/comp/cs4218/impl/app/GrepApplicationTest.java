@@ -20,8 +20,9 @@ import org.junit.jupiter.api.Test;
 import sg.edu.nus.comp.cs4218.exception.GrepException;
 
 class GrepApplicationTest {
+
     private static final String FILE_NAME = "file";
-    private static final String FILE_CONTENTS = "tset";
+    private static final String FILE_CONTENTS = "test";
 
     private static final String STDIN_STRING = "(standard input)";
     private static final String[] STDIN_CONTENTS = new String[]{"test", "tEst"};
@@ -31,14 +32,14 @@ class GrepApplicationTest {
 
     private static final String SEMICOLON_SPACE = ": ";
 
-    private GrepApplication grepApplication;
+    private GrepApplication app;
     private InputStream stdin;
     private Path file;
     private String fileAbsPath;
 
     @BeforeEach
     void setUp() {
-        grepApplication = new GrepApplication();
+        app = new GrepApplication();
         stdin = new ByteArrayInputStream(String.format("%s\n%s", STDIN_CONTENTS[0], STDIN_CONTENTS[1]).getBytes());
         file = createNewFile(FILE_NAME, FILE_CONTENTS);
         fileAbsPath = file.toString();
@@ -54,9 +55,8 @@ class GrepApplicationTest {
      */
     @Test
     void grepFromFile_AllFlagsSpecifiedForOneFile_ReturnsCorrectNumberOfMatchingLinesWithFileName() {
+        String result = assertDoesNotThrow(() -> app.grepFromFiles(PATTERN_BIG_E, true, true, true, fileAbsPath));
         String expected = "1" + STRING_NEWLINE;
-        String result = assertDoesNotThrow(() ->
-                grepApplication.grepFromFiles(PATTERN_BIG_E, true, true, true, fileAbsPath));
         assertEquals(expected, result);
     }
 
@@ -65,9 +65,8 @@ class GrepApplicationTest {
      */
     @Test
     void grepFromFile_isCaseSensitiveIsTrueForOneFile_ReturnsCorrectMatchingLines() {
+        String result = assertDoesNotThrow(() -> app.grepFromFiles(PATTERN_BIG_E, true, false, true, fileAbsPath));
         String expected = FILE_CONTENTS + STRING_NEWLINE;
-        String result = assertDoesNotThrow(() ->
-                grepApplication.grepFromFiles(PATTERN_BIG_E, true, false, true, fileAbsPath));
         assertEquals(expected, result);
     }
 
@@ -76,9 +75,8 @@ class GrepApplicationTest {
      */
     @Test
     void grepFromFile_isCountLinesIsTrueForOneFile_ReturnsCorrectNumberOfMatchingLines() {
+        String result = assertDoesNotThrow(() -> app.grepFromFiles(PATTERN_BIG_E, false, true, false, fileAbsPath));
         String expected = "0" + STRING_NEWLINE;
-        String result = assertDoesNotThrow(() ->
-                grepApplication.grepFromFiles(PATTERN_BIG_E, false, true, false, fileAbsPath));
         assertEquals(expected, result);
     }
 
@@ -87,9 +85,8 @@ class GrepApplicationTest {
      */
     @Test
     void grepFromFile_isPrefixFileNameIsTrueForOneFile_ReturnsCorrectMatchingLinesWithFileName() {
+        String result = assertDoesNotThrow(() -> app.grepFromFiles(PATTERN_SMALL_E, false, false, true, fileAbsPath));
         String expected = FILE_NAME + SEMICOLON_SPACE + FILE_CONTENTS + STRING_NEWLINE;
-        String result = assertDoesNotThrow(() ->
-                grepApplication.grepFromFiles(PATTERN_SMALL_E, false, false, true, fileAbsPath));
         assertEquals(expected, result);
     }
 
@@ -103,14 +100,12 @@ class GrepApplicationTest {
         String secFileContents = "tseet";
 
         Path secFile = createNewFile(secFileName, secFileContents);
-
         String secFileAbsPath = secFile.toString();
 
+        String result = assertDoesNotThrow(() -> app.grepFromFiles(PATTERN_SMALL_E, false, false, false, fileAbsPath, secFileAbsPath));
         String expected = String.join(STRING_NEWLINE,
                 fileAbsPath + SEMICOLON_SPACE + FILE_CONTENTS,
                 secFileAbsPath + SEMICOLON_SPACE + secFileContents) + STRING_NEWLINE;
-        String result = assertDoesNotThrow(() ->
-                grepApplication.grepFromFiles(PATTERN_SMALL_E, false, false, false, fileAbsPath, secFileAbsPath));
         assertEquals(expected, result);
 
         deleteFileOrDirectory(secFile);
@@ -122,8 +117,9 @@ class GrepApplicationTest {
     @Test
     void grepFromFile_NoFilesSpecified_ThrowsGrepException() {
         GrepException result = assertThrows(GrepException.class,
-                () -> grepApplication.grepFromFiles("", false, false, false, null));
-        assertEquals("grep: " + NULL_POINTER, result.getMessage());
+                () -> app.grepFromFiles("", false, false, false, null));
+        String expected = "grep: " + NULL_POINTER;
+        assertEquals(expected, result.getMessage());
     }
 
     /**
@@ -132,8 +128,10 @@ class GrepApplicationTest {
     @Test
     void grepFromStdin_InvalidPattern_ThrowsGrepException() {
         GrepException result = assertThrows(GrepException.class,
-                () -> grepApplication.grepFromStdin("*", false, false, false, stdin));
-        assertEquals("grep: " + ERR_INVALID_REGEX, result.getMessage());
+                () -> app.grepFromStdin("*", false, false, false, stdin));
+        String expected = "grep: " + ERR_INVALID_REGEX;
+        assertEquals(expected, result.getMessage());
+
     }
 
     /**
@@ -142,9 +140,9 @@ class GrepApplicationTest {
      */
     @Test
     void grepFromStdin_AllFlagsSpecified_ReturnsCountOfLinesMatchingPattern() {
-        String expected = "2" + STRING_NEWLINE;
         String result = assertDoesNotThrow(() ->
-                grepApplication.grepFromStdin(PATTERN_SMALL_E, true, true, true, stdin));
+                app.grepFromStdin(PATTERN_SMALL_E, true, true, true, stdin));
+        String expected = "2" + STRING_NEWLINE;
         assertEquals(expected, result);
     }
 
@@ -153,9 +151,9 @@ class GrepApplicationTest {
      */
     @Test
     void grepFromStdin_isCaseInsensitiveIsTrue_ReturnsCorrectOutput() {
-        String expected = String.join(STRING_NEWLINE, STDIN_CONTENTS) + STRING_NEWLINE;
         String result = assertDoesNotThrow(() ->
-                grepApplication.grepFromStdin(PATTERN_SMALL_E, true, false, false, stdin));
+                app.grepFromStdin(PATTERN_SMALL_E, true, false, false, stdin));
+        String expected = String.join(STRING_NEWLINE, STDIN_CONTENTS) + STRING_NEWLINE;
         assertEquals(expected, result);
     }
 
@@ -164,9 +162,9 @@ class GrepApplicationTest {
      */
     @Test
     void grepFromStdin_isCountLinesIsTrue_ReturnsCorrectOutput() {
-        String expected = "1" + STRING_NEWLINE;
         String result = assertDoesNotThrow(() ->
-                grepApplication.grepFromStdin(PATTERN_SMALL_E, false, true, false, stdin));
+                app.grepFromStdin(PATTERN_SMALL_E, false, true, false, stdin));
+        String expected = "1" + STRING_NEWLINE;
         assertEquals(expected, result);
     }
 
@@ -175,9 +173,9 @@ class GrepApplicationTest {
      */
     @Test
     void grepFromStdin_isPrefixFileNameIsTrue_ReturnsCorrectOutput() {
-        String expected = STDIN_STRING + SEMICOLON_SPACE + STDIN_CONTENTS[0] + STRING_NEWLINE;
         String result = assertDoesNotThrow(() ->
-                grepApplication.grepFromStdin(PATTERN_SMALL_E, false, false, true, stdin));
+                app.grepFromStdin(PATTERN_SMALL_E, false, false, true, stdin));
+        String expected = STDIN_STRING + SEMICOLON_SPACE + STDIN_CONTENTS[0] + STRING_NEWLINE;
         assertEquals(expected, result);
     }
 
@@ -186,9 +184,9 @@ class GrepApplicationTest {
      */
     @Test
     void grepFromStdin_NoFlagsSpecified_ReturnsCorrectOutput() {
-        String expected = STDIN_CONTENTS[0] + STRING_NEWLINE;
         String result = assertDoesNotThrow(() ->
-                grepApplication.grepFromStdin(PATTERN_SMALL_E, false, false, false, stdin));
+                app.grepFromStdin(PATTERN_SMALL_E, false, false, false, stdin));
+        String expected = STDIN_CONTENTS[0] + STRING_NEWLINE;
         assertEquals(expected, result);
     }
 
@@ -198,11 +196,11 @@ class GrepApplicationTest {
     @Test
     void grepFromFileAndStdin_NoFlagsSpecified_ReturnsCorrectOutput() {
         String result = assertDoesNotThrow(() ->
-                grepApplication.grepFromFileAndStdin(PATTERN_SMALL_E, false, false, false, stdin, FILE_NAME));
-        assertEquals(String.join(STRING_NEWLINE,
-                        FILE_NAME + SEMICOLON_SPACE + FILE_CONTENTS,
-                        STDIN_STRING + SEMICOLON_SPACE + STDIN_CONTENTS[0]),
-                result);
+                app.grepFromFileAndStdin(PATTERN_SMALL_E, false, false, false, stdin, FILE_NAME));
+        String expected = (String.join(STRING_NEWLINE,
+                FILE_NAME + SEMICOLON_SPACE + FILE_CONTENTS,
+                STDIN_STRING + SEMICOLON_SPACE + STDIN_CONTENTS[0]));
+        assertEquals(expected, result);
     }
 
     /**
@@ -211,12 +209,12 @@ class GrepApplicationTest {
     @Test
     void grepFromFileAndStdin_isCaseSensitiveIsFalse_ReturnsCorrectOutput() {
         String result = assertDoesNotThrow(() ->
-                grepApplication.grepFromFileAndStdin(PATTERN_SMALL_E, true, false, false, stdin, FILE_NAME));
-        assertEquals(String.join(STRING_NEWLINE,
-                        FILE_NAME + SEMICOLON_SPACE + FILE_CONTENTS,
-                        STDIN_STRING + SEMICOLON_SPACE + STDIN_CONTENTS[0],
-                        STDIN_STRING + SEMICOLON_SPACE + STDIN_CONTENTS[1]),
-                result);
+                app.grepFromFileAndStdin(PATTERN_SMALL_E, true, false, false, stdin, FILE_NAME));
+        String expected = String.join(STRING_NEWLINE,
+                FILE_NAME + SEMICOLON_SPACE + FILE_CONTENTS,
+                STDIN_STRING + SEMICOLON_SPACE + STDIN_CONTENTS[0],
+                STDIN_STRING + SEMICOLON_SPACE + STDIN_CONTENTS[1]);
+        assertEquals(expected, result);
     }
 
     /**
@@ -225,8 +223,9 @@ class GrepApplicationTest {
     @Test
     void grepFromFileAndStdin_isCountLinesIsTrue_ReturnsCorrectOutput() {
         String result = assertDoesNotThrow(() ->
-                grepApplication.grepFromFileAndStdin(PATTERN_SMALL_E, false, true, false, stdin, FILE_NAME));
-        assertEquals(String.join(STRING_NEWLINE, FILE_NAME + ": 1", STDIN_STRING + ": 1"), result);
+                app.grepFromFileAndStdin(PATTERN_SMALL_E, false, true, false, stdin, FILE_NAME));
+        String expected = String.join(STRING_NEWLINE, FILE_NAME + ": 1", STDIN_STRING + ": 1");
+        assertEquals(expected, result);
     }
 
     /**
@@ -235,11 +234,11 @@ class GrepApplicationTest {
     @Test
     void grepFromFileStdin_isPrefixFileNameIsTrue_ReturnsCorrectOutput() {
         String result = assertDoesNotThrow(() ->
-                grepApplication.grepFromFileAndStdin(PATTERN_SMALL_E, false, false, true, stdin, FILE_NAME));
-        assertEquals(String.join(STRING_NEWLINE,
-                        FILE_NAME + SEMICOLON_SPACE + FILE_CONTENTS,
-                        STDIN_STRING + SEMICOLON_SPACE + STDIN_CONTENTS[0]),
-                result);
+                app.grepFromFileAndStdin(PATTERN_SMALL_E, false, false, true, stdin, FILE_NAME));
+        String expected = String.join(STRING_NEWLINE,
+                FILE_NAME + SEMICOLON_SPACE + FILE_CONTENTS,
+                STDIN_STRING + SEMICOLON_SPACE + STDIN_CONTENTS[0]);
+        assertEquals(expected, result);
     }
 
     /**
@@ -248,7 +247,8 @@ class GrepApplicationTest {
     @Test
     void grepFromFileAndStdin_AllFlagsSpecified_ReturnsCorrectOutput() {
         String result = assertDoesNotThrow(() ->
-                grepApplication.grepFromFileAndStdin(PATTERN_SMALL_E, true, true, true, stdin, FILE_NAME));
-        assertEquals(String.join(STRING_NEWLINE, FILE_NAME + ": 1", STDIN_STRING + ": 2"), result);
+                app.grepFromFileAndStdin(PATTERN_SMALL_E, true, true, true, stdin, FILE_NAME));
+        String expected = String.join(STRING_NEWLINE, FILE_NAME + ": 1", STDIN_STRING + ": 2");
+        assertEquals(expected, result);
     }
 }

@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static sg.edu.nus.comp.cs4218.impl.parser.ArgsParser.ILLEGAL_FLAG_MSG;
 
@@ -21,6 +22,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import sg.edu.nus.comp.cs4218.exception.InvalidArgsException;
 
 public class WcArgsParserTest {
+
     private static final Set<Character> VALID_FLAGS = Set.of('c', 'l', 'w');
     public static final String FLAG_BYTE_COUNT = "-c";
 
@@ -60,22 +62,22 @@ public class WcArgsParserTest {
 
     @ParameterizedTest
     @ValueSource(strings = {"", " ", "\n"})
-    void parse_EmptyString_ReturnsEmptyFlagsAndNonFlagArgsContainsInput(String args) throws InvalidArgsException {
-        wcArgsParser.parse(args);
+    void parse_EmptyString_ReturnsEmptyFlagsAndNonFlagArgsContainsInput(String args) {
+        assertDoesNotThrow(() -> wcArgsParser.parse(args));
         assertTrue(wcArgsParser.flags.isEmpty());
         assertTrue(wcArgsParser.nonFlagArgs.contains(args));
     }
 
     @Test
-    void parse_ValidFlags_ReturnsGivenMatchingFlags() throws InvalidArgsException {
-        wcArgsParser.parse(FLAG_BYTE_COUNT, FLAG_WORD_COUNT, FLAG_LINE_COUNT);
+    void parse_ValidFlags_ReturnsGivenMatchingFlags() {
+        assertDoesNotThrow(() -> wcArgsParser.parse(FLAG_BYTE_COUNT, FLAG_WORD_COUNT, FLAG_LINE_COUNT));
         assertEquals(VALID_FLAGS, wcArgsParser.flags, "Flags do not match");
     }
 
     @ParameterizedTest
     @ValueSource(strings = {"-a", "-1", "-!", "-C", "-W", "-L", "--"})
     void parse_InvalidFlag_ThrowsInvalidArgsException(String args) {
-        Throwable result = assertThrows(InvalidArgsException.class, () -> {
+        InvalidArgsException result = assertThrowsExactly(InvalidArgsException.class, () -> {
             wcArgsParser.parse(args);
         });
         assertEquals(ILLEGAL_FLAG_MSG + args.charAt(1), result.getMessage());
@@ -94,141 +96,141 @@ public class WcArgsParserTest {
     }
 
     @Test
-    void hasNoFlags_NoFlag_ReturnsTrue() throws InvalidArgsException {
-        wcArgsParser.parse();
+    void hasNoFlags_NoFlag_ReturnsTrue() {
+        assertDoesNotThrow(() -> wcArgsParser.parse());
         assertTrue(wcArgsParser.hasNoFlags());
     }
 
     @Test
-    void isByteCount_NoFlag_ReturnsTrue() throws InvalidArgsException {
-        wcArgsParser.parse();
+    void isByteCount_NoFlag_ReturnsTrue() {
+        assertDoesNotThrow(() -> wcArgsParser.parse());
         assertTrue(wcArgsParser.isByteCount());
     }
 
     @Test
-    void isByteCount_ValidFlagsExcludingByteFlag_ReturnsFalse() throws InvalidArgsException {
-        wcArgsParser.parse(FLAG_WORD_COUNT, FLAG_LINE_COUNT);
+    void isByteCount_ValidFlagsExcludingByteFlag_ReturnsFalse() {
+        assertDoesNotThrow(() -> wcArgsParser.parse(FLAG_WORD_COUNT, FLAG_LINE_COUNT));
         assertFalse(wcArgsParser.isByteCount());
     }
 
     @Test
-    void isByteCount_ValidFlag_ReturnsTrue() throws InvalidArgsException {
-        wcArgsParser.parse(FLAG_BYTE_COUNT);
+    void isByteCount_ValidFlag_ReturnsTrue() {
+        assertDoesNotThrow(() -> wcArgsParser.parse(FLAG_BYTE_COUNT));
         assertTrue(wcArgsParser.isByteCount());
     }
 
     @Test
-    void isByteCount_ValidFlagAndNonFlagArg_ReturnsTrue() throws InvalidArgsException {
-        wcArgsParser.parse(FLAG_BYTE_COUNT, FILE_ONE);
+    void isByteCount_ValidFlagAndNonFlagArg_ReturnsTrue() {
+        assertDoesNotThrow(() -> wcArgsParser.parse(FLAG_BYTE_COUNT, FILE_ONE));
         assertTrue(wcArgsParser.isByteCount());
     }
 
     @Test
-    void isByteCount_OnlyNonFlagArg_ReturnsTrue() throws InvalidArgsException {
-        wcArgsParser.parse(FILE_ONE);
+    void isByteCount_OnlyNonFlagArg_ReturnsTrue() {
+        assertDoesNotThrow(() -> wcArgsParser.parse(FILE_ONE));
         assertTrue(wcArgsParser.isByteCount());
     }
 
     @Test
-    void isLineCount_NoFlag_ReturnsTrue() throws InvalidArgsException {
-        wcArgsParser.parse();
+    void isLineCount_NoFlag_ReturnsTrue() {
+        assertDoesNotThrow(() -> wcArgsParser.parse());
         assertTrue(wcArgsParser.isLineCount());
     }
 
     @Test
-    void isLineCount_ValidFlagsExcludingLineFlag_ReturnsFalse() throws InvalidArgsException {
-        wcArgsParser.parse(FLAG_WORD_COUNT, FLAG_BYTE_COUNT);
+    void isLineCount_ValidFlagsExcludingLineFlag_ReturnsFalse() {
+        assertDoesNotThrow(() -> wcArgsParser.parse(FLAG_WORD_COUNT, FLAG_BYTE_COUNT));
         assertFalse(wcArgsParser.isLineCount());
     }
 
     @Test
-    void isLineCount_ValidFlag_ReturnsTrue() throws InvalidArgsException {
-        wcArgsParser.parse(FLAG_LINE_COUNT);
+    void isLineCount_ValidFlag_ReturnsTrue() {
+        assertDoesNotThrow(() -> wcArgsParser.parse(FLAG_LINE_COUNT));
         assertTrue(wcArgsParser.isLineCount());
     }
 
     @Test
-    void isLineCount_ValidFlagAndNonFlagArg_ReturnsTrue() throws InvalidArgsException {
-        wcArgsParser.parse(FLAG_LINE_COUNT, FILE_ONE);
+    void isLineCount_ValidFlagAndNonFlagArg_ReturnsTrue() {
+        assertDoesNotThrow(() -> wcArgsParser.parse(FLAG_LINE_COUNT, FILE_ONE));
         assertTrue(wcArgsParser.isLineCount());
     }
 
     @Test
-    void isLineCount_OnlyNonFlagArg_ReturnsTrue() throws InvalidArgsException {
-        wcArgsParser.parse(FILE_ONE);
+    void isLineCount_OnlyNonFlagArg_ReturnsTrue() {
+        assertDoesNotThrow(() -> wcArgsParser.parse(FILE_ONE));
         assertTrue(wcArgsParser.isLineCount());
     }
 
     @Test
-    void isWordCount_NoFlag_ReturnsTrue() throws InvalidArgsException {
-        wcArgsParser.parse();
+    void isWordCount_NoFlag_ReturnsTrue() {
+        assertDoesNotThrow(() -> wcArgsParser.parse());
         assertTrue(wcArgsParser.isWordCount());
     }
 
     @Test
-    void isWordCount_ValidFlagsExcludingWordFlag_ReturnsFalse() throws InvalidArgsException {
-        wcArgsParser.parse(FLAG_BYTE_COUNT, FLAG_LINE_COUNT);
+    void isWordCount_ValidFlagsExcludingWordFlag_ReturnsFalse() {
+        assertDoesNotThrow(() -> wcArgsParser.parse(FLAG_BYTE_COUNT, FLAG_LINE_COUNT));
         assertFalse(wcArgsParser.isWordCount());
     }
 
     @Test
-    void isWordCount_ValidFlag_ReturnsTrue() throws InvalidArgsException {
-        wcArgsParser.parse(FLAG_WORD_COUNT);
+    void isWordCount_ValidFlag_ReturnsTrue() {
+        assertDoesNotThrow(() -> wcArgsParser.parse(FLAG_WORD_COUNT));
         assertTrue(wcArgsParser.isWordCount());
     }
 
     @Test
-    void isWordCount_ValidFlagAndNonFlagArg_ReturnsTrue() throws InvalidArgsException {
-        wcArgsParser.parse(FLAG_WORD_COUNT, FILE_ONE);
+    void isWordCount_ValidFlagAndNonFlagArg_ReturnsTrue() {
+        assertDoesNotThrow(() -> wcArgsParser.parse(FLAG_WORD_COUNT, FILE_ONE));
         assertTrue(wcArgsParser.isWordCount());
     }
 
     @Test
-    void isWordCount_OnlyNonFlagArg_ReturnsTrue() throws InvalidArgsException {
-        wcArgsParser.parse(FILE_ONE);
+    void isWordCount_OnlyNonFlagArg_ReturnsTrue() {
+        assertDoesNotThrow(() -> wcArgsParser.parse(FILE_ONE));
         assertTrue(wcArgsParser.isWordCount());
     }
 
     @Test
-    void getFileNames_NoArg_ReturnsEmpty() throws InvalidArgsException {
-        wcArgsParser.parse();
+    void getFileNames_NoArg_ReturnsEmpty() {
+        assertDoesNotThrow(() -> wcArgsParser.parse());
         List<String> result = wcArgsParser.getFileNames();
         assertTrue(result.isEmpty());
     }
 
     @Test
-    void getFileNames_OneNonFlagArg_ReturnsOneFileName() throws InvalidArgsException {
-        wcArgsParser.parse(FILE_ONE);
+    void getFileNames_OneNonFlagArg_ReturnsOneFileName() {
+        assertDoesNotThrow(() -> wcArgsParser.parse(FILE_ONE));
         List<String> result = wcArgsParser.getFileNames();
         List<String> expected = List.of(FILE_ONE);
         assertEquals(expected, result);
     }
 
     @Test
-    void getFileNames_MultipleNonFlagArgs_ReturnsMultipleFileNames() throws InvalidArgsException {
-        wcArgsParser.parse(FILE_ONE, FILE_TWO, FILE_THREE);
+    void getFileNames_MultipleNonFlagArgs_ReturnsMultipleFileNames() {
+        assertDoesNotThrow(() -> wcArgsParser.parse(FILE_ONE, FILE_TWO, FILE_THREE));
         List<String> result = wcArgsParser.getFileNames();
         List<String> expected = List.of(FILE_ONE, FILE_TWO, FILE_THREE);
         assertEquals(expected, result);
     }
 
     @Test
-    void getFileNames_ValidFlagsAndOneNoFlagArg_ReturnsOneFolder() throws InvalidArgsException {
-        wcArgsParser.parse(FLAG_WORD_COUNT, FLAG_BYTE_COUNT, FLAG_LINE_COUNT, FILE_ONE);
+    void getFileNames_ValidFlagsAndOneNoFlagArg_ReturnsOneFolder() {
+        assertDoesNotThrow(() -> wcArgsParser.parse(FLAG_WORD_COUNT, FLAG_BYTE_COUNT, FLAG_LINE_COUNT, FILE_ONE));
         List<String> result = wcArgsParser.getFileNames();
         List<String> expected = List.of(FILE_ONE);
         assertEquals(expected, result);
     }
 
     @Test
-    void isStdinOnly_NoArg_ReturnsTrue() throws InvalidArgsException {
-        wcArgsParser.parse();
+    void isStdinOnly_NoArg_ReturnsTrue() {
+        assertDoesNotThrow(() -> wcArgsParser.parse());
         assertTrue(wcArgsParser.isStdinOnly());
     }
 
     @Test
-    void isStdinOnly_OneNonFlagArg_ReturnsFalse() throws InvalidArgsException {
-        wcArgsParser.parse(FILE_ONE);
+    void isStdinOnly_OneNonFlagArg_ReturnsFalse() {
+        assertDoesNotThrow(() -> wcArgsParser.parse(FILE_ONE));
         assertFalse(wcArgsParser.isStdinOnly());
     }
 }

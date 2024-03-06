@@ -2,7 +2,7 @@ package sg.edu.nus.comp.cs4218.impl.app;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 import static org.junit.jupiter.api.Assertions.fail;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_NOT_FOUND;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IS_NOT_DIR;
@@ -81,8 +81,8 @@ class CdApplicationTest {
     }
 
     /**
-     * Tests changeToDirectory method in CdApplication and expects the current directory to be changed to the
-     * valid directory.
+     * Tests changeToDirectory method in CdApplication and expects the current directory
+     * to be changed to the valid directory.
      *
      * @param validDir    String of a valid directory path or name that can be executed.
      * @param expectedDir Path of the expected directory.
@@ -100,7 +100,7 @@ class CdApplicationTest {
      */
     @Test
     void changeToDirectory_NullPathStr_ThrowsErrNoArgs() {
-        CdException result = assertThrows(CdException.class, () -> app.changeToDirectory(null));
+        CdException result = assertThrowsExactly(CdException.class, () -> app.changeToDirectory(null));
         assertEquals(String.format("cd: %s", ERR_NO_ARGS), result.getMessage());
     }
 
@@ -110,7 +110,7 @@ class CdApplicationTest {
      */
     @Test
     void changeToDirectory_EmptyPathStr_ThrowsErrNoArgs() {
-        CdException result = assertThrows(CdException.class, () -> app.changeToDirectory(""));
+        CdException result = assertThrowsExactly(CdException.class, () -> app.changeToDirectory(""));
         assertEquals(String.format("cd: %s", ERR_NO_ARGS), result.getMessage());
     }
 
@@ -126,13 +126,12 @@ class CdApplicationTest {
 
         // Given
         Path noPermDir = createNewDirectory(dir, dirName);
-
         if (!noPermDir.toFile().setExecutable(false)) {
             fail("Failed to set executable permission for directory to test.");
         }
 
         // When
-        CdException result = assertThrows(CdException.class, () -> app.changeToDirectory(dirName));
+        CdException result = assertThrowsExactly(CdException.class, () -> app.changeToDirectory(dirName));
 
         // Then
         assertEquals(String.format("cd: %s: %s", dirName, ERR_NO_PERM), result.getMessage());
@@ -150,7 +149,7 @@ class CdApplicationTest {
         String dirName = "nonExistentDirectory";
 
         // When
-        CdException result = assertThrows(CdException.class, () -> app.changeToDirectory(dirName));
+        CdException result = assertThrowsExactly(CdException.class, () -> app.changeToDirectory(dirName));
 
         // Then
         assertEquals(String.format("cd: %s: %s", dirName, ERR_FILE_NOT_FOUND), result.getMessage());
@@ -169,7 +168,7 @@ class CdApplicationTest {
                 "IOException occurred during test setup");
 
         // When
-        CdException result = assertThrows(CdException.class, () -> app.changeToDirectory(fileName));
+        CdException result = assertThrowsExactly(CdException.class, () -> app.changeToDirectory(fileName));
 
         // Then
         assertEquals(String.format("cd: %s: %s", fileName, ERR_IS_NOT_DIR), result.getMessage());

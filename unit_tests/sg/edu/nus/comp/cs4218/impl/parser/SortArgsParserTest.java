@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static sg.edu.nus.comp.cs4218.impl.parser.ArgsParser.ILLEGAL_FLAG_MSG;
 
@@ -71,9 +72,8 @@ class SortArgsParserTest {
 
     @ParameterizedTest
     @ValueSource(strings = {"", " ", "\n"})
-    void parse_EmptyString_ReturnsEmptyFlagsAndNonFlagArgsContainsInput(String args)
-            throws InvalidArgsException {
-        sortArgsParser.parse(args);
+    void parse_EmptyString_ReturnsEmptyFlagsAndNonFlagArgsContainsInput(String args) {
+        assertDoesNotThrow(() -> sortArgsParser.parse(args));
         assertTrue(sortArgsParser.flags.isEmpty());
         assertTrue(sortArgsParser.nonFlagArgs.contains(args));
     }
@@ -106,7 +106,7 @@ class SortArgsParserTest {
     @ParameterizedTest
     @ValueSource(strings = {"-a", "-1", "-!", "-N", "-R", "-F", "--"})
     void parse_InvalidFlag_ThrowsInvalidArgsException(String args) {
-        Throwable result = assertThrows(InvalidArgsException.class, () -> {
+        InvalidArgsException result = assertThrowsExactly(InvalidArgsException.class, () -> {
             sortArgsParser.parse(args);
         });
         assertEquals(ILLEGAL_FLAG_MSG + args.charAt(1), result.getMessage());
@@ -206,24 +206,24 @@ class SortArgsParserTest {
     @Test
     void getFileNames_OneNonFlagArg_ReturnsOneFile() {
         assertDoesNotThrow(() -> sortArgsParser.parse(FILE_ONE));
-        List<String> expected = List.of(FILE_ONE);
         List<String> result = sortArgsParser.getFileNames();
+        List<String> expected = List.of(FILE_ONE);
         assertEquals(expected, result);
     }
 
     @Test
     void getFileNames_MultipleNonFlagArg_ReturnsMultipleFiles() {
         assertDoesNotThrow(() -> sortArgsParser.parse(FILE_ONE, FILE_TWO, FILE_THREE));
-        List<String> expected = List.of(FILE_ONE, FILE_TWO, FILE_THREE);
         List<String> result = sortArgsParser.getFileNames();
+        List<String> expected = List.of(FILE_ONE, FILE_TWO, FILE_THREE);
         assertEquals(expected, result);
     }
 
     @Test
     void getFileNames_ValidFlagsAndOneNonFlagArg_ReturnsOneFile() {
         assertDoesNotThrow(() -> sortArgsParser.parse(FLAG_FIRST_NUM, FLAG_REV_ORDER, FLAG_CASE_IGNORE, FILE_ONE));
-        List<String> expected = List.of(FILE_ONE);
         List<String> result = sortArgsParser.getFileNames();
+        List<String> expected = List.of(FILE_ONE);
         assertEquals(expected, result);
     }
 }

@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static sg.edu.nus.comp.cs4218.impl.parser.ArgsParser.ILLEGAL_FLAG_MSG;
 
@@ -58,9 +59,8 @@ class MkdirArgsParserTest {
 
     @ParameterizedTest
     @ValueSource(strings = {"", " ", "\n"})
-    void parse_EmptyString_ReturnsEmptyFlagsAndNonFlagArgsContainsInput(String args)
-            throws InvalidArgsException {
-        mkdirArgsParser.parse(args);
+    void parse_EmptyString_ReturnsEmptyFlagsAndNonFlagArgsContainsInput(String args) {
+        assertDoesNotThrow(() -> mkdirArgsParser.parse(args));
         assertTrue(mkdirArgsParser.flags.isEmpty());
         assertTrue(mkdirArgsParser.nonFlagArgs.contains(args));
     }
@@ -74,9 +74,7 @@ class MkdirArgsParserTest {
     @ParameterizedTest
     @ValueSource(strings = {"-a", "-1", "-!", "-P", "--"})
     void parse_InvalidFlag_ThrowsInvalidArgsException(String args) {
-        Throwable result = assertThrows(InvalidArgsException.class, () -> {
-            mkdirArgsParser.parse(args);
-        });
+        InvalidArgsException result = assertThrowsExactly(InvalidArgsException.class, () -> mkdirArgsParser.parse(args));
         assertEquals(ILLEGAL_FLAG_MSG + args.charAt(1), result.getMessage());
     }
 
@@ -126,24 +124,24 @@ class MkdirArgsParserTest {
     @Test
     void getDirectories_OneNonFlagArg_ReturnsOneFolder() {
         assertDoesNotThrow(() -> mkdirArgsParser.parse(FILE_ONE));
-        List<String> expected = List.of(FILE_ONE);
         List<String> result = mkdirArgsParser.getDirectories();
+        List<String> expected = List.of(FILE_ONE);
         assertEquals(expected, result);
     }
 
     @Test
     void getDirectories_MultipleNonFlagArg_ReturnsMultipleFolder() {
         assertDoesNotThrow(() -> mkdirArgsParser.parse(FILE_ONE, FILE_TWO, FILE_THREE));
-        List<String> expected = List.of(FILE_ONE, FILE_TWO, FILE_THREE);
         List<String> result = mkdirArgsParser.getDirectories();
+        List<String> expected = List.of(FILE_ONE, FILE_TWO, FILE_THREE);
         assertEquals(expected, result);
     }
 
     @Test
     void getDirectories_ValidFlagAndOneNonFlagArg_ReturnsOneFolder() {
         assertDoesNotThrow(() -> mkdirArgsParser.parse(FLAG_CR_PARENT, FILE_ONE));
-        List<String> expected = List.of(FILE_ONE);
         List<String> result = mkdirArgsParser.getDirectories();
+        List<String> expected = List.of(FILE_ONE);
         assertEquals(expected, result);
     }
 }

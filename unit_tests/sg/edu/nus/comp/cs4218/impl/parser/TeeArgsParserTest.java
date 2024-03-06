@@ -110,16 +110,16 @@ public class TeeArgsParserTest {
     @Test
     void getFileNames_MultipleNonFlagArgs_ReturnsMultipleNonFlagArgs() {
         assertDoesNotThrow(() -> teeArgsParser.parse(FILE_ONE, FILE_TWO, FILE_THREE));
-        List<String> expected = List.of(FILE_ONE, FILE_TWO, FILE_THREE);
         List<String> result = teeArgsParser.getFileNames();
+        List<String> expected = List.of(FILE_ONE, FILE_TWO, FILE_THREE);
         assertEquals(expected, result);
     }
 
     @Test
     void getFileNames_ValidFlagAndOneNonFlagArg_ReturnsOneNonFlagArg() {
         assertDoesNotThrow(() -> teeArgsParser.parse(FLAG_APPEND, FILE_ONE));
-        List<String> expected = List.of(FILE_ONE);
         List<String> result = teeArgsParser.getFileNames();
+        List<String> expected = List.of(FILE_ONE);
         assertEquals(expected, result);
     }
 }

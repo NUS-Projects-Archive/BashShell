@@ -14,6 +14,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 class GrepArgsParserTest {
+
     private GrepArgsParser grepArgsParser;
 
     @BeforeEach
@@ -52,7 +53,7 @@ class GrepArgsParserTest {
         String result = grepArgsParser.getPattern();
 
         // Then
-        assertEquals(result, null);
+        assertEquals(null, result);
     }
 
     @Test
@@ -65,7 +66,7 @@ class GrepArgsParserTest {
         String result = grepArgsParser.getPattern();
 
         // Then
-        assertEquals(result, pattern);
+        assertEquals(pattern, result);
     }
 
     @Test
@@ -88,6 +89,6 @@ class GrepArgsParserTest {
         String[] result = grepArgsParser.getFileNames();
 
         // Then
-        assertArrayEquals(result, fileNames);
+        assertArrayEquals(fileNames, result);
     }
 }

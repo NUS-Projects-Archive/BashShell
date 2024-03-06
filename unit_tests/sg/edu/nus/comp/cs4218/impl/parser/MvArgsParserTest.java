@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static sg.edu.nus.comp.cs4218.impl.parser.ArgsParser.ILLEGAL_FLAG_MSG;
 
@@ -63,9 +64,8 @@ class MvArgsParserTest {
 
     @ParameterizedTest
     @ValueSource(strings = {"", " ", "\n"})
-    void parse_EmptyString_ReturnsEmptyFlagsAndNonFlagArgsContainsInput(String args)
-            throws InvalidArgsException {
-        mvArgsParser.parse(args);
+    void parse_EmptyString_ReturnsEmptyFlagsAndNonFlagArgsContainsInput(String args) {
+        assertDoesNotThrow(() -> mvArgsParser.parse(args));
         assertTrue(mvArgsParser.flags.isEmpty());
         assertTrue(mvArgsParser.nonFlagArgs.contains(args));
     }
@@ -79,9 +79,7 @@ class MvArgsParserTest {
     @ParameterizedTest
     @ValueSource(strings = {"-a", "-1", "-!", "-P", "--"})
     void parse_InvalidFlag_ThrowsInvalidArgsException(String args) {
-        Throwable result = assertThrows(InvalidArgsException.class, () -> {
-            mvArgsParser.parse(args);
-        });
+        InvalidArgsException result = assertThrowsExactly(InvalidArgsException.class, () -> mvArgsParser.parse(args));
         assertEquals(ILLEGAL_FLAG_MSG + args.charAt(1), result.getMessage());
     }
 
@@ -126,8 +124,8 @@ class MvArgsParserTest {
     @ValueSource(strings = {"file1", "-n file2"})
     void getSourceDirectories_OneNonFlagArg_ReturnsEmptyList(String args) {
         assertDoesNotThrow(() -> mvArgsParser.parse(splitArgs(args)));
-        List<String> expected = List.of();
         List<String> result = mvArgsParser.getSourceDirectories();
+        List<String> expected = List.of();
         assertEquals(expected, result);
     }
 
@@ -135,8 +133,8 @@ class MvArgsParserTest {
     @ValueSource(strings = {"file1 file2", "-n file1 file2"})
     void getSourceDirectories_TwoNonFlagArgs_ReturnsFirstDirectory(String args) {
         assertDoesNotThrow(() -> mvArgsParser.parse(splitArgs(args)));
-        List<String> expected = List.of(FILE_ONE);
         List<String> result = mvArgsParser.getSourceDirectories();
+        List<String> expected = List.of(FILE_ONE);
         assertEquals(expected, result);
     }
 
@@ -144,8 +142,8 @@ class MvArgsParserTest {
     @ValueSource(strings = {"file1 file2 file3", "-n file1 file2 file3"})
     void getSourceDirectories_MultipleNonFlagArgs_ReturnsAllDirectoriesExceptLast(String args) {
         assertDoesNotThrow(() -> mvArgsParser.parse(splitArgs(args)));
-        List<String> expected = List.of(FILE_ONE, FILE_TWO);
         List<String> result = mvArgsParser.getSourceDirectories();
+        List<String> expected = List.of(FILE_ONE, FILE_TWO);
         assertEquals(expected, result);
     }
 

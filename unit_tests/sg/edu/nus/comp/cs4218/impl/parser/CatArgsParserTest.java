@@ -4,9 +4,13 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 import static sg.edu.nus.comp.cs4218.impl.parser.ArgsParser.ILLEGAL_FLAG_MSG;
+
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,16 +18,13 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
-import sg.edu.nus.comp.cs4218.exception.InvalidArgsException;
 
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Stream;
+import sg.edu.nus.comp.cs4218.exception.InvalidArgsException;
 
 class CatArgsParserTest {
 
+    private static final Set<Character> VALID_FLAGS = Set.of('n');
     private static final String NON_FLAG_ARG = "file";
-    private final Set<Character> VALID_FLAGS = Set.of('n');
     private CatArgsParser catArgsParser;
 
     private static Stream<Arguments> validSyntax() {
@@ -51,13 +52,9 @@ class CatArgsParserTest {
     @ParameterizedTest
     @ValueSource(strings = {"", " ", "\n"})
     void parse_EmptyString_ReturnsEmptyFlagsAndNonFlagArgsContainsInput(String args) {
-        try {
-            catArgsParser.parse(args);
-            assertTrue(catArgsParser.flags.isEmpty());
-            assertTrue(catArgsParser.nonFlagArgs.contains(args));
-        } catch (InvalidArgsException e) {
-            fail(e.getMessage());
-        }
+        assertDoesNotThrow(() -> catArgsParser.parse(args));
+        assertTrue(catArgsParser.flags.isEmpty());
+        assertTrue(catArgsParser.nonFlagArgs.contains(args));
     }
 
     @Test
@@ -69,7 +66,7 @@ class CatArgsParserTest {
     @ParameterizedTest
     @ValueSource(strings = {"-a", "-1", "-!", "-P", "--"})
     void parse_InvalidFlag_ThrowsInvalidArgsException(String args) {
-        Throwable result = assertThrows(InvalidArgsException.class, () -> {
+        InvalidArgsException result = assertThrowsExactly(InvalidArgsException.class, () -> {
             catArgsParser.parse(args);
         });
         assertEquals(ILLEGAL_FLAG_MSG + args.charAt(1), result.getMessage());
@@ -121,24 +118,24 @@ class CatArgsParserTest {
     @Test
     void getNonFlagArgs_OneNonFlagArg_ReturnsOneArg() {
         assertDoesNotThrow(() -> catArgsParser.parse(NON_FLAG_ARG));
-        List<String> expected = List.of(NON_FLAG_ARG);
         List<String> result = catArgsParser.getNonFlagArgs();
+        List<String> expected = List.of(NON_FLAG_ARG);
         assertEquals(expected, result);
     }
 
     @Test
     void getNonFlagArgs_MultipleNonFlagArgs_ReturnsMultipleArgs() {
         assertDoesNotThrow(() -> catArgsParser.parse("file1.txt", "file2.txt", "file3.txt"));
-        List<String> expected = List.of("file1.txt", "file2.txt", "file3.txt");
         List<String> result = catArgsParser.getNonFlagArgs();
+        List<String> expected = List.of("file1.txt", "file2.txt", "file3.txt");
         assertEquals(expected, result);
     }
 
     @Test
     void getNonFlagArgs_ValidFlagAndOneNonFlagArg_ReturnsOneArg() {
         assertDoesNotThrow(() -> catArgsParser.parse("-n", NON_FLAG_ARG));
-        List<String> expected = List.of(NON_FLAG_ARG);
         List<String> result = catArgsParser.getNonFlagArgs();
+        List<String> expected = List.of(NON_FLAG_ARG);
         assertEquals(expected, result);
     }
 }

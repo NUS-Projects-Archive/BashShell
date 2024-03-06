@@ -16,7 +16,8 @@ import org.junit.jupiter.params.provider.ValueSource;
 import sg.edu.nus.comp.cs4218.exception.InvalidArgsException;
 
 public class RmArgsParserTest {
-    private RmArgsParser parser;
+
+    private RmArgsParser rmArgsParser;
 
     private static Stream<Arguments> validFlags() {
         return Stream.of(
@@ -28,23 +29,23 @@ public class RmArgsParserTest {
 
     @BeforeEach
     void setUp() {
-        this.parser = new RmArgsParser();
+        rmArgsParser = new RmArgsParser();
     }
 
     @ParameterizedTest
     @MethodSource("validFlags")
     void parse_ValidFlags_CorrectMatchingFlags(String args, boolean... expectedResults) {
-        assertDoesNotThrow(() -> this.parser.parse(args));
+        assertDoesNotThrow(() -> rmArgsParser.parse(args));
         assertArrayEquals(expectedResults, new boolean[]{
-                this.parser.isRecursive(),
-                this.parser.isRecursive()
+                rmArgsParser.isRecursive(),
+                rmArgsParser.isRecursive()
         });
     }
 
     @ParameterizedTest
     @ValueSource(strings = {"-R", "-D"})
     void parse_InvalidFlags_ThrowsInvalidArgsException(String args) {
-        Throwable thrown = assertThrowsExactly(InvalidArgsException.class, () -> this.parser.parse(args));
+        InvalidArgsException thrown = assertThrowsExactly(InvalidArgsException.class, () -> rmArgsParser.parse(args));
         String illegalFlag = args.substring(1);
         assertEquals(String.format("illegal option -- %s", illegalFlag), thrown.getMessage());
     }

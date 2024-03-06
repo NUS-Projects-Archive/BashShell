@@ -133,20 +133,20 @@ public class CutArgsParserTest {
     @ParameterizedTest
     @ValueSource(strings = {"-a", "-1", "-!", "-C", "-B", "--"})
     void parse_InvalidFlag_ThrowsInvalidArgsException(String args) {
-        String expectedMsg = String.format("illegal option -- %s", args.charAt(1));
-        InvalidArgsException exception = assertThrowsExactly(InvalidArgsException.class, () -> {
+        InvalidArgsException result = assertThrowsExactly(InvalidArgsException.class, () -> {
             cutArgsParser.parse(args, SINGLE_NUM, FILE_ONE);
         });
-        assertEquals(expectedMsg, exception.getMessage());
+        String expected = String.format("illegal option -- %s", args.charAt(1));
+        assertEquals(expected, result.getMessage());
     }
 
     @Test
     void parse_NoFlags_ThrowsInvalidArgsException() {
-        String expectedMsg = "Invalid syntax"; // one valid flag is expected
-        InvalidArgsException exception = assertThrowsExactly(InvalidArgsException.class, () -> {
+        InvalidArgsException result = assertThrowsExactly(InvalidArgsException.class, () -> {
             cutArgsParser.parse(SINGLE_NUM, FILE_ONE);
         });
-        assertEquals(expectedMsg, exception.getMessage());
+        String expected = "Invalid syntax"; // one valid flag is expected
+        assertEquals(expected, result.getMessage());
     }
 
     @ParameterizedTest
@@ -199,8 +199,8 @@ public class CutArgsParserTest {
         String[] arguments = args.split("\\s+");
         String lastFile = arguments[arguments.length - 1];
         assertDoesNotThrow(() -> cutArgsParser.parse(arguments));
-        List<String> expected = List.of(lastFile);
         List<String> result = cutArgsParser.getFileNames();
+        List<String> expected = List.of(lastFile);
         assertEquals(expected, result);
     }
 
@@ -211,8 +211,8 @@ public class CutArgsParserTest {
         String secondLastFile = arguments[arguments.length - 2];
         String lastFile = arguments[arguments.length - 1];
         assertDoesNotThrow(() -> cutArgsParser.parse(arguments));
-        List<String> expected = List.of(secondLastFile, lastFile);
         List<String> result = cutArgsParser.getFileNames();
+        List<String> expected = List.of(secondLastFile, lastFile);
         assertEquals(expected, result);
     }
 }

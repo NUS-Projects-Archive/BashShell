@@ -51,6 +51,6 @@ public final class AssertUtils {
      * @param actualObject Object to assert the type of
      */
     public static void assertSameType(Object expectedType, Object actualObject) {
-        assertEquals(actualObject.getClass(), expectedType);
+        assertEquals(expectedType, actualObject.getClass());
     }
 }
