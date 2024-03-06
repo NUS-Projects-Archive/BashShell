@@ -43,9 +43,7 @@ class EchoApplicationTest {
 
     @Test
     void constructResult_NullArgs_ThrowsEchoException() {
-        EchoException result = assertThrowsExactly(EchoException.class, () -> {
-            app.constructResult(null);
-        });
+        EchoException result = assertThrowsExactly(EchoException.class, () -> app.constructResult(null));
         assertEquals(ECHO_EXCEPTION + ERR_NULL_ARGS, result.getMessage());
     }
 
