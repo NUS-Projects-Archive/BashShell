@@ -3,6 +3,7 @@ package sg.edu.nus.comp.cs4218.impl.app;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -69,9 +70,9 @@ class CatApplicationTest {
 
     @Test
     void readFile_FileNotFound_ThrowsCatException() {
-        Throwable result = assertThrows(CatException.class, () -> {
-            app.readFile(false, new File(NON_EXISTENT_FILE));
-        });
+        CatException result = assertThrowsExactly(CatException.class, () ->
+                app.readFile(false, new File(NON_EXISTENT_FILE))
+        );
         assertTrue(result.getMessage().contains(CAT_EXCEPTION_MSG + ERR_FILE_NOT_FOUND));
     }
 
@@ -92,9 +93,7 @@ class CatApplicationTest {
     @Test
     void readStdin_IOExceptionWhenReadingInput_ThrowsCatException() {
         when(assertDoesNotThrow(() -> brMock.readLine())).thenThrow(new IOException());
-        Throwable result = assertThrows(CatException.class, () -> {
-            app.readStdIn(false, brMock);
-        });
+        CatException result = assertThrowsExactly(CatException.class, () -> app.readStdIn(false, brMock));
         assertTrue(result.getMessage().contains(CAT_EXCEPTION_MSG + ERR_IO_EXCEPTION));
     }
 
@@ -118,9 +117,7 @@ class CatApplicationTest {
     @Test
     void catStdin_IOExceptionWhenReadingInput_ThrowsCatException() {
         when(assertDoesNotThrow(() -> inputStreamMock.read())).thenThrow(new IOException());
-        assertThrows(CatException.class, () -> {
-            app.catStdin(false, inputStreamMock);
-        });
+        assertThrows(CatException.class, () -> app.catStdin(false, inputStreamMock));
     }
 
     @ParameterizedTest
@@ -174,7 +171,8 @@ class CatApplicationTest {
     void catFileAndStdin_StdinOnlyNoLineNumber_ReturnsUserInput(String args) {
         inputStreamMock = new ByteArrayInputStream(args.getBytes(StandardCharsets.UTF_8));
         String result = assertDoesNotThrow(() -> app.catFileAndStdin(false, inputStreamMock, "-"));
-        assertEquals(args + STRING_NEWLINE, result);
+        String expected = args + STRING_NEWLINE;
+        assertEquals(expected, result);
     }
 
     @Test

@@ -28,7 +28,7 @@ public class TeeArgsParserTest {
     private static final String FILE_ONE = "file1";
     private static final String FILE_TWO = "file2";
     private static final String FILE_THREE = "file3";
-    private TeeArgsParser teeArgsParser;
+    private TeeArgsParser parser;
 
     private static Stream<Arguments> validSyntax() {
         return Stream.of(
@@ -49,77 +49,75 @@ public class TeeArgsParserTest {
 
     @BeforeEach
     void setUp() {
-        this.teeArgsParser = new TeeArgsParser();
+        this.parser = new TeeArgsParser();
     }
 
     @Test
     void parse_ValidFlag_ReturnsGivenMatchingFlag() {
-        assertDoesNotThrow(() -> teeArgsParser.parse(FLAG_APPEND));
-        assertEquals(VALID_FLAGS, teeArgsParser.flags, "Flags do not match");
+        assertDoesNotThrow(() -> parser.parse(FLAG_APPEND));
+        assertEquals(VALID_FLAGS, parser.flags, "Flags do not match");
     }
 
     @ParameterizedTest
     @ValueSource(strings = {"-b", "-1", "-!", "-A", "--"})
     void parse_InvalidFlag_ThrowsInvalidArgsException(String args) {
         String expectedMsg = "illegal option -- " + args.charAt(1);
-        InvalidArgsException exception = assertThrowsExactly(InvalidArgsException.class, () -> {
-            teeArgsParser.parse(args);
-        });
+        InvalidArgsException exception = assertThrowsExactly(InvalidArgsException.class, () -> parser.parse(args));
         assertEquals(expectedMsg, exception.getMessage());
     }
 
     @ParameterizedTest
     @MethodSource("validSyntax")
     void parse_ValidSyntax_DoNotThrowException(String... args) {
-        assertDoesNotThrow(() -> teeArgsParser.parse(args));
+        assertDoesNotThrow(() -> parser.parse(args));
     }
 
     @ParameterizedTest
     @MethodSource("invalidSyntax")
     void parse_InvalidSyntax_ThrowsInvalidArgsException(String... args) {
-        assertThrows(InvalidArgsException.class, () -> teeArgsParser.parse(args));
+        assertThrows(InvalidArgsException.class, () -> parser.parse(args));
     }
 
     @Test
     void isAppend_ValidFlag_ReturnsTrue() {
-        assertDoesNotThrow(() -> teeArgsParser.parse(FLAG_APPEND));
-        assertTrue(teeArgsParser.isAppend());
+        assertDoesNotThrow(() -> parser.parse(FLAG_APPEND));
+        assertTrue(parser.isAppend());
     }
 
     @Test
     void isAppend_OnlyNonFlagArg_ReturnsFalse() {
-        assertDoesNotThrow(() -> teeArgsParser.parse(FILE_ONE));
-        assertFalse(teeArgsParser.isAppend());
+        assertDoesNotThrow(() -> parser.parse(FILE_ONE));
+        assertFalse(parser.isAppend());
     }
 
     @Test
     void getFileNames_NoArg_ReturnsEmpty() {
-        assertDoesNotThrow(() -> teeArgsParser.parse());
-        List<String> result = teeArgsParser.getFileNames();
+        assertDoesNotThrow(() -> parser.parse());
+        List<String> result = parser.getFileNames();
         assertTrue(result.isEmpty());
     }
 
     @Test
     void getFileNames_OneNonFlagArg_ReturnsOneNonFlagArg() {
-        assertDoesNotThrow(() -> teeArgsParser.parse(FILE_ONE));
-        List<String> result = teeArgsParser.getFileNames();
+        assertDoesNotThrow(() -> parser.parse(FILE_ONE));
+        List<String> result = parser.getFileNames();
         List<String> expected = List.of(FILE_ONE);
         assertEquals(expected, result);
     }
 
     @Test
     void getFileNames_MultipleNonFlagArgs_ReturnsMultipleNonFlagArgs() {
-        assertDoesNotThrow(() -> teeArgsParser.parse(FILE_ONE, FILE_TWO, FILE_THREE));
+        assertDoesNotThrow(() -> parser.parse(FILE_ONE, FILE_TWO, FILE_THREE));
+        List<String> result = parser.getFileNames();
         List<String> expected = List.of(FILE_ONE, FILE_TWO, FILE_THREE);
-        List<String> result = teeArgsParser.getFileNames();
         assertEquals(expected, result);
     }
 
     @Test
     void getFileNames_ValidFlagAndOneNonFlagArg_ReturnsOneNonFlagArg() {
-        assertDoesNotThrow(() -> teeArgsParser.parse(FLAG_APPEND, FILE_ONE));
+        assertDoesNotThrow(() -> parser.parse(FLAG_APPEND, FILE_ONE));
+        List<String> result = parser.getFileNames();
         List<String> expected = List.of(FILE_ONE);
-        List<String> result = teeArgsParser.getFileNames();
         assertEquals(expected, result);
     }
 }

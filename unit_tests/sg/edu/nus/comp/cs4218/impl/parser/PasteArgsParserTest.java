@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static sg.edu.nus.comp.cs4218.impl.parser.ArgsParser.ILLEGAL_FLAG_MSG;
 
@@ -28,7 +29,7 @@ public class PasteArgsParserTest {
     private static final String FILE_TWO = "file2";
     private static final String FILE_THREE = "file3";
     private static final String STDIN = "-";
-    private PasteArgsParser pasteArgsParser;
+    private PasteArgsParser parser;
 
     private static Stream<Arguments> validSyntax() {
         return Stream.of(
@@ -59,82 +60,80 @@ public class PasteArgsParserTest {
 
     @BeforeEach
     void setUp() {
-        pasteArgsParser = new PasteArgsParser();
+        parser = new PasteArgsParser();
     }
 
     @Test
-    void parse_ValidFlag_ReturnsGivenMatchingFlag() throws InvalidArgsException {
-        pasteArgsParser.parse("-s");
-        assertEquals(VALID_FLAGS, pasteArgsParser.flags, "Flags do not match");
+    void parse_ValidFlag_ReturnsGivenMatchingFlag() {
+        assertDoesNotThrow(() -> parser.parse("-s"));
+        assertEquals(VALID_FLAGS, parser.flags, "Flags do not match");
     }
 
     @ParameterizedTest
     @ValueSource(strings = {"-a", "-1", "-!", "-S", "--"})
     void parse_InvalidFlag_ThrowsInvalidArgsException(String args) {
-        Throwable result = assertThrows(InvalidArgsException.class, () -> {
-            pasteArgsParser.parse(args);
-        });
+        InvalidArgsException result = assertThrowsExactly(InvalidArgsException.class, () -> parser.parse(args));
         assertEquals(ILLEGAL_FLAG_MSG + args.charAt(1), result.getMessage());
     }
 
     @ParameterizedTest
     @MethodSource("validSyntax")
     void parse_ValidSyntax_DoNotThrowException(String... args) {
-        assertDoesNotThrow(() -> pasteArgsParser.parse(args));
+        assertDoesNotThrow(() -> parser.parse(args));
     }
 
     @ParameterizedTest
     @MethodSource("invalidSyntax")
     void parse_InvalidSyntax_ThrowsInvalidArgsException(String... args) {
-        assertThrows(InvalidArgsException.class, () -> pasteArgsParser.parse(args));
+        assertThrows(InvalidArgsException.class, () -> parser.parse(args));
     }
 
     @Test
-    void isSerial_ValidFlag_ReturnsTrue() throws InvalidArgsException {
-        pasteArgsParser.parse(FLAG_SERIAL);
-        assertTrue(pasteArgsParser.isSerial());
+    void isSerial_ValidFlag_ReturnsTrue() {
+        assertDoesNotThrow(() -> parser.parse(FLAG_SERIAL));
+        assertTrue(parser.isSerial());
     }
 
     @Test
-    void isSerial_ValidFlagAndNonFlagArg_ReturnsTrue() throws InvalidArgsException {
-        pasteArgsParser.parse(FLAG_SERIAL, FILE_ONE);
-        assertTrue(pasteArgsParser.isSerial());
+    void isSerial_ValidFlagAndNonFlagArg_ReturnsTrue() {
+        assertDoesNotThrow(() -> parser.parse(FLAG_SERIAL, FILE_ONE));
+        assertTrue(parser.isSerial());
     }
 
     @Test
-    void isSerial_OnlyNonFlagArg_ReturnsFalse() throws InvalidArgsException {
-        pasteArgsParser.parse(FILE_ONE);
-        assertFalse(pasteArgsParser.isSerial());
+    void isSerial_OnlyNonFlagArg_ReturnsFalse() {
+        assertDoesNotThrow(() -> parser.parse(FILE_ONE));
+        assertFalse(parser.isSerial());
     }
 
     @Test
-    void getNonFlagArgs_NoArg_ReturnsEmpty() throws InvalidArgsException {
-        pasteArgsParser.parse();
-        List<String> result = pasteArgsParser.getNonFlagArgs();
+    void getNonFlagArgs_NoArg_ReturnsEmpty() {
+        assertDoesNotThrow(() -> parser.parse());
+        List<String> result = parser.getNonFlagArgs();
         assertTrue(result.isEmpty());
     }
 
     @Test
-    void getNonFlagArgs_OneNonFlagArg_ReturnsOneNonFlagArg() throws InvalidArgsException {
-        pasteArgsParser.parse(FILE_ONE);
-        List<String> result = pasteArgsParser.getNonFlagArgs();
+    void getNonFlagArgs_OneNonFlagArg_ReturnsOneNonFlagArg() {
+        assertDoesNotThrow(() -> parser.parse(FILE_ONE));
+        List<String> result = parser.getNonFlagArgs();
         List<String> expected = List.of(FILE_ONE);
         assertEquals(expected, result);
     }
 
     @Test
-    void getNonFlagArgs_MultipleNonFlagArgs_ReturnsMultipleNonFlagArgs() throws InvalidArgsException {
-        pasteArgsParser.parse(FILE_ONE, FILE_TWO, FILE_THREE);
+    void getNonFlagArgs_MultipleNonFlagArgs_ReturnsMultipleNonFlagArgs() {
+        assertDoesNotThrow(() -> parser.parse(FILE_ONE, FILE_TWO, FILE_THREE));
+        List<String> result = parser.getNonFlagArgs();
         List<String> expected = List.of(FILE_ONE, FILE_TWO, FILE_THREE);
-        List<String> result = pasteArgsParser.getNonFlagArgs();
         assertEquals(expected, result);
     }
 
     @Test
-    void getNonFlagArgs_ValidFlagAndOneNonFlagArg_ReturnsOneNonFlagArg() throws InvalidArgsException {
-        pasteArgsParser.parse(FLAG_SERIAL, FILE_ONE);
+    void getNonFlagArgs_ValidFlagAndOneNonFlagArg_ReturnsOneNonFlagArg() {
+        assertDoesNotThrow(() -> parser.parse(FLAG_SERIAL, FILE_ONE));
+        List<String> result = parser.getNonFlagArgs();
         List<String> expected = List.of(FILE_ONE);
-        List<String> result = pasteArgsParser.getNonFlagArgs();
         assertEquals(expected, result);
     }
 }

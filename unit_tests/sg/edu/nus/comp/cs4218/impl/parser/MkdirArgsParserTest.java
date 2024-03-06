@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static sg.edu.nus.comp.cs4218.impl.parser.ArgsParser.ILLEGAL_FLAG_MSG;
 
@@ -27,7 +28,7 @@ class MkdirArgsParserTest {
     private static final String FILE_ONE = "file1";
     private static final String FILE_TWO = "file2";
     private static final String FILE_THREE = "file3";
-    private MkdirArgsParser mkdirArgsParser;
+    private MkdirArgsParser parser;
 
     private static Stream<Arguments> validSyntax() {
         return Stream.of(
@@ -53,97 +54,94 @@ class MkdirArgsParserTest {
 
     @BeforeEach
     void setUp() {
-        mkdirArgsParser = new MkdirArgsParser();
+        parser = new MkdirArgsParser();
     }
 
     @ParameterizedTest
     @ValueSource(strings = {"", " ", "\n"})
-    void parse_EmptyString_ReturnsEmptyFlagsAndNonFlagArgsContainsInput(String args)
-            throws InvalidArgsException {
-        mkdirArgsParser.parse(args);
-        assertTrue(mkdirArgsParser.flags.isEmpty());
-        assertTrue(mkdirArgsParser.nonFlagArgs.contains(args));
+    void parse_EmptyString_ReturnsEmptyFlagsAndNonFlagArgsContainsInput(String args) {
+        assertDoesNotThrow(() -> parser.parse(args));
+        assertTrue(parser.flags.isEmpty());
+        assertTrue(parser.nonFlagArgs.contains(args));
     }
 
     @Test
     void parse_ValidFlag_ReturnsGivenMatchingFlag() {
-        assertDoesNotThrow(() -> mkdirArgsParser.parse(FLAG_CR_PARENT));
-        assertEquals(VALID_FLAGS, mkdirArgsParser.flags, "Flags do not match");
+        assertDoesNotThrow(() -> parser.parse(FLAG_CR_PARENT));
+        assertEquals(VALID_FLAGS, parser.flags, "Flags do not match");
     }
 
     @ParameterizedTest
     @ValueSource(strings = {"-a", "-1", "-!", "-P", "--"})
     void parse_InvalidFlag_ThrowsInvalidArgsException(String args) {
-        Throwable result = assertThrows(InvalidArgsException.class, () -> {
-            mkdirArgsParser.parse(args);
-        });
+        InvalidArgsException result = assertThrowsExactly(InvalidArgsException.class, () -> parser.parse(args));
         assertEquals(ILLEGAL_FLAG_MSG + args.charAt(1), result.getMessage());
     }
 
     @ParameterizedTest
     @MethodSource("validSyntax")
     void parse_validSyntax_DoNotThrowException(String... args) {
-        assertDoesNotThrow(() -> mkdirArgsParser.parse(args));
+        assertDoesNotThrow(() -> parser.parse(args));
     }
 
     @ParameterizedTest
     @MethodSource("invalidSyntax")
     void parse_invalidSyntax_ThrowsInvalidArgsException(String... args) {
-        assertThrows(InvalidArgsException.class, () -> mkdirArgsParser.parse(args));
+        assertThrows(InvalidArgsException.class, () -> parser.parse(args));
     }
 
     @Test
     void isCreateParent_NoFlag_ReturnsFalse() {
-        assertDoesNotThrow(() -> mkdirArgsParser.parse());
-        assertFalse(mkdirArgsParser.isCreateParent());
+        assertDoesNotThrow(() -> parser.parse());
+        assertFalse(parser.isCreateParent());
     }
 
     @Test
     void isCreateParent_ValidFlag_ReturnsTrue() {
-        assertDoesNotThrow(() -> mkdirArgsParser.parse(FLAG_CR_PARENT));
-        assertTrue(mkdirArgsParser.isCreateParent());
+        assertDoesNotThrow(() -> parser.parse(FLAG_CR_PARENT));
+        assertTrue(parser.isCreateParent());
     }
 
     @Test
     void isCreateParent_ValidFlagAndNonFlagArg_ReturnsTrue() {
-        assertDoesNotThrow(() -> mkdirArgsParser.parse(FLAG_CR_PARENT, FILE_ONE));
-        assertTrue(mkdirArgsParser.isCreateParent());
+        assertDoesNotThrow(() -> parser.parse(FLAG_CR_PARENT, FILE_ONE));
+        assertTrue(parser.isCreateParent());
     }
 
     @Test
     void isCreateParent_OnlyNonFlagArg_ReturnsFalse() {
-        assertDoesNotThrow(() -> mkdirArgsParser.parse(FILE_ONE));
-        assertFalse(mkdirArgsParser.isCreateParent());
+        assertDoesNotThrow(() -> parser.parse(FILE_ONE));
+        assertFalse(parser.isCreateParent());
     }
 
     @Test
     void getDirectories_NoArg_ReturnsEmpty() {
-        assertDoesNotThrow(() -> mkdirArgsParser.parse());
-        List<String> result = mkdirArgsParser.getDirectories();
+        assertDoesNotThrow(() -> parser.parse());
+        List<String> result = parser.getDirectories();
         assertTrue(result.isEmpty());
     }
 
     @Test
     void getDirectories_OneNonFlagArg_ReturnsOneFolder() {
-        assertDoesNotThrow(() -> mkdirArgsParser.parse(FILE_ONE));
+        assertDoesNotThrow(() -> parser.parse(FILE_ONE));
+        List<String> result = parser.getDirectories();
         List<String> expected = List.of(FILE_ONE);
-        List<String> result = mkdirArgsParser.getDirectories();
         assertEquals(expected, result);
     }
 
     @Test
     void getDirectories_MultipleNonFlagArg_ReturnsMultipleFolder() {
-        assertDoesNotThrow(() -> mkdirArgsParser.parse(FILE_ONE, FILE_TWO, FILE_THREE));
+        assertDoesNotThrow(() -> parser.parse(FILE_ONE, FILE_TWO, FILE_THREE));
+        List<String> result = parser.getDirectories();
         List<String> expected = List.of(FILE_ONE, FILE_TWO, FILE_THREE);
-        List<String> result = mkdirArgsParser.getDirectories();
         assertEquals(expected, result);
     }
 
     @Test
     void getDirectories_ValidFlagAndOneNonFlagArg_ReturnsOneFolder() {
-        assertDoesNotThrow(() -> mkdirArgsParser.parse(FLAG_CR_PARENT, FILE_ONE));
+        assertDoesNotThrow(() -> parser.parse(FLAG_CR_PARENT, FILE_ONE));
+        List<String> result = parser.getDirectories();
         List<String> expected = List.of(FILE_ONE);
-        List<String> result = mkdirArgsParser.getDirectories();
         assertEquals(expected, result);
     }
 }

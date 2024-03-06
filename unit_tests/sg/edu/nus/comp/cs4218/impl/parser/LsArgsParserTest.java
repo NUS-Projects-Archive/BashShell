@@ -22,6 +22,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import sg.edu.nus.comp.cs4218.exception.InvalidArgsException;
 
 class LsArgsParserTest {
+
     private static final String FLAG_R = "-R";
     private static final String FLAG_X = "-X";
     private static final String FLAG_XR = "-XR";
@@ -29,7 +30,7 @@ class LsArgsParserTest {
     private static final String FLAG_P = "-P";
     private static final String EXAMPLE = "example";
 
-    private LsArgsParser lsArgsParser;
+    private LsArgsParser parser;
 
     private static Stream<Arguments> validSyntax() {
 
@@ -65,8 +66,8 @@ class LsArgsParserTest {
 
     private void testGetDirectoriesReturningEmpty(String... args) {
         // When
-        assertDoesNotThrow(() -> lsArgsParser.parse(args));
-        List<String> result = lsArgsParser.getDirectories();
+        assertDoesNotThrow(() -> parser.parse(args));
+        List<String> result = parser.getDirectories();
 
         // Then
         assertTrue(result.isEmpty());
@@ -74,58 +75,58 @@ class LsArgsParserTest {
 
     @BeforeEach
     void setUp() {
-        lsArgsParser = new LsArgsParser();
+        parser = new LsArgsParser();
     }
 
     /**
      * Tests if parse sets the flags and non-flag arguments correctly.
      *
-     * @param args          Arguments to parse.
-     * @param expectedFlags Expected flags.
-     * @param expectedNFA   Expected non-flag arguments.
+     * @param args          Arguments to parse
+     * @param expectedFlags Expected flags
+     * @param expectedNFA   Expected non-flag arguments
      */
     @ParameterizedTest
     @MethodSource("validSyntax")
     void parse_ValidSyntax_HasCorrectFlagsAndNonFlagArgs(String[] args, Set<Character> expectedFlags,
                                                          List<String> expectedNFA) {
-        assertDoesNotThrow(() -> lsArgsParser.parse(args));
-        assertEquals(expectedFlags, lsArgsParser.flags, "Flags do not match");
-        assertEquals(expectedNFA, lsArgsParser.nonFlagArgs, "Non-flag arguments do not match");
+        assertDoesNotThrow(() -> parser.parse(args));
+        assertEquals(expectedFlags, parser.flags, "Flags do not match");
+        assertEquals(expectedNFA, parser.nonFlagArgs, "Non-flag arguments do not match");
     }
 
     /**
      * Tests if parse throws InvalidArgsException when given invalid syntax.
      *
-     * @param args Arguments to parse.
+     * @param args Arguments to parse
      */
     @ParameterizedTest
     @MethodSource("invalidSyntax")
     void parse_InvalidSyntax_ThrowsInvalidArgsException(String... args) {
-        assertThrows(InvalidArgsException.class, () -> lsArgsParser.parse(args));
+        assertThrows(InvalidArgsException.class, () -> parser.parse(args));
     }
 
     /**
      * Tests if isRecursive returns true when -R flag is present in args.
      *
-     * @param args Arguments with -R to parse.
+     * @param args Arguments with -R to parse
      */
     @ParameterizedTest
     @ValueSource(strings = {FLAG_R, FLAG_RX, FLAG_XR})
     void isRecursive_ValidFlag_ReturnsTrue(String args) {
-        assertDoesNotThrow(() -> lsArgsParser.parse(args));
-        assertTrue(lsArgsParser.isRecursive());
+        assertDoesNotThrow(() -> parser.parse(args));
+        assertTrue(parser.isRecursive());
     }
 
     /**
      * Tests if isRecursive returns false when -R flag is not present in args.
      *
-     * @param args Arguments without -R to parse.
+     * @param args Arguments without -R to parse
      */
     @ParameterizedTest
     @ValueSource(strings = {FLAG_X, EXAMPLE})
     void isRecursive_InvalidFlag_ReturnsFalse(String args) {
-        assertDoesNotThrow(() -> lsArgsParser.parse(args));
-        assertFalse(lsArgsParser.isRecursive());
+        assertDoesNotThrow(() -> parser.parse(args));
+        assertFalse(parser.isRecursive());
     }
 
     /**
@@ -133,32 +134,32 @@ class LsArgsParserTest {
      */
     @Test
     void isRecursive_NoFlag_ReturnsFalse() {
-        assertDoesNotThrow(() -> lsArgsParser.parse(""));
-        assertFalse(lsArgsParser.isRecursive());
+        assertDoesNotThrow(() -> parser.parse(""));
+        assertFalse(parser.isRecursive());
     }
 
     /**
      * Tests if isSortByExt returns true when -X flag is present in args.
      *
-     * @param args Arguments with -X to parse.
+     * @param args Arguments with -X to parse
      */
     @ParameterizedTest
     @ValueSource(strings = {FLAG_X, FLAG_RX, FLAG_XR})
     void isSortByExt_ValidFlag_ReturnsTrue(String args) {
-        assertDoesNotThrow(() -> lsArgsParser.parse(args));
-        assertTrue(lsArgsParser.isSortByExt());
+        assertDoesNotThrow(() -> parser.parse(args));
+        assertTrue(parser.isSortByExt());
     }
 
     /**
      * Tests if isSortByExt returns false when -X flag is not present in args.
      *
-     * @param args Arguments without -X to parse.
+     * @param args Arguments without -X to parse
      */
     @ParameterizedTest
     @ValueSource(strings = {FLAG_R, EXAMPLE})
     void isSortByExt_InvalidFlag_ReturnsFalse(String args) {
-        assertDoesNotThrow(() -> lsArgsParser.parse(args));
-        assertFalse(lsArgsParser.isSortByExt());
+        assertDoesNotThrow(() -> parser.parse(args));
+        assertFalse(parser.isSortByExt());
     }
 
     /**
@@ -166,8 +167,8 @@ class LsArgsParserTest {
      */
     @Test
     void isSortByExt_NoFlag_ReturnsFalse() {
-        assertDoesNotThrow(() -> lsArgsParser.parse(""));
-        assertFalse(lsArgsParser.isSortByExt());
+        assertDoesNotThrow(() -> parser.parse(""));
+        assertFalse(parser.isSortByExt());
     }
 
     /**
@@ -193,13 +194,13 @@ class LsArgsParserTest {
     void getDirectories_WithArgsThatHasNonFlagArgs_ReturnsNonFlagArgs() {
         // Given
         String[] args = new String[]{EXAMPLE, FLAG_R, FLAG_X};
-        List<String> expected = List.of(EXAMPLE);
 
         // When
-        assertDoesNotThrow(() -> lsArgsParser.parse(args));
-        List<String> result = lsArgsParser.getDirectories();
+        assertDoesNotThrow(() -> parser.parse(args));
+        List<String> result = parser.getDirectories();
 
         // Then
+        List<String> expected = List.of(EXAMPLE);
         assertEquals(expected, result);
     }
 }

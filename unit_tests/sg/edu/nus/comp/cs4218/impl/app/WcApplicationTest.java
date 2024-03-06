@@ -73,68 +73,59 @@ public class WcApplicationTest {
 
     @Test
     void countFromFiles_NonExistentFile_ReturnsFileNotFoundError() {
-        assertDoesNotThrow(() -> {
-            String result = app.countFromFiles(true, true, true, NON_EXISTENT_FILE);
-            assertEquals(WC_EXCEPTION_MSG + ERR_FILE_NOT_FOUND, result);
-        });
+        String result = assertDoesNotThrow(() -> app.countFromFiles(true, true, true, NON_EXISTENT_FILE));
+        String expected = WC_EXCEPTION_MSG + ERR_FILE_NOT_FOUND;
+        assertEquals(expected, result);
+
     }
 
     @Test
     void countFromFiles_NonExistentFileAndValidFile_ReturnsValidFileCountsAndError() {
+        String result = assertDoesNotThrow(() -> app.countFromFiles(true, true, true, NON_EXISTENT_FILE, filePathA));
         List<String> expectedList = new ArrayList<>();
         expectedList.add(WC_EXCEPTION_MSG + ERR_FILE_NOT_FOUND);
         expectedList.add(appendString(3, 11, 57, String.format(STRING_FORMAT, filePathA)));
         expectedList.add(appendString(3, 11, 57, TOTAL_LAST_LINE));
         String expected = String.join(STRING_NEWLINE, expectedList);
-        assertDoesNotThrow(() -> {
-            String result = app.countFromFiles(true, true, true, NON_EXISTENT_FILE, filePathA);
-            assertEquals(expected, result);
-        });
+        assertEquals(expected, result);
     }
 
     @Test
     void countFromFiles_CountFromFilesWithAllFlags_ReturnsAllCounts() {
+        String result = assertDoesNotThrow(() -> app.countFromFiles(true, true, true, filePathA, filePathB));
         List<String> expectedList = new ArrayList<>();
         expectedList.add(appendString(3, 11, 57, String.format(STRING_FORMAT, filePathA)));
         expectedList.add(appendString(3, 12, 75, String.format(STRING_FORMAT, filePathB)));
         expectedList.add(appendString(6, 23, 132, TOTAL_LAST_LINE));
         String expected = String.join(STRING_NEWLINE, expectedList);
-        assertDoesNotThrow(() -> {
-            String result = app.countFromFiles(true, true, true, filePathA, filePathB);
-            assertEquals(expected, result);
-        });
+        assertEquals(expected, result);
     }
 
     @Test
     void countFromFiles_CountFromFilesWithBytesAndLinesFlags_ReturnsBytesAndLinesCounts() {
+        String result = assertDoesNotThrow(() -> app.countFromFiles(false, true, true, filePathA, filePathB));
         List<String> expectedList = new ArrayList<>();
         expectedList.add(appendString(3, 11, -1, String.format(STRING_FORMAT, filePathA)));
         expectedList.add(appendString(3, 12, -1, String.format(STRING_FORMAT, filePathB)));
         expectedList.add(appendString(6, 23, -1, TOTAL_LAST_LINE));
         String expected = String.join(STRING_NEWLINE, expectedList);
-        assertDoesNotThrow(() -> {
-            String result = app.countFromFiles(false, true, true, filePathA, filePathB);
-            assertEquals(expected, result);
-        });
+        assertEquals(expected, result);
     }
 
     @Test
-    void countFromStdin_NullStdin_ThrowsException() {
-        assertThrows(WcException.class, () -> {
-            String result = app.countFromStdin(true, true, true, null);
-            assertEquals(WC_EXCEPTION_MSG + ERR_NULL_STREAMS, result);
-        });
+    void countFromStdin_NullStdin_ThrowsWcException() {
+        WcException result = assertThrows(WcException.class, () -> app.countFromStdin(true, true, true, null));
+        String expected = WC_EXCEPTION_MSG + ERR_NULL_STREAMS;
+        assertEquals(expected, result.getMessage());
     }
 
     @Test
     void countFromStdin_EmptyStdin_ReturnsCorrectCounts() {
+        String result = assertDoesNotThrow(() -> app.countFromStdin(true, true, true, new ByteArrayInputStream("".getBytes())));
         List<String> expectedList = new ArrayList<>();
         expectedList.add(appendString(0, 0, 0, ""));
         String expected = String.join(STRING_NEWLINE, expectedList);
-        assertDoesNotThrow(() -> {
-            String result = app.countFromStdin(true, true, true, new ByteArrayInputStream("".getBytes()));
-            assertEquals(expected, result);
-        });
+        assertEquals(expected, result);
     }
 
     @Test
@@ -142,11 +133,10 @@ public class WcApplicationTest {
         List<String> expectedList = new ArrayList<>();
         expectedList.add(appendString(3, 11, 57, ""));
         String expected = String.join(STRING_NEWLINE, expectedList);
+
         try (InputStream inputStream = IOUtils.openInputStream(filePathA)) {
-            assertDoesNotThrow(() -> {
-                String result = app.countFromStdin(true, true, true, inputStream);
-                assertEquals(expected, result);
-            });
+            String result = assertDoesNotThrow(() -> app.countFromStdin(true, true, true, inputStream));
+            assertEquals(expected, result);
         } catch (IOException | ShellException e) {
             e.printStackTrace();
         }
@@ -157,11 +147,10 @@ public class WcApplicationTest {
         List<String> expectedList = new ArrayList<>();
         expectedList.add(appendString(3, 11, -1, ""));
         String expected = String.join(STRING_NEWLINE, expectedList);
+
         try (InputStream inputStream = IOUtils.openInputStream(filePathA)) {
-            assertDoesNotThrow(() -> {
-                String result = app.countFromStdin(false, true, true, inputStream);
-                assertEquals(expected, result);
-            });
+            String result = assertDoesNotThrow(() -> app.countFromStdin(false, true, true, inputStream));
+            assertEquals(expected, result);
         } catch (IOException | ShellException e) {
             e.printStackTrace();
         }
@@ -174,11 +163,10 @@ public class WcApplicationTest {
         expectedList.add(appendString(3, 12, 75, String.format(STRING_FORMAT, filePathB)));
         expectedList.add(appendString(6, 23, 132, TOTAL_LAST_LINE));
         String expected = String.join(STRING_NEWLINE, expectedList);
+
         try (InputStream inputStream = IOUtils.openInputStream(filePathA)) {
-            assertDoesNotThrow(() -> {
-                String result = app.countFromFileAndStdin(true, true, true, inputStream, "-", filePathB);
-                assertEquals(expected, result);
-            });
+            String result = assertDoesNotThrow(() -> app.countFromFileAndStdin(true, true, true, inputStream, "-", filePathB));
+            assertEquals(expected, result);
         } catch (IOException | ShellException e) {
             e.printStackTrace();
         }
@@ -191,11 +179,10 @@ public class WcApplicationTest {
         expectedList.add(appendString(3, -1, 75, String.format(STRING_FORMAT, filePathB)));
         expectedList.add(appendString(6, -1, 132, TOTAL_LAST_LINE));
         String expected = String.join(STRING_NEWLINE, expectedList);
+
         try (InputStream inputStream = IOUtils.openInputStream(filePathA)) {
-            assertDoesNotThrow(() -> {
-                String result = app.countFromFileAndStdin(true, true, false, inputStream, "-", filePathB);
-                assertEquals(expected, result);
-            });
+            String result = assertDoesNotThrow(() -> app.countFromFileAndStdin(true, true, false, inputStream, "-", filePathB));
+            assertEquals(expected, result);
         } catch (IOException | ShellException e) {
             e.printStackTrace();
         }

@@ -1,7 +1,8 @@
 package sg.edu.nus.comp.cs4218.impl.app;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -42,24 +43,25 @@ class EchoApplicationTest {
 
     @Test
     void constructResult_NullArgs_ThrowsEchoException() {
-        Throwable result = assertThrows(EchoException.class, () -> {
-            app.constructResult(null);
-        });
+        EchoException result = assertThrowsExactly(EchoException.class, () -> app.constructResult(null));
         assertEquals(ECHO_EXCEPTION + ERR_NULL_ARGS, result.getMessage());
     }
 
     @Test
-    void constructResult_NoArgs_ReturnsNewLine() throws EchoException {
-        assertEquals(STRING_NEWLINE, app.constructResult(new String[0]));
+    void constructResult_NoArgs_ReturnsNewLine() {
+        String result = assertDoesNotThrow(() -> app.constructResult(new String[0]));
+        assertEquals(STRING_NEWLINE, result);
     }
 
     @Test
-    void constructResult_OneArg_JoinsArgAndNewLine() throws EchoException {
-        assertEquals("OneArg" + STRING_NEWLINE, app.constructResult(new String[]{"OneArg"}));
+    void constructResult_OneArg_JoinsArgAndNewLine() {
+        String result = assertDoesNotThrow(() -> app.constructResult(new String[]{"OneArg"}));
+        assertEquals("OneArg" + STRING_NEWLINE, result);
     }
 
     @Test
-    void constructResult_ManyArgs_JoinsArgsAndNewLine() throws EchoException {
-        assertEquals("Many" + " " + "Args" + STRING_NEWLINE, app.constructResult(new String[]{"Many", "Args"}));
+    void constructResult_ManyArgs_JoinsArgsAndNewLine() {
+        String result = assertDoesNotThrow(() -> app.constructResult(new String[]{"Many", "Args"}));
+        assertEquals("Many" + " " + "Args" + STRING_NEWLINE, result);
     }
 }

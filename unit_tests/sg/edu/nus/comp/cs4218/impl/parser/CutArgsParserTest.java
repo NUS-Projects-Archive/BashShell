@@ -32,7 +32,7 @@ public class CutArgsParserTest {
     private static final String FILE_ONE = "file1";
     private static final String FILE_TWO = "file2";
     private static final String STDIN = "-";
-    private CutArgsParser cutArgsParser;
+    private CutArgsParser parser;
 
     private static Stream<Arguments> validSyntax() {
         return Stream.of(
@@ -107,90 +107,90 @@ public class CutArgsParserTest {
 
     @BeforeEach
     void setUp() {
-        this.cutArgsParser = new CutArgsParser();
+        this.parser = new CutArgsParser();
     }
 
     @ParameterizedTest
     @ValueSource(strings = {"", " ", "\n"})
     void parse_EmptyString_ReturnsEmptyFlagsAndNonFlagArgsContainsInput(String args) {
-        assertDoesNotThrow(() -> cutArgsParser.parse(args));
-        assertTrue(cutArgsParser.flags.isEmpty());
-        assertTrue(cutArgsParser.nonFlagArgs.contains(args));
+        assertDoesNotThrow(() -> parser.parse(args));
+        assertTrue(parser.flags.isEmpty());
+        assertTrue(parser.nonFlagArgs.contains(args));
     }
 
     @ParameterizedTest
     @ValueSource(strings = {FLAG_CUT_BY_CHAR, FLAG_CUT_BY_BYTE})
     void parse_ValidFlag_ShouldMatchGivenFlags(String args) {
-        assertDoesNotThrow(() -> cutArgsParser.parse(args));
+        assertDoesNotThrow(() -> parser.parse(args));
 
-        // Retain only the common elements between cutArgsParser.flags and VALID_FLAGS
-        cutArgsParser.flags.retainAll(VALID_FLAGS);
+        // Retain only the common elements between parser.flags and VALID_FLAGS
+        parser.flags.retainAll(VALID_FLAGS);
 
         // Check if there's at least one common element
-        assertFalse(cutArgsParser.flags.isEmpty());
+        assertFalse(parser.flags.isEmpty());
     }
 
     @ParameterizedTest
     @ValueSource(strings = {"-a", "-1", "-!", "-C", "-B", "--"})
     void parse_InvalidFlag_ThrowsInvalidArgsException(String args) {
-        String expectedMsg = String.format("illegal option -- %s", args.charAt(1));
-        InvalidArgsException exception = assertThrowsExactly(InvalidArgsException.class, () -> {
-            cutArgsParser.parse(args, SINGLE_NUM, FILE_ONE);
-        });
-        assertEquals(expectedMsg, exception.getMessage());
+        InvalidArgsException result = assertThrowsExactly(InvalidArgsException.class, () ->
+                parser.parse(args, SINGLE_NUM, FILE_ONE)
+        );
+        String expected = String.format("illegal option -- %s", args.charAt(1));
+        assertEquals(expected, result.getMessage());
     }
 
     @Test
     void parse_NoFlags_ThrowsInvalidArgsException() {
-        String expectedMsg = "Invalid syntax"; // one valid flag is expected
-        InvalidArgsException exception = assertThrowsExactly(InvalidArgsException.class, () -> {
-            cutArgsParser.parse(SINGLE_NUM, FILE_ONE);
-        });
-        assertEquals(expectedMsg, exception.getMessage());
+        InvalidArgsException result = assertThrowsExactly(InvalidArgsException.class, () ->
+                parser.parse(SINGLE_NUM, FILE_ONE)
+        );
+        String expected = "Invalid syntax"; // one valid flag is expected
+        assertEquals(expected, result.getMessage());
     }
 
     @ParameterizedTest
     @MethodSource("validSyntax")
     void parse_ValidSyntax_DoNotThrowException(String... args) {
-        assertDoesNotThrow(() -> cutArgsParser.parse(args));
+        assertDoesNotThrow(() -> parser.parse(args));
     }
 
     @ParameterizedTest
     @MethodSource("invalidSyntax")
     void parse_invalidSyntax_ThrowsInvalidArgsException(String... args) {
         // InvalidArgsException to be thrown for scenarios where no flag is provided or more than one flag is given
-        assertThrows(InvalidArgsException.class, () -> cutArgsParser.parse(args));
+        assertThrows(InvalidArgsException.class, () -> parser.parse(args));
     }
 
     @Test
     void isCharPo_ValidFlagAndSyntax_ReturnsTrue() {
-        assertDoesNotThrow(() -> cutArgsParser.parse(FLAG_CUT_BY_CHAR, SINGLE_NUM, FILE_ONE));
-        assertTrue(cutArgsParser.isCharPo());
+        assertDoesNotThrow(() -> parser.parse(FLAG_CUT_BY_CHAR, SINGLE_NUM, FILE_ONE));
+        assertTrue(parser.isCharPo());
     }
 
     @Test
     void isCharPo_DifferentValidFlagAndSyntax_ReturnsFalse() {
-        assertDoesNotThrow(() -> cutArgsParser.parse(FLAG_CUT_BY_BYTE, SINGLE_NUM, FILE_ONE));
-        assertFalse(cutArgsParser.isCharPo());
+        assertDoesNotThrow(() -> parser.parse(FLAG_CUT_BY_BYTE, SINGLE_NUM, FILE_ONE));
+        assertFalse(parser.isCharPo());
     }
 
     @Test
     void isBytePo_ValidFlagAndSyntax_ReturnsTrue() {
-        assertDoesNotThrow(() -> cutArgsParser.parse(FLAG_CUT_BY_BYTE, SINGLE_NUM, FILE_ONE));
-        assertTrue(cutArgsParser.isBytePo());
+        assertDoesNotThrow(() -> parser.parse(FLAG_CUT_BY_BYTE, SINGLE_NUM, FILE_ONE));
+        assertTrue(parser.isBytePo());
     }
 
     @Test
     void isBytePo_DifferentValidFlagAndSyntax_ReturnsTrue() {
-        assertDoesNotThrow(() -> cutArgsParser.parse(FLAG_CUT_BY_CHAR, SINGLE_NUM, FILE_ONE));
-        assertFalse(cutArgsParser.isBytePo());
+        assertDoesNotThrow(() -> parser.parse(FLAG_CUT_BY_CHAR, SINGLE_NUM, FILE_ONE));
+        assertFalse(parser.isBytePo());
     }
 
     @ParameterizedTest
     @MethodSource("validRangeList")
     void getRangeList_ValidList_ReturnsSortedList(String[] args, List<Integer[]> expected) {
-        assertDoesNotThrow(() -> cutArgsParser.parse(args));
-        assertEquals(cutArgsParser.getRangeList(), expected);
+        assertDoesNotThrow(() -> parser.parse(args));
+        assertEquals(parser.getRangeList(), expected);
     }
 
     @ParameterizedTest
@@ -198,9 +198,9 @@ public class CutArgsParserTest {
     void getFileNames_OneFileGiven_ReturnsOneFile(String args) {
         String[] arguments = args.split("\\s+");
         String lastFile = arguments[arguments.length - 1];
-        assertDoesNotThrow(() -> cutArgsParser.parse(arguments));
+        assertDoesNotThrow(() -> parser.parse(arguments));
+        List<String> result = parser.getFileNames();
         List<String> expected = List.of(lastFile);
-        List<String> result = cutArgsParser.getFileNames();
         assertEquals(expected, result);
     }
 
@@ -210,9 +210,9 @@ public class CutArgsParserTest {
         String[] arguments = args.split("\\s+");
         String secondLastFile = arguments[arguments.length - 2];
         String lastFile = arguments[arguments.length - 1];
-        assertDoesNotThrow(() -> cutArgsParser.parse(arguments));
+        assertDoesNotThrow(() -> parser.parse(arguments));
+        List<String> result = parser.getFileNames();
         List<String> expected = List.of(secondLastFile, lastFile);
-        List<String> result = cutArgsParser.getFileNames();
         assertEquals(expected, result);
     }
 }

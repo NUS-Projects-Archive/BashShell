@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static sg.edu.nus.comp.cs4218.impl.parser.ArgsParser.ILLEGAL_FLAG_MSG;
 
@@ -31,7 +32,7 @@ class SortArgsParserTest {
     private static final String FILE_TWO = "file2";
     private static final String FILE_THREE = "file3";
     private static final String DASH = "-";
-    private SortArgsParser sortArgsParser;
+    private SortArgsParser parser;
 
     private static Stream<Arguments> validSyntax() {
         return Stream.of(
@@ -66,164 +67,161 @@ class SortArgsParserTest {
 
     @BeforeEach
     void setUp() {
-        sortArgsParser = new SortArgsParser();
+        parser = new SortArgsParser();
     }
 
     @ParameterizedTest
     @ValueSource(strings = {"", " ", "\n"})
-    void parse_EmptyString_ReturnsEmptyFlagsAndNonFlagArgsContainsInput(String args)
-            throws InvalidArgsException {
-        sortArgsParser.parse(args);
-        assertTrue(sortArgsParser.flags.isEmpty());
-        assertTrue(sortArgsParser.nonFlagArgs.contains(args));
+    void parse_EmptyString_ReturnsEmptyFlagsAndNonFlagArgsContainsInput(String args) {
+        assertDoesNotThrow(() -> parser.parse(args));
+        assertTrue(parser.flags.isEmpty());
+        assertTrue(parser.nonFlagArgs.contains(args));
     }
 
     @ParameterizedTest
     @ValueSource(strings = {FLAG_FIRST_NUM, FLAG_REV_ORDER, FLAG_CASE_IGNORE})
     void parse_ValidFlag_ShouldMatchGivenFlags(String args) {
-        assertDoesNotThrow(() -> sortArgsParser.parse(args));
+        assertDoesNotThrow(() -> parser.parse(args));
 
-        // Retain only the common elements between sortArgsParser.flags and VALID_FLAGS
-        sortArgsParser.flags.retainAll(VALID_FLAGS);
+        // Retain only the common elements between parser.flags and VALID_FLAGS
+        parser.flags.retainAll(VALID_FLAGS);
 
         // Check if there's at least one common element
-        assertFalse(sortArgsParser.flags.isEmpty());
+        assertFalse(parser.flags.isEmpty());
     }
 
     @Test
     void parse_AllValidFlags_ReturnsGivenMatchingFlags() {
-        assertDoesNotThrow(() -> sortArgsParser.parse(FLAG_FIRST_NUM, FLAG_REV_ORDER, FLAG_CASE_IGNORE));
-        assertEquals(VALID_FLAGS, sortArgsParser.flags, "Flags do not match");
+        assertDoesNotThrow(() -> parser.parse(FLAG_FIRST_NUM, FLAG_REV_ORDER, FLAG_CASE_IGNORE));
+        assertEquals(VALID_FLAGS, parser.flags, "Flags do not match");
     }
 
     @ParameterizedTest
     @ValueSource(strings = {"-nrf", "-nfr", "-rnf", "-rfn", "-fnr", "-frn"})
     void parse_AllValidFlagsTogether_ReturnsGivenMatchingFlags(String args) {
-        assertDoesNotThrow(() -> sortArgsParser.parse(args));
-        assertEquals(VALID_FLAGS, sortArgsParser.flags, "Flags do not match");
+        assertDoesNotThrow(() -> parser.parse(args));
+        assertEquals(VALID_FLAGS, parser.flags, "Flags do not match");
     }
 
     @ParameterizedTest
     @ValueSource(strings = {"-a", "-1", "-!", "-N", "-R", "-F", "--"})
     void parse_InvalidFlag_ThrowsInvalidArgsException(String args) {
-        Throwable result = assertThrows(InvalidArgsException.class, () -> {
-            sortArgsParser.parse(args);
-        });
+        InvalidArgsException result = assertThrowsExactly(InvalidArgsException.class, () -> parser.parse(args));
         assertEquals(ILLEGAL_FLAG_MSG + args.charAt(1), result.getMessage());
     }
 
     @ParameterizedTest
     @MethodSource("validSyntax")
     void parse_ValidSyntax_DoNotThrowException(String... args) {
-        assertDoesNotThrow(() -> sortArgsParser.parse(args));
+        assertDoesNotThrow(() -> parser.parse(args));
     }
 
     @ParameterizedTest
     @MethodSource("invalidSyntax")
     void parse_invalidSyntax_ThrowsInvalidArgsException(String... args) {
-        assertThrows(InvalidArgsException.class, () -> sortArgsParser.parse(args));
+        assertThrows(InvalidArgsException.class, () -> parser.parse(args));
     }
 
     @Test
     void isFirstWordNumber_NoFlag_ReturnsFalse() {
-        assertDoesNotThrow(() -> sortArgsParser.parse());
-        assertFalse(sortArgsParser.isFirstWordNumber());
+        assertDoesNotThrow(() -> parser.parse());
+        assertFalse(parser.isFirstWordNumber());
     }
 
     @Test
     void isFirstWordNumber_ValidFlag_ReturnsTrue() {
-        assertDoesNotThrow(() -> sortArgsParser.parse(FLAG_FIRST_NUM));
-        assertTrue(sortArgsParser.isFirstWordNumber());
+        assertDoesNotThrow(() -> parser.parse(FLAG_FIRST_NUM));
+        assertTrue(parser.isFirstWordNumber());
     }
 
     @Test
     void isFirstWordNumber_ValidFlagAndNonFlagArg_ReturnsTrue() {
-        assertDoesNotThrow(() -> sortArgsParser.parse(FLAG_FIRST_NUM, FILE_ONE));
-        assertTrue(sortArgsParser.isFirstWordNumber());
+        assertDoesNotThrow(() -> parser.parse(FLAG_FIRST_NUM, FILE_ONE));
+        assertTrue(parser.isFirstWordNumber());
     }
 
     @Test
     void isFirstWordNumber_OnlyNonFlagArg_ReturnsFalse() {
-        assertDoesNotThrow(() -> sortArgsParser.parse(FILE_ONE));
-        assertFalse(sortArgsParser.isFirstWordNumber());
+        assertDoesNotThrow(() -> parser.parse(FILE_ONE));
+        assertFalse(parser.isFirstWordNumber());
     }
 
     @Test
     void isReverseOrder_NoFlag_ReturnsTrue() {
-        assertDoesNotThrow(() -> sortArgsParser.parse());
-        assertFalse(sortArgsParser.isReverseOrder());
+        assertDoesNotThrow(() -> parser.parse());
+        assertFalse(parser.isReverseOrder());
     }
 
     @Test
     void isReverseOrder_ValidFlag_ReturnsTrue() {
-        assertDoesNotThrow(() -> sortArgsParser.parse(FLAG_REV_ORDER));
-        assertTrue(sortArgsParser.isReverseOrder());
+        assertDoesNotThrow(() -> parser.parse(FLAG_REV_ORDER));
+        assertTrue(parser.isReverseOrder());
     }
 
     @Test
     void isReverseOrder_ValidFlagAndNonFlagArg_ReturnsTrue() {
-        assertDoesNotThrow(() -> sortArgsParser.parse(FLAG_REV_ORDER, FILE_ONE));
-        assertTrue(sortArgsParser.isReverseOrder());
+        assertDoesNotThrow(() -> parser.parse(FLAG_REV_ORDER, FILE_ONE));
+        assertTrue(parser.isReverseOrder());
     }
 
     @Test
     void isReverseOrder_OnlyNonFlagArg_ReturnsFalse() {
-        assertDoesNotThrow(() -> sortArgsParser.parse(FILE_ONE));
-        assertFalse(sortArgsParser.isReverseOrder());
+        assertDoesNotThrow(() -> parser.parse(FILE_ONE));
+        assertFalse(parser.isReverseOrder());
     }
 
     @Test
     void isCaseIndependent_NoFlag_ReturnsTrue() {
-        assertDoesNotThrow(() -> sortArgsParser.parse());
-        assertFalse(sortArgsParser.isCaseIndependent());
+        assertDoesNotThrow(() -> parser.parse());
+        assertFalse(parser.isCaseIndependent());
     }
 
     @Test
     void isCaseIndependent_ValidFlag_ReturnsTrue() {
-        assertDoesNotThrow(() -> sortArgsParser.parse(FLAG_CASE_IGNORE));
-        assertTrue(sortArgsParser.isCaseIndependent());
+        assertDoesNotThrow(() -> parser.parse(FLAG_CASE_IGNORE));
+        assertTrue(parser.isCaseIndependent());
     }
 
     @Test
     void isCaseIndependent_ValidFlagAndNonFlagArg_ReturnsTrue() {
-        assertDoesNotThrow(() -> sortArgsParser.parse(FLAG_CASE_IGNORE, FILE_ONE));
-        assertTrue(sortArgsParser.isCaseIndependent());
+        assertDoesNotThrow(() -> parser.parse(FLAG_CASE_IGNORE, FILE_ONE));
+        assertTrue(parser.isCaseIndependent());
     }
 
     @Test
     void isCaseIndependent_OnlyNonFlagArg_ReturnsFalse() {
-        assertDoesNotThrow(() -> sortArgsParser.parse(FILE_ONE));
-        assertFalse(sortArgsParser.isCaseIndependent());
+        assertDoesNotThrow(() -> parser.parse(FILE_ONE));
+        assertFalse(parser.isCaseIndependent());
     }
 
     @Test
     void getFileNames_NoArg_ReturnsEmpty() {
-        assertDoesNotThrow(() -> sortArgsParser.parse());
-        List<String> result = sortArgsParser.getFileNames();
+        assertDoesNotThrow(() -> parser.parse());
+        List<String> result = parser.getFileNames();
         assertTrue(result.isEmpty());
     }
 
     @Test
     void getFileNames_OneNonFlagArg_ReturnsOneFile() {
-        assertDoesNotThrow(() -> sortArgsParser.parse(FILE_ONE));
+        assertDoesNotThrow(() -> parser.parse(FILE_ONE));
+        List<String> result = parser.getFileNames();
         List<String> expected = List.of(FILE_ONE);
-        List<String> result = sortArgsParser.getFileNames();
         assertEquals(expected, result);
     }
 
     @Test
     void getFileNames_MultipleNonFlagArg_ReturnsMultipleFiles() {
-        assertDoesNotThrow(() -> sortArgsParser.parse(FILE_ONE, FILE_TWO, FILE_THREE));
+        assertDoesNotThrow(() -> parser.parse(FILE_ONE, FILE_TWO, FILE_THREE));
+        List<String> result = parser.getFileNames();
         List<String> expected = List.of(FILE_ONE, FILE_TWO, FILE_THREE);
-        List<String> result = sortArgsParser.getFileNames();
         assertEquals(expected, result);
     }
 
     @Test
     void getFileNames_ValidFlagsAndOneNonFlagArg_ReturnsOneFile() {
-        assertDoesNotThrow(() -> sortArgsParser.parse(FLAG_FIRST_NUM, FLAG_REV_ORDER, FLAG_CASE_IGNORE, FILE_ONE));
+        assertDoesNotThrow(() -> parser.parse(FLAG_FIRST_NUM, FLAG_REV_ORDER, FLAG_CASE_IGNORE, FILE_ONE));
+        List<String> result = parser.getFileNames();
         List<String> expected = List.of(FILE_ONE);
-        List<String> result = sortArgsParser.getFileNames();
         assertEquals(expected, result);
     }
 }

@@ -18,13 +18,13 @@ import sg.edu.nus.comp.cs4218.impl.util.IOUtils;
 import sg.edu.nus.comp.cs4218.impl.util.StringUtils;
 
 class TeeApplicationTest {
+
     private static final String FILE_A = "A.txt";
     private static final String FILE_B = "B.txt";
     private static final String EMPTY_FILE = "empty.txt";
     private static final String CONTENT_FILE_A = "A\nB\nC\nD\nE";
     private static final String CONTENT_FILE_B = "1\n2\n3\n4\n5";
     private TeeApplication app;
-
     private InputStream inputStream;
     @TempDir
     private Path tempDir;
@@ -68,18 +68,18 @@ class TeeApplicationTest {
 
     @Test
     void teeFromStdin_OneFile_WritesToFile() {
-        String expected = CONTENT_FILE_A + StringUtils.STRING_NEWLINE;
         String outputStdOut = assertDoesNotThrow(() -> app.teeFromStdin(false, inputStream, emptyFile));
         String outputFile = assertDoesNotThrow(() -> Files.readString(emptyFilePath));
+        String expected = CONTENT_FILE_A + StringUtils.STRING_NEWLINE;
         assertEquals(expected, outputStdOut);
         assertEquals(expected, outputFile);
     }
 
     @Test
     void teeFromStdin_OneFileAndValidFlag_AppendsToFile() {
-        String expected = CONTENT_FILE_B + StringUtils.STRING_NEWLINE + CONTENT_FILE_A + StringUtils.STRING_NEWLINE;
         String outputStdOut = assertDoesNotThrow(() -> app.teeFromStdin(true, inputStream, fileB));
         String outputFile = assertDoesNotThrow(() -> Files.readString(fileBPath));
+        String expected = CONTENT_FILE_B + StringUtils.STRING_NEWLINE + CONTENT_FILE_A + StringUtils.STRING_NEWLINE;
         assertEquals(expected, outputStdOut);
         assertEquals(expected, outputFile);
     }
