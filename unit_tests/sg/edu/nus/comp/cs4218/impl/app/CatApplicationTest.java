@@ -70,9 +70,9 @@ class CatApplicationTest {
 
     @Test
     void readFile_FileNotFound_ThrowsCatException() {
-        CatException result = assertThrowsExactly(CatException.class, () -> {
-            app.readFile(false, new File(NON_EXISTENT_FILE));
-        });
+        CatException result = assertThrowsExactly(CatException.class, () ->
+                app.readFile(false, new File(NON_EXISTENT_FILE))
+        );
         assertTrue(result.getMessage().contains(CAT_EXCEPTION_MSG + ERR_FILE_NOT_FOUND));
     }
 
@@ -93,9 +93,7 @@ class CatApplicationTest {
     @Test
     void readStdin_IOExceptionWhenReadingInput_ThrowsCatException() {
         when(assertDoesNotThrow(() -> brMock.readLine())).thenThrow(new IOException());
-        CatException result = assertThrowsExactly(CatException.class, () -> {
-            app.readStdIn(false, brMock);
-        });
+        CatException result = assertThrowsExactly(CatException.class, () -> app.readStdIn(false, brMock));
         assertTrue(result.getMessage().contains(CAT_EXCEPTION_MSG + ERR_IO_EXCEPTION));
     }
 
@@ -119,9 +117,7 @@ class CatApplicationTest {
     @Test
     void catStdin_IOExceptionWhenReadingInput_ThrowsCatException() {
         when(assertDoesNotThrow(() -> inputStreamMock.read())).thenThrow(new IOException());
-        assertThrows(CatException.class, () -> {
-            app.catStdin(false, inputStreamMock);
-        });
+        assertThrows(CatException.class, () -> app.catStdin(false, inputStreamMock));
     }
 
     @ParameterizedTest

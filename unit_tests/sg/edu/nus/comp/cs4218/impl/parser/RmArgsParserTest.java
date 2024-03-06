@@ -17,7 +17,7 @@ import sg.edu.nus.comp.cs4218.exception.InvalidArgsException;
 
 public class RmArgsParserTest {
 
-    private RmArgsParser rmArgsParser;
+    private RmArgsParser parser;
 
     private static Stream<Arguments> validFlags() {
         return Stream.of(
@@ -29,23 +29,23 @@ public class RmArgsParserTest {
 
     @BeforeEach
     void setUp() {
-        rmArgsParser = new RmArgsParser();
+        parser = new RmArgsParser();
     }
 
     @ParameterizedTest
     @MethodSource("validFlags")
     void parse_ValidFlags_CorrectMatchingFlags(String args, boolean... expectedResults) {
-        assertDoesNotThrow(() -> rmArgsParser.parse(args));
+        assertDoesNotThrow(() -> parser.parse(args));
         assertArrayEquals(expectedResults, new boolean[]{
-                rmArgsParser.isRecursive(),
-                rmArgsParser.isRecursive()
+                parser.isRecursive(),
+                parser.isRecursive()
         });
     }
 
     @ParameterizedTest
     @ValueSource(strings = {"-R", "-D"})
     void parse_InvalidFlags_ThrowsInvalidArgsException(String args) {
-        InvalidArgsException thrown = assertThrowsExactly(InvalidArgsException.class, () -> rmArgsParser.parse(args));
+        InvalidArgsException thrown = assertThrowsExactly(InvalidArgsException.class, () -> parser.parse(args));
         String illegalFlag = args.substring(1);
         assertEquals(String.format("illegal option -- %s", illegalFlag), thrown.getMessage());
     }

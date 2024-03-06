@@ -58,7 +58,6 @@ class EchoApplicationTest {
     @Test
     void constructResult_OneArg_JoinsArgAndNewLine() {
         String result = assertDoesNotThrow(() -> app.constructResult(new String[]{"OneArg"}));
-
         assertEquals("OneArg" + STRING_NEWLINE, result);
     }
 

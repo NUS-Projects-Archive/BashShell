@@ -29,7 +29,7 @@ class MvArgsParserTest {
     private static final String FILE_THREE = "file3";
 
     private final Set<Character> VALID_FLAGS = Set.of('n');
-    private MvArgsParser mvArgsParser;
+    private MvArgsParser parser;
 
     private static Stream<Arguments> validSyntax() {
         return Stream.of(
@@ -59,72 +59,72 @@ class MvArgsParserTest {
 
     @BeforeEach
     void setUp() {
-        mvArgsParser = new MvArgsParser();
+        parser = new MvArgsParser();
     }
 
     @ParameterizedTest
     @ValueSource(strings = {"", " ", "\n"})
     void parse_EmptyString_ReturnsEmptyFlagsAndNonFlagArgsContainsInput(String args) {
-        assertDoesNotThrow(() -> mvArgsParser.parse(args));
-        assertTrue(mvArgsParser.flags.isEmpty());
-        assertTrue(mvArgsParser.nonFlagArgs.contains(args));
+        assertDoesNotThrow(() -> parser.parse(args));
+        assertTrue(parser.flags.isEmpty());
+        assertTrue(parser.nonFlagArgs.contains(args));
     }
 
     @Test
     void parse_ValidFlag_ReturnsGivenMatchingFlag() {
-        assertDoesNotThrow(() -> mvArgsParser.parse(FLAG_OVERWRITE));
-        assertEquals(VALID_FLAGS, mvArgsParser.flags, "Flags do not match");
+        assertDoesNotThrow(() -> parser.parse(FLAG_OVERWRITE));
+        assertEquals(VALID_FLAGS, parser.flags, "Flags do not match");
     }
 
     @ParameterizedTest
     @ValueSource(strings = {"-a", "-1", "-!", "-P", "--"})
     void parse_InvalidFlag_ThrowsInvalidArgsException(String args) {
-        InvalidArgsException result = assertThrowsExactly(InvalidArgsException.class, () -> mvArgsParser.parse(args));
+        InvalidArgsException result = assertThrowsExactly(InvalidArgsException.class, () -> parser.parse(args));
         assertEquals(ILLEGAL_FLAG_MSG + args.charAt(1), result.getMessage());
     }
 
     @ParameterizedTest
     @MethodSource("validSyntax")
     void parse_validSyntax_DoNotThrowException(String... args) {
-        assertDoesNotThrow(() -> mvArgsParser.parse(args));
+        assertDoesNotThrow(() -> parser.parse(args));
     }
 
     @ParameterizedTest
     @MethodSource("invalidSyntax")
     void parse_invalidSyntax_ThrowsInvalidArgsException(String... args) {
-        assertThrows(InvalidArgsException.class, () -> mvArgsParser.parse(args));
+        assertThrows(InvalidArgsException.class, () -> parser.parse(args));
     }
 
     @Test
     void isOverwrite_NoFlag_ReturnsFalse() {
-        assertDoesNotThrow(() -> mvArgsParser.parse());
-        assertTrue(mvArgsParser.isOverwrite());
+        assertDoesNotThrow(() -> parser.parse());
+        assertTrue(parser.isOverwrite());
     }
 
     @Test
     void isOverwrite_ValidFlag_ReturnsFalse() {
-        assertDoesNotThrow(() -> mvArgsParser.parse(FLAG_OVERWRITE));
-        assertFalse(mvArgsParser.isOverwrite());
+        assertDoesNotThrow(() -> parser.parse(FLAG_OVERWRITE));
+        assertFalse(parser.isOverwrite());
     }
 
     @Test
     void isOverwrite_OnlyNonFlagArg_ReturnsFalse() {
-        assertDoesNotThrow(() -> mvArgsParser.parse(FILE_ONE));
-        assertTrue(mvArgsParser.isOverwrite());
+        assertDoesNotThrow(() -> parser.parse(FILE_ONE));
+        assertTrue(parser.isOverwrite());
     }
 
     @Test
     void getSourceDirectories_NoArg_ThrowsIllegalArgsException() {
         assertThrows(IllegalArgumentException.class, () -> {
-            mvArgsParser.getSourceDirectories();
+            parser.getSourceDirectories();
         });
     }
 
     @ParameterizedTest
     @ValueSource(strings = {"file1", "-n file2"})
     void getSourceDirectories_OneNonFlagArg_ReturnsEmptyList(String args) {
-        assertDoesNotThrow(() -> mvArgsParser.parse(splitArgs(args)));
-        List<String> result = mvArgsParser.getSourceDirectories();
+        assertDoesNotThrow(() -> parser.parse(splitArgs(args)));
+        List<String> result = parser.getSourceDirectories();
         List<String> expected = List.of();
         assertEquals(expected, result);
     }
@@ -132,8 +132,8 @@ class MvArgsParserTest {
     @ParameterizedTest
     @ValueSource(strings = {"file1 file2", "-n file1 file2"})
     void getSourceDirectories_TwoNonFlagArgs_ReturnsFirstDirectory(String args) {
-        assertDoesNotThrow(() -> mvArgsParser.parse(splitArgs(args)));
-        List<String> result = mvArgsParser.getSourceDirectories();
+        assertDoesNotThrow(() -> parser.parse(splitArgs(args)));
+        List<String> result = parser.getSourceDirectories();
         List<String> expected = List.of(FILE_ONE);
         assertEquals(expected, result);
     }
@@ -141,8 +141,8 @@ class MvArgsParserTest {
     @ParameterizedTest
     @ValueSource(strings = {"file1 file2 file3", "-n file1 file2 file3"})
     void getSourceDirectories_MultipleNonFlagArgs_ReturnsAllDirectoriesExceptLast(String args) {
-        assertDoesNotThrow(() -> mvArgsParser.parse(splitArgs(args)));
-        List<String> result = mvArgsParser.getSourceDirectories();
+        assertDoesNotThrow(() -> parser.parse(splitArgs(args)));
+        List<String> result = parser.getSourceDirectories();
         List<String> expected = List.of(FILE_ONE, FILE_TWO);
         assertEquals(expected, result);
     }
@@ -150,31 +150,31 @@ class MvArgsParserTest {
     @Test
     void getDestinationDirectory_NoArg_ThrowsIndexOutOfBoundsException() {
         assertThrows(IndexOutOfBoundsException.class, () -> {
-            mvArgsParser.getDestinationDirectory();
+            parser.getDestinationDirectory();
         });
     }
 
     @ParameterizedTest
     @ValueSource(strings = {"file1", "-n file1"})
     void getDestinationDirectory_OneNonFlagArg_ReturnsLastDirectory(String args) {
-        assertDoesNotThrow(() -> mvArgsParser.parse(splitArgs(args)));
-        String result = mvArgsParser.getDestinationDirectory();
+        assertDoesNotThrow(() -> parser.parse(splitArgs(args)));
+        String result = parser.getDestinationDirectory();
         assertEquals(FILE_ONE, result);
     }
 
     @ParameterizedTest
     @ValueSource(strings = {"file1 file2", "-n file1 file2"})
     void getDestinationDirectory_TwoNonFlagArgs_ReturnsLastDirectory(String args) {
-        assertDoesNotThrow(() -> mvArgsParser.parse(splitArgs(args)));
-        String result = mvArgsParser.getDestinationDirectory();
+        assertDoesNotThrow(() -> parser.parse(splitArgs(args)));
+        String result = parser.getDestinationDirectory();
         assertEquals(FILE_TWO, result);
     }
 
     @ParameterizedTest
     @ValueSource(strings = {"file1 file2 file3", "-n file1 file2 file3"})
     void getDestinationDirectory_MultipleNonFlagArgs_ReturnsReturnsLastDirectory(String args) {
-        assertDoesNotThrow(() -> mvArgsParser.parse(splitArgs(args)));
-        String result = mvArgsParser.getDestinationDirectory();
+        assertDoesNotThrow(() -> parser.parse(splitArgs(args)));
+        String result = parser.getDestinationDirectory();
         assertEquals(FILE_THREE, result);
     }
 }

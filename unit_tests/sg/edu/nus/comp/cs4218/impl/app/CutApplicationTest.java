@@ -74,9 +74,9 @@ class CutApplicationTest {
     @Test
     void cutFromFiles_FileDoNotExist_ThrowsCutException() {
         String nonExistFile = tempDir.resolve("nonExistFile.txt").toString();
-        CutException result = assertThrowsExactly(CutException.class, () -> {
-            app.cutFromFiles(true, false, null, nonExistFile);
-        });
+        CutException result = assertThrowsExactly(CutException.class, () ->
+                app.cutFromFiles(true, false, null, nonExistFile)
+        );
         String expected = "cut: No such file or directory";
         assertEquals(expected, result.getMessage());
     }
@@ -84,9 +84,9 @@ class CutApplicationTest {
     @Test
     void cutFromFiles_FileGivenAsDirectory_ThrowsCutException() {
         List<int[]> range = List.of(new int[]{1, 5});
-        CutException result = assertThrowsExactly(CutException.class, () -> {
-            app.cutFromFiles(true, false, range, tempDir.toString());
-        });
+        CutException result = assertThrowsExactly(CutException.class, () ->
+                app.cutFromFiles(true, false, range, tempDir.toString())
+        );
         String expected = "cut: This is a directory";
         assertEquals(expected, result.getMessage());
     }
@@ -99,9 +99,9 @@ class CutApplicationTest {
         }
 
         List<int[]> range = List.of(new int[]{1, 5});
-        CutException result = assertThrowsExactly(CutException.class, () -> {
-            app.cutFromFiles(true, false, range, filePath.toString());
-        });
+        CutException result = assertThrowsExactly(CutException.class, () ->
+                app.cutFromFiles(true, false, range, filePath.toString())
+        );
         String expected = "cut: Permission denied";
         assertEquals(expected, result.getMessage());
     }

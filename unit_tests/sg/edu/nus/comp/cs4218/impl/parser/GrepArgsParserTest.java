@@ -15,20 +15,20 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 class GrepArgsParserTest {
 
-    private GrepArgsParser grepArgsParser;
+    private GrepArgsParser parser;
 
     @BeforeEach
     void setUp() {
-        grepArgsParser = new GrepArgsParser();
+        parser = new GrepArgsParser();
     }
 
     @Test
     void isInvert_FlagsContainIsInvert_ReturnsTrue() {
         // Given
-        grepArgsParser.flags.add('v');
+        parser.flags.add('v');
 
         // When
-        boolean result = grepArgsParser.isInvert();
+        boolean result = parser.isInvert();
 
         // Then
         assertTrue(result);
@@ -38,10 +38,10 @@ class GrepArgsParserTest {
     @ValueSource(chars = {'V', 'X'})
     void isInvert_FlagsDoesContainIsInvert_ReturnsFalse(char flag) {
         // Given
-        grepArgsParser.flags.add(flag);
+        parser.flags.add(flag);
 
         // When
-        boolean result = grepArgsParser.isInvert();
+        boolean result = parser.isInvert();
 
         // Then
         assertFalse(result);
@@ -50,20 +50,20 @@ class GrepArgsParserTest {
     @Test
     void getPattern_NonFlagArgsIsEmpty_ReturnsNull() {
         // When
-        String result = grepArgsParser.getPattern();
+        String result = parser.getPattern();
 
         // Then
-        assertEquals(null, result);
+        assertNull(result);
     }
 
     @Test
     void getPattern_NonFlagArgsIsNotEmpty_ReturnsFirstNonFlagArg() {
         // Given
         final String pattern = "a*b";
-        grepArgsParser.nonFlagArgs.add("a*b");
+        parser.nonFlagArgs.add("a*b");
 
         // When
-        String result = grepArgsParser.getPattern();
+        String result = parser.getPattern();
 
         // Then
         assertEquals(pattern, result);
@@ -72,7 +72,7 @@ class GrepArgsParserTest {
     @Test
     void getFileNames_NonFlagArgsSizeLessOrEqualsToOne_ReturnsNull() {
         // When
-        String[] result = grepArgsParser.getFileNames();
+        String[] result = parser.getFileNames();
 
         // Then
         assertNull(result);
@@ -82,11 +82,11 @@ class GrepArgsParserTest {
     void getFileNames_NonFlagArgsSizeMoreThanOne_ReturnsSecondNonFlagArgsOnwards() {
         // Given
         final String[] fileNames = {"file1.txt", "file2.txt"};
-        grepArgsParser.nonFlagArgs.add("a*b");
-        grepArgsParser.nonFlagArgs.addAll(Arrays.asList(fileNames));
+        parser.nonFlagArgs.add("a*b");
+        parser.nonFlagArgs.addAll(Arrays.asList(fileNames));
 
         // When
-        String[] result = grepArgsParser.getFileNames();
+        String[] result = parser.getFileNames();
 
         // Then
         assertArrayEquals(fileNames, result);

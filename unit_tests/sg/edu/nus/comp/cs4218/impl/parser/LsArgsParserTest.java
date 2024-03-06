@@ -30,7 +30,7 @@ class LsArgsParserTest {
     private static final String FLAG_P = "-P";
     private static final String EXAMPLE = "example";
 
-    private LsArgsParser lsArgsParser;
+    private LsArgsParser parser;
 
     private static Stream<Arguments> validSyntax() {
 
@@ -66,8 +66,8 @@ class LsArgsParserTest {
 
     private void testGetDirectoriesReturningEmpty(String... args) {
         // When
-        assertDoesNotThrow(() -> lsArgsParser.parse(args));
-        List<String> result = lsArgsParser.getDirectories();
+        assertDoesNotThrow(() -> parser.parse(args));
+        List<String> result = parser.getDirectories();
 
         // Then
         assertTrue(result.isEmpty());
@@ -75,7 +75,7 @@ class LsArgsParserTest {
 
     @BeforeEach
     void setUp() {
-        lsArgsParser = new LsArgsParser();
+        parser = new LsArgsParser();
     }
 
     /**
@@ -89,9 +89,9 @@ class LsArgsParserTest {
     @MethodSource("validSyntax")
     void parse_ValidSyntax_HasCorrectFlagsAndNonFlagArgs(String[] args, Set<Character> expectedFlags,
                                                          List<String> expectedNFA) {
-        assertDoesNotThrow(() -> lsArgsParser.parse(args));
-        assertEquals(expectedFlags, lsArgsParser.flags, "Flags do not match");
-        assertEquals(expectedNFA, lsArgsParser.nonFlagArgs, "Non-flag arguments do not match");
+        assertDoesNotThrow(() -> parser.parse(args));
+        assertEquals(expectedFlags, parser.flags, "Flags do not match");
+        assertEquals(expectedNFA, parser.nonFlagArgs, "Non-flag arguments do not match");
     }
 
     /**
@@ -102,7 +102,7 @@ class LsArgsParserTest {
     @ParameterizedTest
     @MethodSource("invalidSyntax")
     void parse_InvalidSyntax_ThrowsInvalidArgsException(String... args) {
-        assertThrows(InvalidArgsException.class, () -> lsArgsParser.parse(args));
+        assertThrows(InvalidArgsException.class, () -> parser.parse(args));
     }
 
     /**
@@ -113,8 +113,8 @@ class LsArgsParserTest {
     @ParameterizedTest
     @ValueSource(strings = {FLAG_R, FLAG_RX, FLAG_XR})
     void isRecursive_ValidFlag_ReturnsTrue(String args) {
-        assertDoesNotThrow(() -> lsArgsParser.parse(args));
-        assertTrue(lsArgsParser.isRecursive());
+        assertDoesNotThrow(() -> parser.parse(args));
+        assertTrue(parser.isRecursive());
     }
 
     /**
@@ -125,8 +125,8 @@ class LsArgsParserTest {
     @ParameterizedTest
     @ValueSource(strings = {FLAG_X, EXAMPLE})
     void isRecursive_InvalidFlag_ReturnsFalse(String args) {
-        assertDoesNotThrow(() -> lsArgsParser.parse(args));
-        assertFalse(lsArgsParser.isRecursive());
+        assertDoesNotThrow(() -> parser.parse(args));
+        assertFalse(parser.isRecursive());
     }
 
     /**
@@ -134,8 +134,8 @@ class LsArgsParserTest {
      */
     @Test
     void isRecursive_NoFlag_ReturnsFalse() {
-        assertDoesNotThrow(() -> lsArgsParser.parse(""));
-        assertFalse(lsArgsParser.isRecursive());
+        assertDoesNotThrow(() -> parser.parse(""));
+        assertFalse(parser.isRecursive());
     }
 
     /**
@@ -146,8 +146,8 @@ class LsArgsParserTest {
     @ParameterizedTest
     @ValueSource(strings = {FLAG_X, FLAG_RX, FLAG_XR})
     void isSortByExt_ValidFlag_ReturnsTrue(String args) {
-        assertDoesNotThrow(() -> lsArgsParser.parse(args));
-        assertTrue(lsArgsParser.isSortByExt());
+        assertDoesNotThrow(() -> parser.parse(args));
+        assertTrue(parser.isSortByExt());
     }
 
     /**
@@ -158,8 +158,8 @@ class LsArgsParserTest {
     @ParameterizedTest
     @ValueSource(strings = {FLAG_R, EXAMPLE})
     void isSortByExt_InvalidFlag_ReturnsFalse(String args) {
-        assertDoesNotThrow(() -> lsArgsParser.parse(args));
-        assertFalse(lsArgsParser.isSortByExt());
+        assertDoesNotThrow(() -> parser.parse(args));
+        assertFalse(parser.isSortByExt());
     }
 
     /**
@@ -167,8 +167,8 @@ class LsArgsParserTest {
      */
     @Test
     void isSortByExt_NoFlag_ReturnsFalse() {
-        assertDoesNotThrow(() -> lsArgsParser.parse(""));
-        assertFalse(lsArgsParser.isSortByExt());
+        assertDoesNotThrow(() -> parser.parse(""));
+        assertFalse(parser.isSortByExt());
     }
 
     /**
@@ -196,8 +196,8 @@ class LsArgsParserTest {
         String[] args = new String[]{EXAMPLE, FLAG_R, FLAG_X};
 
         // When
-        assertDoesNotThrow(() -> lsArgsParser.parse(args));
-        List<String> result = lsArgsParser.getDirectories();
+        assertDoesNotThrow(() -> parser.parse(args));
+        List<String> result = parser.getDirectories();
 
         // Then
         List<String> expected = List.of(EXAMPLE);

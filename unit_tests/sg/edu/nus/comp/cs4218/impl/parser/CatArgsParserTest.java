@@ -25,7 +25,7 @@ class CatArgsParserTest {
 
     private static final Set<Character> VALID_FLAGS = Set.of('n');
     private static final String NON_FLAG_ARG = "file";
-    private CatArgsParser catArgsParser;
+    private CatArgsParser parser;
 
     private static Stream<Arguments> validSyntax() {
         return Stream.of(
@@ -46,95 +46,93 @@ class CatArgsParserTest {
 
     @BeforeEach
     void setUp() {
-        catArgsParser = new CatArgsParser();
+        parser = new CatArgsParser();
     }
 
     @ParameterizedTest
     @ValueSource(strings = {"", " ", "\n"})
     void parse_EmptyString_ReturnsEmptyFlagsAndNonFlagArgsContainsInput(String args) {
-        assertDoesNotThrow(() -> catArgsParser.parse(args));
-        assertTrue(catArgsParser.flags.isEmpty());
-        assertTrue(catArgsParser.nonFlagArgs.contains(args));
+        assertDoesNotThrow(() -> parser.parse(args));
+        assertTrue(parser.flags.isEmpty());
+        assertTrue(parser.nonFlagArgs.contains(args));
     }
 
     @Test
     void parse_ValidFlag_ReturnsGivenMatchingFlag() {
-        assertDoesNotThrow(() -> catArgsParser.parse("-n"));
-        assertEquals(VALID_FLAGS, catArgsParser.flags);
+        assertDoesNotThrow(() -> parser.parse("-n"));
+        assertEquals(VALID_FLAGS, parser.flags);
     }
 
     @ParameterizedTest
     @ValueSource(strings = {"-a", "-1", "-!", "-P", "--"})
     void parse_InvalidFlag_ThrowsInvalidArgsException(String args) {
-        InvalidArgsException result = assertThrowsExactly(InvalidArgsException.class, () -> {
-            catArgsParser.parse(args);
-        });
+        InvalidArgsException result = assertThrowsExactly(InvalidArgsException.class, () -> parser.parse(args));
         assertEquals(ILLEGAL_FLAG_MSG + args.charAt(1), result.getMessage());
     }
 
     @ParameterizedTest
     @MethodSource("validSyntax")
     void parse_validSyntax_DoNotThrowException(String... args) {
-        assertDoesNotThrow(() -> catArgsParser.parse(args));
+        assertDoesNotThrow(() -> parser.parse(args));
     }
 
     @ParameterizedTest
     @MethodSource("invalidSyntax")
     void parse_invalidSyntax_ThrowsInvalidArgsException(String... args) {
-        assertThrows(InvalidArgsException.class, () -> catArgsParser.parse(args));
+        assertThrows(InvalidArgsException.class, () -> parser.parse(args));
     }
 
     @Test
     void isLineNumber_NoFlag_ReturnsFalse() {
-        assertDoesNotThrow(() -> catArgsParser.parse());
-        assertFalse(catArgsParser.isLineNumber());
+        assertDoesNotThrow(() -> parser.parse());
+        assertFalse(parser.isLineNumber());
     }
 
     @Test
     void isLineNumber_ValidFlag_ReturnsTrue() {
-        assertDoesNotThrow(() -> catArgsParser.parse("-n"));
-        assertTrue(catArgsParser.isLineNumber());
+        assertDoesNotThrow(() -> parser.parse("-n"));
+        assertTrue(parser.isLineNumber());
     }
 
     @Test
     void isLineNumber_ValidFlagAndNonFlagArg_ReturnsTrue() {
-        assertDoesNotThrow(() -> catArgsParser.parse("-n", NON_FLAG_ARG));
-        assertTrue(catArgsParser.isLineNumber());
+        assertDoesNotThrow(() -> parser.parse("-n", NON_FLAG_ARG));
+        assertTrue(parser.isLineNumber());
     }
 
     @Test
     void isLineNumber_OnlyNonFlagArg_ReturnsFalse() {
-        assertDoesNotThrow(() -> catArgsParser.parse(NON_FLAG_ARG));
-        assertFalse(catArgsParser.isLineNumber());
+        assertDoesNotThrow(() -> parser.parse(NON_FLAG_ARG));
+        assertFalse(parser.isLineNumber());
     }
 
     @Test
     void getNonFlagArgs_NoArgs_ReturnsEmpty() {
-        assertDoesNotThrow(() -> catArgsParser.parse());
-        List<String> result = catArgsParser.getNonFlagArgs();
+        assertDoesNotThrow(() -> parser.parse());
+        List<String> result = parser.getNonFlagArgs();
         assertTrue(result.isEmpty());
     }
 
     @Test
     void getNonFlagArgs_OneNonFlagArg_ReturnsOneArg() {
-        assertDoesNotThrow(() -> catArgsParser.parse(NON_FLAG_ARG));
-        List<String> result = catArgsParser.getNonFlagArgs();
+        assertDoesNotThrow(() -> parser.parse(NON_FLAG_ARG));
+        List<String> result = parser.getNonFlagArgs();
         List<String> expected = List.of(NON_FLAG_ARG);
         assertEquals(expected, result);
     }
 
     @Test
     void getNonFlagArgs_MultipleNonFlagArgs_ReturnsMultipleArgs() {
-        assertDoesNotThrow(() -> catArgsParser.parse("file1.txt", "file2.txt", "file3.txt"));
-        List<String> result = catArgsParser.getNonFlagArgs();
+        assertDoesNotThrow(() -> parser.parse("file1.txt", "file2.txt", "file3.txt"));
+        List<String> result = parser.getNonFlagArgs();
         List<String> expected = List.of("file1.txt", "file2.txt", "file3.txt");
         assertEquals(expected, result);
     }
 
     @Test
     void getNonFlagArgs_ValidFlagAndOneNonFlagArg_ReturnsOneArg() {
-        assertDoesNotThrow(() -> catArgsParser.parse("-n", NON_FLAG_ARG));
-        List<String> result = catArgsParser.getNonFlagArgs();
+        assertDoesNotThrow(() -> parser.parse("-n", NON_FLAG_ARG));
+        List<String> result = parser.getNonFlagArgs();
         List<String> expected = List.of(NON_FLAG_ARG);
         assertEquals(expected, result);
     }
