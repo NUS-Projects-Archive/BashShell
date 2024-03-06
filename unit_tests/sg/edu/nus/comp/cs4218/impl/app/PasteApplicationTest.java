@@ -2,7 +2,6 @@ package sg.edu.nus.comp.cs4218.impl.app;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 
 import java.io.IOException;
@@ -49,8 +48,10 @@ public class PasteApplicationTest {
 
     @Test
     void mergeStdin_StdinWithoutFlag_MergesStdinInParallel() {
-        InputStream inputStream = assertDoesNotThrow(() -> IOUtils.openInputStream(filePathA));
-        String result = assertDoesNotThrow(() -> app.mergeStdin(false, inputStream));
+        String result = assertDoesNotThrow(() -> {
+            InputStream inputStream = IOUtils.openInputStream(filePathA);
+            return app.mergeStdin(false, inputStream);
+        });
         String expected = "A" +
                 StringUtils.STRING_NEWLINE + "B" +
                 StringUtils.STRING_NEWLINE + "C" +
@@ -61,8 +62,10 @@ public class PasteApplicationTest {
 
     @Test
     void mergeStdin_StdinWithFlag_MergesStdinInSerial() {
-        InputStream inputStream = assertDoesNotThrow(() -> IOUtils.openInputStream(filePathA));
-        String result = assertDoesNotThrow(() -> app.mergeStdin(true, inputStream));
+        String result = assertDoesNotThrow(() -> {
+            InputStream inputStream = IOUtils.openInputStream(filePathA);
+            return app.mergeStdin(true, inputStream);
+        });
         String expected = "A" +
                 StringUtils.STRING_TAB + "B" +
                 StringUtils.STRING_TAB + "C" +
@@ -105,8 +108,10 @@ public class PasteApplicationTest {
 
     @Test
     void mergeFileAndStdin_FileAndStdinWithoutFlag_MergesFileAndStdinInParallel() {
-        InputStream inputStream = assertDoesNotThrow(() -> IOUtils.openInputStream(filePathA));
-        String result = assertDoesNotThrow(() -> app.mergeFileAndStdin(false, inputStream, STDIN, filePathB, STDIN));
+        String result = assertDoesNotThrow(() -> {
+            InputStream inputStream = IOUtils.openInputStream(filePathA);
+            return app.mergeFileAndStdin(false, inputStream, STDIN, filePathB, STDIN);
+        });
         String expected = "A" + StringUtils.STRING_TAB + "1" + StringUtils.STRING_TAB + "B" +
                 StringUtils.STRING_NEWLINE + "C" + StringUtils.STRING_TAB + "2" + StringUtils.STRING_TAB + "D" +
                 StringUtils.STRING_NEWLINE + "E" + StringUtils.STRING_TAB + "3" +
@@ -118,8 +123,10 @@ public class PasteApplicationTest {
 
     @Test
     void mergeFileAndStdin_FileAndStdinWithFlag_MergesFileAndStdinInSerial() {
-        InputStream inputStream = assertDoesNotThrow(() -> IOUtils.openInputStream(filePathA));
-        String result = assertDoesNotThrow(() -> app.mergeFileAndStdin(true, inputStream, STDIN, filePathB, STDIN));
+        String result = assertDoesNotThrow(() -> {
+            InputStream inputStream = IOUtils.openInputStream(filePathA);
+            return app.mergeFileAndStdin(true, inputStream, STDIN, filePathB, STDIN);
+        });
         String expected = "A" + StringUtils.STRING_TAB + "B" +
                 StringUtils.STRING_TAB + "C" + StringUtils.STRING_TAB + "D" +
                 StringUtils.STRING_TAB + "E" + StringUtils.STRING_NEWLINE + "1" +
