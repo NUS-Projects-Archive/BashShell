@@ -115,9 +115,7 @@ class MvArgsParserTest {
 
     @Test
     void getSourceDirectories_NoArg_ThrowsIllegalArgsException() {
-        assertThrows(IllegalArgumentException.class, () -> {
-            parser.getSourceDirectories();
-        });
+        assertThrows(IllegalArgumentException.class, () -> parser.getSourceDirectories());
     }
 
     @ParameterizedTest
@@ -125,7 +123,7 @@ class MvArgsParserTest {
     void getSourceDirectories_OneNonFlagArg_ReturnsEmptyList(String args) {
         assertDoesNotThrow(() -> parser.parse(splitArgs(args)));
         List<String> result = parser.getSourceDirectories();
-        List<String> expected = List.of();
+        List<String> expected = List.of(); // expected to be empty list
         assertEquals(expected, result);
     }
 
