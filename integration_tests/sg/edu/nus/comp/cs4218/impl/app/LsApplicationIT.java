@@ -2,7 +2,6 @@ package sg.edu.nus.comp.cs4218.impl.app;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.doThrow;
@@ -52,6 +51,7 @@ import sg.edu.nus.comp.cs4218.exception.LsException;
 
 @SuppressWarnings("PMD.ClassNamingConventions")
 class LsApplicationIT {
+
     private static final String[] CWD_NON_DIRS = {"a.z", "z.a", "z"};
     private static final String DIR_A_NAME = "dirA";
     private static final String[] CWD_DIRS = {DIR_A_NAME};
@@ -159,7 +159,7 @@ class LsApplicationIT {
     @Test
     void run_NullStdOut_ThrowsLsException() {
         InputStream mockedInputStream = new ByteArrayInputStream("".getBytes());
-        LsException result = assertThrows(LsException.class, () -> app.run(new String[0], mockedInputStream, null));
+        LsException result = assertThrowsExactly(LsException.class, () -> app.run(new String[0], mockedInputStream, null));
         assertEquals(String.format("ls: %s", ERR_NO_OSTREAM), result.getMessage());
     }
 
@@ -169,7 +169,7 @@ class LsApplicationIT {
     @Test
     void run_NullArgs_ThrowsLsException() {
         InputStream mockedInputStream = new ByteArrayInputStream("".getBytes());
-        LsException result = assertThrows(LsException.class, () -> app.run(null, mockedInputStream, System.out));
+        LsException result = assertThrowsExactly(LsException.class, () -> app.run(null, mockedInputStream, System.out));
         assertEquals(String.format("ls: %s", ERR_NULL_ARGS), result.getMessage());
     }
 
@@ -217,7 +217,6 @@ class LsApplicationIT {
     void run_ValidFile_PrintsFileName() {
         // Given
         String fileName = CWD_NON_DIRS[0];
-        String expected = String.format("%s%s", fileName, STRING_NEWLINE);
         InputStream mockedInputStream = new ByteArrayInputStream("".getBytes());
 
         // When
@@ -225,6 +224,7 @@ class LsApplicationIT {
 
         // Then
         String actual = outContent.toString();
+        String expected = String.format("%s%s", fileName, STRING_NEWLINE);
         assertEquals(expected, actual);
     }
 
@@ -235,16 +235,16 @@ class LsApplicationIT {
     void run_NonExistentDir_ThrowsInvalidDirectoryLsException() {
         // Given
         String nonExistDirName = "nonExistDir";
-        String expected = String.format("ls: cannot access '%s': %s", nonExistDirName, ERR_FILE_NOT_FOUND);
         InputStream mockedInputStream = new ByteArrayInputStream("".getBytes());
 
         // When
-        InvalidDirectoryLsException exception = assertThrowsExactly(InvalidDirectoryLsException.class, () -> {
-            app.run(new String[]{nonExistDirName}, mockedInputStream, System.out);
-        });
+        InvalidDirectoryLsException result = assertThrowsExactly(InvalidDirectoryLsException.class, () ->
+                app.run(new String[]{nonExistDirName}, mockedInputStream, System.out)
+        );
 
         // Then
-        assertEquals(expected, exception.getMessage());
+        String expected = String.format("ls: cannot access '%s': %s", nonExistDirName, ERR_FILE_NOT_FOUND);
+        assertEquals(expected, result.getMessage());
     }
 
     /**
@@ -288,7 +288,7 @@ class LsApplicationIT {
     @MethodSource("provideInvalidFlags")
     void run_InvalidFlags_ThrowsLsException(String[] args, String invalidArgOutput) {
         InputStream mockedInputStream = new ByteArrayInputStream("".getBytes());
-        LsException result = assertThrows(LsException.class, () -> app.run(args, mockedInputStream, System.out));
+        LsException result = assertThrowsExactly(LsException.class, () -> app.run(args, mockedInputStream, System.out));
         assertEquals(String.format("ls: %s%s", ILLEGAL_FLAG_MSG, invalidArgOutput), result.getMessage());
     }
 
@@ -302,7 +302,7 @@ class LsApplicationIT {
         LsException result;
         try (OutputStream mockedStdout = Mockito.mock(OutputStream.class)) {
             assertDoesNotThrow(() -> doThrow(new IOException()).when(mockedStdout).write(Mockito.any(byte[].class)));
-            result = assertThrows(LsException.class, () -> app.run(new String[0], null, mockedStdout));
+            result = assertThrowsExactly(LsException.class, () -> app.run(new String[0], null, mockedStdout));
         } catch (IOException e) {
             fail("Failed to create mocked output stream.");
             return;

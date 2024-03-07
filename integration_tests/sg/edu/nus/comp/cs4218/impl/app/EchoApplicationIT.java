@@ -2,7 +2,7 @@ package sg.edu.nus.comp.cs4218.impl.app;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -25,7 +25,6 @@ public class EchoApplicationIT {
 
     private static final String ECHO_EX_MSG = "echo: ";
     private EchoApplication app;
-
     private OutputStream outThrowException;
     private OutputStream out;
 
@@ -45,17 +44,17 @@ public class EchoApplicationIT {
 
     @Test
     void run_NullOutputStream_ThrowsEchoException() {
-        Throwable result = assertThrows(EchoException.class, () -> {
-            app.run(new String[]{"A", "B", "C"}, null, null);
-        });
+        EchoException result = assertThrowsExactly(EchoException.class, () ->
+                app.run(new String[]{"A", "B", "C"}, null, null)
+        );
         assertEquals(ECHO_EX_MSG + ERR_NO_OSTREAM, result.getMessage());
     }
 
     @Test
     void run_IOExceptionWhenWritingByteBuffer_ThrowsEchoException() {
-        Throwable result = assertThrows(EchoException.class, () -> {
-            app.run(new String[]{"A", "B", "C"}, null, outThrowException);
-        });
+        EchoException result = assertThrowsExactly(EchoException.class, () ->
+                app.run(new String[]{"A", "B", "C"}, null, outThrowException)
+        );
         assertEquals(ECHO_EX_MSG + ERR_IO_EXCEPTION, result.getMessage());
     }
 

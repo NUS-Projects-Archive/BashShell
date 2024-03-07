@@ -2,7 +2,6 @@ package sg.edu.nus.comp.cs4218.impl.app;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_NOT_FOUND;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_ISTREAM;
@@ -29,6 +28,7 @@ import sg.edu.nus.comp.cs4218.impl.util.IOUtils;
 
 @SuppressWarnings("PMD.ClassNamingConventions")
 public class WcApplicationIT {
+
     private static final String FILE_NAME_A = "A.txt";
     private static final String FILE_NAME_B = "B.txt";
     private static final String NON_EXISTENT_FILE = "nonExistentFile.txt";
@@ -39,6 +39,7 @@ public class WcApplicationIT {
     private static final String TOTAL_LAST_LINE = " total";
     private ByteArrayOutputStream outputStream;
     private WcApplication app;
+
     @TempDir
     private Path wcTestDir;
     private String filePathA;
@@ -78,71 +79,57 @@ public class WcApplicationIT {
 
     @Test
     void run_NullStdin_ThrowsWcException() {
-        Throwable result = assertThrows(WcException.class, () -> {
-            app.run(new String[]{filePathA}, null, System.out);
-        });
+        WcException result = assertThrowsExactly(WcException.class, () -> app.run(new String[]{filePathA}, null, System.out));
         assertEquals(WC_EXCEPTION_MSG + ERR_NO_ISTREAM, result.getMessage());
     }
 
     @Test
     void run_NullStdout_ThrowsWcException() {
-        Throwable result = assertThrows(WcException.class, () -> {
-            app.run(new String[]{filePathA}, System.in, null);
-        });
+        WcException result = assertThrowsExactly(WcException.class, () -> app.run(new String[]{filePathA}, System.in, null));
         assertEquals(WC_EXCEPTION_MSG + ERR_NULL_STREAMS, result.getMessage());
     }
 
     @Test
     void run_InvalidFlags_ThrowsException() {
+        WcException result = assertThrowsExactly(WcException.class, () -> app.run(new String[]{"-W"}, System.in, System.out));
         String expected = WC_EXCEPTION_MSG + "illegal option -- W";
-        WcException exception = assertThrowsExactly(WcException.class, () -> {
-            app.run(new String[]{"-W"}, System.in, System.out);
-        });
-        assertEquals(expected, exception.getMessage());
+        assertEquals(expected, result.getMessage());
     }
 
     @Test
     void run_NonExistentFileAndValidFile_ReturnsFileCountAndException() {
+        assertDoesNotThrow(() -> app.run(new String[]{NON_EXISTENT_FILE, filePathA}, System.in, outputStream));
         List<String> expectedList = new ArrayList<>();
         expectedList.add(WC_EXCEPTION_MSG + ERR_FILE_NOT_FOUND);
         expectedList.add(appendString(3, 11, 57, String.format(STRING_FORMAT, filePathA)));
         expectedList.add(appendString(3, 11, 57, TOTAL_LAST_LINE));
         expectedList.add("");
         String expected = String.join(STRING_NEWLINE, expectedList);
-        assertDoesNotThrow(() -> {
-            app.run(new String[]{NON_EXISTENT_FILE, filePathA}, System.in, outputStream);
-        });
         assertEquals(expected, outputStream.toString());
     }
 
 
     @Test
     void run_MultipleFilesNoStdinNoFlags_PrintsFilesAllCounts() {
+        assertDoesNotThrow(() -> app.run(new String[]{filePathA, filePathB}, System.in, outputStream));
         List<String> expectedList = new ArrayList<>();
         expectedList.add(appendString(3, 11, 57, String.format(STRING_FORMAT, filePathA)));
         expectedList.add(appendString(3, 12, 75, String.format(STRING_FORMAT, filePathB)));
         expectedList.add(appendString(6, 23, 132, TOTAL_LAST_LINE));
         expectedList.add("");
         String expected = String.join(STRING_NEWLINE, expectedList);
-
-        assertDoesNotThrow(() -> {
-            app.run(new String[]{filePathA, filePathB}, System.in, outputStream);
-        });
         assertEquals(expected, outputStream.toString());
     }
 
     @Test
     void run_MultipleFilesBytesAndLinesFlags_PrintsBytesAndLineCounts() {
+        assertDoesNotThrow(() -> app.run(new String[]{"-c", "-l", filePathA, filePathB}, System.in, outputStream));
         List<String> expectedList = new ArrayList<>();
         expectedList.add(appendString(3, -1, 57, String.format(STRING_FORMAT, filePathA)));
         expectedList.add(appendString(3, -1, 75, String.format(STRING_FORMAT, filePathB)));
         expectedList.add(appendString(6, -1, 132, TOTAL_LAST_LINE));
         expectedList.add("");
         String expected = String.join(STRING_NEWLINE, expectedList);
-
-        assertDoesNotThrow(() -> {
-            app.run(new String[]{"-c", "-l", filePathA, filePathB}, System.in, outputStream);
-        });
         assertEquals(expected, outputStream.toString());
     }
 
@@ -155,9 +142,7 @@ public class WcApplicationIT {
         expectedList.add("");
         String expected = String.join(STRING_NEWLINE, expectedList);
 
-        assertDoesNotThrow(() -> {
-            app.run(new String[]{"-w", filePathA, filePathB}, System.in, outputStream);
-        });
+        assertDoesNotThrow(() -> app.run(new String[]{"-w", filePathA, filePathB}, System.in, outputStream));
         assertEquals(expected, outputStream.toString());
     }
 
@@ -169,9 +154,7 @@ public class WcApplicationIT {
         String expected = String.join(STRING_NEWLINE, expectedList);
 
         try (InputStream inputStream = IOUtils.openInputStream(filePathA)) {
-            assertDoesNotThrow(() -> {
-                app.run(new String[]{}, inputStream, outputStream);
-            });
+            assertDoesNotThrow(() -> app.run(new String[]{}, inputStream, outputStream));
             assertEquals(expected, outputStream.toString());
         } catch (IOException | ShellException e) {
             e.printStackTrace();
@@ -186,9 +169,7 @@ public class WcApplicationIT {
         String expected = String.join(STRING_NEWLINE, expectedList);
 
         try (InputStream inputStream = IOUtils.openInputStream(filePathA)) {
-            assertDoesNotThrow(() -> {
-                app.run(new String[]{"-c", "-w"}, inputStream, outputStream);
-            });
+            assertDoesNotThrow(() -> app.run(new String[]{"-c", "-w"}, inputStream, outputStream));
             assertEquals(expected, outputStream.toString());
         } catch (IOException | ShellException e) {
             e.printStackTrace();
@@ -205,9 +186,7 @@ public class WcApplicationIT {
         String expected = String.join(STRING_NEWLINE, expectedList);
 
         try (InputStream inputStream = IOUtils.openInputStream(filePathA)) {
-            assertDoesNotThrow(() -> {
-                app.run(new String[]{STDIN, filePathB}, inputStream, outputStream);
-            });
+            assertDoesNotThrow(() -> app.run(new String[]{STDIN, filePathB}, inputStream, outputStream));
             assertEquals(expected, outputStream.toString());
         } catch (IOException | ShellException e) {
             e.printStackTrace();
@@ -224,9 +203,7 @@ public class WcApplicationIT {
         String expected = String.join(STRING_NEWLINE, expectedList);
 
         try (InputStream inputStream = IOUtils.openInputStream(filePathA)) {
-            assertDoesNotThrow(() -> {
-                app.run(new String[]{"-w", "-l", STDIN, filePathB}, inputStream, outputStream);
-            });
+            assertDoesNotThrow(() -> app.run(new String[]{"-w", "-l", STDIN, filePathB}, inputStream, outputStream));
             assertEquals(expected, outputStream.toString());
         } catch (IOException | ShellException e) {
             e.printStackTrace();
@@ -243,29 +220,28 @@ public class WcApplicationIT {
         String expected = String.join(STRING_NEWLINE, expectedList);
 
         try (InputStream inputStream = IOUtils.openInputStream(filePathA)) {
-            assertDoesNotThrow(() -> {
-                app.run(new String[]{STDIN, NON_EXISTENT_FILE}, inputStream, outputStream);
-            });
+            assertDoesNotThrow(() -> app.run(new String[]{STDIN, NON_EXISTENT_FILE}, inputStream, outputStream));
             assertEquals(expected, outputStream.toString());
         } catch (IOException | ShellException e) {
             e.printStackTrace();
         }
-
     }
 
     @Test
     void run_ValidFileAndEmptyStdin_ReturnsCorrectCounts() {
+        // Given
+        InputStream mockedInputStream = new ByteArrayInputStream("".getBytes());
+
+        // When
+        assertDoesNotThrow(() -> app.run(new String[]{STDIN, filePathA}, mockedInputStream, outputStream));
+
+        // Then
         List<String> expectedList = new ArrayList<>();
         expectedList.add(appendString(0, 0, 0, " -"));
         expectedList.add(appendString(3, 11, 57, String.format(STRING_FORMAT, filePathA)));
         expectedList.add(appendString(3, 11, 57, TOTAL_LAST_LINE));
         expectedList.add("");
         String expected = String.join(STRING_NEWLINE, expectedList);
-
-        InputStream mockedInputStream = new ByteArrayInputStream("".getBytes());
-        assertDoesNotThrow(() -> {
-            app.run(new String[]{STDIN, filePathA}, mockedInputStream, outputStream);
-        });
         assertEquals(expected, outputStream.toString());
     }
 }
