@@ -1,7 +1,6 @@
 package sg.edu.nus.comp.cs4218.impl.app;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
@@ -44,67 +43,61 @@ public class CutApplicationIT {
 
     @Test
     void run_EmptyArgs_ThrowsCutException() {
-        String expectedMsg = "cut: Null arguments";
-        CutException exception = assertThrowsExactly(CutException.class, () -> {
-            app.run(null, null, null);
-        });
-        assertEquals(expectedMsg, exception.getMessage());
+        CutException result = assertThrowsExactly(CutException.class, () -> app.run(null, null, null));
+        String expected = "cut: Null arguments";
+        assertEquals(expected, result.getMessage());
     }
 
     @Test
     void run_InsufficientArgs_ThrowsCutException() {
-        String expectedMsg = "cut: Insufficient arguments";
-        CutException exception = assertThrowsExactly(CutException.class, () -> {
-            String[] args = {"-c"};
-            app.run(args, null, null);
-        });
-        assertEquals(expectedMsg, exception.getMessage());
+        String[] args = {"-c"};
+        CutException result = assertThrowsExactly(CutException.class, () -> app.run(args, null, null));
+        String expected = "cut: Insufficient arguments";
+        assertEquals(expected, result.getMessage());
     }
 
     @Test
     void run_NoStdin_ThrowsCutException() {
-        String expectedMsg = "cut: InputStream not provided";
-        CutException exception = assertThrowsExactly(CutException.class, () -> {
-            String[] args = {"-c", "1-5"};
-            app.run(args, null, null);
-        });
-        assertEquals(expectedMsg, exception.getMessage());
+        String[] args = {"-c", "1-5"};
+        CutException result = assertThrowsExactly(CutException.class, () -> app.run(args, null, null));
+        String expected = "cut: InputStream not provided";
+        assertEquals(expected, result.getMessage());
     }
 
     @Test
     void run_NoStdout_ThrowsCutException() {
-        String expectedMsg = "cut: OutputStream not provided";
-        CutException exception = assertThrowsExactly(CutException.class, () -> {
-            String[] args = {"-c", "1-5", tempFilePath.toString()};
+        String[] args = {"-c", "1-5", tempFilePath.toString()};
+        CutException result = assertThrowsExactly(CutException.class, () -> {
             InputStream mockedStdin = mock(InputStream.class);
             app.run(args, mockedStdin, null);
         });
-        assertEquals(expectedMsg, exception.getMessage());
+        String expected = "cut: OutputStream not provided";
+        assertEquals(expected, result.getMessage());
     }
 
     @Test
     void run_FailsToReadFromInputStream_ThrowsCutException() {
-        String expectedMsg = "cut: Could not read from input stream";
-        Throwable result = assertThrows(CutException.class, () -> {
-            String[] args = {"-c", "1-10", tempFilePath.toString()};
+        String[] args = {"-c", "1-10", tempFilePath.toString()};
+        CutException result = assertThrowsExactly(CutException.class, () -> {
             InputStream mockedStdin = mock(InputStream.class);
             doThrow(new IOException()).when(mockedStdin).read(any(byte[].class));
             OutputStream mockedStdout = mock(OutputStream.class);
             app.run(args, mockedStdin, mockedStdout);
         });
-        assertEquals(expectedMsg, result.getMessage());
+        String expected = "cut: Could not read from input stream";
+        assertEquals(expected, result.getMessage());
     }
 
     @Test
     void run_FailsToWriteToOutputStream_ThrowsCutException() {
-        String expectedMsg = "cut: Could not write to output stream";
-        Throwable result = assertThrows(CutException.class, () -> {
-            String[] args = {"-c", "1-10", tempFilePath.toString()};
+        String[] args = {"-c", "1-10", tempFilePath.toString()};
+        CutException result = assertThrowsExactly(CutException.class, () -> {
             InputStream mockedStdin = mock(InputStream.class);
             OutputStream mockedStdout = mock(OutputStream.class);
             doThrow(new IOException()).when(mockedStdout).write(any(byte[].class));
             app.run(args, mockedStdin, mockedStdout);
         });
-        assertEquals(expectedMsg, result.getMessage());
+        String expected = "cut: Could not write to output stream";
+        assertEquals(expected, result.getMessage());
     }
 }

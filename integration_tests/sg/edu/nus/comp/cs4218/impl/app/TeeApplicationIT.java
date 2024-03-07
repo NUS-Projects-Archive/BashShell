@@ -10,13 +10,9 @@ import static org.mockito.Mockito.mock;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir;
 
 import sg.edu.nus.comp.cs4218.exception.TeeException;
 
@@ -27,59 +23,57 @@ public class TeeApplicationIT {
 
     @BeforeEach
     void setUp() throws IOException {
-        this.app = new TeeApplication();
+        app = new TeeApplication();
     }
 
     @Test
     void run_NullOutputStream_ThrowsTeeException() {
-        String expectedMsg = "tee: Null arguments";
-        TeeException exception = assertThrowsExactly(TeeException.class, () -> {
-            String[] args = {};
+        String[] args = {};
+        TeeException result = assertThrowsExactly(TeeException.class, () -> {
             InputStream mockedStdin = mock(InputStream.class);
             app.run(args, mockedStdin, null);
         });
-        assertEquals(expectedMsg, exception.getMessage());
+        String expected = "tee: Null arguments";
+        assertEquals(expected, result.getMessage());
     }
 
     @Test
     void run_OnlyInvalidArgs_ThrowsTeeException() {
-        String expectedMsg = "tee: illegal option -- A";
-        TeeException exception = assertThrowsExactly(TeeException.class, () -> {
-            String[] args = {"-A"};
+        String[] args = {"-A"};
+        TeeException result = assertThrowsExactly(TeeException.class, () -> {
             InputStream mockedStdin = mock(InputStream.class);
             doThrow(new IOException()).when(mockedStdin).read(any(byte[].class));
             OutputStream mockedStdout = mock(OutputStream.class);
             app.run(args, mockedStdin, mockedStdout);
         });
 
-        assertEquals(expectedMsg, exception.getMessage());
+        String expected = "tee: illegal option -- A";
+        assertEquals(expected, result.getMessage());
     }
 
     @Test
     void run_InsufficientArgs_ThrowsTeeException() {
-        String expectedMsg = "tee: Insufficient arguments";
-        TeeException exception = assertThrowsExactly(TeeException.class, () -> {
-            String[] args = {"-a"};
-            app.run(args, null, null);
-        });
-        assertEquals(expectedMsg, exception.getMessage());
+        String[] args = {"-a"};
+        TeeException result = assertThrowsExactly(TeeException.class, () -> app.run(args, null, null));
+        String expected = "tee: Insufficient arguments";
+        assertEquals(expected, result.getMessage());
     }
 
     @Test
     void run_NoStdout_ThrowsTeeException() {
-        String expectedMsg = "tee: OutputStream not provided";
-        TeeException exception = assertThrowsExactly(TeeException.class, () -> {
-            String[] args = {"-a"};
+        String[] args = {"-a"};
+        TeeException result = assertThrowsExactly(TeeException.class, () -> {
             InputStream mockedStdin = mock(InputStream.class);
             app.run(args, mockedStdin, null);
         });
-        assertEquals(expectedMsg, exception.getMessage());
+        String expected = "tee: OutputStream not provided";
+        assertEquals(expected, result.getMessage());
     }
 
     @Test
     void run_ValidArgs_DoesNotThrowException() {
+        String[] args = {"-a"};
         assertDoesNotThrow(() -> {
-            String[] args = {"-a"};
             InputStream mockedStdin = mock(InputStream.class);
             OutputStream mockedStdout = mock(OutputStream.class);
             app.run(args, mockedStdin, mockedStdout);

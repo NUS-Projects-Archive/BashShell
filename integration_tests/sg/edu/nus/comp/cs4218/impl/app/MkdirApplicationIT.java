@@ -2,7 +2,7 @@ package sg.edu.nus.comp.cs4218.impl.app;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_EXISTS;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_FOLDERS;
@@ -44,18 +44,14 @@ public class MkdirApplicationIT {
 
     @Test
     void run_EmptyArgs_ThrowsMkdirException() {
-        Throwable result = assertThrows(MkdirException.class, () -> {
-            app.run(null, null, null);
-        });
+        MkdirException result = assertThrowsExactly(MkdirException.class, () -> app.run(null, null, null));
         assertEquals(MKDIR_EX_MSG + ERR_NULL_ARGS, result.getMessage());
     }
 
     @Test
     void run_NoDirectoriesArgs_ThrowsMkdirException() {
         String[] args = {"-p"};
-        Throwable result = assertThrows(MkdirException.class, () -> {
-            app.run(args, null, null);
-        });
+        MkdirException result = assertThrowsExactly(MkdirException.class, () -> app.run(args, null, null));
         assertEquals(MKDIR_EX_MSG + ERR_NO_FOLDERS, result.getMessage());
     }
 
@@ -63,27 +59,21 @@ public class MkdirApplicationIT {
     void run_MissingTopLevel_ThrowsMkdirException() {
         Path missTopLevelPath = tempDir.resolve("missingTopLevel/" + TEMP_FILE);
         String[] args = {missTopLevelPath.toString()};
-        Throwable result = assertThrows(MkdirException.class, () -> {
-            app.run(args, null, null);
-        });
+        MkdirException result = assertThrowsExactly(MkdirException.class, () -> app.run(args, null, null));
         assertEquals(MKDIR_EX_MSG + ERR_TOP_LEVEL_MISSING, result.getMessage());
     }
 
     @Test
     void run_RootDirectory_ThrowsMkdirException() {
         String[] args = {"/"};
-        Throwable result = assertThrows(MkdirException.class, () -> {
-            app.run(args, null, null);
-        });
+        MkdirException result = assertThrowsExactly(MkdirException.class, () -> app.run(args, null, null));
         assertEquals(MKDIR_EX_MSG + ERR_FILE_EXISTS, result.getMessage());
     }
 
     @Test
     void run_FolderExists_ThrowsMkdirException() {
         String[] args = {tempFile};
-        Throwable result = assertThrows(MkdirException.class, () -> {
-            app.run(args, null, null);
-        });
+        MkdirException result = assertThrowsExactly(MkdirException.class, () -> app.run(args, null, null));
         assertEquals(MKDIR_EX_MSG + ERR_FILE_EXISTS, result.getMessage());
     }
 

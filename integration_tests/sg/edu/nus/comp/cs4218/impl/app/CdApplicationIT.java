@@ -2,7 +2,7 @@ package sg.edu.nus.comp.cs4218.impl.app;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 import static org.mockito.Mockito.mock;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NULL_ARGS;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_TOO_MANY_ARGS;
@@ -29,6 +29,7 @@ import sg.edu.nus.comp.cs4218.exception.CdException;
 
 @SuppressWarnings("PMD.ClassNamingConventions")
 class CdApplicationIT {
+
     private static final String DIR_NAME = "tempDir";
     private static final String CHILD_DIR_NAME = "tempChildDir";
 
@@ -94,7 +95,7 @@ class CdApplicationIT {
      */
     @Test
     void run_NullArgs_ThrowsErrNullArgs() {
-        CdException result = assertThrows(CdException.class, () -> app.run(null, mockInputStream, mockOutputStream));
+        CdException result = assertThrowsExactly(CdException.class, () -> app.run(null, mockInputStream, mockOutputStream));
         assertEquals("cd: " + ERR_NULL_ARGS, result.getMessage());
     }
 
@@ -103,7 +104,7 @@ class CdApplicationIT {
      */
     @Test
     void run_MultipleArgs_ThrowsErrTooManyArgs() {
-        CdException result = assertThrows(CdException.class, () -> app.run(new String[]{"a", "b"},
+        CdException result = assertThrowsExactly(CdException.class, () -> app.run(new String[]{"a", "b"},
                 mockInputStream, mockOutputStream));
         assertEquals(String.format("cd: %s", ERR_TOO_MANY_ARGS), result.getMessage());
     }

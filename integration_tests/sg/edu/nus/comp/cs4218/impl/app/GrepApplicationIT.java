@@ -2,7 +2,7 @@ package sg.edu.nus.comp.cs4218.impl.app;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.mock;
 import static sg.edu.nus.comp.cs4218.impl.app.GrepApplication.EMPTY_PATTERN;
@@ -29,18 +29,18 @@ import sg.edu.nus.comp.cs4218.exception.GrepException;
 
 @SuppressWarnings("PMD.ClassNamingConventions")
 class GrepApplicationIT {
+
     private static final String VALID_PATTERN_A_B = "ab";
     private static final String GREP_STRING = "grep: ";
     private static final String COLON_SPACE = ": ";
     private static final String INPUT_CONTENTS = String.join(STRING_NEWLINE, "aabb", "x", "ab");
     private static final String[] OUTPUT_CONTENTS = new String[]{"aabb", "ab"};
-    private GrepApplication grepApplication;
+    private GrepApplication app;
     private ByteArrayOutputStream outContent;
 
     @BeforeEach
     void setUp() {
-        grepApplication = new GrepApplication();
-
+        app = new GrepApplication();
         outContent = new ByteArrayOutputStream();
         System.setOut(new PrintStream(outContent));
     }
@@ -51,12 +51,10 @@ class GrepApplicationIT {
      */
     @Test
     void run_NullStdinAndNoInputFilesSpecified_ThrowsGrepException() {
-        // Given
-        String[] args = new String[]{""};
-
         // When
-        GrepException result = assertThrows(GrepException.class,
-                () -> grepApplication.run(args, null, mock(OutputStream.class)));
+        GrepException result = assertThrowsExactly(GrepException.class, () ->
+                app.run(new String[]{""}, null, mock(OutputStream.class))
+        );
 
         // Then
         assertEquals(GREP_STRING + ERR_NO_INPUT, result.getMessage());
@@ -68,8 +66,9 @@ class GrepApplicationIT {
     @Test
     void run_NullPattern_ThrowsGrepException() {
         // When
-        GrepException result = assertThrows(GrepException.class,
-                () -> grepApplication.run(new String[]{}, mock(InputStream.class), mock(OutputStream.class)));
+        GrepException result = assertThrowsExactly(GrepException.class, () ->
+                app.run(new String[]{}, mock(InputStream.class), mock(OutputStream.class))
+        );
 
         // Then
         assertEquals(GREP_STRING + ERR_SYNTAX, result.getMessage());
@@ -82,8 +81,9 @@ class GrepApplicationIT {
     @Test
     void run_PatternIsEmpty_ThrowsGrepException() {
         // When
-        GrepException result = assertThrows(GrepException.class,
-                () -> grepApplication.run(new String[]{""}, mock(InputStream.class), mock(OutputStream.class)));
+        GrepException result = assertThrowsExactly(GrepException.class, () ->
+                app.run(new String[]{""}, mock(InputStream.class), mock(OutputStream.class))
+        );
 
         // Then
         assertEquals(GREP_STRING + EMPTY_PATTERN, result.getMessage());
@@ -98,12 +98,11 @@ class GrepApplicationIT {
         String[] args = new String[]{VALID_PATTERN_A_B};
         InputStream stdin = new ByteArrayInputStream(INPUT_CONTENTS.getBytes(StandardCharsets.UTF_8));
 
-        String expected = String.join(STRING_NEWLINE, OUTPUT_CONTENTS) + STRING_NEWLINE;
-
         // When
-        assertDoesNotThrow(() -> grepApplication.run(args, stdin, System.out));
+        assertDoesNotThrow(() -> app.run(args, stdin, System.out));
 
         // Then
+        String expected = String.join(STRING_NEWLINE, OUTPUT_CONTENTS) + STRING_NEWLINE;
         assertEquals(expected, outContent.toString());
     }
 
@@ -117,12 +116,11 @@ class GrepApplicationIT {
         String fileAbsPath = file.toString();
         String[] args = new String[]{VALID_PATTERN_A_B, fileAbsPath};
 
-        String expected = String.join(STRING_NEWLINE, OUTPUT_CONTENTS) + STRING_NEWLINE;
-
         // When
-        assertDoesNotThrow(() -> grepApplication.run(args, mock(InputStream.class), System.out));
+        assertDoesNotThrow(() -> app.run(args, mock(InputStream.class), System.out));
 
         // Then
+        String expected = String.join(STRING_NEWLINE, OUTPUT_CONTENTS) + STRING_NEWLINE;
         assertEquals(expected, outContent.toString());
 
         // Clean up
@@ -144,17 +142,16 @@ class GrepApplicationIT {
 
         String[] args = new String[]{VALID_PATTERN_A_B, fileOneAbsPath, fileTwoAbsPath};
 
+        // When
+        assertDoesNotThrow(() -> app.run(args, mock(InputStream.class), System.out));
+
+        // Then
         String expected = String.join(STRING_NEWLINE,
                 fileOneAbsPath + COLON_SPACE + OUTPUT_CONTENTS[0],
                 fileOneAbsPath + COLON_SPACE + OUTPUT_CONTENTS[1],
                 fileTwoAbsPath + COLON_SPACE + OUTPUT_CONTENTS[0],
                 fileTwoAbsPath + COLON_SPACE + OUTPUT_CONTENTS[1]
         ) + STRING_NEWLINE;
-
-        // When
-        assertDoesNotThrow(() -> grepApplication.run(args, mock(InputStream.class), System.out));
-
-        // Then
         assertEquals(expected, outContent.toString());
 
         // Clean up
@@ -171,12 +168,11 @@ class GrepApplicationIT {
         String fileName = "Nonexistent";
         String[] args = new String[]{VALID_PATTERN_A_B, fileName};
 
-        String expected = fileName + COLON_SPACE + ERR_FILE_NOT_FOUND + STRING_NEWLINE;
-
         // When
-        assertDoesNotThrow(() -> grepApplication.run(args, mock(InputStream.class), System.out));
+        assertDoesNotThrow(() -> app.run(args, mock(InputStream.class), System.out));
 
         // Then
+        String expected = fileName + COLON_SPACE + ERR_FILE_NOT_FOUND + STRING_NEWLINE;
         assertEquals(expected, outContent.toString());
     }
 
@@ -187,7 +183,9 @@ class GrepApplicationIT {
     void run_GetInputFromFileWithNoReadPermission_ReturnsPermDeniedErr() {
         // Given
         Path file = createNewFile("tempFile", INPUT_CONTENTS);
-        if (!file.toFile().setReadable(false)) {
+        boolean isSetReadable = file.toFile().setReadable(false);
+
+        if (!isSetReadable) {
             fail("Unable to set file to not readable");
             deleteFileOrDirectory(file);
             return;
@@ -196,12 +194,11 @@ class GrepApplicationIT {
         String fileAbsPath = file.toString();
         String[] args = new String[]{VALID_PATTERN_A_B, fileAbsPath};
 
-        String expected = fileAbsPath + COLON_SPACE + ERR_NO_PERM + STRING_NEWLINE;
-
         // When
-        assertDoesNotThrow(() -> grepApplication.run(args, mock(InputStream.class), System.out));
+        assertDoesNotThrow(() -> app.run(args, mock(InputStream.class), System.out));
 
         // Then
+        String expected = fileAbsPath + COLON_SPACE + ERR_NO_PERM + STRING_NEWLINE;
         assertEquals(expected, outContent.toString());
 
         // Clean up

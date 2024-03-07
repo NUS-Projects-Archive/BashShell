@@ -22,6 +22,7 @@ import sg.edu.nus.comp.cs4218.impl.util.StringUtils;
 
 @SuppressWarnings("PMD.ClassNamingConventions")
 public class RmApplicationIT {
+    
     private static final String TEST_RESOURCES = "resources/rm/";
     private static final String EMPTY_DIRECTORY = "empty_directory";
     private static final String TEST_DIRECTORY = "test_folder";
@@ -37,12 +38,12 @@ public class RmApplicationIT {
     void setUp(@TempDir(cleanup = CleanupMode.ALWAYS) Path tempDir) throws IOException {
 
         final String resourceDirectory = StringUtils.removeTrailing(TEST_RESOURCES, "/");
-        this.testingDirectory = tempDir;
-        this.app = new RmApplication();
+        testingDirectory = tempDir;
+        app = new RmApplication();
 
         try (Stream<Path> stream = Files.walk(Paths.get(resourceDirectory))) {
             stream.forEach(source -> {
-                Path destination = Paths.get(this.testingDirectory.toString(),
+                Path destination = Paths.get(testingDirectory.toString(),
                         source.toString().substring(resourceDirectory.length()));
 
                 try {
@@ -52,7 +53,7 @@ public class RmApplicationIT {
                 }
             });
 
-            Files.createDirectory(this.testingDirectory.resolve(EMPTY_DIRECTORY));
+            Files.createDirectory(testingDirectory.resolve(EMPTY_DIRECTORY));
         }
     }
 
@@ -60,7 +61,7 @@ public class RmApplicationIT {
     void run_NoArgs_ThrowsRmException() {
         final String expectedMsg = "rm: missing operand"; // Given
         RmException exception = assertThrowsExactly(RmException.class, () ->
-                this.app.run(null, null, null)
+                app.run(null, null, null)
         ); // When
         assertEquals(expectedMsg, exception.getMessage()); // Then
     }
@@ -68,8 +69,8 @@ public class RmApplicationIT {
     @Test
     void run_RemoveExistingFile_SuccessfullyRemoveFile() {
         final String[] args = {TEST_FILE_ONE};
-        assertDoesNotThrow(() -> this.app.run(args, null, null));
-        assertTrue(Files.notExists(Paths.get(this.testingDirectory.toString(), TEST_FILE_ONE)));
+        assertDoesNotThrow(() -> app.run(args, null, null));
+        assertTrue(Files.notExists(Paths.get(testingDirectory.toString(), TEST_FILE_ONE)));
     }
 
     @Test
@@ -79,7 +80,7 @@ public class RmApplicationIT {
         final String expectedMsg = String.format("rm: cannot remove '%s': No such file or directory", NON_EXIST_FILE);
 
         RmException exception = assertThrowsExactly(RmException.class, () ->
-                this.app.run(args, null, null)
+                app.run(args, null, null)
         ); // When
         assertEquals(expectedMsg, exception.getMessage()); // Then
     }
@@ -91,7 +92,7 @@ public class RmApplicationIT {
         final String expectedMsg = String.format("rm: cannot remove '%s': Is a directory", TEST_DIRECTORY);
 
         RmException exception = assertThrowsExactly(RmException.class, () ->
-                this.app.run(args, null, null)
+                app.run(args, null, null)
         ); // When
         assertEquals(expectedMsg, exception.getMessage()); // Then
     }
@@ -99,8 +100,8 @@ public class RmApplicationIT {
     @Test
     void run_RemoveEmptyDirectory_SuccessfullyRemoveDirectory() {
         final String[] args = {"-d", EMPTY_DIRECTORY};
-        assertDoesNotThrow(() -> this.app.run(args, null, null));
-        assertTrue(Files.notExists(Paths.get(this.testingDirectory.toString(), EMPTY_DIRECTORY)));
+        assertDoesNotThrow(() -> app.run(args, null, null));
+        assertTrue(Files.notExists(Paths.get(testingDirectory.toString(), EMPTY_DIRECTORY)));
     }
 
     @Test
@@ -110,7 +111,7 @@ public class RmApplicationIT {
         final String expectedMsg = String.format("rm: cannot remove '%s': Directory not empty", TEST_DIRECTORY);
 
         RmException exception = assertThrowsExactly(RmException.class, () ->
-                this.app.run(args, null, null)
+                app.run(args, null, null)
         ); // When
         assertEquals(expectedMsg, exception.getMessage()); // Then
     }
@@ -118,18 +119,18 @@ public class RmApplicationIT {
     @Test
     void run_RemoveSingleDirectoryRecursively_SuccessfullyRemoveAllFilesAndDirectory() {
         final String[] args = {"-r", TEST_DIRECTORY};
-        assertDoesNotThrow(() -> this.app.run(args, null, null));
-        assertTrue(Files.exists(Paths.get(this.testingDirectory.toString(), TEST_FILE_ONE))); // should exist
-        assertTrue(Files.exists(Paths.get(this.testingDirectory.toString(), EMPTY_DIRECTORY))); // should exist
-        assertTrue(Files.notExists(Paths.get(this.testingDirectory.toString(), TEST_DIRECTORY)));
+        assertDoesNotThrow(() -> app.run(args, null, null));
+        assertTrue(Files.exists(Paths.get(testingDirectory.toString(), TEST_FILE_ONE))); // should exist
+        assertTrue(Files.exists(Paths.get(testingDirectory.toString(), EMPTY_DIRECTORY))); // should exist
+        assertTrue(Files.notExists(Paths.get(testingDirectory.toString(), TEST_DIRECTORY)));
     }
 
     @Test
     void run_RemoveMultipleDirectoriesRecursively_SuccessfullyRemoveAllFilesAndDirectory() {
         final String[] args = {"-r", TEST_DIRECTORY, EMPTY_DIRECTORY};
-        assertDoesNotThrow(() -> this.app.run(args, null, null));
-        assertTrue(Files.exists(Paths.get(this.testingDirectory.toString(), TEST_FILE_ONE))); // should exist
-        assertTrue(Files.notExists(Paths.get(this.testingDirectory.toString(), EMPTY_DIRECTORY)));
-        assertTrue(Files.notExists(Paths.get(this.testingDirectory.toString(), TEST_DIRECTORY)));
+        assertDoesNotThrow(() -> app.run(args, null, null));
+        assertTrue(Files.exists(Paths.get(testingDirectory.toString(), TEST_FILE_ONE))); // should exist
+        assertTrue(Files.notExists(Paths.get(testingDirectory.toString(), EMPTY_DIRECTORY)));
+        assertTrue(Files.notExists(Paths.get(testingDirectory.toString(), TEST_DIRECTORY)));
     }
 }

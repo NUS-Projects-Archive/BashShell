@@ -70,8 +70,7 @@ class ShellImplIT {
         String invalidAppName = commandString.split(" ")[0].replace("`", "").replace("\"", "");
 
         // When
-        ShellException result = assertThrows(ShellException.class,
-                () -> shellImpl.parseAndEvaluate(commandString, System.out));
+        ShellException result = assertThrows(ShellException.class, () -> shellImpl.parseAndEvaluate(commandString, System.out));
 
         // Then
         assertEquals(String.format("shell: %s: %s", invalidAppName, ERR_INVALID_APP), result.getMessage());

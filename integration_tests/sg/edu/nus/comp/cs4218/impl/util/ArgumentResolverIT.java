@@ -3,6 +3,7 @@ package sg.edu.nus.comp.cs4218.impl.util;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_SYNTAX;
 
 import java.nio.file.Files;
@@ -63,7 +64,7 @@ public class ArgumentResolverIT {
     void parseArguments_InvalidQuotingArgsList_ThrowsShellException() {
         List<String> argsList = new ArrayList<>(VALID_QUOTES.keySet());
         argsList.add("\"`\"");
-        Throwable result = assertThrows(ShellException.class, () -> argumentResolver.parseArguments(argsList));
+        ShellException result = assertThrowsExactly(ShellException.class, () -> argumentResolver.parseArguments(argsList));
         assertEquals(String.format("shell: %s", ERR_SYNTAX), result.getMessage());
     }
 
@@ -93,9 +94,9 @@ public class ArgumentResolverIT {
         assertDoesNotThrow(() -> childTwo.resolve("file4.txt").toFile().createNewFile());
 
         List<String> argList = List.of("parent/child1/*", "parent/child2/*");
+        List<String> result = assertDoesNotThrow(() -> argumentResolver.parseArguments(argList));
         List<String> expected = List.of("parent/child1/file1.txt", "parent/child1/file2.txt",
                 "parent/child2/file3.txt", "parent/child2/file4.txt");
-        List<String> result = assertDoesNotThrow(() -> argumentResolver.parseArguments(argList));
         assertEquals(expected, result);
     }
 

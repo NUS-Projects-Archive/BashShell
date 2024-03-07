@@ -31,30 +31,24 @@ public class MvApplicationIT {
     @Test
     void run_NullArgs_ThrowsMvException() {
         String expectedMsg = "mv: Missing Argument";
-        MvException exception = assertThrowsExactly(MvException.class, () -> {
-            app.run(null, null, null);
-        });
+        MvException exception = assertThrowsExactly(MvException.class, () -> app.run(null, null, null));
         assertEquals(expectedMsg, exception.getMessage());
     }
 
     @Test
     void run_EmptyArgsArray_ThrowsMvException() {
-        String expectedMsg = "mv: Missing Argument";
-        MvException exception = assertThrowsExactly(MvException.class, () -> {
-            String[] args = {};
-            app.run(args, null, null);
-        });
-        assertEquals(expectedMsg, exception.getMessage());
+        String[] args = {};
+        MvException result = assertThrowsExactly(MvException.class, () -> app.run(args, null, null));
+        String expected = "mv: Missing Argument";
+        assertEquals(expected, result.getMessage());
     }
 
     @ParameterizedTest
     @ValueSource(strings = {"", "a", "1", "$", "."})
     void run_InsufficientArgs_ThrowsMvException(String args) {
-        String expectedMsg = "mv: Insufficient arguments";
-        MvException exception = assertThrowsExactly(MvException.class, () -> {
-            app.run(args.split("\\s+"), null, null);
-        });
-        assertEquals(expectedMsg, exception.getMessage());
+        MvException result = assertThrowsExactly(MvException.class, () -> app.run(args.split("\\s+"), null, null));
+        String expected = "mv: Insufficient arguments";
+        assertEquals(expected, result.getMessage());
     }
 
     @Test
