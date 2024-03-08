@@ -108,13 +108,13 @@ public class SortApplication implements SortInterface {
         for (String file : fileNames) {
             File node = IOUtils.resolveFilePath(file).toFile();
             if (!node.exists()) {
-                throw new SortException(PROB_SORT_FILE + ERR_FILE_NOT_FOUND);
+                throw new SortException(String.format("%s'%s': %s", PROB_SORT_FILE, file, ERR_FILE_NOT_FOUND));
             }
             if (node.isDirectory()) {
-                throw new SortException(PROB_SORT_FILE + ERR_IS_DIR);
+                throw new SortException(String.format("%s'%s': %s", PROB_SORT_FILE, file, ERR_IS_DIR));
             }
             if (!node.canRead()) {
-                throw new SortException(PROB_SORT_FILE + ERR_NO_PERM);
+                throw new SortException(String.format("%s'%s': %s", PROB_SORT_FILE, file, ERR_NO_PERM));
             }
             InputStream input = null;
             try {
