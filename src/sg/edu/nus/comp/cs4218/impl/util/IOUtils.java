@@ -25,7 +25,10 @@ import sg.edu.nus.comp.cs4218.exception.ShellException;
  */
 @SuppressWarnings("PMD.PreserveStackTrace")
 public final class IOUtils {
-    private IOUtils() { /* Does nothing */}
+    /**
+     * Private constructor to prevent instantiation.
+     */
+    private IOUtils() { /* Does nothing */ }
 
     /**
      * Opens an inputStream based on the file name.
