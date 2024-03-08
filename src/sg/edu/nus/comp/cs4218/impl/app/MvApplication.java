@@ -142,26 +142,28 @@ public class MvApplication implements MvInterface {
 
         List<MvException> errorList = new ArrayList<>();
         for (String srcFile : fileName) {
-            Path srcPath = IOUtils.resolveFilePath(srcFile);
-            Path destPath = destFolderPath.resolve(srcPath.getFileName());
-
-            if (!Files.exists(srcPath)) {
-                errorList.add(new MvException(String.format("cannot find '%s': %s", srcFile, ERR_FILE_NOT_FOUND)));
-                continue;
-            }
-
-            if (!Files.isReadable(srcPath)) {
-                errorList.add(new MvException(String.format("cannot open '%s': %s", srcFile, ERR_NO_PERM)));
-                continue;
-            }
-
             try {
-                // Overwrite an existing file only if either it do not exist or overwrite flag is given
-                if (!Files.exists(destPath) || isOverwrite) {
-                    Files.move(srcPath, destPath, StandardCopyOption.REPLACE_EXISTING);
+                Path srcPath = IOUtils.resolveFilePath(srcFile);
+                Path destPath = destFolderPath.resolve(srcPath.getFileName());
+
+                if (!Files.exists(srcPath)) {
+                    throw new MvException(String.format("cannot find '%s': %s", srcFile, ERR_FILE_NOT_FOUND));
                 }
-            } catch (IOException e) {
-                throw new MvException(ERR_IO_EXCEPTION, e);
+
+                if (!Files.isReadable(srcPath)) {
+                    throw new MvException(String.format("cannot open '%s': %s", srcFile, ERR_NO_PERM));
+                }
+
+                try {
+                    // Overwrite an existing file only if either it do not exist or overwrite flag is given
+                    if (!Files.exists(destPath) || isOverwrite) {
+                        Files.move(srcPath, destPath, StandardCopyOption.REPLACE_EXISTING);
+                    }
+                } catch (IOException e) {
+                    throw new MvException(ERR_IO_EXCEPTION, e);
+                }
+            } catch (MvException exception) {
+                errorList.add(exception);
             }
         }
 

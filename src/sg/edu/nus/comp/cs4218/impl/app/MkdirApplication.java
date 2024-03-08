@@ -60,18 +60,20 @@ public class MkdirApplication implements MkdirInterface {
 
         List<MkdirException> errorList = new ArrayList<>();
         for (String folder : directories) {
-            String folderAbsPath = getAbsolutePath(folder);
-            File file = new File(folderAbsPath);
+            try {
+                String folderAbsPath = getAbsolutePath(folder);
+                File file = new File(folderAbsPath);
 
-            if ((!isCreateParent && isAnyTopLevelFolderMissing(file))) {
-                errorList.add(new MkdirException(String.format("cannot create directory '%s': %s", folder, ERR_TOP_LEVEL_MISSING)));
-                continue;
+                if ((!isCreateParent && isAnyTopLevelFolderMissing(file))) {
+                    throw new MkdirException(String.format("cannot create directory '%s': %s", folder, ERR_TOP_LEVEL_MISSING));
+                }
+                if (!isCreateParent && file.exists()) {
+                    throw new MkdirException(String.format("cannot create directory '%s': %s", folder, ERR_FILE_EXISTS));
+                }
+                createFolder(folder);
+            } catch (MkdirException exception) {
+                errorList.add(exception);
             }
-            if (!isCreateParent && file.exists()) {
-                errorList.add(new MkdirException(String.format("cannot create directory '%s': %s", folder, ERR_FILE_EXISTS)));
-                continue;
-            }
-            createFolder(folder);
         }
 
         if (!errorList.isEmpty()) {
