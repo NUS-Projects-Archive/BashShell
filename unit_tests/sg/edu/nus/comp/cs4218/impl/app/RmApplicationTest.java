@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -17,6 +18,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.CleanupMode;
 import org.junit.jupiter.api.io.TempDir;
 
+import sg.edu.nus.comp.cs4218.Environment;
 import sg.edu.nus.comp.cs4218.exception.RmException;
 import sg.edu.nus.comp.cs4218.impl.util.StringUtils;
 
@@ -27,6 +29,7 @@ public class RmApplicationTest {
     private static final String TEST_DIRECTORY = "test_folder";
     private static final String NON_EXIST_FILE = "does-not-exist.txt";
     private static final String TEST_FILE_ONE = "test-file-1.txt";
+    private static final String TEST_FILE_TWO = "test-file-2.txt";
 
     @TempDir
     private Path testingDirectory;
@@ -52,8 +55,13 @@ public class RmApplicationTest {
                 }
             });
 
-            Files.createDirectory(testingDirectory.resolve(EMPTY_DIRECTORY));
         }
+
+        // Add an empty directory
+        Files.createDirectory(testingDirectory.resolve(EMPTY_DIRECTORY));
+
+        // Set CWD to be the test directory
+        Environment.currentDirectory = testingDirectory.toString();
     }
 
     @Test
@@ -67,6 +75,18 @@ public class RmApplicationTest {
         final String expectedMsg = String.format("rm: cannot remove '%s': No such file or directory", NON_EXIST_FILE);
         RmException exception = assertThrowsExactly(RmException.class, () ->
                 app.remove(false, false, NON_EXIST_FILE)
+        );
+        assertEquals(expectedMsg, exception.getMessage());
+    }
+
+    @Test
+    void remove_MixExistingAndNonExistentFiles_ThrowsRmExceptionButDeletesExistingFile() {
+        final String expectedMsg = String.format("rm: cannot remove '%s': No such file or directory"
+                        + STRING_NEWLINE
+                        + "rm: cannot remove '%s': No such file or directory",
+                NON_EXIST_FILE, NON_EXIST_FILE);
+        RmException exception = assertThrowsExactly(RmException.class, () ->
+                app.remove(false, false, NON_EXIST_FILE, TEST_FILE_ONE, NON_EXIST_FILE, TEST_FILE_TWO)
         );
         assertEquals(expectedMsg, exception.getMessage());
     }

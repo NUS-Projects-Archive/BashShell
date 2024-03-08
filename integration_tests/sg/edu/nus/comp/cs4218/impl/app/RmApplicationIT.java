@@ -17,12 +17,13 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.CleanupMode;
 import org.junit.jupiter.api.io.TempDir;
 
+import sg.edu.nus.comp.cs4218.Environment;
 import sg.edu.nus.comp.cs4218.exception.RmException;
 import sg.edu.nus.comp.cs4218.impl.util.StringUtils;
 
 @SuppressWarnings("PMD.ClassNamingConventions")
 public class RmApplicationIT {
-    
+
     private static final String TEST_RESOURCES = "resources/rm/";
     private static final String EMPTY_DIRECTORY = "empty_directory";
     private static final String TEST_DIRECTORY = "test_folder";
@@ -53,17 +54,20 @@ public class RmApplicationIT {
                 }
             });
 
-            Files.createDirectory(testingDirectory.resolve(EMPTY_DIRECTORY));
         }
+
+        // Add an empty directory
+        Files.createDirectory(testingDirectory.resolve(EMPTY_DIRECTORY));
+
+        // Set CWD to be the test directory
+        Environment.currentDirectory = testingDirectory.toString();
     }
 
     @Test
     void run_NoArgs_ThrowsRmException() {
-        final String expectedMsg = "rm: missing operand"; // Given
-        RmException exception = assertThrowsExactly(RmException.class, () ->
-                app.run(null, null, null)
-        ); // When
-        assertEquals(expectedMsg, exception.getMessage()); // Then
+        final String expectedMsg = "rm: Null arguments";
+        RmException exception = assertThrowsExactly(RmException.class, () -> app.run(null, null, null));
+        assertEquals(expectedMsg, exception.getMessage());
     }
 
     @Test
@@ -79,9 +83,7 @@ public class RmApplicationIT {
         final String[] args = {NON_EXIST_FILE};
         final String expectedMsg = String.format("rm: cannot remove '%s': No such file or directory", NON_EXIST_FILE);
 
-        RmException exception = assertThrowsExactly(RmException.class, () ->
-                app.run(args, null, null)
-        ); // When
+        RmException exception = assertThrowsExactly(RmException.class, () ->app.run(args, null, null)); // When
         assertEquals(expectedMsg, exception.getMessage()); // Then
     }
 
@@ -91,9 +93,7 @@ public class RmApplicationIT {
         final String[] args = {TEST_DIRECTORY};
         final String expectedMsg = String.format("rm: cannot remove '%s': Is a directory", TEST_DIRECTORY);
 
-        RmException exception = assertThrowsExactly(RmException.class, () ->
-                app.run(args, null, null)
-        ); // When
+        RmException exception = assertThrowsExactly(RmException.class, () -> app.run(args, null, null)); // When
         assertEquals(expectedMsg, exception.getMessage()); // Then
     }
 
@@ -110,9 +110,7 @@ public class RmApplicationIT {
         final String[] args = {"-d", TEST_DIRECTORY};
         final String expectedMsg = String.format("rm: cannot remove '%s': Directory not empty", TEST_DIRECTORY);
 
-        RmException exception = assertThrowsExactly(RmException.class, () ->
-                app.run(args, null, null)
-        ); // When
+        RmException exception = assertThrowsExactly(RmException.class, () -> app.run(args, null, null)); // When
         assertEquals(expectedMsg, exception.getMessage()); // Then
     }
 
