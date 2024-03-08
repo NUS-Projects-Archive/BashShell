@@ -18,6 +18,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.CleanupMode;
 import org.junit.jupiter.api.io.TempDir;
 
+import sg.edu.nus.comp.cs4218.Environment;
 import sg.edu.nus.comp.cs4218.exception.RmException;
 import sg.edu.nus.comp.cs4218.impl.util.StringUtils;
 
@@ -56,6 +57,9 @@ public class RmApplicationTest {
 
             Files.createDirectory(testingDirectory.resolve(EMPTY_DIRECTORY));
         }
+
+        // Set CWD to be the test directory
+        Environment.currentDirectory = testingDirectory.toString();
     }
 
     @Test
