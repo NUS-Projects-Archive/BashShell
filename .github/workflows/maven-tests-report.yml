@@ -4,6 +4,9 @@ on:
   push:
     branches: ['main']
     tags: ['ms1', 'ms2', 'ms3']
+  pull_request:
+    branches: ['main']
+  workflow_dispatch:
 
 jobs:
   build:
