@@ -2,8 +2,10 @@ package sg.edu.nus.comp.cs4218.impl.app;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -61,7 +63,8 @@ public class MvApplicationIT {
         assertDoesNotThrow(() -> app.run(args, null, null));
 
         Path movedFile = tempDir.resolve("subdirectory/file");
-        assertTrue(Files.exists(movedFile));
+        assertTrue(Files.exists(movedFile)); // assert that file has moved to the new location
+        assertFalse(Files.exists(file)); // assert that file does n exist in the old location
     }
 
     @Test
@@ -72,7 +75,7 @@ public class MvApplicationIT {
         String[] args = {"a", "b", subDir.toString()};
         MvException result = assertThrowsExactly(MvException.class, () -> app.run(args, null, null));
 
-        String expected = "mv: cannot find 'a': No such file or directory" + System.lineSeparator() +
+        String expected = "mv: cannot find 'a': No such file or directory" + STRING_NEWLINE +
                 "mv: cannot find 'b': No such file or directory";
         assertEquals(expected, result.getMessage());
     }
