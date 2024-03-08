@@ -69,8 +69,6 @@ public class RmApplication implements RmInterface {
 
         for (String file : fileName) {
             try {
-                boolean deleteSuccessful = false;
-
                 // File is relative path, need to change to absolute path
                 File fileToDelete = new File(currentDirectory.resolve(file).toString());
 
@@ -88,11 +86,10 @@ public class RmApplication implements RmInterface {
                         }
                         Environment.currentDirectory = currentDirectory.toString();
 
-                        // Contents deleted, now delete folder
-                        deleteSuccessful = fileToDelete.delete();
+                        deleteFile(fileToDelete); // Contents deleted, now delete folder
                     } else if (isEmptyFolder) {
                         if (fileContents == null || fileContents.length == 0) {
-                            deleteSuccessful = fileToDelete.delete();
+                            deleteFile(fileToDelete);
                         } else {
                             throw new RmException(String.format("cannot remove '%s': Directory not empty", file));
                         }
@@ -103,11 +100,7 @@ public class RmApplication implements RmInterface {
 
                 // Is a file -> delete it
                 if (fileToDelete.isFile()) {
-                    deleteSuccessful = fileToDelete.delete();
-                }
-
-                if (!deleteSuccessful) {
-                    throw new RmException("Failed to delete " + file);
+                    deleteFile(fileToDelete);
                 }
 
             } catch (RmException exception) {
@@ -117,6 +110,19 @@ public class RmApplication implements RmInterface {
 
         if (!errorList.isEmpty()) {
             throw new RmException(errorList);
+        }
+    }
+
+    /**
+     * Deletes specified file.
+     *
+     * @param file File to delete
+     * @throws RmException if it failed to delete file
+     */
+    private void deleteFile(final File file) throws RmException {
+        boolean isSuccess = file.delete();
+        if (!isSuccess) {
+            throw new RmException("Failed to delete " + file);
         }
     }
 }
