@@ -2,6 +2,7 @@ name: Maven Tests Report
 
 on:
   push:
+    branches: ['main']
   workflow_dispatch:
 
 jobs:
@@ -18,6 +19,10 @@ jobs:
         with:
           java-version: '11'
           distribution: 'adopt'
+          cache: maven
+
+      - name: Verify
+        run: mvn --batch-mode --update-snapshots verify
 
       - name: Build
         run: mvn --batch-mode -DskipTests package
