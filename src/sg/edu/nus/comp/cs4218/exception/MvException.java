@@ -1,5 +1,7 @@
 package sg.edu.nus.comp.cs4218.exception;
 
+import java.util.List;
+
 public class MvException extends AbstractApplicationException {
 
     private static final long serialVersionUID = -2890717950640280147L;
@@ -12,5 +14,9 @@ public class MvException extends AbstractApplicationException {
 
     public MvException(String message, Throwable cause) {
         super(message, cause);
+    }
+
+    public MvException(List<MvException> exceptions) {
+        super(exceptions);
     }
 }

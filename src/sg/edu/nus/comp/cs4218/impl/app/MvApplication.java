@@ -8,8 +8,6 @@ import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IS_DIR;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_MISSING_ARG;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_ARGS;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_PERM;
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_WRITE_STREAM;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -69,21 +67,10 @@ public class MvApplication implements MvInterface {
         final String[] srcDirectories = parser.getSourceDirectories().toArray(new String[parser.getSourceDirectories().size()]);
         final String destDirectory = parser.getDestinationDirectory();
 
-        String result;
         if (srcDirectories.length > 1) {
-            result = mvFilesToFolder(isOverwrite, destDirectory, srcDirectories);
+            mvFilesToFolder(isOverwrite, destDirectory, srcDirectories);
         } else {
-            result = mvSrcFileToDestFile(isOverwrite, srcDirectories[0], destDirectory);
-        }
-
-        try {
-            if (result == null) {
-                return;
-            }
-            stdout.write(result.getBytes());
-            stdout.write(STRING_NEWLINE.getBytes());
-        } catch (IOException e) {
-            throw new MvException(ERR_WRITE_STREAM, e);
+            mvSrcFileToDestFile(isOverwrite, srcDirectories[0], destDirectory);
         }
     }
 
@@ -139,7 +126,7 @@ public class MvApplication implements MvInterface {
      * @param isOverwrite Boolean option to perform overwriting
      * @param destFolder  String representing the path to the destination folder
      * @param fileName    Array of String representing the file names
-     * @return Null if successful; otherwise, returns messages related to source file errors
+     * @return Null
      * @throws MvException If moving encounters issues, e.g., file not found, permission errors, or I/O exception
      */
     @Override
@@ -161,20 +148,20 @@ public class MvApplication implements MvInterface {
             throw new MvException(formatMvErrorMessage(PROB_MV_FOLDER, ERR_NO_PERM, destFolder));
         }
 
-        List<String> result = new ArrayList<>();
+        List<MvException> errorList = new ArrayList<>();
         for (String srcFile : fileName) {
             Path srcPath = IOUtils.resolveFilePath(srcFile);
             Path destPath = destFolderPath.resolve(srcPath.getFileName());
 
             // Ensure that source file exist
             if (!Files.exists(srcPath)) {
-                result.add(String.format("mv: " + PROB_MV_FOLDER + "'%s': " + ERR_FILE_NOT_FOUND, srcFile));
+                errorList.add(new MvException(formatMvErrorMessage(PROB_MV_FOLDER, ERR_FILE_NOT_FOUND, srcFile)));
                 continue;
             }
 
             // Ensure that source file have the required read permission
             if (!Files.isReadable(srcPath)) {
-                result.add(String.format("mv: " + PROB_MV_FOLDER + "'%s': " + ERR_NO_PERM, srcFile));
+                errorList.add(new MvException(formatMvErrorMessage(PROB_MV_FOLDER, ERR_NO_PERM, srcFile)));
                 continue;
             }
 
@@ -188,7 +175,11 @@ public class MvApplication implements MvInterface {
             }
         }
 
-        return result.isEmpty() ? null : String.join(STRING_NEWLINE, result);
+        if (!errorList.isEmpty()) {
+            throw new MvException(errorList);
+        }
+
+        return null;
     }
 
     private String formatMvErrorMessage(String cause, String error, String file) {
