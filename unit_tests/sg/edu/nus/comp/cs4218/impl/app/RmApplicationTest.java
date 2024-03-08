@@ -55,8 +55,10 @@ public class RmApplicationTest {
                 }
             });
 
-            Files.createDirectory(testingDirectory.resolve(EMPTY_DIRECTORY));
         }
+
+        // Add an empty directory
+        Files.createDirectory(testingDirectory.resolve(EMPTY_DIRECTORY));
 
         // Set CWD to be the test directory
         Environment.currentDirectory = testingDirectory.toString();
