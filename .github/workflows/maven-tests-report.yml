@@ -3,7 +3,7 @@ name: Maven Tests Report
 on:
   push:
     branches: ['main']
-  workflow_dispatch:
+    tags: ['ms1', 'ms2', 'ms3']
 
 jobs:
   build:
