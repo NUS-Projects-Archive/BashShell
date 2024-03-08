@@ -38,7 +38,7 @@ public class RmArgsParserTest {
         assertDoesNotThrow(() -> parser.parse(args));
         assertArrayEquals(expectedResults, new boolean[]{
                 parser.isRecursive(),
-                parser.isRecursive()
+                parser.isEmptyDirectory()
         });
     }
 
