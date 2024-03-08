@@ -101,7 +101,7 @@ public class SortApplication implements SortInterface {
     @Override
     public String sortFromFiles(Boolean isFirstWordNumber, Boolean isReverseOrder, Boolean isCaseIndependent,
                                 String... fileNames) throws SortException {
-        if (fileNames == null) {
+        if (fileNames == null || fileNames.length == 0) {
             throw new SortException(PROB_SORT_FILE + ERR_NULL_ARGS);
         }
         List<String> lines = new ArrayList<>();

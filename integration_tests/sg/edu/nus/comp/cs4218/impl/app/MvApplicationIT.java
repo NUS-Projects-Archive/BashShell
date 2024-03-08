@@ -3,10 +3,9 @@ package sg.edu.nus.comp.cs4218.impl.app;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -52,31 +51,29 @@ public class MvApplicationIT {
     }
 
     @Test
-    void run_MovesSrcFiles_DoNotWriteToStdout(@TempDir Path tempDir) {
+    void run_MovesSrcFiles_MovesFile(@TempDir Path tempDir) {
         Path subDir = tempDir.resolve("subdirectory");
         assertDoesNotThrow(() -> Files.createDirectories(subDir));
         Path file = tempDir.resolve("file");
         assertDoesNotThrow(() -> Files.createFile(file));
 
         String[] args = {file.toString(), subDir.toString()};
-        OutputStream stdout = new ByteArrayOutputStream();
-        assertDoesNotThrow(() -> app.run(args, null, stdout));
+        assertDoesNotThrow(() -> app.run(args, null, null));
 
-        String expected = "";
-        assertEquals(expected, stdout.toString());
+        Path movedFile = tempDir.resolve("subdirectory/file");
+        assertTrue(Files.exists(movedFile));
     }
 
     @Test
-    void run_MovesMultipleDoNotExistSrcFile_WritesErrorToStdout(@TempDir Path tempDir) {
+    void run_MovesMultipleDoNotExistSrcFile_ThrowsMvException(@TempDir Path tempDir) {
         Path subDir = tempDir.resolve("subdirectory");
         assertDoesNotThrow(() -> Files.createDirectories(subDir));
 
         String[] args = {"a", "b", subDir.toString()};
-        OutputStream stdout = new ByteArrayOutputStream();
-        assertDoesNotThrow(() -> app.run(args, null, stdout));
+        MvException result = assertThrowsExactly(MvException.class, () -> app.run(args, null, null));
 
-        String expected = "mv: Problem move to folder: 'a': No such file or directory" + System.lineSeparator() +
-                "mv: Problem move to folder: 'b': No such file or directory" + System.lineSeparator();
-        assertEquals(expected, stdout.toString());
+        String expected = "mv: cannot find 'a': No such file or directory" + System.lineSeparator() +
+                "mv: cannot find 'b': No such file or directory";
+        assertEquals(expected, result.getMessage());
     }
 }

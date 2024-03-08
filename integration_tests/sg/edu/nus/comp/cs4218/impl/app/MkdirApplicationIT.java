@@ -60,21 +60,24 @@ public class MkdirApplicationIT {
         Path missTopLevelPath = tempDir.resolve("missingTopLevel/" + TEMP_FILE);
         String[] args = {missTopLevelPath.toString()};
         MkdirException result = assertThrowsExactly(MkdirException.class, () -> app.run(args, null, null));
-        assertEquals(MKDIR_EX_MSG + ERR_TOP_LEVEL_MISSING, result.getMessage());
+        String expected = MKDIR_EX_MSG + String.format("cannot create directory '%s': %s", missTopLevelPath, ERR_TOP_LEVEL_MISSING);
+        assertEquals(expected, result.getMessage());
     }
 
     @Test
     void run_RootDirectory_ThrowsMkdirException() {
         String[] args = {"/"};
         MkdirException result = assertThrowsExactly(MkdirException.class, () -> app.run(args, null, null));
-        assertEquals(MKDIR_EX_MSG + ERR_FILE_EXISTS, result.getMessage());
+        String expected = MKDIR_EX_MSG + String.format("cannot create directory '%s': %s", "/", ERR_FILE_EXISTS);
+        assertEquals(expected, result.getMessage());
     }
 
     @Test
     void run_FolderExists_ThrowsMkdirException() {
         String[] args = {tempFile};
         MkdirException result = assertThrowsExactly(MkdirException.class, () -> app.run(args, null, null));
-        assertEquals(MKDIR_EX_MSG + ERR_FILE_EXISTS, result.getMessage());
+        String expected = MKDIR_EX_MSG + String.format("cannot create directory '%s': %s", tempFile, ERR_FILE_EXISTS);
+        assertEquals(expected, result.getMessage());
     }
 
     @Test
