@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 class ExitApplicationTest {
 
     @Test
-    void run_noArgs_exitCodeZero() {
+    void run_NoArgs_ExitCodeZero() {
         ExitApplication exitApp = new ExitApplication(); // Given
         int exitCode = assertDoesNotThrow(() ->
                 catchSystemExit(() -> exitApp.run(null, null, null)) // When

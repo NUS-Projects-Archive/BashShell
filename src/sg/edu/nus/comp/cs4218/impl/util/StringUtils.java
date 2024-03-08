@@ -26,7 +26,10 @@ public final class StringUtils {
     public static final char CHAR_ASTERISK = '*';
     public static final char CHAR_FLAG_PREFIX = '-';
 
-    private StringUtils() {}
+    /**
+     * Private constructor to prevent instantiation.
+     */
+    private StringUtils() { /* Does nothing */ }
 
     /**
      * Returns the file separator defined for a particular system.
