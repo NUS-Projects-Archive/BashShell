@@ -1,5 +1,7 @@
 package sg.edu.nus.comp.cs4218.impl.parser;
 
+import java.util.List;
+
 public class RmArgsParser extends ArgsParser {
 
     public static final char FLAG_RECURSIVE = 'r';
@@ -30,5 +32,14 @@ public class RmArgsParser extends ArgsParser {
      */
     public boolean isEmptyDirectory() {
         return flags.contains(FLAG_EMPTY_DIR);
+    }
+
+    /**
+     * Returns a list of files to be removed.
+     *
+     * @return List of files
+     */
+    public List<String> getFiles() {
+        return nonFlagArgs;
     }
 }
