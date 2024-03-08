@@ -10,6 +10,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 
 import sg.edu.nus.comp.cs4218.Environment;
 import sg.edu.nus.comp.cs4218.app.MkdirInterface;
@@ -56,17 +58,26 @@ public class MkdirApplication implements MkdirInterface {
             throw new MkdirException(ERR_NO_FOLDERS);
         }
 
+        List<MkdirException> errorList = new ArrayList<>();
         for (String folder : directories) {
-            String folderAbsPath = getAbsolutePath(folder);
-            File file = new File(folderAbsPath);
+            try {
+                String folderAbsPath = getAbsolutePath(folder);
+                File file = new File(folderAbsPath);
 
-            if ((!isCreateParent && isAnyTopLevelFolderMissing(file))) {
-                throw new MkdirException(ERR_TOP_LEVEL_MISSING);
+                if ((!isCreateParent && isAnyTopLevelFolderMissing(file))) {
+                    throw new MkdirException(String.format("cannot create directory '%s': %s", folder, ERR_TOP_LEVEL_MISSING));
+                }
+                if (!isCreateParent && file.exists()) {
+                    throw new MkdirException(String.format("cannot create directory '%s': %s", folder, ERR_FILE_EXISTS));
+                }
+                createFolder(folder);
+            } catch (MkdirException exception) {
+                errorList.add(exception);
             }
-            if (!isCreateParent && file.exists()) {
-                throw new MkdirException(ERR_FILE_EXISTS);
-            }
-            createFolder(folder);
+        }
+
+        if (!errorList.isEmpty()) {
+            throw new MkdirException(errorList);
         }
     }
 

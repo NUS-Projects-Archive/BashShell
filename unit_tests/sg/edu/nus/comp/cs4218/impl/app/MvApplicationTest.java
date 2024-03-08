@@ -24,8 +24,6 @@ import sg.edu.nus.comp.cs4218.exception.MvException;
 
 class MvApplicationTest {
 
-    private static final String PROB_MV_DEST_FILE = "mv: Problem move to destination file: ";
-    private static final String PROB_MV_FOLDER = "mv: Problem move to folder: ";
     private static final String TEMP_SRC_FILE = "srcFile.txt";
     private static final String TEMP_DEST_FILE = "destFile.txt";
     private static final String TEMP_DEST_DIR = "subdirectory";
@@ -40,13 +38,18 @@ class MvApplicationTest {
     private String tempDestFile;
     private String tempDestDir;
 
-    private String getFileNotFoundMsg(String cause, String file) {
-        return String.format("%s'%s': No such file or directory", cause, file);
+    private String getFileNotFoundMsg(String file) {
+        return String.format("mv: cannot find '%s': No such file or directory", file);
     }
 
-    private String getPermissionDeniedMsg(String cause, String file) {
-        return String.format("%s'%s': Permission denied", cause, file);
+    private String getCannotReadPermissionMsg(String file) {
+        return String.format("mv: cannot read '%s': Permission denied", file);
     }
+
+    private String getCannotWritePermissionMsg(String file) {
+        return String.format("mv: cannot create regular file '%s': Permission denied", file);
+    }
+
 
     @BeforeEach
     void setUp() throws IOException {
@@ -73,7 +76,7 @@ class MvApplicationTest {
         MvException result = assertThrowsExactly(MvException.class, () ->
                 app.mvSrcFileToDestFile(false, nonExistFile, tempDestFile)
         );
-        String expected = getFileNotFoundMsg(PROB_MV_DEST_FILE, nonExistFile);
+        String expected = getFileNotFoundMsg(nonExistFile);
         assertEquals(expected, result.getMessage());
     }
 
@@ -88,7 +91,7 @@ class MvApplicationTest {
         MvException result = assertThrowsExactly(MvException.class, () ->
                 app.mvSrcFileToDestFile(false, tempSrcFile, tempDestFile)
         );
-        String expected = getPermissionDeniedMsg(PROB_MV_DEST_FILE, tempSrcFile);
+        String expected = getCannotReadPermissionMsg(tempSrcFile);
         assertEquals(expected, result.getMessage());
     }
 
@@ -103,12 +106,12 @@ class MvApplicationTest {
         MvException result = assertThrowsExactly(MvException.class, () ->
                 app.mvSrcFileToDestFile(false, tempSrcFile, tempDestFile)
         );
-        String expected = getPermissionDeniedMsg(PROB_MV_DEST_FILE, tempDestFile);
+        String expected = getCannotWritePermissionMsg(tempDestFile);
         assertEquals(expected, result.getMessage());
     }
 
     @Test
-    void mvSrcFileToDestFile_DestFileDoNotExist_MovedFile() {
+    void mvSrcFileToDestFile_DestFileDoNotExist_MovesFile() {
         String content = "a b c";
         assertDoesNotThrow(() -> Files.write(tempSrcFilePath, content.getBytes()));
         List<String> expectedContent = assertDoesNotThrow(() -> Files.readAllLines(tempSrcFilePath));
@@ -128,7 +131,7 @@ class MvApplicationTest {
     }
 
     @Test
-    void mvSrcFileToDestFile_IsOverwrite_MovedFile() {
+    void mvSrcFileToDestFile_IsOverwrite_MovesFile() {
         String srcContent = "a b c";
         assertDoesNotThrow(() -> Files.write(tempSrcFilePath, srcContent.getBytes()));
         List<String> expectedContent = assertDoesNotThrow(() -> Files.readAllLines(tempSrcFilePath));
@@ -149,18 +152,18 @@ class MvApplicationTest {
     void mvFilesToFolder_DestFolderDoNotExist_ThrowsMvException() {
         String nonExistFolder = tempDir.resolve("nonExistFolder").toString();
         MvException result = assertThrowsExactly(MvException.class, () ->
-                app.mvFilesToFolder(false, nonExistFolder, null)
+                app.mvFilesToFolder(false, nonExistFolder, new String[0])
         );
-        String expected = getFileNotFoundMsg(PROB_MV_FOLDER, nonExistFolder);
+        String expected = getFileNotFoundMsg(nonExistFolder);
         assertEquals(expected, result.getMessage());
     }
 
     @Test
     void mvFilesToFolder_DestIsNotADirectory_ThrowsMvException() {
         MvException result = assertThrowsExactly(MvException.class, () ->
-                app.mvFilesToFolder(false, tempDestFile, null)
+                app.mvFilesToFolder(false, tempDestFile, new String[0])
         );
-        String expected = String.format("%s'%s': This is a directory", PROB_MV_FOLDER, tempDestFile);
+        String expected = String.format("mv: cannot move '%s': This is a directory", tempDestFile);
         assertEquals(expected, result.getMessage());
     }
 
@@ -173,35 +176,39 @@ class MvApplicationTest {
         }
 
         MvException result = assertThrowsExactly(MvException.class, () ->
-                app.mvFilesToFolder(false, tempDestDir, null)
+                app.mvFilesToFolder(false, tempDestDir, new String[0])
         );
-        String expected = getPermissionDeniedMsg(PROB_MV_FOLDER, tempDestDir);
+        String expected = getCannotWritePermissionMsg(tempDestDir);
         assertEquals(expected, result.getMessage());
     }
 
     @Test
-    void mvFilesToFolder_SrcFileDoNotExist_ReturnsErrorMessage() {
+    void mvFilesToFolder_SrcFileDoNotExist_ThrowsMvException() {
         String nonExistFile = tempDir.resolve("nonExistFile.txt").toString();
-        String result = assertDoesNotThrow(() -> app.mvFilesToFolder(false, tempDestDir, nonExistFile));
-        String expected = getFileNotFoundMsg(PROB_MV_FOLDER, nonExistFile);
-        assertEquals(expected, result);
+        MvException result = assertThrowsExactly(MvException.class, () ->
+                app.mvFilesToFolder(false, tempDestDir, nonExistFile)
+        );
+        String expected = getFileNotFoundMsg(nonExistFile);
+        assertEquals(expected, result.getMessage());
     }
 
     @Test
     @DisabledOnOs(value = OS.WINDOWS)
-    void mvFilesToFolder_SrcFileNoPermissionToRead_ReturnsErrorMessage() {
+    void mvFilesToFolder_SrcFileNoPermissionToRead_ThrowsMvException() {
         boolean isSetReadable = tempSrcFilePath.toFile().setReadable(false);
         if (!isSetReadable) {
             fail("Failed to set read permission to false for test source file");
         }
 
-        String result = assertDoesNotThrow(() -> app.mvFilesToFolder(false, tempDestDir, tempSrcFile));
-        String expected = getPermissionDeniedMsg(PROB_MV_FOLDER, tempSrcFile);
-        assertEquals(expected, result);
+        MvException result = assertThrowsExactly(MvException.class, () ->
+                app.mvFilesToFolder(false, tempDestDir, tempSrcFile)
+        );
+        String expected = getCannotReadPermissionMsg(tempSrcFile);
+        assertEquals(expected, result.getMessage());
     }
 
     @Test
-    void mvFilesToFolder_SrcFileDoNotExistInDestFolder_MovedFile() {
+    void mvFilesToFolder_SrcFileDoNotExistInDestFolder_MovesFile() {
         String result = assertDoesNotThrow(() -> app.mvFilesToFolder(false, tempDestDir, tempSrcFile));
         File movedSrcFile = tempDestDirPath.resolve(TEMP_SRC_FILE).toFile();
         File srcFile = tempSrcFilePath.toFile();
@@ -212,7 +219,7 @@ class MvApplicationTest {
     }
 
     @Test
-    void mvFilesToFolder_IsOverwrite_MovedFile() {
+    void mvFilesToFolder_IsOverwrite_MovesFile() {
         String srcContent = "a b c";
         assertDoesNotThrow(() -> Files.write(tempSrcFilePath, srcContent.getBytes()));
         List<String> expectedContent = assertDoesNotThrow(() -> Files.readAllLines(tempSrcFilePath));
@@ -237,7 +244,7 @@ class MvApplicationTest {
     }
 
     @Test
-    void mvFilesToFolder_MultipleSrcFilesAllExists_MovedFile() {
+    void mvFilesToFolder_MultipleSrcFilesAllExists_MovesFile() {
         Path srcFileAPath = tempDir.resolve("A");
         Path srcFileBPath = tempDir.resolve("B");
         assertDoesNotThrow(() -> Files.createFile(srcFileAPath));
@@ -258,17 +265,19 @@ class MvApplicationTest {
     }
 
     @Test
-    void mvFilesToFolder_SomeSrcFileDoNotExistsAtEnd_MovedFile() {
+    void mvFilesToFolder_SomeSrcFileDoNotExistsAtEnd_MovesFileAndThrowsMvException() {
         Path srcFileAPath = tempDir.resolve("A");
         Path srcFileBPath = tempDir.resolve("B");
         Path srcFileCPath = tempDir.resolve("C"); // do not exist
         assertDoesNotThrow(() -> Files.createFile(srcFileAPath));
         assertDoesNotThrow(() -> Files.createFile(srcFileBPath));
 
-        String expected = getFileNotFoundMsg(PROB_MV_FOLDER, srcFileCPath.toString());
-        String actual = assertDoesNotThrow(() -> app.mvFilesToFolder(false, tempDestDirPath.toString(),
-                srcFileAPath.toString(), srcFileBPath.toString(), srcFileCPath.toString()));
+        MvException actual = assertThrowsExactly(MvException.class, () ->
+                app.mvFilesToFolder(false, tempDestDirPath.toString(), srcFileAPath.toString(),
+                        srcFileBPath.toString(), srcFileCPath.toString())
+        );
 
+        String expected = getFileNotFoundMsg(srcFileCPath.toString());
         File movedSrcFileA = tempDestDirPath.resolve("A").toFile();
         File movedSrcFileB = tempDestDirPath.resolve("B").toFile();
         File srcFileA = srcFileAPath.toFile();
@@ -278,21 +287,23 @@ class MvApplicationTest {
         assertTrue(movedSrcFileB.exists()); // assert that the src file B exists in subdirectory
         assertFalse(srcFileA.exists()); // assert that the original src file A no longer exists
         assertFalse(srcFileB.exists()); // assert that the original src file B no longer exists
-        assertEquals(expected, actual); // assert that 'C' is returned
+        assertEquals(expected, actual.getMessage()); // assert that 'C' is returned
     }
 
     @Test
-    void mvFilesToFolder_SomeSrcFileDoNotExistsAtStart_MovedFile() {
+    void mvFilesToFolder_SomeSrcFileDoNotExistsAtStart_MovesFileAndThrowsMvException() {
         Path srcFileAPath = tempDir.resolve("A"); // do not exist
         Path srcFileBPath = tempDir.resolve("B");
         Path srcFileCPath = tempDir.resolve("C");
         assertDoesNotThrow(() -> Files.createFile(srcFileBPath));
         assertDoesNotThrow(() -> Files.createFile(srcFileCPath));
 
-        String expected = getFileNotFoundMsg(PROB_MV_FOLDER, srcFileAPath.toString());
-        String actual = assertDoesNotThrow(() -> app.mvFilesToFolder(false, tempDestDirPath.toString(),
-                srcFileAPath.toString(), srcFileBPath.toString(), srcFileCPath.toString()));
+        MvException actual = assertThrowsExactly(MvException.class, () ->
+                app.mvFilesToFolder(false, tempDestDirPath.toString(), srcFileAPath.toString(),
+                        srcFileBPath.toString(), srcFileCPath.toString())
+        );
 
+        String expected = getFileNotFoundMsg(srcFileAPath.toString());
         File movedSrcFileB = tempDestDirPath.resolve("B").toFile();
         File movedSrcFileC = tempDestDirPath.resolve("C").toFile();
         File srcFileB = srcFileBPath.toFile();
@@ -302,6 +313,6 @@ class MvApplicationTest {
         assertTrue(movedSrcFileC.exists()); // assert that the src file C exists in subdirectory
         assertFalse(srcFileB.exists()); // assert that the original src file B no longer exists
         assertFalse(srcFileC.exists()); // assert that the original src file C no longer exists
-        assertEquals(expected, actual); // assert that 'A' is returned
+        assertEquals(expected, actual.getMessage()); // assert that 'A' is returned
     }
 }

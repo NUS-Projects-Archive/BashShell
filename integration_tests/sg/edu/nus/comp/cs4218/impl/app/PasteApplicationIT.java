@@ -111,8 +111,10 @@ public class PasteApplicationIT {
 
     @Test
     void run_NoFlagAndStdin_PrintsStdinInParallel() {
-        InputStream inputStream = assertDoesNotThrow(() -> IOUtils.openInputStream(filePathA));
-        assertDoesNotThrow(() -> app.run(new String[]{}, inputStream, outputStream));
+        assertDoesNotThrow(() -> {
+            InputStream inputStream = IOUtils.openInputStream(filePathA);
+            app.run(new String[]{}, inputStream, outputStream);
+        });
         String expected = "A" + StringUtils.STRING_NEWLINE + "B" +
                 StringUtils.STRING_NEWLINE + "C" +
                 StringUtils.STRING_NEWLINE + "D" +
@@ -122,8 +124,10 @@ public class PasteApplicationIT {
 
     @Test
     void run_ValidFlagAndStdin_PrintsStdinInSerial() {
-        InputStream inputStream = assertDoesNotThrow(() -> IOUtils.openInputStream(filePathA));
-        assertDoesNotThrow(() -> app.run(new String[]{"-s"}, inputStream, outputStream));
+        assertDoesNotThrow(() -> {
+            InputStream inputStream = IOUtils.openInputStream(filePathA);
+            app.run(new String[]{"-s"}, inputStream, outputStream);
+        });
         String expected = "A" + StringUtils.STRING_TAB + "B" +
                 StringUtils.STRING_TAB + "C" +
                 StringUtils.STRING_TAB + "D" +
@@ -133,8 +137,10 @@ public class PasteApplicationIT {
 
     @Test
     void run_NoFlagStdinAndFile_PrintsStdinAndFileInParallel() {
-        InputStream inputStream = assertDoesNotThrow(() -> IOUtils.openInputStream(filePathA));
-        assertDoesNotThrow(() -> app.run(new String[]{STDIN, filePathB, STDIN}, inputStream, outputStream));
+        assertDoesNotThrow(() -> {
+            InputStream inputStream = IOUtils.openInputStream(filePathA);
+            app.run(new String[]{STDIN, filePathB, STDIN}, inputStream, outputStream);
+        });
         String expected = "A" + StringUtils.STRING_TAB + "1" + StringUtils.STRING_TAB + "B" +
                 StringUtils.STRING_NEWLINE + "C" + StringUtils.STRING_TAB + "2" + StringUtils.STRING_TAB + "D" +
                 StringUtils.STRING_NEWLINE + "E" + StringUtils.STRING_TAB + "3" +
@@ -146,8 +152,10 @@ public class PasteApplicationIT {
 
     @Test
     void run_ValidFlagStdinAndFile_PrintsStdinAndFileInSerial() {
-        InputStream inputStream = assertDoesNotThrow(() -> IOUtils.openInputStream(filePathA));
-        assertDoesNotThrow(() -> app.run(new String[]{STDIN, filePathB, STDIN, "-s"}, inputStream, outputStream));
+        assertDoesNotThrow(() -> {
+            InputStream inputStream = IOUtils.openInputStream(filePathA);
+            app.run(new String[]{STDIN, filePathB, STDIN, "-s"}, inputStream, outputStream);
+        });
         String expected = "A" + StringUtils.STRING_TAB + "B" +
                 StringUtils.STRING_TAB + "C" + StringUtils.STRING_TAB + "D" +
                 StringUtils.STRING_TAB + "E" + StringUtils.STRING_NEWLINE + "1" +

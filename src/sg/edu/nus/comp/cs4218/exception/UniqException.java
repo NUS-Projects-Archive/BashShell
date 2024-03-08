@@ -13,6 +13,6 @@ public class UniqException extends AbstractApplicationException {
     }
 
     public UniqException(String message, Throwable cause) {
-        super(message, cause);
+        super("uniq: " + message, cause);
     }
 }

@@ -45,11 +45,11 @@ class SortApplicationTest {
 
     @Test
     void sortFromFiles_EmptyFiles_ThrowsSortException() {
-        String expectedMsg = "sort: Problem sort from file: Null arguments";
         SortException result = assertThrowsExactly(SortException.class, () ->
-                app.sortFromFiles(false, false, false, null)
+                app.sortFromFiles(false, false, false, new String[0])
         );
-        assertEquals(expectedMsg, result.getMessage());
+        String expected = "sort: Problem sort from file: Null arguments";
+        assertEquals(expected, result.getMessage());
     }
 
     @Test
@@ -58,7 +58,7 @@ class SortApplicationTest {
         SortException result = assertThrowsExactly(SortException.class, () ->
                 app.sortFromFiles(false, false, false, nonExistFile)
         );
-        String expected = "sort: Problem sort from file: No such file or directory";
+        String expected = String.format("sort: Problem sort from file: '%s': No such file or directory", nonExistFile);
         assertEquals(expected, result.getMessage());
     }
 
@@ -67,7 +67,7 @@ class SortApplicationTest {
         SortException result = assertThrowsExactly(SortException.class, () ->
                 app.sortFromFiles(false, false, false, tempDir.toString())
         );
-        String expected = "sort: Problem sort from file: This is a directory";
+        String expected = String.format("sort: Problem sort from file: '%s': This is a directory", tempDir);
         assertEquals(expected, result.getMessage());
     }
 
