@@ -35,7 +35,7 @@ public class RmApplication implements RmInterface {
      * @param stdin  An InputStream, not used
      * @param stdout An OutputStream, not used
      * @throws RmException If the arguments are null or an empty array,
-     *                     *              or if there is an issue deleting files
+     *                     or if there is an issue deleting files
      */
     @Override
     public void run(String[] args, InputStream stdin, OutputStream stdout) throws RmException {
@@ -76,7 +76,7 @@ public class RmApplication implements RmInterface {
                     throw new RmException(String.format("cannot remove '%s': No such file or directory", file));
                 }
 
-                // Is a folder: check flags
+                // Is a folder -> check flags
                 if (fileToDelete.isDirectory()) {
                     String[] fileContents = fileToDelete.list();
                     if (isRecursive) {
