@@ -9,7 +9,7 @@ public final class FileUtils {
     private FileUtils() { /* Does nothing */}
 
     /**
-     * Create a temporary file with the given contents.
+     * Create a temporary file with the given contents in the default temporary-file directory.
      *
      * @param fileName Name of file to be created
      * @param contents Contents to be written to the file
@@ -17,6 +17,20 @@ public final class FileUtils {
      */
     public static Path createNewFile(String fileName, String contents) {
         Path file = assertDoesNotThrow(() -> Files.createTempFile(fileName, ""), "Unable to create temporary file");
+        assertDoesNotThrow(() -> Files.write(file, contents.getBytes()), "Unable to write to temporary file");
+        return file;
+    }
+
+    /**
+     * Create a temporary file with the given contents in the specified directory.
+     *
+     * @param dir      Directory where file is to be created in
+     * @param fileName Name of file to be created
+     * @param contents Contents to be written to the file
+     * @return
+     */
+    public static Path createNewFileInDir(Path dir, String fileName, String contents) {
+        Path file = assertDoesNotThrow(() -> Files.createTempFile(dir, fileName, ""), "Unable to create temporary file");
         assertDoesNotThrow(() -> Files.write(file, contents.getBytes()), "Unable to write to temporary file");
         return file;
     }

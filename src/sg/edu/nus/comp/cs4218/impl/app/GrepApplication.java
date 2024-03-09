@@ -17,6 +17,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.StringJoiner;
@@ -149,17 +151,23 @@ public class GrepApplication implements GrepInterface {
      * @return a String of the absolute path of the filename
      */
     private String convertToAbsolutePath(String fileName) {
-        String home = System.getProperty("user.home").trim();
-        String currentDir = Environment.currentDirectory.trim();
-        String convertedPath = convertPathToSystemPath(fileName);
+        Path path = Paths.get(fileName);
 
-        String newPath;
-        if (convertedPath.length() >= home.length() && convertedPath.substring(0, home.length()).trim().equals(home)) {
-            newPath = convertedPath;
-        } else {
-            newPath = currentDir + CHAR_FILE_SEP + convertedPath;
+        if (!path.isAbsolute()) {
+            String home = System.getProperty("user.home").trim();
+            String currentDir = Environment.currentDirectory.trim();
+            String convertedPath = convertPathToSystemPath(fileName);
+
+            String newPath;
+            if (convertedPath.length() >= home.length() && convertedPath.substring(0, home.length()).trim().equals(home)) {
+                newPath = convertedPath;
+            } else {
+                newPath = currentDir + CHAR_FILE_SEP + convertedPath;
+            }
+            return newPath;
         }
-        return newPath;
+        
+        return fileName;
     }
 
     /**

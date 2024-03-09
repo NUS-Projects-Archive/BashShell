@@ -11,6 +11,7 @@ import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_INPUT;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_PERM;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_SYNTAX;
 import static sg.edu.nus.comp.cs4218.impl.util.FileUtils.createNewFile;
+import static sg.edu.nus.comp.cs4218.impl.util.FileUtils.createNewFileInDir;
 import static sg.edu.nus.comp.cs4218.impl.util.FileUtils.deleteFileOrDirectory;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 
@@ -22,9 +23,14 @@ import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledOnOs;
+import org.junit.jupiter.api.condition.OS;
+import org.junit.jupiter.api.io.TempDir;
 
+import sg.edu.nus.comp.cs4218.Environment;
 import sg.edu.nus.comp.cs4218.exception.GrepException;
 
 @SuppressWarnings("PMD.ClassNamingConventions")
@@ -38,11 +44,23 @@ class GrepApplicationIT {
     private GrepApplication app;
     private ByteArrayOutputStream outContent;
 
+    @TempDir
+    private Path tempDir;
+    private Path file;
+
     @BeforeEach
     void setUp() {
         app = new GrepApplication();
         outContent = new ByteArrayOutputStream();
         System.setOut(new PrintStream(outContent));
+
+        Environment.currentDirectory = tempDir.toFile().getAbsolutePath();
+        file = createNewFileInDir(tempDir, "tempFile", INPUT_CONTENTS);
+    }
+
+    @AfterEach
+    void tearDown() {
+        deleteFileOrDirectory(file);
     }
 
     /**
@@ -108,13 +126,11 @@ class GrepApplicationIT {
 
     /**
      * Tests with valid pattern and file is not null.
+     * File is a relative path - file name.
      */
     @Test
-    void run_GetInputFromValidFile_ReturnsResultBasedOnFileContents() {
-        // Given
-        Path file = createNewFile("tempFile", INPUT_CONTENTS);
-        String fileAbsPath = file.toString();
-        String[] args = new String[]{VALID_PATTERN_A_B, fileAbsPath};
+    void run_GetInputFromValidFileName_ReturnsResultBasedOnFileContents() {
+        String[] args = new String[]{VALID_PATTERN_A_B, file.getFileName().toString()};
 
         // When
         assertDoesNotThrow(() -> app.run(args, mock(InputStream.class), System.out));
@@ -122,9 +138,22 @@ class GrepApplicationIT {
         // Then
         String expected = String.join(STRING_NEWLINE, OUTPUT_CONTENTS) + STRING_NEWLINE;
         assertEquals(expected, outContent.toString());
+    }
 
-        // Clean up
-        deleteFileOrDirectory(file);
+    /**
+     * Tests with valid pattern and file is not null.
+     * File is the absolute file path.
+     */
+    @Test
+    void run_GetInputFromValidAbsoluteFilePath_ReturnsResultBasedOnFileContents() {
+        String[] args = new String[]{VALID_PATTERN_A_B, file.toString()};
+
+        // When
+        assertDoesNotThrow(() -> app.run(args, mock(InputStream.class), System.out));
+
+        // Then
+        String expected = String.join(STRING_NEWLINE, OUTPUT_CONTENTS) + STRING_NEWLINE;
+        assertEquals(expected, outContent.toString());
     }
 
     /**
@@ -180,6 +209,7 @@ class GrepApplicationIT {
      * Tests with unreadable existing file.
      */
     @Test
+    @DisabledOnOs(OS.WINDOWS)
     void run_GetInputFromFileWithNoReadPermission_ReturnsPermDeniedErr() {
         // Given
         Path file = createNewFile("tempFile", INPUT_CONTENTS);
