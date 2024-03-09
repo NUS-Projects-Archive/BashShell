@@ -1,4 +1,4 @@
-name: Maven Tests Report
+name: Maven Test Reports
 
 on:
   push:
@@ -37,7 +37,8 @@ jobs:
           name: Unit Test Report
           path: target/surefire-reports/*Test.xml
           reporter: java-junit
-          continue-on-error: true
+          #fail-on-error: true
+        continue-on-error: true
 
       - name: Integration Tests Report
         uses: dorny/test-reporter@v1
@@ -46,5 +47,5 @@ jobs:
           name: Integration Test Report
           path: target/surefire-reports/*IT.xml
           reporter: java-junit
-
-          continue-on-error: true
+          #fail-on-error: true
+        continue-on-error: true
