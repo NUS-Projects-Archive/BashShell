@@ -1,5 +1,6 @@
 package sg.edu.nus.comp.cs4218.impl.parser;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -37,26 +38,22 @@ public class CutArgsParserTest {
     private static Stream<Arguments> validSyntax() {
         return Stream.of(
                 Arguments.of((Object) new String[]{FLAG_CUT_BY_CHAR, SINGLE_NUM}),
-                Arguments.of((Object) new String[]{FLAG_CUT_BY_BYTE, SINGLE_NUM}),
                 Arguments.of((Object) new String[]{FLAG_CUT_BY_CHAR, SINGLE_NUM, STDIN}),
-                Arguments.of((Object) new String[]{FLAG_CUT_BY_BYTE, SINGLE_NUM, STDIN}),
                 Arguments.of((Object) new String[]{FLAG_CUT_BY_CHAR, SINGLE_NUM, FILE_ONE}),
-                Arguments.of((Object) new String[]{FLAG_CUT_BY_BYTE, SINGLE_NUM, FILE_ONE}),
                 Arguments.of((Object) new String[]{FLAG_CUT_BY_CHAR, MULTI_NUM, FILE_ONE}),
-                Arguments.of((Object) new String[]{FLAG_CUT_BY_BYTE, MULTI_NUM, FILE_ONE}),
                 Arguments.of((Object) new String[]{FLAG_CUT_BY_CHAR, RANGE_OF_NUM, FILE_ONE}),
-                Arguments.of((Object) new String[]{FLAG_CUT_BY_BYTE, RANGE_OF_NUM, FILE_ONE}),
                 Arguments.of((Object) new String[]{FLAG_CUT_BY_CHAR, MULTI_AND_RANGE, FILE_ONE}),
-                Arguments.of((Object) new String[]{FLAG_CUT_BY_BYTE, MULTI_AND_RANGE, FILE_ONE}),
-                Arguments.of((Object) new String[]{FLAG_CUT_BY_CHAR, MULTI_AND_RANGE, FILE_ONE}),
-                Arguments.of((Object) new String[]{FLAG_CUT_BY_BYTE, MULTI_AND_RANGE, FILE_ONE}),
-                Arguments.of((Object) new String[]{FLAG_CUT_BY_CHAR, SINGLE_NUM, STDIN}),
-                Arguments.of((Object) new String[]{FLAG_CUT_BY_BYTE, SINGLE_NUM, STDIN}),
                 Arguments.of((Object) new String[]{FLAG_CUT_BY_CHAR, SINGLE_NUM, FILE_ONE, STDIN}),
-                Arguments.of((Object) new String[]{FLAG_CUT_BY_BYTE, SINGLE_NUM, FILE_ONE, STDIN}),
                 Arguments.of((Object) new String[]{FLAG_CUT_BY_CHAR, SINGLE_NUM, STDIN, STDIN}),
-                Arguments.of((Object) new String[]{FLAG_CUT_BY_BYTE, SINGLE_NUM, STDIN, STDIN}),
                 Arguments.of((Object) new String[]{FLAG_CUT_BY_CHAR, SINGLE_NUM, FILE_ONE, FILE_TWO}),
+                Arguments.of((Object) new String[]{FLAG_CUT_BY_BYTE, SINGLE_NUM}),
+                Arguments.of((Object) new String[]{FLAG_CUT_BY_BYTE, SINGLE_NUM, STDIN}),
+                Arguments.of((Object) new String[]{FLAG_CUT_BY_BYTE, SINGLE_NUM, FILE_ONE}),
+                Arguments.of((Object) new String[]{FLAG_CUT_BY_BYTE, MULTI_NUM, FILE_ONE}),
+                Arguments.of((Object) new String[]{FLAG_CUT_BY_BYTE, RANGE_OF_NUM, FILE_ONE}),
+                Arguments.of((Object) new String[]{FLAG_CUT_BY_BYTE, MULTI_AND_RANGE, FILE_ONE}),
+                Arguments.of((Object) new String[]{FLAG_CUT_BY_BYTE, SINGLE_NUM, FILE_ONE, STDIN}),
+                Arguments.of((Object) new String[]{FLAG_CUT_BY_BYTE, SINGLE_NUM, STDIN, STDIN}),
                 Arguments.of((Object) new String[]{FLAG_CUT_BY_BYTE, SINGLE_NUM, FILE_ONE, FILE_TWO})
         );
     }
@@ -67,16 +64,24 @@ public class CutArgsParserTest {
                 Arguments.of((Object) new String[]{SINGLE_NUM, FILE_ONE}), // lacking flag
                 Arguments.of((Object) new String[]{FLAG_CUT_BY_CHAR, FILE_ONE}), // lacking range
                 Arguments.of((Object) new String[]{FLAG_CUT_BY_BYTE, FILE_ONE}), // lacking range
-                Arguments.of((Object) new String[]{FLAG_CUT_BY_CHAR, FLAG_CUT_BY_BYTE, SINGLE_NUM, FILE_ONE}), // only 1 flag
-                Arguments.of((Object) new String[]{FLAG_CUT_BY_BYTE, FLAG_CUT_BY_CHAR, SINGLE_NUM, FILE_ONE}), // only 1 flag
+                Arguments.of((Object) new String[]{FLAG_CUT_BY_CHAR, FLAG_CUT_BY_BYTE, SINGLE_NUM, FILE_ONE}), // only 1 flag allowed
+                Arguments.of((Object) new String[]{FLAG_CUT_BY_BYTE, FLAG_CUT_BY_CHAR, SINGLE_NUM, FILE_ONE}), // only 1 flag allowed
                 Arguments.of((Object) new String[]{"-C", SINGLE_NUM, FILE_ONE}),
                 Arguments.of((Object) new String[]{"-B", SINGLE_NUM, FILE_ONE}),
-                Arguments.of((Object) new String[]{FLAG_CUT_BY_CHAR, "0", FILE_ONE}),
+                Arguments.of((Object) new String[]{FLAG_CUT_BY_CHAR, "0", FILE_ONE}), // position must be numbered from 1
                 Arguments.of((Object) new String[]{FLAG_CUT_BY_CHAR, "0-5", FILE_ONE}),
                 Arguments.of((Object) new String[]{FLAG_CUT_BY_CHAR, "0,5", FILE_ONE}),
-                Arguments.of((Object) new String[]{FLAG_CUT_BY_CHAR, "-1", FILE_ONE}),
+                Arguments.of((Object) new String[]{FLAG_CUT_BY_CHAR, "-1", FILE_ONE}), // range must have start value
+                Arguments.of((Object) new String[]{FLAG_CUT_BY_CHAR, "1-", FILE_ONE}), // range must have end value
+                Arguments.of((Object) new String[]{FLAG_CUT_BY_CHAR, "1-5-10", FILE_ONE}), // cannot have multiple hyphens
+                Arguments.of((Object) new String[]{FLAG_CUT_BY_CHAR, "1--5", FILE_ONE}), // cannot have multiple hyphens
                 Arguments.of((Object) new String[]{FLAG_CUT_BY_CHAR, "-1-5", FILE_ONE}),
-                Arguments.of((Object) new String[]{FLAG_CUT_BY_CHAR, "-1,5", FILE_ONE})
+                Arguments.of((Object) new String[]{FLAG_CUT_BY_CHAR, "-1,5", FILE_ONE}),
+                Arguments.of((Object) new String[]{FLAG_CUT_BY_CHAR, "-", FILE_ONE}),
+                Arguments.of((Object) new String[]{FLAG_CUT_BY_CHAR, ",1", FILE_ONE}), // cannot start with comma
+                Arguments.of((Object) new String[]{FLAG_CUT_BY_CHAR, "1,", FILE_ONE}), // cannot end with comma
+                Arguments.of((Object) new String[]{FLAG_CUT_BY_CHAR, ",1,", FILE_ONE}),
+                Arguments.of((Object) new String[]{FLAG_CUT_BY_CHAR, "1,,5", FILE_ONE}) // cannot have consecutive commas
         );
     }
 
@@ -85,23 +90,23 @@ public class CutArgsParserTest {
                 Arguments.of(new String[]{FLAG_CUT_BY_CHAR, SINGLE_NUM, FILE_ONE},
                         List.of(new int[]{1, 1})),
                 Arguments.of(new String[]{FLAG_CUT_BY_CHAR, MULTI_NUM, FILE_ONE},
-                        List.of(new int[]{1, 1}, new int[]{1, 5})),
+                        List.of(new int[]{1, 1}, new int[]{5, 5})),
                 Arguments.of(new String[]{FLAG_CUT_BY_CHAR, RANGE_OF_NUM, FILE_ONE},
                         List.of(new int[]{1, 5})),
                 Arguments.of(new String[]{FLAG_CUT_BY_CHAR, "1,5,10-15", FILE_ONE},
-                        List.of(new int[]{1, 1}, new int[]{1, 5}), new int[]{10, 15}),
+                        List.of(new int[]{1, 1}, new int[]{5, 5}, new int[]{10, 15})),
                 Arguments.of(new String[]{FLAG_CUT_BY_CHAR, "10-15,5,1", FILE_ONE},
-                        List.of(new int[]{1, 1}, new int[]{1, 5}), new int[]{10, 15}),
+                        List.of(new int[]{1, 1}, new int[]{5, 5}, new int[]{10, 15})),
                 Arguments.of(new String[]{FLAG_CUT_BY_CHAR, SINGLE_NUM, "-"},
                         List.of(new int[]{1, 1})),
                 Arguments.of(new String[]{FLAG_CUT_BY_CHAR, MULTI_NUM, "-"},
-                        List.of(new int[]{1, 1}, new int[]{1, 5})),
+                        List.of(new int[]{1, 1}, new int[]{5, 5})),
                 Arguments.of(new String[]{FLAG_CUT_BY_CHAR, RANGE_OF_NUM, "-"},
                         List.of(new int[]{1, 5})),
                 Arguments.of(new String[]{FLAG_CUT_BY_CHAR, "1,5,10-15", "-"},
-                        List.of(new int[]{1, 1}, new int[]{1, 5}), new int[]{10, 15}),
+                        List.of(new int[]{1, 1}, new int[]{5, 5}, new int[]{10, 15})),
                 Arguments.of(new String[]{FLAG_CUT_BY_CHAR, "10-15,5,1", "-"},
-                        List.of(new int[]{1, 1}, new int[]{1, 5}), new int[]{10, 15})
+                        List.of(new int[]{1, 1}, new int[]{5, 5}, new int[]{10, 15}))
         );
     }
 
@@ -111,17 +116,9 @@ public class CutArgsParserTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"", " ", "\n"})
-    void parse_EmptyString_ReturnsEmptyFlagsAndNonFlagArgsContainsInput(String args) {
-        assertDoesNotThrow(() -> parser.parse(args));
-        assertTrue(parser.flags.isEmpty());
-        assertTrue(parser.nonFlagArgs.contains(args));
-    }
-
-    @ParameterizedTest
     @ValueSource(strings = {FLAG_CUT_BY_CHAR, FLAG_CUT_BY_BYTE})
-    void parse_ValidFlag_ShouldMatchGivenFlags(String args) {
-        assertDoesNotThrow(() -> parser.parse(args));
+    void parse_ValidFlag_ShouldMatchGivenFlags(String flags) {
+        assertDoesNotThrow(() -> parser.parse(flags, SINGLE_NUM, FILE_ONE));
 
         // Retain only the common elements between parser.flags and VALID_FLAGS
         parser.flags.retainAll(VALID_FLAGS);
@@ -140,15 +137,6 @@ public class CutArgsParserTest {
         assertEquals(expected, result.getMessage());
     }
 
-    @Test
-    void parse_NoFlags_ThrowsInvalidArgsException() {
-        InvalidArgsException result = assertThrowsExactly(InvalidArgsException.class, () ->
-                parser.parse(SINGLE_NUM, FILE_ONE)
-        );
-        String expected = "Invalid syntax"; // one valid flag is expected
-        assertEquals(expected, result.getMessage());
-    }
-
     @ParameterizedTest
     @MethodSource("validSyntax")
     void parse_ValidSyntax_DoNotThrowException(String... args) {
@@ -160,6 +148,94 @@ public class CutArgsParserTest {
     void parse_invalidSyntax_ThrowsInvalidArgsException(String... args) {
         // InvalidArgsException to be thrown for scenarios where no flag is provided or more than one flag is given
         assertThrows(InvalidArgsException.class, () -> parser.parse(args));
+    }
+
+    @Test
+    void parse_NoFlags_ThrowsInvalidArgsException() {
+        InvalidArgsException result = assertThrowsExactly(InvalidArgsException.class, () ->
+                parser.parse(SINGLE_NUM, FILE_ONE)
+        );
+        String expected = "You must specify either cut by character or byte";
+        assertEquals(expected, result.getMessage());
+    }
+
+    @Test
+    void parse_BothFlagsSelected_ThrowsInvalidArgsException() {
+        InvalidArgsException result = assertThrowsExactly(InvalidArgsException.class, () ->
+                parser.parse(FLAG_CUT_BY_CHAR, FLAG_CUT_BY_BYTE, SINGLE_NUM, FILE_ONE)
+        );
+        String expected = "Only one flag can be selected";
+        assertEquals(expected, result.getMessage());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"a", "b", "c", "@", "/", "+"})
+    void parse_InvalidRangeCharacter_ThrowsInvalidArgsException(String invalid) {
+        String range = String.format("1-5,%s,10-15", invalid);
+        InvalidArgsException result = assertThrowsExactly(InvalidArgsException.class, () ->
+                parser.parse(FLAG_CUT_BY_CHAR, range, FILE_ONE)
+        );
+        String expected = String.format("invalid byte/character position: '%s'", invalid);
+        assertEquals(expected, result.getMessage());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {",1,5", "1,5,", "1,,5"})
+    void parse_EmptyCharacterAtStartOrEndOrInBetweenCommas_ThrowsInvalidArgsException(String range) {
+        InvalidArgsException result = assertThrowsExactly(InvalidArgsException.class, () ->
+                parser.parse(FLAG_CUT_BY_CHAR, range, FILE_ONE)
+        );
+        String expected = "byte/character positions are numbered from 1";
+        assertEquals(expected, result.getMessage());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"0", "0,1", "1,0", "1-5,0", "0,1-5"})
+    void parse_SingleCharacterLessThanOne_ThrowsInvalidArgsException(String range) {
+        InvalidArgsException result = assertThrowsExactly(InvalidArgsException.class, () ->
+                parser.parse(FLAG_CUT_BY_CHAR, range, FILE_ONE)
+        );
+        String expected = "byte/character positions are numbered from 1";
+        assertEquals(expected, result.getMessage());
+    }
+
+    @Test
+    void parse_HyphenWithoutStartOrEndValues_ThrowsInvalidArgsException() {
+        InvalidArgsException result = assertThrowsExactly(InvalidArgsException.class, () ->
+                parser.parse(FLAG_CUT_BY_CHAR, "1-5,-,10-15", FILE_ONE)
+        );
+        String expected = "invalid range with no endpoint: '-'";
+        assertEquals(expected, result.getMessage());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"1-3-5", "1-", "-1", "1--5"})
+    void parse_InvalidHyphenFormat_ThrowsInvalidArgsException(String invalid) {
+        String range = String.format("1-5,%s,10-15", invalid);
+        InvalidArgsException result = assertThrowsExactly(InvalidArgsException.class, () ->
+                parser.parse(FLAG_CUT_BY_CHAR, range, FILE_ONE)
+        );
+        String expected = String.format("invalid range format: '%s'", invalid);
+        assertEquals(expected, result.getMessage());
+    }
+
+    @Test
+    void parse_HyphenStartValueLessThanOne_ThrowsInvalidArgsException() {
+        InvalidArgsException result = assertThrowsExactly(InvalidArgsException.class, () ->
+                parser.parse(FLAG_CUT_BY_CHAR, "0-5", FILE_ONE)
+        );
+        String expected = "byte/character positions are numbered from 1";
+        assertEquals(expected, result.getMessage());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"5-1", "10-5", "15-10"})
+    void parse_HyphenEndValueLessThanStartValue_ThrowsInvalidArgsException(String range) {
+        InvalidArgsException result = assertThrowsExactly(InvalidArgsException.class, () ->
+                parser.parse(FLAG_CUT_BY_CHAR, range, FILE_ONE)
+        );
+        String expected = String.format("invalid decreasing range: '%s'", range);
+        assertEquals(expected, result.getMessage());
     }
 
     @Test
@@ -188,9 +264,15 @@ public class CutArgsParserTest {
 
     @ParameterizedTest
     @MethodSource("validRangeList")
-    void getRangeList_ValidList_ReturnsSortedList(String[] args, List<Integer[]> expected) {
+    void getRangeList_ValidList_ReturnsSortedList(String[] args, List<int[]> expected) throws InvalidArgsException {
         assertDoesNotThrow(() -> parser.parse(args));
-        assertEquals(parser.getRangeList(), expected);
+        List<int[]> actualList = parser.getRangeList();
+        assertEquals(expected.size(), actualList.size());
+        for (int i = 0; i < actualList.size(); i++) {
+            int[] actualSublist = actualList.get(i);
+            int[] expectedSubList = expected.get(i);
+            assertArrayEquals(expectedSubList, actualSublist);
+        }
     }
 
     @ParameterizedTest
