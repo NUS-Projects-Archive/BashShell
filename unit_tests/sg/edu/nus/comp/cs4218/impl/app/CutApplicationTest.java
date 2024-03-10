@@ -14,6 +14,8 @@ import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledOnOs;
+import org.junit.jupiter.api.condition.OS;
 import org.junit.jupiter.api.io.TempDir;
 
 import sg.edu.nus.comp.cs4218.exception.CutException;
@@ -77,24 +79,27 @@ class CutApplicationTest {
         CutException result = assertThrowsExactly(CutException.class, () ->
                 app.cutFromFiles(true, false, null, nonExistFile)
         );
-        String expected = "cut: No such file or directory";
+        String expected = "cut: 'nonExistFile.txt': No such file or directory";
         assertEquals(expected, result.getMessage());
     }
 
     @Test
     void cutFromFiles_FileGivenAsDirectory_ThrowsCutException() {
+        Path subDir = tempDir.resolve("subdirectory");
+        assertDoesNotThrow(() -> Files.createDirectories(subDir));
         List<int[]> range = List.of(new int[]{1, 5});
         CutException result = assertThrowsExactly(CutException.class, () ->
-                app.cutFromFiles(true, false, range, tempDir.toString())
+                app.cutFromFiles(true, false, range, subDir.toString())
         );
-        String expected = "cut: This is a directory";
+        String expected = "cut: 'subdirectory': This is a directory";
         assertEquals(expected, result.getMessage());
     }
 
     @Test
+    @DisabledOnOs(value = OS.WINDOWS)
     void cutFromFiles_FileNoPermissionToRead_ThrowsCutException() {
-        boolean isReadable = filePath.toFile().setReadable(false);
-        if (isReadable) {
+        boolean isSetReadable = filePath.toFile().setReadable(false);
+        if (isSetReadable) {
             fail("Failed to set read permission to false for test");
         }
 
@@ -102,7 +107,7 @@ class CutApplicationTest {
         CutException result = assertThrowsExactly(CutException.class, () ->
                 app.cutFromFiles(true, false, range, filePath.toString())
         );
-        String expected = "cut: Permission denied";
+        String expected = String.format("cut: '%s': Permission denied", filePath);
         assertEquals(expected, result.getMessage());
     }
 

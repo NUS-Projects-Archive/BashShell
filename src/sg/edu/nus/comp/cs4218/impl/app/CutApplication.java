@@ -1,27 +1,196 @@
 package sg.edu.nus.comp.cs4218.impl.app;
 
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_NOT_FOUND;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IO_EXCEPTION;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IS_DIR;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_MISSING_ARG;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_ARGS;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_ISTREAM;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_OSTREAM;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_PERM;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NULL_ARGS;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NULL_STREAMS;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_WRITE_STREAM;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
+
+import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import sg.edu.nus.comp.cs4218.app.CutInterface;
 import sg.edu.nus.comp.cs4218.exception.CutException;
+import sg.edu.nus.comp.cs4218.exception.InvalidArgsException;
+import sg.edu.nus.comp.cs4218.exception.ShellException;
+import sg.edu.nus.comp.cs4218.impl.parser.CutArgsParser;
+import sg.edu.nus.comp.cs4218.impl.util.IOUtils;
 
+/**
+ * The cut command cuts out selected portions of each line (as specified by list)
+ * from each file and writes them to the standard output.
+ *
+ * <p>
+ * <b>Command format:</b> <br>
+ * <code>mv [Option] cut Option LIST FILES...</code> <br>
+ * </p>
+ */
 public class CutApplication implements CutInterface {
+
+    /**
+     * Runs the cut application with the specified arguments.
+     *
+     * @param args   Array of arguments for the application
+     * @param stdin  An InputStream. The input for the command is read from this InputStream
+     *               if no files are specified
+     * @param stdout An OutputStream. The output of the command is written to this OutputStream
+     * @throws CutException
+     */
     @Override
     public void run(String[] args, InputStream stdin, OutputStream stdout) throws CutException {
-        throw new CutException("EF2 not implemented");
+        if (args == null || args.length == 0) {
+            throw new CutException(ERR_MISSING_ARG);
+        }
+        if (args.length < 2) {
+            throw new CutException(ERR_NO_ARGS);
+        }
+        if (stdin == null) {
+            throw new CutException(ERR_NO_ISTREAM);
+        }
+        if (stdout == null) {
+            throw new CutException(ERR_NO_OSTREAM);
+        }
+
+        // Parse argument(s) provided
+        final CutArgsParser parser = new CutArgsParser();
+        try {
+            parser.parse(args);
+        } catch (InvalidArgsException e) {
+            throw new CutException(e.getMessage(), e);
+        }
+
+        final Boolean isCharPo = parser.isCharPo();
+        final Boolean isBytePo = parser.isBytePo();
+        final List<int[]> ranges = parser.getRangeList();
+        final String[] files = parser.getFileNames().toArray(new String[parser.getFileNames().size()]);
+
+        StringBuilder output = new StringBuilder();
+        if (files.length == 0) {
+            output.append(cutFromStdin(isCharPo, isBytePo, ranges, stdin));
+        } else {
+            output.append(cutFromFiles(isCharPo, isBytePo, ranges, files));
+        }
+
+        try {
+            if (!output.toString().isEmpty()) {
+                stdout.write(output.toString().getBytes());
+                stdout.write(STRING_NEWLINE.getBytes());
+            }
+        } catch (IOException e) {
+            throw new CutException(ERR_WRITE_STREAM, e);
+        }
     }
 
     @Override
     public String cutFromFiles(Boolean isCharPo, Boolean isBytePo, List<int[]> ranges, String... fileName)
             throws CutException {
-        throw new CutException("EF2 not implemented");
+        if (fileName == null || fileName.length == 0) {
+            throw new CutException(ERR_NULL_ARGS);
+        }
+
+        List<String> output = new ArrayList<>();
+        List<CutException> errorList = new ArrayList<>();
+        for (String file : fileName) {
+            try {
+                File node = IOUtils.resolveFilePath(file).toFile();
+                if (!node.exists()) {
+                    throw new CutException(String.format("'%s': %s", node.getName(), ERR_FILE_NOT_FOUND));
+                }
+                if (node.isDirectory()) {
+                    throw new CutException(String.format("'%s': %s", node.getName(), ERR_IS_DIR));
+                }
+                if (!node.canRead()) {
+                    throw new CutException(String.format("'%s': %s", node.getName(), ERR_NO_PERM));
+                }
+                InputStream input = null;
+                try {
+                    input = IOUtils.openInputStream(file);
+                    List<String> lines = IOUtils.getLinesFromInputStream(input);
+                    output = cutSelectedPortions(isCharPo, isBytePo, ranges, lines);
+                    IOUtils.closeInputStream(input);
+                    input.close();
+                } catch (ShellException | IOException e) {
+                    throw new CutException(e.getMessage(), e);
+                } finally {
+                    try {
+                        if (input != null) {
+                            input.close();
+                        }
+                    } catch (IOException e) {
+                        throw new CutException(e.getMessage(), e);
+                    }
+                }
+            } catch (CutException exception) {
+                errorList.add(exception);
+            }
+        }
+
+        if (!errorList.isEmpty()) {
+            throw new CutException(errorList);
+        }
+
+        return String.join(STRING_NEWLINE, output);
     }
 
     @Override
     public String cutFromStdin(Boolean isCharPo, Boolean isBytePo, List<int[]> ranges, InputStream stdin)
             throws CutException {
-        throw new CutException("EF2 not implemented");
+        if (stdin == null) {
+            throw new CutException(ERR_NULL_STREAMS);
+        }
+
+        List<String> lines = null;
+        try {
+            lines = IOUtils.getLinesFromInputStream(stdin);
+        } catch (IOException e) {
+            throw new CutException(ERR_IO_EXCEPTION, e);
+        }
+
+        List<String> output = cutSelectedPortions(isCharPo, isBytePo, ranges, lines);
+        return String.join(STRING_NEWLINE, output);
+    }
+
+    private List<String> cutSelectedPortions(Boolean isCharPo, Boolean isBytePo, List<int[]> ranges, List<String> lines) {
+        return lines.stream()
+                .map(line -> cutLine(isCharPo, isBytePo, ranges, line))
+                .collect(Collectors.toList());
+    }
+
+    private String cutLine(Boolean isCharPo, Boolean isBytePo, List<int[]> ranges, String line) {
+        return ranges.stream()
+                .map(range -> cutPortion(isCharPo, isBytePo, range, line))
+                .collect(Collectors.joining());
+    }
+
+    private String cutPortion(Boolean isCharPo, Boolean isBytePo, int[] range, String line) {
+        int start = range[0] - 1; // 0-based index
+        int end = range[1];
+
+        if (start >= 0 && start < line.length()) {
+            int limit = isCharPo
+                    ? Math.min(end, line.length())
+                    : Math.min(end, line.getBytes().length);
+
+            if (isCharPo) {
+                return line.substring(start, limit);
+            } else if (isBytePo) {
+                byte[] lineBytes = line.getBytes();
+                return new String(lineBytes, start, limit - start);
+            }
+        }
+
+        return "";
     }
 }

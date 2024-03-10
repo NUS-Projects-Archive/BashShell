@@ -264,9 +264,9 @@ public class CutArgsParserTest {
 
     @ParameterizedTest
     @MethodSource("validRangeList")
-    void getRangeList_ValidList_ReturnsSortedList(String[] args, List<int[]> expected) throws InvalidArgsException {
+    void getRangeList_ValidList_ReturnsSortedList(String[] args, List<int[]> expected) {
         assertDoesNotThrow(() -> parser.parse(args));
-        List<int[]> actualList = parser.getRangeList();
+        List<int[]> actualList = assertDoesNotThrow(() -> parser.getRangeList());
         assertEquals(expected.size(), actualList.size());
         for (int i = 0; i < actualList.size(); i++) {
             int[] actualSublist = actualList.get(i);

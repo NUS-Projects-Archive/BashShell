@@ -1,6 +1,7 @@
 package sg.edu.nus.comp.cs4218.impl.parser;
 
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_SYNTAX;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_FLAG_PREFIX;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -17,6 +18,7 @@ public class CutArgsParser extends ArgsParser {
     private static final char FLAG_BYTE_POS = 'b';
     public static final String NO_FLAG_MSG = "You must specify either cut by character or byte";
     public static final String TOO_MANY_FLAG_MSG = "Only one flag can be selected";
+    private List<int[]> rangeList = new ArrayList<>();
 
     public CutArgsParser() {
         super();
@@ -32,12 +34,37 @@ public class CutArgsParser extends ArgsParser {
         return flags.contains(FLAG_BYTE_POS);
     }
 
-    public List<int[]> getRangeList() throws InvalidArgsException {
-        return convertToRangeList(nonFlagArgs.get(0));
+    public List<int[]> getRangeList() {
+        return rangeList;
     }
 
     public List<String> getFileNames() {
-        return nonFlagArgs.subList(1, nonFlagArgs.size());
+        return nonFlagArgs;
+    }
+
+    /**
+     * Separates command flags from non-flag arguments given a tokenized command.
+     *
+     * @param args
+     */
+    @Override
+    public void parse(String... args) throws InvalidArgsException {
+        boolean isFirstNonFlagArg = true;
+        for (String arg : args) {
+            if (arg.length() > 1 && arg.charAt(0) == CHAR_FLAG_PREFIX) {
+                // Treat the characters (excluding CHAR_FLAG_PREFIX) as individual flags.
+                for (int i = 1; i < arg.length(); i++) {
+                    flags.add(arg.charAt(i));
+                }
+            } else if (isFirstNonFlagArg) {
+                rangeList = convertToRangeList(arg);
+                isFirstNonFlagArg = false;
+            } else {
+                nonFlagArgs.add(arg);
+            }
+        }
+
+        validateArgs();
     }
 
     @Override

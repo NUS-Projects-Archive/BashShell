@@ -173,8 +173,4 @@ public class MvApplication implements MvInterface {
 
         return null;
     }
-
-    private String formatMvErrorMessage(String cause, String error, String file) {
-        return String.format("%s'%s': %s", cause, file, error);
-    }
 }

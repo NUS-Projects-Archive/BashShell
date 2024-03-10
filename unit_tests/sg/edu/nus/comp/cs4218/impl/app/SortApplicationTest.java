@@ -58,16 +58,18 @@ class SortApplicationTest {
         SortException result = assertThrowsExactly(SortException.class, () ->
                 app.sortFromFiles(false, false, false, nonExistFile)
         );
-        String expected = String.format("sort: Problem sort from file: '%s': No such file or directory", nonExistFile);
+        String expected = "sort: Problem sort from file: 'nonExistFile.txt': No such file or directory";
         assertEquals(expected, result.getMessage());
     }
 
     @Test
     void sortFromFiles_FileGivenAsDirectory_ThrowsSortException() {
+        Path subDir = tempDir.resolve("subdirectory");
+        assertDoesNotThrow(() -> Files.createDirectories(subDir));
         SortException result = assertThrowsExactly(SortException.class, () ->
-                app.sortFromFiles(false, false, false, tempDir.toString())
+                app.sortFromFiles(false, false, false, subDir.toString())
         );
-        String expected = String.format("sort: Problem sort from file: '%s': This is a directory", tempDir);
+        String expected = "sort: Problem sort from file: 'subdirectory': This is a directory";
         assertEquals(expected, result.getMessage());
     }
 
