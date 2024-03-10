@@ -13,8 +13,4 @@ public class CutException extends AbstractApplicationException {
     public CutException(String message, Throwable cause) {
         super("cut: " + message, cause);
     }
-
-    public CutException(List<CutException> exceptions) {
-        super(exceptions);
-    }
 }

@@ -112,7 +112,7 @@ public class CutApplication implements CutInterface {
         }
 
         List<String> output = new ArrayList<>();
-        List<CutException> errorList = new ArrayList<>();
+        List<String> errorList = new ArrayList<>();
         for (String file : fileName) {
             try {
                 File node = IOUtils.resolveFilePath(file).toFile();
@@ -143,12 +143,12 @@ public class CutApplication implements CutInterface {
                     }
                 }
             } catch (CutException exception) {
-                errorList.add(exception);
+                errorList.add(exception.getMessage());
             }
         }
 
         if (!errorList.isEmpty()) {
-            throw new CutException(errorList);
+            output.addAll(errorList);
         }
 
         return String.join(STRING_NEWLINE, output);
@@ -181,21 +181,34 @@ public class CutApplication implements CutInterface {
         return String.join(STRING_NEWLINE, output);
     }
 
+    /**
+     * Cuts out selected portions of each line.
+     *
+     * @param isCharPo Boolean option to cut by character position
+     * @param isBytePo Boolean option to cut by byte position
+     * @param ranges   List of 2-element arrays containing the start and end indices for cut.
+     *                 For instance, cutting on the first column would be represented using a [1,1] array.
+     * @param stdin    InputStream containing arguments from Stdin
+     * @param fileName Array of String of file names
+     * @return A string containing the concatenated output of cut portions from each line
+     * @throws CutException
+     */
     public String cutFromFileAndStdin(Boolean isCharPo, Boolean isBytePo, List<int[]> ranges,
                                       InputStream stdin, String... fileName) throws CutException {
         List<String> result = new ArrayList<>();
         for (String file : fileName) {
             if ("-".equals(file)) {
-                System.out.println("cut from stdin");
                 result.add(cutFromStdin(isCharPo, isBytePo, ranges, stdin));
             } else {
                 result.add(cutFromFiles(isCharPo, isBytePo, ranges, file));
             }
         }
+
         return String.join(STRING_NEWLINE, result);
     }
 
-    private List<String> cutSelectedPortions(Boolean isCharPo, Boolean isBytePo, List<int[]> ranges, InputStream stdin) throws IOException {
+    private List<String> cutSelectedPortions(Boolean isCharPo, Boolean isBytePo, List<int[]> ranges, InputStream stdin)
+            throws IOException {
         List<String> lines = IOUtils.getLinesFromInputStream(stdin);
         return lines.stream()
                 .map(line -> cutLine(isCharPo, isBytePo, ranges, line))
