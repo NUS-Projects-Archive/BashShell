@@ -2,7 +2,6 @@ package sg.edu.nus.comp.cs4218.impl.app;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.ByteArrayInputStream;
@@ -17,8 +16,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledOnOs;
 import org.junit.jupiter.api.condition.OS;
 import org.junit.jupiter.api.io.TempDir;
-
-import sg.edu.nus.comp.cs4218.exception.CutException;
 
 class CutApplicationTest {
 
@@ -74,41 +71,35 @@ class CutApplicationTest {
     }
 
     @Test
-    void cutFromFiles_FileDoNotExist_ThrowsCutException() {
+    void cutFromFiles_FileDoNotExist_PrintsErrorMessage() {
         String nonExistFile = tempDir.resolve("nonExistFile.txt").toString();
-        CutException result = assertThrowsExactly(CutException.class, () ->
-                app.cutFromFiles(true, false, null, nonExistFile)
-        );
+        String result = assertDoesNotThrow(() -> app.cutFromFiles(true, false, null, nonExistFile));
         String expected = "cut: 'nonExistFile.txt': No such file or directory";
-        assertEquals(expected, result.getMessage());
+        assertEquals(expected, result);
     }
 
     @Test
-    void cutFromFiles_FileGivenAsDirectory_ThrowsCutException() {
+    void cutFromFiles_FileGivenAsDirectory_PrintsErrorMessage() {
         Path subDir = tempDir.resolve("subdirectory");
         assertDoesNotThrow(() -> Files.createDirectories(subDir));
         List<int[]> range = List.of(new int[]{1, 5});
-        CutException result = assertThrowsExactly(CutException.class, () ->
-                app.cutFromFiles(true, false, range, subDir.toString())
-        );
+        String result = assertDoesNotThrow(() -> app.cutFromFiles(true, false, range, subDir.toString()));
         String expected = "cut: 'subdirectory': This is a directory";
-        assertEquals(expected, result.getMessage());
+        assertEquals(expected, result);
     }
 
     @Test
     @DisabledOnOs(value = OS.WINDOWS)
-    void cutFromFiles_FileNoPermissionToRead_ThrowsCutException() {
+    void cutFromFiles_FileNoPermissionToRead_PrintsErrorMessage() {
         boolean isSetReadable = filePath.toFile().setReadable(false);
         if (isSetReadable) {
             fail("Failed to set read permission to false for test");
         }
 
         List<int[]> range = List.of(new int[]{1, 5});
-        CutException result = assertThrowsExactly(CutException.class, () ->
-                app.cutFromFiles(true, false, range, filePath.toString())
-        );
+        String result = assertDoesNotThrow(() -> app.cutFromFiles(true, false, range, filePath.toString()));
         String expected = String.format("cut: '%s': Permission denied", filePath);
-        assertEquals(expected, result.getMessage());
+        assertEquals(expected, result);
     }
 
     @Test

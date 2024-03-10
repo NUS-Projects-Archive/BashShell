@@ -44,7 +44,7 @@ public class CutApplicationIT {
     @Test
     void run_EmptyArgs_ThrowsCutException() {
         CutException result = assertThrowsExactly(CutException.class, () -> app.run(null, null, null));
-        String expected = "cut: Null arguments";
+        String expected = "cut: Missing Argument";
         assertEquals(expected, result.getMessage());
     }
 
@@ -77,14 +77,14 @@ public class CutApplicationIT {
 
     @Test
     void run_FailsToReadFromInputStream_ThrowsCutException() {
-        String[] args = {"-c", "1-10", tempFilePath.toString()};
+        String[] args = {"-c", "1-10", "-"};
         CutException result = assertThrowsExactly(CutException.class, () -> {
             InputStream mockedStdin = mock(InputStream.class);
             doThrow(new IOException()).when(mockedStdin).read(any(byte[].class));
             OutputStream mockedStdout = mock(OutputStream.class);
             app.run(args, mockedStdin, mockedStdout);
         });
-        String expected = "cut: Could not read from input stream";
+        String expected = "cut: IOException";
         assertEquals(expected, result.getMessage());
     }
 
