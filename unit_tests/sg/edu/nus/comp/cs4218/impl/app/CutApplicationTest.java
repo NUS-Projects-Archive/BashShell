@@ -97,7 +97,7 @@ class CutApplicationTest {
         }
 
         String result = assertDoesNotThrow(() -> app.cutFromFiles(true, false, ONE_TO_FIVE_RANGE, fileOne));
-        String expected = String.format("cut: '%s': Permission denied", fileOne);
+        String expected = "cut: 'file1.txt': Permission denied";
         assertEquals(expected, result);
     }
 
