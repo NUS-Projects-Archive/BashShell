@@ -92,7 +92,7 @@ class CutApplicationTest {
     @DisabledOnOs(value = OS.WINDOWS)
     void cutFromFiles_FileNoPermissionToRead_PrintsErrorMessage() {
         boolean isSetReadable = fileOnePath.toFile().setReadable(false);
-        if (isSetReadable) {
+        if (!isSetReadable) {
             fail("Failed to set read permission to false for test");
         }
 
