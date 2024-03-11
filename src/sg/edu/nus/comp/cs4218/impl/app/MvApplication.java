@@ -91,11 +91,11 @@ public class MvApplication implements MvInterface {
         }
 
         if (!Files.isReadable(srcPath)) {
-            throw new MvException(String.format("cannot open '%s': %s", srcFile, ERR_NO_PERM));
+            throw new MvException(String.format("cannot read '%s': %s", srcFile, ERR_NO_PERM));
         }
 
         if (Files.exists(destPath) && !Files.isWritable(destPath)) {
-            throw new MvException(String.format("cannot create regular file '%s': %s", destPath, ERR_NO_PERM));
+            throw new MvException(String.format("cannot write '%s': %s", destPath, ERR_NO_PERM));
         }
 
         // Append file name to destination directory if destination is a directory
