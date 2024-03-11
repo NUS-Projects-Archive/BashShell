@@ -44,7 +44,7 @@ class SortApplicationTest {
     }
 
     @Test
-    void sortFromFiles_EmptyFiles_ThrowsSortException() {
+    void sortFromFiles_EmptyFile_ThrowsSortException() {
         SortException result = assertThrowsExactly(SortException.class, () ->
                 app.sortFromFiles(false, false, false, new String[0])
         );

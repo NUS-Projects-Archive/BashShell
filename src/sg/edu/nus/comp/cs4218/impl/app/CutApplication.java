@@ -128,7 +128,7 @@ public class CutApplication implements CutInterface {
                 InputStream input = null;
                 try {
                     input = IOUtils.openInputStream(file);
-                    output = cutSelectedPortions(isCharPo, isBytePo, ranges, input);
+                    output.addAll(cutSelectedPortions(isCharPo, isBytePo, ranges, input));
                     IOUtils.closeInputStream(input);
                     input.close();
                 } catch (ShellException | IOException e) {
@@ -142,8 +142,8 @@ public class CutApplication implements CutInterface {
                         throw new CutException(e.getMessage(), e);
                     }
                 }
-            } catch (CutException exception) {
-                errorList.add(exception.getMessage());
+            } catch (CutException e) {
+                errorList.add(e.getMessage());
             }
         }
 

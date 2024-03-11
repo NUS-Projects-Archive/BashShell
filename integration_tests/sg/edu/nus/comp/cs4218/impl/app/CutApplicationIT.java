@@ -21,12 +21,12 @@ import sg.edu.nus.comp.cs4218.exception.CutException;
 @SuppressWarnings("PMD.ClassNamingConventions")
 public class CutApplicationIT {
 
-    private static final String TEMP_FILE = "file.txt";
-    private static final String TEMP_CONTENT = "1234567890";
+    private static final String FILE = "file.txt";
+    private static final String FILE_CONTENT = "1234567890";
 
     @TempDir
     private Path tempDir;
-    private Path tempFilePath;
+    private Path filePath;
     private CutApplication app;
 
     @BeforeEach
@@ -34,11 +34,11 @@ public class CutApplicationIT {
         app = new CutApplication();
 
         // Create temporary file, automatically deletes after test execution
-        tempFilePath = tempDir.resolve(TEMP_FILE);
-        Files.createFile(tempFilePath);
+        filePath = tempDir.resolve(FILE);
+        Files.createFile(filePath);
 
         // Writes content to temporary file
-        Files.write(tempFilePath, TEMP_CONTENT.getBytes());
+        Files.write(filePath, FILE_CONTENT.getBytes());
     }
 
     @Test
@@ -66,7 +66,7 @@ public class CutApplicationIT {
 
     @Test
     void run_NoStdout_ThrowsCutException() {
-        String[] args = {"-c", "1-5", tempFilePath.toString()};
+        String[] args = {"-c", "1-5", filePath.toString()};
         CutException result = assertThrowsExactly(CutException.class, () -> {
             InputStream mockedStdin = mock(InputStream.class);
             app.run(args, mockedStdin, null);
@@ -79,8 +79,8 @@ public class CutApplicationIT {
     void run_FailsToReadFromInputStream_ThrowsCutException() {
         String[] args = {"-c", "1-10", "-"};
         CutException result = assertThrowsExactly(CutException.class, () -> {
-            InputStream mockedStdin = mock(InputStream.class);
-            doThrow(new IOException()).when(mockedStdin).read(any(byte[].class));
+                InputStream mockedStdin = mock(InputStream.class);
+                doThrow(new IOException()).when(mockedStdin).read(any(byte[].class));
             OutputStream mockedStdout = mock(OutputStream.class);
             app.run(args, mockedStdin, mockedStdout);
         });
@@ -90,7 +90,7 @@ public class CutApplicationIT {
 
     @Test
     void run_FailsToWriteToOutputStream_ThrowsCutException() {
-        String[] args = {"-c", "1-10", tempFilePath.toString()};
+        String[] args = {"-c", "1-10", filePath.toString()};
         CutException result = assertThrowsExactly(CutException.class, () -> {
             InputStream mockedStdin = mock(InputStream.class);
             OutputStream mockedStdout = mock(OutputStream.class);
