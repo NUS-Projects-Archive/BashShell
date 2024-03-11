@@ -44,6 +44,9 @@ public class CutArgsParser extends ArgsParser {
 
     /**
      * Separates command flags from non-flag arguments given a tokenized command.
+     * <p>
+     * Assumptions:
+     * - The first non flag arg is treated as range
      *
      * @param args
      */
