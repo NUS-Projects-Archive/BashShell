@@ -107,9 +107,8 @@ public class CutApplication implements CutInterface {
      * @throws CutException
      */
     @Override
-    public String cutFromFiles(Boolean isCharPo, Boolean isBytePo, List<int[]> ranges, String... fileName)
-            throws CutException {
-        if (isCharPo == isBytePo) {
+    public String cutFromFiles(Boolean isCharPo, Boolean isBytePo, List<int[]> ranges, String... fileName) throws CutException {
+        if (isCharPo.equals(isBytePo)) {
             throw new CutException("Exactly one flag (cut by character or byte) should be selected, but not both");
         }
         if (fileName == null || fileName.length == 0) {
@@ -174,7 +173,7 @@ public class CutApplication implements CutInterface {
     @Override
     public String cutFromStdin(Boolean isCharPo, Boolean isBytePo, List<int[]> ranges, InputStream stdin)
             throws CutException {
-        if (isCharPo == isBytePo) {
+        if (isCharPo.equals(isBytePo)) {
             throw new CutException("Exactly one flag (cut by character or byte) should be selected, but not both");
         }
         if (stdin == null) {
@@ -206,7 +205,7 @@ public class CutApplication implements CutInterface {
      */
     public String cutFromFileAndStdin(Boolean isCharPo, Boolean isBytePo, List<int[]> ranges,
                                       InputStream stdin, String... fileName) throws CutException {
-        if (isCharPo == isBytePo) {
+        if (isCharPo.equals(isBytePo)) {
             throw new CutException("Exactly one flag (cut by character or byte) should be selected, but not both");
         }
 
