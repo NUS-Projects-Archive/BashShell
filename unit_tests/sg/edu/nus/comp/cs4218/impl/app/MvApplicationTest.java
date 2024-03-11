@@ -47,7 +47,7 @@ class MvApplicationTest {
     }
 
     private String getCannotWritePermissionMsg(String file) {
-        return String.format("mv: cannot create regular file '%s': Permission denied", file);
+        return String.format("mv: cannot write '%s': Permission denied", file);
     }
 
 
