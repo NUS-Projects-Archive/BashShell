@@ -63,11 +63,28 @@ class CutApplicationTest {
 
     // The tests do not cover scenarios where no flag is provided, more than one flag is given,
     // or the invalidity of the range, as exceptions are expected to be thrown before reaching the cutFromFiles method.
+    @Test
+    void cutFromFiles_BothCutOptionsFalse_ThrowsCutException() {
+        CutException result = assertThrowsExactly(CutException.class, () ->
+                app.cutFromFiles(false, false, null, new String[0])
+        );
+        String expected = "cut: Exactly one flag (cut by character or byte) should be selected, but not both";
+        assertEquals(expected, result.getMessage());
+    }
+
+    @Test
+    void cutFromFiles_BothCutOptionsTrue_ThrowsCutException() {
+        CutException result = assertThrowsExactly(CutException.class, () ->
+                app.cutFromFiles(true, true, null, new String[0])
+        );
+        String expected = "cut: Exactly one flag (cut by character or byte) should be selected, but not both";
+        assertEquals(expected, result.getMessage());
+    }
 
     @Test
     void cutFromFiles_EmptyFile_ThrowsCutException() {
         CutException result = assertThrowsExactly(CutException.class, () ->
-                app.cutFromFiles(false, false, null, new String[0])
+                app.cutFromFiles(true, false, null, new String[0])
         );
         String expected = "cut: Null arguments";
         assertEquals(expected, result.getMessage());
@@ -126,35 +143,49 @@ class CutApplicationTest {
 
     @Test
     void cutFromFiles_MultipleFiles_ReturnsCutString() {
-        String result = assertDoesNotThrow(() -> app.cutFromFiles(false, true, ONE_TO_FIVE_RANGE, fileOne, fileTwo));
+        String result = assertDoesNotThrow(() -> app.cutFromFiles(true, false, ONE_TO_FIVE_RANGE, fileOne, fileTwo));
         String expected = ONE_TO_FIVE + STRING_NEWLINE + ZERO_TO_SIX;
         assertEquals(expected, result);
     }
 
     @Test
     void cutFromFiles_SomeFilesAtTheStartDoNotExist_ReturnsCutStringAndErrorMessage() {
-        String result = assertDoesNotThrow(() -> app.cutFromFiles(false, true, ONE_TO_FIVE_RANGE, nonExistFile, fileOne, fileTwo));
+        String result = assertDoesNotThrow(() -> app.cutFromFiles(true, false, ONE_TO_FIVE_RANGE, nonExistFile, fileOne, fileTwo));
         String expected = ONE_TO_FIVE + STRING_NEWLINE + ZERO_TO_SIX + STRING_NEWLINE + NON_EXIST_FILE;
         assertEquals(expected, result);
     }
 
     @Test
     void cutFromFiles_SomeFilesInTheMiddleDoNotExist_ReturnsCutStringAndErrorMessage() {
-        String result = assertDoesNotThrow(() -> app.cutFromFiles(false, true, ONE_TO_FIVE_RANGE, fileOne, nonExistFile, fileTwo));
+        String result = assertDoesNotThrow(() -> app.cutFromFiles(true, false, ONE_TO_FIVE_RANGE, fileOne, nonExistFile, fileTwo));
         String expected = ONE_TO_FIVE + STRING_NEWLINE + ZERO_TO_SIX + STRING_NEWLINE + NON_EXIST_FILE;
         assertEquals(expected, result);
     }
 
     @Test
     void cutFromFiles_SomeFilesAtTheEndDoNotExist_ReturnsCutStringAndErrorMessage() {
-        String result = assertDoesNotThrow(() -> app.cutFromFiles(false, true, ONE_TO_FIVE_RANGE, fileOne, fileTwo, nonExistFile));
+        String result = assertDoesNotThrow(() -> app.cutFromFiles(true, false, ONE_TO_FIVE_RANGE, fileOne, fileTwo, nonExistFile));
         String expected = ONE_TO_FIVE + STRING_NEWLINE + ZERO_TO_SIX + STRING_NEWLINE + NON_EXIST_FILE;
         assertEquals(expected, result);
     }
 
     @Test
-    void cutFromStdin_NullStdin_ThrowsCutException() {
+    void cutFromStdin_BothCutOptionsFalse_ThrowsCutException() {
         CutException result = assertThrowsExactly(CutException.class, () -> app.cutFromStdin(false, false, null, null));
+        String expected = "cut: Exactly one flag (cut by character or byte) should be selected, but not both";
+        assertEquals(expected, result.getMessage());
+    }
+
+    @Test
+    void cutFromStdin_BothCutOptionsTrue_ThrowsCutException() {
+        CutException result = assertThrowsExactly(CutException.class, () -> app.cutFromStdin(true, true, null, null));
+        String expected = "cut: Exactly one flag (cut by character or byte) should be selected, but not both";
+        assertEquals(expected, result.getMessage());
+    }
+
+    @Test
+    void cutFromStdin_NullStdin_ThrowsCutException() {
+        CutException result = assertThrowsExactly(CutException.class, () -> app.cutFromStdin(true, false, null, null));
         String expected = "cut: Null Pointer Exception";
         assertEquals(expected, result.getMessage());
     }

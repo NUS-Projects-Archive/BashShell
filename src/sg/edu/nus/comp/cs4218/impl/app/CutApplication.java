@@ -26,6 +26,7 @@ import sg.edu.nus.comp.cs4218.exception.CutException;
 import sg.edu.nus.comp.cs4218.exception.InvalidArgsException;
 import sg.edu.nus.comp.cs4218.exception.ShellException;
 import sg.edu.nus.comp.cs4218.impl.parser.CutArgsParser;
+import sg.edu.nus.comp.cs4218.impl.util.CollectionsUtils;
 import sg.edu.nus.comp.cs4218.impl.util.IOUtils;
 
 /**
@@ -34,7 +35,7 @@ import sg.edu.nus.comp.cs4218.impl.util.IOUtils;
  *
  * <p>
  * <b>Command format:</b> <br>
- * <code>mv [Option] cut Option LIST FILES...</code> <br>
+ * <code>cut Option LIST FILES...</code> <br>
  * </p>
  */
 public class CutApplication implements CutInterface {
@@ -74,7 +75,7 @@ public class CutApplication implements CutInterface {
         final Boolean isCharPo = parser.isCharPo();
         final Boolean isBytePo = parser.isBytePo();
         final List<int[]> ranges = parser.getRangeList();
-        final String[] files = parser.getFileNames().toArray(new String[parser.getFileNames().size()]);
+        final String[] files = CollectionsUtils.listToArray(parser.getFileNames());
 
         StringBuilder output = new StringBuilder();
         if (files.length == 0) {
@@ -84,7 +85,7 @@ public class CutApplication implements CutInterface {
         }
 
         try {
-            if (!output.toString().isEmpty()) {
+            if (output.length() != 0) {
                 stdout.write(output.toString().getBytes());
                 stdout.write(STRING_NEWLINE.getBytes());
             }
@@ -101,12 +102,16 @@ public class CutApplication implements CutInterface {
      * @param ranges   List of 2-element arrays containing the start and end indices for cut.
      *                 For instance, cutting on the first column would be represented using a [1,1] array.
      * @param fileName Array of String of file names
-     * @return A string containing the concatenated output of cut portions from each line
+     * @return A string containing the concatenated output of cut portions from each line,
+     *         including errors (if any) at the end
      * @throws CutException
      */
     @Override
     public String cutFromFiles(Boolean isCharPo, Boolean isBytePo, List<int[]> ranges, String... fileName)
             throws CutException {
+        if (isCharPo == isBytePo) {
+            throw new CutException("Exactly one flag (cut by character or byte) should be selected, but not both");
+        }
         if (fileName == null || fileName.length == 0) {
             throw new CutException(ERR_NULL_ARGS);
         }
@@ -162,15 +167,20 @@ public class CutApplication implements CutInterface {
      * @param ranges   List of 2-element arrays containing the start and end indices for cut.
      *                 For instance, cutting on the first column would be represented using a [1,1] array.
      * @param stdin    InputStream containing arguments from Stdin
-     * @return A string containing the concatenated output of cut portions from each line
+     * @return A string containing the concatenated output of cut portions from each line,
+     *         including errors (if any) at the end
      * @throws CutException
      */
     @Override
     public String cutFromStdin(Boolean isCharPo, Boolean isBytePo, List<int[]> ranges, InputStream stdin)
             throws CutException {
+        if (isCharPo == isBytePo) {
+            throw new CutException("Exactly one flag (cut by character or byte) should be selected, but not both");
+        }
         if (stdin == null) {
             throw new CutException(ERR_NULL_STREAMS);
         }
+
         List<String> output = null;
         try {
             output = cutSelectedPortions(isCharPo, isBytePo, ranges, stdin);
@@ -190,11 +200,16 @@ public class CutApplication implements CutInterface {
      *                 For instance, cutting on the first column would be represented using a [1,1] array.
      * @param stdin    InputStream containing arguments from Stdin
      * @param fileName Array of String of file names
-     * @return A string containing the concatenated output of cut portions from each line
+     * @return A string containing the concatenated output of cut portions from each line,
+     *         including errors (if any) at the end
      * @throws CutException
      */
     public String cutFromFileAndStdin(Boolean isCharPo, Boolean isBytePo, List<int[]> ranges,
                                       InputStream stdin, String... fileName) throws CutException {
+        if (isCharPo == isBytePo) {
+            throw new CutException("Exactly one flag (cut by character or byte) should be selected, but not both");
+        }
+
         List<String> result = new ArrayList<>();
         for (String file : fileName) {
             if ("-".equals(file)) {

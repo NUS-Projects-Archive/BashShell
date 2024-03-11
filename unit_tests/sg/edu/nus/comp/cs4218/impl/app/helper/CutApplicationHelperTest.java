@@ -2,6 +2,7 @@ package sg.edu.nus.comp.cs4218.impl.app.helper;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static sg.edu.nus.comp.cs4218.impl.util.AssertUtils.assertSameList;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 
 import java.io.ByteArrayInputStream;
@@ -39,9 +40,7 @@ class CutApplicationHelperTest {
                 CutApplicationHelper.cutSelectedPortions(true, false, range, stdin)
         );
         List<String> expected = List.of("", ""); // 0-based index
-        for (int i = 0; i < result.size(); i++) {
-            assertEquals(expected.get(i), result.get(i));
-        }
+        assertSameList(expected, result);
     }
 
     @Test
@@ -51,9 +50,7 @@ class CutApplicationHelperTest {
                 CutApplicationHelper.cutSelectedPortions(true, false, range, stdin)
         );
         List<String> expected = List.of("567890", "654321"); // 0-based index
-        for (int i = 0; i < result.size(); i++) {
-            assertEquals(expected.get(i), result.get(i));
-        }
+        assertSameList(expected, result);
     }
 
     @Test
@@ -62,9 +59,7 @@ class CutApplicationHelperTest {
                 CutApplicationHelper.cutSelectedPortions(true, false, RANGE_ONE_TO_FIVE, stdin)
         );
         List<String> expected = List.of("12345", "09876");
-        for (int i = 0; i < result.size(); i++) {
-            assertEquals(expected.get(i), result.get(i));
-        }
+        assertSameList(expected, result);
     }
 
     @Test
@@ -73,8 +68,6 @@ class CutApplicationHelperTest {
                 CutApplicationHelper.cutSelectedPortions(false, true, RANGE_ONE_TO_FIVE, stdin)
         );
         List<String> expected = List.of("12345", "09876");
-        for (int i = 0; i < result.size(); i++) {
-            assertEquals(expected.get(i), result.get(i));
-        }
+        assertSameList(expected, result);
     }
 }

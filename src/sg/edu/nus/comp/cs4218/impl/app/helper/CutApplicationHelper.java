@@ -60,19 +60,21 @@ public final class CutApplicationHelper {
         int start = range[0] - 1; // 0-based index
         int end = range[1];
 
-        if (start >= 0 && start < line.length()) {
-            int limit = isCharPo
-                    ? Math.min(end, line.length())
-                    : Math.min(end, line.getBytes().length);
-
-            if (isCharPo) {
-                return line.substring(start, limit);
-            } else if (isBytePo) {
-                byte[] lineBytes = line.getBytes();
-                return new String(lineBytes, start, limit - start);
-            }
+        if (start < 0 || start >= line.length()) {
+            return "";
         }
 
-        return "";
+        int limit = isCharPo
+                ? Math.min(end, line.length())
+                : Math.min(end, line.getBytes().length);
+
+        if (isCharPo) {
+            return line.substring(start, limit);
+        } else if (isBytePo) {
+            byte[] lineBytes = line.getBytes();
+            return new String(lineBytes, start, limit - start);
+        } else {
+            throw new IllegalArgumentException("You must specify either cut by character or byte");
+        }
     }
 }

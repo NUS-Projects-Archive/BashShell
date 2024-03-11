@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static sg.edu.nus.comp.cs4218.impl.util.AssertUtils.assertEmptyString;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 
 import java.io.ByteArrayInputStream;
@@ -152,9 +153,27 @@ public class CutApplicationIT {
     }
 
     @Test
+    void cutFromFileAndStdin_BothCutOptionsFalse_ThrowsCutException() {
+        CutException result = assertThrowsExactly(CutException.class, () ->
+                app.cutFromFileAndStdin(false, false, null, null)
+        );
+        String expected = "cut: Exactly one flag (cut by character or byte) should be selected, but not both";
+        assertEquals(expected, result.getMessage());
+    }
+
+    @Test
+    void cutFromFileAndStdin_BothCutOptionsTrue_ThrowsCutException() {
+        CutException result = assertThrowsExactly(CutException.class, () ->
+                app.cutFromFileAndStdin(true, true, null, null)
+        );
+        String expected = "cut: Exactly one flag (cut by character or byte) should be selected, but not both";
+        assertEquals(expected, result.getMessage());
+    }
+
+    @Test
     void cutFromFileAndStdin_NoFilesAndStdin_ReturnsEmptyString() {
-        String result = assertDoesNotThrow(() -> app.cutFromFileAndStdin(false, false, null, null));
-        assertEquals("", result);
+        String result = assertDoesNotThrow(() -> app.cutFromFileAndStdin(true, false, null, null));
+        assertEmptyString(result);
     }
 
     @Test
