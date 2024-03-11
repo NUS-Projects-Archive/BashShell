@@ -102,13 +102,13 @@ class CutApplicationTest {
     }
 
     @Test
-    void cutFromFiles_CutByChar_ReturnsCutRange() {
+    void cutFromFiles_CutByChar_ReturnsCutString() {
         String result = assertDoesNotThrow(() -> app.cutFromFiles(true, false, ONE_TO_FIVE_RANGE, fileOne));
         assertEquals(ONE_TO_FIVE, result);
     }
 
     @Test
-    void cutFromFiles_CutByByte_ReturnsCutRange() {
+    void cutFromFiles_CutByByte_ReturnsCutString() {
         String result = assertDoesNotThrow(() -> app.cutFromFiles(false, true, ONE_TO_FIVE_RANGE, fileOne));
         assertEquals(ONE_TO_FIVE, result);
     }
@@ -125,28 +125,28 @@ class CutApplicationTest {
     }
 
     @Test
-    void cutFromFiles_MultipleFiles_ReturnsCutRange() {
+    void cutFromFiles_MultipleFiles_ReturnsCutString() {
         String result = assertDoesNotThrow(() -> app.cutFromFiles(false, true, ONE_TO_FIVE_RANGE, fileOne, fileTwo));
         String expected = ONE_TO_FIVE + STRING_NEWLINE + ZERO_TO_SIX;
         assertEquals(expected, result);
     }
 
     @Test
-    void cutFromFiles_SomeFilesAtTheStartDoNotExist_ReturnsCutRangeAndErrorMessage() {
+    void cutFromFiles_SomeFilesAtTheStartDoNotExist_ReturnsCutStringAndErrorMessage() {
         String result = assertDoesNotThrow(() -> app.cutFromFiles(false, true, ONE_TO_FIVE_RANGE, nonExistFile, fileOne, fileTwo));
         String expected = ONE_TO_FIVE + STRING_NEWLINE + ZERO_TO_SIX + STRING_NEWLINE + NON_EXIST_FILE;
         assertEquals(expected, result);
     }
 
     @Test
-    void cutFromFiles_SomeFilesInTheMiddleDoNotExist_ReturnsCutRangeAndErrorMessage() {
+    void cutFromFiles_SomeFilesInTheMiddleDoNotExist_ReturnsCutStringAndErrorMessage() {
         String result = assertDoesNotThrow(() -> app.cutFromFiles(false, true, ONE_TO_FIVE_RANGE, fileOne, nonExistFile, fileTwo));
         String expected = ONE_TO_FIVE + STRING_NEWLINE + ZERO_TO_SIX + STRING_NEWLINE + NON_EXIST_FILE;
         assertEquals(expected, result);
     }
 
     @Test
-    void cutFromFiles_SomeFilesAtTheEndDoNotExist_ReturnsCutRangeAndErrorMessage() {
+    void cutFromFiles_SomeFilesAtTheEndDoNotExist_ReturnsCutStringAndErrorMessage() {
         String result = assertDoesNotThrow(() -> app.cutFromFiles(false, true, ONE_TO_FIVE_RANGE, fileOne, fileTwo, nonExistFile));
         String expected = ONE_TO_FIVE + STRING_NEWLINE + ZERO_TO_SIX + STRING_NEWLINE + NON_EXIST_FILE;
         assertEquals(expected, result);
@@ -160,14 +160,14 @@ class CutApplicationTest {
     }
 
     @Test
-    void cutFromStdin_CutByChar_ReturnsCutRange() {
+    void cutFromStdin_CutByChar_ReturnsCutString() {
         InputStream stdin = new ByteArrayInputStream(FILE_ONE_CONTENT.getBytes());
         String result = assertDoesNotThrow(() -> app.cutFromStdin(true, false, ONE_TO_FIVE_RANGE, stdin));
         assertEquals(ONE_TO_FIVE, result);
     }
 
     @Test
-    void cutFromStdin_CutByByte_ReturnsCutRange() {
+    void cutFromStdin_CutByByte_ReturnsCutString() {
         InputStream stdin = new ByteArrayInputStream(FILE_ONE_CONTENT.getBytes());
         String result = assertDoesNotThrow(() -> app.cutFromStdin(true, false, ONE_TO_FIVE_RANGE, stdin));
         assertEquals(ONE_TO_FIVE, result);
