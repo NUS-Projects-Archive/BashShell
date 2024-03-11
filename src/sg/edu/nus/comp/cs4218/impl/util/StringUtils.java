@@ -13,6 +13,7 @@ public final class StringUtils {
     public static final String STRING_TAB = "\t";
     public static final String STRING_CURR_DIR = ".";
     public static final String STRING_PARENT_DIR = "..";
+    public static final String STRING_STDIN_OUTPUT = "(standard input)";
     public static final char CHAR_FILE_SEP = File.separatorChar;
     public static final char CHAR_TAB = '\t';
     public static final char CHAR_SPACE = ' ';
