@@ -1,5 +1,6 @@
 package sg.edu.nus.comp.cs4218.impl.app;
 
+import static sg.edu.nus.comp.cs4218.impl.app.helper.CutApplicationHelper.cutSelectedPortions;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_NOT_FOUND;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IO_EXCEPTION;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IS_DIR;
@@ -19,7 +20,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import sg.edu.nus.comp.cs4218.app.CutInterface;
 import sg.edu.nus.comp.cs4218.exception.CutException;
@@ -205,39 +205,5 @@ public class CutApplication implements CutInterface {
         }
 
         return String.join(STRING_NEWLINE, result);
-    }
-
-    private List<String> cutSelectedPortions(Boolean isCharPo, Boolean isBytePo, List<int[]> ranges, InputStream stdin)
-            throws IOException {
-        List<String> lines = IOUtils.getLinesFromInputStream(stdin);
-        return lines.stream()
-                .map(line -> cutLine(isCharPo, isBytePo, ranges, line))
-                .collect(Collectors.toList());
-    }
-
-    private String cutLine(Boolean isCharPo, Boolean isBytePo, List<int[]> ranges, String line) {
-        return ranges.stream()
-                .map(range -> cutPortion(isCharPo, isBytePo, range, line))
-                .collect(Collectors.joining());
-    }
-
-    private String cutPortion(Boolean isCharPo, Boolean isBytePo, int[] range, String line) {
-        int start = range[0] - 1; // 0-based index
-        int end = range[1];
-
-        if (start >= 0 && start < line.length()) {
-            int limit = isCharPo
-                    ? Math.min(end, line.length())
-                    : Math.min(end, line.getBytes().length);
-
-            if (isCharPo) {
-                return line.substring(start, limit);
-            } else if (isBytePo) {
-                byte[] lineBytes = line.getBytes();
-                return new String(lineBytes, start, limit - start);
-            }
-        }
-
-        return "";
     }
 }
