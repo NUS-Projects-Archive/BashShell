@@ -84,7 +84,7 @@ class SortApplicationTest {
         SortException result = assertThrowsExactly(SortException.class, () ->
                 app.sortFromFiles(false, false, false, file)
         );
-        String expected = "sort: Problem sort from file: Permission denied";
+        String expected = "sort: Problem sort from file: 'file.txt': Permission denied";
         assertEquals(expected, result.getMessage());
     }
 
