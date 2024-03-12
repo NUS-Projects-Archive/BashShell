@@ -102,8 +102,8 @@ public class CutApplication implements CutInterface {
      * @param ranges   List of 2-element arrays containing the start and end indices for cut.
      *                 For instance, cutting on the first column would be represented using a [1,1] array.
      * @param fileName Array of String of file names
-     * @return A string containing the concatenated output of cut portions from each line,
-     * including errors (if any) at the end
+     * @return A string containing the concatenated output of cut portions from each line
+     *         including errors (if any) at the end
      * @throws CutException
      */
     @Override
@@ -165,7 +165,7 @@ public class CutApplication implements CutInterface {
      *                 For instance, cutting on the first column would be represented using a [1,1] array.
      * @param stdin    InputStream containing arguments from Stdin
      * @return A string containing the concatenated output of cut portions from each line,
-     * including errors (if any) at the end
+     *         including errors (if any) at the end
      * @throws CutException
      */
     @Override
@@ -196,7 +196,7 @@ public class CutApplication implements CutInterface {
      * @param stdin    InputStream containing arguments from Stdin
      * @param fileName Array of String of file names
      * @return A string containing the concatenated output of cut portions from each line,
-     * including errors (if any) at the end
+     *         including errors (if any) at the end
      * @throws CutException
      */
     public String cutFromFileAndStdin(Boolean isCharPo, Boolean isBytePo, List<int[]> ranges,

@@ -1,6 +1,7 @@
 package sg.edu.nus.comp.cs4218.impl.util;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.IOException;
@@ -60,7 +61,7 @@ public final class AssertUtils {
      * @param actual The string to be checked for emptiness
      */
     public static void assertEmptyString(String actual) {
-        assertEquals("", actual);
+        assertTrue(actual.isEmpty());
     }
 
     /**
