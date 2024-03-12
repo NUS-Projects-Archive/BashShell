@@ -24,23 +24,36 @@ public class MvApplicationIT {
 
     private MvApplication app;
 
+    @TempDir
+    private Path tempDir;
+    private Path filePath;
+    private String subDir;
+    private String file;
+
     @BeforeEach
     void setUp() throws IOException {
         app = new MvApplication();
+
+        Path subDirPath = tempDir.resolve("subdirectory");
+        assertDoesNotThrow(() -> Files.createDirectories(subDirPath));
+        subDir = subDirPath.toString();
+
+        filePath = tempDir.resolve("file");
+        assertDoesNotThrow(() -> Files.createFile(filePath));
+        file = filePath.toString();
     }
 
     @Test
     void run_NullArgs_ThrowsMvException() {
-        String expectedMsg = "mv: Missing Argument";
-        MvException exception = assertThrowsExactly(MvException.class, () -> app.run(null, null, null));
-        assertEquals(expectedMsg, exception.getMessage());
+        MvException result = assertThrowsExactly(MvException.class, () -> app.run(null, null, null));
+        String expected = "mv: Null arguments";
+        assertEquals(expected, result.getMessage());
     }
 
     @Test
-    void run_EmptyArgsArray_ThrowsMvException() {
-        String[] args = {};
-        MvException result = assertThrowsExactly(MvException.class, () -> app.run(args, null, null));
-        String expected = "mv: Missing Argument";
+    void run_EmptyArgs_ThrowsMvException() {
+        MvException result = assertThrowsExactly(MvException.class, () -> app.run(new String[0], null, null));
+        String expected = "mv: Null arguments";
         assertEquals(expected, result.getMessage());
     }
 
@@ -53,30 +66,42 @@ public class MvApplicationIT {
     }
 
     @Test
-    void run_MovesSrcFiles_MovesFile(@TempDir Path tempDir) {
-        Path subDir = tempDir.resolve("subdirectory");
-        assertDoesNotThrow(() -> Files.createDirectories(subDir));
-        Path file = tempDir.resolve("file");
-        assertDoesNotThrow(() -> Files.createFile(file));
-
-        String[] args = {file.toString(), subDir.toString()};
+    void run_MovesSrcFiles_MovesFile() {
+        String[] args = {file, subDir};
         assertDoesNotThrow(() -> app.run(args, null, null));
 
         Path movedFile = tempDir.resolve("subdirectory/file");
         assertTrue(Files.exists(movedFile)); // assert that file has moved to the new location
-        assertFalse(Files.exists(file)); // assert that file does n exist in the old location
+        assertFalse(Files.exists(filePath)); // assert that file does not exist in the old location
     }
 
     @Test
-    void run_MovesMultipleDoNotExistSrcFile_ThrowsMvException(@TempDir Path tempDir) {
-        Path subDir = tempDir.resolve("subdirectory");
-        assertDoesNotThrow(() -> Files.createDirectories(subDir));
+    void run_DoNotExistSrcFile_ThrowsMvException() {
+        String[] args = {"nonExistentFile.txt", subDir};
+        MvException result = assertThrowsExactly(MvException.class, () -> app.run(args, null, null));
+        String expected = "mv: cannot find 'nonExistentFile.txt': No such file or directory";
+        assertEquals(expected, result.getMessage());
+    }
 
-        String[] args = {"a", "b", subDir.toString()};
+    @Test
+    void run_MultipleDoNotExistSrcFile_ThrowsMvException() {
+        String[] args = {"nonExistentFile1.txt", "nonExistentFile2.txt", subDir};
+        MvException result = assertThrowsExactly(MvException.class, () -> app.run(args, null, null));
+        String expected = "mv: cannot find 'nonExistentFile1.txt': No such file or directory" + STRING_NEWLINE +
+                "mv: cannot find 'nonExistentFile2.txt': No such file or directory";
+        assertEquals(expected, result.getMessage());
+    }
+
+    @Test
+    void run_SomeDoNotExistSrcFile_MovesFileAndThrowsMvException() {
+        String[] args = {file, "nonExistentFile.txt", subDir};
         MvException result = assertThrowsExactly(MvException.class, () -> app.run(args, null, null));
 
-        String expected = "mv: cannot find 'a': No such file or directory" + STRING_NEWLINE +
-                "mv: cannot find 'b': No such file or directory";
+        Path movedFile = tempDir.resolve("subdirectory/file");
+        assertTrue(Files.exists(movedFile)); // assert that file has moved to the new location
+        assertFalse(Files.exists(filePath)); // assert that file does n exist in the old location
+
+        String expected = "mv: cannot find 'nonExistentFile.txt': No such file or directory";
         assertEquals(expected, result.getMessage());
     }
 }

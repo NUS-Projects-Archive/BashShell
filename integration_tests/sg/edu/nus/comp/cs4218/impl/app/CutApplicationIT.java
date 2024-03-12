@@ -37,12 +37,12 @@ public class CutApplicationIT {
     private static final String ZERO_TO_SIX = "09876";
     private static final String STDIN_FIRST_FIVE = "lorem";
     private static final String RANGE_ONE_TO_FIVE = "1-5";
+    private CutApplication app;
 
     @TempDir
     private Path tempDir;
     private String fileOne;
     private String fileTwo;
-    private CutApplication app;
 
     @BeforeEach
     void setUp() throws IOException {
@@ -66,14 +66,14 @@ public class CutApplicationIT {
     @Test
     void run_NullArgs_ThrowsCutException() {
         CutException result = assertThrowsExactly(CutException.class, () -> app.run(null, null, null));
-        String expected = "cut: Missing Argument";
+        String expected = "cut: Null arguments";
         assertEquals(expected, result.getMessage());
     }
 
     @Test
     void run_EmptyArgs_ThrowsCutException() {
         CutException result = assertThrowsExactly(CutException.class, () -> app.run(new String[0], null, null));
-        String expected = "cut: Missing Argument";
+        String expected = "cut: Null arguments";
         assertEquals(expected, result.getMessage());
     }
 

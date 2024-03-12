@@ -4,7 +4,6 @@ import static sg.edu.nus.comp.cs4218.impl.app.helper.CutApplicationHelper.cutSel
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_NOT_FOUND;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IO_EXCEPTION;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IS_DIR;
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_MISSING_ARG;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_ARGS;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_ISTREAM;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_OSTREAM;
@@ -52,7 +51,7 @@ public class CutApplication implements CutInterface {
     @Override
     public void run(String[] args, InputStream stdin, OutputStream stdout) throws CutException {
         if (args == null || args.length == 0) {
-            throw new CutException(ERR_MISSING_ARG);
+            throw new CutException(ERR_NULL_ARGS);
         }
         if (args.length < 2) {
             throw new CutException(ERR_NO_ARGS);

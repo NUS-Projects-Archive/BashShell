@@ -6,14 +6,18 @@ import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -22,101 +26,169 @@ import sg.edu.nus.comp.cs4218.exception.SortException;
 @SuppressWarnings("PMD.ClassNamingConventions")
 public class SortApplicationIT {
 
-    private static final String FILE = "file.txt";
+    private static final String BIG_A = "A";
+    private static final String BIG_B = "B";
+    private static final String SMALL_A = "a";
+    private static final String SMALL_B = "b";
+    private static final String SMALL_O = "o";
+
+    private static final String[] FILE_CONTENT = {"5", BIG_A, "2", BIG_B, "10", SMALL_O, "1", SMALL_A, "3", SMALL_B};
+    private static final String[] OUT_NO_FLAGS = {"1", "10", "2", "3", "5", BIG_A, BIG_B, SMALL_A, SMALL_B, SMALL_O};
+    private static final String[] OUT_FIRST_NUM = {"1", "2", "3", "5", "10", BIG_A, BIG_B, SMALL_A, SMALL_B, SMALL_O};
+    private static final String[] OUT_REV_ORDER = {SMALL_O, SMALL_B, SMALL_A, BIG_B, BIG_A, "5", "3", "2", "10", "1"};
+    private static final String[] OUT_CASE_IGNORE = {"1", "10", "2", "3", "5", BIG_A, SMALL_A, BIG_B, SMALL_B, SMALL_O};
+
     private SortApplication app;
+    private OutputStream stdout;
 
-    @TempDir
-    private Path tempDir;
-    private Path filePath;
-    private String file;
-
-    private String joinStringsBySystemLineSeparator(String... strings) {
-        return String.join(System.lineSeparator(), strings);
+    private String joinStringsByNewline(String... strings) {
+        return String.join(STRING_NEWLINE, strings);
     }
 
     @BeforeEach
     void setUp() throws IOException {
         app = new SortApplication();
-
-        // Create temporary file, automatically deletes after test execution
-        filePath = tempDir.resolve(FILE);
-        file = filePath.toString();
-        Files.createFile(filePath);
+        stdout = new ByteArrayOutputStream();
     }
 
     @Test
-    void run_NoStdout_ThrowsSortException() {
+    void run_NullStdin_ThrowsSortException() {
         SortException result = assertThrowsExactly(SortException.class, () -> app.run(null, null, null));
+        String expected = "sort: InputStream not provided";
+        assertEquals(expected, result.getMessage());
+    }
+
+    @Test
+    void run_NullStdout_ThrowsSortException() {
+        SortException result = assertThrowsExactly(SortException.class, () -> {
+            InputStream stdin = mock(InputStream.class);
+            app.run(null, stdin, null);
+        });
         String expected = "sort: OutputStream not provided";
         assertEquals(expected, result.getMessage());
     }
 
     @Test
     void run_FailsToWriteToOutputStream_ThrowsSortException() {
-        String content = joinStringsBySystemLineSeparator("a", "c", "b", "A");
-        assertDoesNotThrow(() -> Files.write(filePath, content.getBytes()));
-        String[] args = {file};
+        String[] args = {};
         SortException result = assertThrowsExactly(SortException.class, () -> {
+            InputStream stdin = new ByteArrayInputStream("mock data".getBytes());
             OutputStream mockedStdout = mock(OutputStream.class);
             doThrow(new IOException()).when(mockedStdout).write(any(byte[].class));
-            app.run(args, null, mockedStdout);
+            app.run(args, stdin, mockedStdout);
         });
         String expected = "sort: Could not write to output stream";
         assertEquals(expected, result.getMessage());
     }
 
-    @Test
-    void run_NoFlags_WritesSortedListToStdout() {
-        String content = joinStringsBySystemLineSeparator("a", "c", "b", "A");
-        assertDoesNotThrow(() -> Files.write(filePath, content.getBytes()));
-        String[] args = {file};
-        OutputStream stdout = new ByteArrayOutputStream();
-        assertDoesNotThrow(() -> app.run(args, null, stdout));
-        String expected = joinStringsBySystemLineSeparator("A", "a", "b", "c") + System.lineSeparator();
-        assertEquals(expected, stdout.toString());
+    @Nested
+    class FileInputTests {
+
+        private InputStream stdin;
+        private String file;
+
+        @BeforeEach
+        void setUp(@TempDir Path tempDir) throws IOException {
+            stdin = mock(InputStream.class);
+
+            // Create temporary file, automatically deletes after test execution
+            String content = joinStringsByNewline(FILE_CONTENT);
+            Path filePath = tempDir.resolve("file.txt");
+            Files.createFile(filePath);
+            Files.write(filePath, content.getBytes());
+            file = filePath.toString();
+        }
+
+        @Test
+        void run_NoFlags_WritesSortedListToStdout() {
+            String[] args = {file};
+            assertDoesNotThrow(() -> app.run(args, stdin, stdout));
+            String expected = joinStringsByNewline(OUT_NO_FLAGS) + STRING_NEWLINE;
+            assertEquals(expected, stdout.toString());
+        }
+
+        @Test
+        void run_IsFirstWordNumberFlag_WritesSortedListToStdout() {
+            String[] args = {"-n", file};
+            assertDoesNotThrow(() -> app.run(args, stdin, stdout));
+            String expected = joinStringsByNewline(OUT_FIRST_NUM) + STRING_NEWLINE;
+            assertEquals(expected, stdout.toString());
+        }
+
+        @Test
+        void run_IsReverseOrderFlag_WritesReverseSortedListToStdout() {
+            String[] args = {"-r", file};
+            assertDoesNotThrow(() -> app.run(args, stdin, stdout));
+            String expected = joinStringsByNewline(OUT_REV_ORDER) + STRING_NEWLINE;
+            assertEquals(expected, stdout.toString());
+        }
+
+        @Test
+        void run_IsCaseIndependentFlag_WritesCaseIndependentSortedListToStdout() {
+            String[] args = {"-f", file};
+            assertDoesNotThrow(() -> app.run(args, stdin, stdout));
+            String expected = joinStringsByNewline(OUT_CASE_IGNORE) + STRING_NEWLINE;
+            assertEquals(expected, stdout.toString());
+        }
+
+        @Test
+        void run_IsFirstWordNumberAndIsCaseIndependentFlag_IsFirstWordNumberTakesPrecedence() {
+            String[] args = {"-n", "-f", file};
+            assertDoesNotThrow(() -> app.run(args, stdin, stdout));
+            String expected = joinStringsByNewline(OUT_FIRST_NUM) + STRING_NEWLINE;
+            assertEquals(expected, stdout.toString());
+        }
     }
 
-    @Test
-    void run_IsFirstWordNumberFlag_WritesSortedListToStdout() {
-        String content = joinStringsBySystemLineSeparator("10", "1", "2");
-        assertDoesNotThrow(() -> Files.write(filePath, content.getBytes()));
-        String[] args = {"-n", file};
-        OutputStream stdout = new ByteArrayOutputStream();
-        assertDoesNotThrow(() -> app.run(args, null, stdout));
-        String expected = joinStringsBySystemLineSeparator("1", "2", "10") + System.lineSeparator();
-        assertEquals(expected, stdout.toString());
-    }
+    @Nested
+    class StdinInputTests {
 
-    @Test
-    void run_IsReverseOrderFlag_WritesReverseSortedListToStdout() {
-        String content = joinStringsBySystemLineSeparator("a", "c", "b");
-        assertDoesNotThrow(() -> Files.write(filePath, content.getBytes()));
-        String[] args = {"-r", file};
-        OutputStream stdout = new ByteArrayOutputStream();
-        assertDoesNotThrow(() -> app.run(args, null, stdout));
-        String expected = joinStringsBySystemLineSeparator("c", "b", "a") + System.lineSeparator();
-        assertEquals(expected, stdout.toString());
-    }
+        private InputStream stdin;
 
-    @Test
-    void run_IsCaseIndependentFlag_WritesCaseIndependentSortedListToStdout() {
-        String content = joinStringsBySystemLineSeparator("a", "c", "b", "A");
-        assertDoesNotThrow(() -> Files.write(filePath, content.getBytes()));
-        String[] args = {"-f", file};
-        OutputStream stdout = new ByteArrayOutputStream();
-        assertDoesNotThrow(() -> app.run(args, null, stdout));
-        String expected = joinStringsBySystemLineSeparator("a", "A", "b", "c") + System.lineSeparator();
-        assertEquals(expected, stdout.toString());
-    }
+        @BeforeEach
+        void setUp() {
+            String content = joinStringsByNewline(FILE_CONTENT);
+            stdin = new ByteArrayInputStream(content.getBytes());
+        }
 
-    @Test
-    void run_IsFirstWordNumberAndIsCaseIndependentFlag_IsFirstWordNumberTakesPrecedence() {
-        String content = joinStringsBySystemLineSeparator("a", "3", "B", "2", "C", "1");
-        assertDoesNotThrow(() -> Files.write(filePath, content.getBytes()));
-        OutputStream stdout = new ByteArrayOutputStream();
-        String[] args = {"-n", "-f", file};
-        assertDoesNotThrow(() -> app.run(args, null, stdout));
-        String expected = joinStringsBySystemLineSeparator("1", "2", "3", "B", "C", "a") + System.lineSeparator();
-        assertEquals(expected, stdout.toString());
+        @Test
+        void run_NoFlags_WritesSortedListToStdout() {
+            String[] args = {};
+            assertDoesNotThrow(() -> app.run(args, stdin, stdout));
+            String expected = joinStringsByNewline(OUT_NO_FLAGS) + STRING_NEWLINE;
+            assertEquals(expected, stdout.toString());
+        }
+
+        @Test
+        void run_IsFirstWordNumberFlag_WritesSortedListToStdout() {
+            String[] args = {"-n"};
+            assertDoesNotThrow(() -> app.run(args, stdin, stdout));
+            String expected = joinStringsByNewline(OUT_FIRST_NUM) + STRING_NEWLINE;
+            assertEquals(expected, stdout.toString());
+        }
+
+        @Test
+        void run_IsReverseOrderFlag_WritesReverseSortedListToStdout() {
+            String[] args = {"-r"};
+            assertDoesNotThrow(() -> app.run(args, stdin, stdout));
+            String expected = joinStringsByNewline(OUT_REV_ORDER) + STRING_NEWLINE;
+            assertEquals(expected, stdout.toString());
+        }
+
+        @Test
+        void run_IsCaseIndependentFlag_WritesCaseIndependentSortedListToStdout() {
+            String[] args = {"-f"};
+            assertDoesNotThrow(() -> app.run(args, stdin, stdout));
+            String expected = joinStringsByNewline(OUT_CASE_IGNORE) + STRING_NEWLINE;
+            assertEquals(expected, stdout.toString());
+        }
+
+        @Test
+        void run_IsFirstWordNumberAndIsCaseIndependentFlag_IsFirstWordNumberTakesPrecedence() {
+            String[] args = {"-n", "-f"};
+            assertDoesNotThrow(() -> app.run(args, stdin, stdout));
+            String expected = joinStringsByNewline(OUT_FIRST_NUM) + STRING_NEWLINE;
+            assertEquals(expected, stdout.toString());
+        }
     }
 }

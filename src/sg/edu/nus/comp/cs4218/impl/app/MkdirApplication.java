@@ -18,6 +18,7 @@ import sg.edu.nus.comp.cs4218.app.MkdirInterface;
 import sg.edu.nus.comp.cs4218.exception.InvalidArgsException;
 import sg.edu.nus.comp.cs4218.exception.MkdirException;
 import sg.edu.nus.comp.cs4218.impl.parser.MkdirArgsParser;
+import sg.edu.nus.comp.cs4218.impl.util.CollectionsUtils;
 
 /**
  * The mkdir command creates new folders, if they do not already exist.
@@ -44,7 +45,7 @@ public class MkdirApplication implements MkdirInterface {
         }
 
         // Parse argument(s) provided
-        MkdirArgsParser parser = new MkdirArgsParser();
+        final MkdirArgsParser parser = new MkdirArgsParser();
         try {
             parser.parse(args);
         } catch (InvalidArgsException e) {
@@ -52,7 +53,7 @@ public class MkdirApplication implements MkdirInterface {
         }
 
         final Boolean isCreateParent = parser.isCreateParent();
-        String[] directories = parser.getDirectories().toArray(new String[parser.getDirectories().size()]);
+        final String[] directories = CollectionsUtils.listToArray(parser.getDirectories());
 
         if (directories.length == 0) {
             throw new MkdirException(ERR_NO_FOLDERS);
