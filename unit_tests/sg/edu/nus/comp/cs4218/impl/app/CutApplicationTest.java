@@ -33,6 +33,7 @@ class CutApplicationTest {
     private static final String ZERO_TO_SIX = "09876";
     private static final String ERR_NON_EXIST = "cut: 'nonExistFile.txt': No such file or directory";
     private static final String ERR_ONE_FLAG_ONLY = "cut: Exactly one flag (cut by character or byte) should be selected, but not both";
+    private CutApplication app;
 
     @TempDir
     private Path tempDir;
@@ -40,7 +41,6 @@ class CutApplicationTest {
     private String fileOne;
     private String fileTwo;
     private String nonExistFile;
-    private CutApplication app;
 
     @BeforeEach
     void setUp() throws IOException {
