@@ -12,12 +12,12 @@ class ExitApplicationTest {
     private ExitApplication app;
 
     @BeforeEach
-    public void renewApplication() {
+    public void setUp() {
         app = new ExitApplication();
     }
 
     @Test
-    void run_NoArgs_ExitCodeZero() {
+    void terminateExecution_NoArgs_ExitWithCodeZero() {
         int exitCode = assertDoesNotThrow(() ->
                 catchSystemExit(() -> app.terminateExecution())
         );

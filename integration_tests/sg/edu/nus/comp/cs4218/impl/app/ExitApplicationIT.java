@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
 
+@SuppressWarnings("PMD.ClassNamingConventions")
 public class ExitApplicationIT {
 
     @Test
