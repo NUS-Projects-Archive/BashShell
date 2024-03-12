@@ -91,11 +91,11 @@ public class MvApplication implements MvInterface {
         }
 
         if (!Files.isReadable(srcPath)) {
-            throw new MvException(String.format("cannot open '%s': %s", srcFile, ERR_NO_PERM));
+            throw new MvException(String.format("cannot read '%s': %s", srcFile, ERR_NO_PERM));
         }
 
         if (Files.exists(destPath) && !Files.isWritable(destPath)) {
-            throw new MvException(String.format("cannot create regular file '%s': %s", destPath, ERR_NO_PERM));
+            throw new MvException(String.format("cannot write '%s': %s", destPath, ERR_NO_PERM));
         }
 
         // Append file name to destination directory if destination is a directory
@@ -137,7 +137,7 @@ public class MvApplication implements MvInterface {
         }
 
         if (!Files.isWritable(destFolderPath)) {
-            throw new MvException(String.format("cannot create regular file '%s': %s", destFolder, ERR_NO_PERM));
+            throw new MvException(String.format("cannot write '%s': %s", destFolder, ERR_NO_PERM));
         }
 
         List<MvException> errorList = new ArrayList<>();
@@ -151,7 +151,7 @@ public class MvApplication implements MvInterface {
                 }
 
                 if (!Files.isReadable(srcPath)) {
-                    throw new MvException(String.format("cannot open '%s': %s", srcFile, ERR_NO_PERM));
+                    throw new MvException(String.format("cannot read '%s': %s", srcFile, ERR_NO_PERM));
                 }
 
                 try {
@@ -172,9 +172,5 @@ public class MvApplication implements MvInterface {
         }
 
         return null;
-    }
-
-    private String formatMvErrorMessage(String cause, String error, String file) {
-        return String.format("%s'%s': %s", cause, file, error);
     }
 }

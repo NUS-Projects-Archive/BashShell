@@ -1,6 +1,7 @@
 package sg.edu.nus.comp.cs4218.impl.util;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.IOException;
@@ -52,5 +53,27 @@ public final class AssertUtils {
      */
     public static void assertSameType(Object expectedType, Object actualObject) {
         assertEquals(expectedType, actualObject.getClass());
+    }
+
+    /**
+     * Assert that {@code actual} is equal to an empty string ("").
+     *
+     * @param actual The string to be checked for emptiness
+     */
+    public static void assertEmptyString(String actual) {
+        assertTrue(actual.isEmpty());
+    }
+
+    /**
+     * Asserts that two lists are equal in size and contain equal elements at corresponding positions.
+     *
+     * @param expected The expected list
+     * @param actual   The actual list to be compared against the expected list
+     */
+    public static <T> void assertSameList(List<T> expected, List<T> actual) {
+        assertEquals(expected.size(), actual.size());
+        for (int i = 0; i < actual.size(); i++) {
+            assertEquals(expected.get(i), actual.get(i));
+        }
     }
 }
