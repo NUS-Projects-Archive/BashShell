@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 import static org.junit.jupiter.api.Assertions.fail;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -29,8 +30,8 @@ class SortApplicationTest {
     private Path filePath;
     private String file;
 
-    private String joinStringsBySystemLineSeparator(String... strings) {
-        return String.join(System.lineSeparator(), strings);
+    private String joinStringsByNewline(String... strings) {
+        return String.join(STRING_NEWLINE, strings);
     }
 
     @BeforeEach
@@ -90,80 +91,82 @@ class SortApplicationTest {
 
     @Test
     void sortFromFiles_NoFlags_ReturnsSortedList() {
-        String content = joinStringsBySystemLineSeparator("a", "c", "b", "A");
+        String content = joinStringsByNewline("a", "c", "b", "A");
         assertDoesNotThrow(() -> Files.write(filePath, content.getBytes()));
         String result = assertDoesNotThrow(() -> app.sortFromFiles(false, false, false, file));
-        String expected = joinStringsBySystemLineSeparator("A", "a", "b", "c");
+        String expected = joinStringsByNewline("A", "a", "b", "c");
         assertEquals(expected, result);
     }
 
     @Test
     void sortFromFiles_IsFirstWordNumberFlag_ReturnsSortedList() {
-        String content = joinStringsBySystemLineSeparator("10", "1", "2");
+        String content = joinStringsByNewline("10", "1", "2");
         assertDoesNotThrow(() -> Files.write(filePath, content.getBytes()));
         String result = assertDoesNotThrow(() -> app.sortFromFiles(true, false, false, file));
-        String expected = joinStringsBySystemLineSeparator("1", "2", "10");
+        String expected = joinStringsByNewline("1", "2", "10");
         assertEquals(expected, result);
     }
 
     @Test
     void sortFromFiles_IsReverseOrderFlag_ReturnsReverseSortedList() {
-        String content = joinStringsBySystemLineSeparator("a", "c", "b");
+        String content = joinStringsByNewline("a", "c", "b");
         assertDoesNotThrow(() -> Files.write(filePath, content.getBytes()));
-        String expected = joinStringsBySystemLineSeparator("c", "b", "a");
+        String expected = joinStringsByNewline("c", "b", "a");
         String result = assertDoesNotThrow(() -> app.sortFromFiles(false, true, false, file));
         assertEquals(expected, result);
     }
 
     @Test
     void sortFromFiles_IsCaseIndependentFlag_ReturnsCaseIndependentSortedList() {
-        String content = joinStringsBySystemLineSeparator("a", "c", "b", "A");
+        String content = joinStringsByNewline("a", "c", "b", "A");
         assertDoesNotThrow(() -> Files.write(filePath, content.getBytes()));
         String result = assertDoesNotThrow(() -> app.sortFromFiles(false, false, true, file));
-        String expected = joinStringsBySystemLineSeparator("a", "A", "b", "c");
+        String expected = joinStringsByNewline("a", "A", "b", "c");
         assertEquals(expected, result);
     }
 
     @Test
     void sortFromStdin_NoStdin_ThrowsSortException() {
-        SortException result = assertThrowsExactly(SortException.class, () -> app.sortFromStdin(false, false, false, null));
+        SortException result = assertThrowsExactly(SortException.class, () ->
+                app.sortFromStdin(false, false, false, null)
+        );
         String expected = "sort: Problem sort from stdin: Null Pointer Exception";
         assertEquals(expected, result.getMessage());
     }
 
     @Test
     void sortFromStdin_NoFlags_ReturnsSortedList() {
-        String content = joinStringsBySystemLineSeparator("a", "c", "b", "A");
+        String content = joinStringsByNewline("a", "c", "b", "A");
         InputStream stdin = new ByteArrayInputStream(content.getBytes());
         String result = assertDoesNotThrow(() -> app.sortFromStdin(false, false, false, stdin));
-        String expected = joinStringsBySystemLineSeparator("A", "a", "b", "c");
+        String expected = joinStringsByNewline("A", "a", "b", "c");
         assertEquals(expected, result);
     }
 
     @Test
     void sortFromStdin_IsFirstWordNumberFlag_ReturnsSortedList() {
-        String content = joinStringsBySystemLineSeparator("10", "1", "2");
+        String content = joinStringsByNewline("10", "1", "2");
         InputStream stdin = new ByteArrayInputStream(content.getBytes());
         String result = assertDoesNotThrow(() -> app.sortFromStdin(true, false, false, stdin));
-        String expected = joinStringsBySystemLineSeparator("1", "2", "10");
+        String expected = joinStringsByNewline("1", "2", "10");
         assertEquals(expected, result);
     }
 
     @Test
     void sortFromStdin_IsReverseOrderFlag_ReturnsReverseSortedList() {
-        String content = joinStringsBySystemLineSeparator("a", "c", "b");
+        String content = joinStringsByNewline("a", "c", "b");
         InputStream stdin = new ByteArrayInputStream(content.getBytes());
         String result = assertDoesNotThrow(() -> app.sortFromStdin(false, true, false, stdin));
-        String expected = joinStringsBySystemLineSeparator("c", "b", "a");
+        String expected = joinStringsByNewline("c", "b", "a");
         assertEquals(expected, result);
     }
 
     @Test
     void sortFromStdin_IsCaseIndependentFlag_ReturnsCaseIndependentSortedList() {
-        String content = joinStringsBySystemLineSeparator("a", "c", "b", "A");
+        String content = joinStringsByNewline("a", "c", "b", "A");
         InputStream stdin = new ByteArrayInputStream(content.getBytes());
         String result = assertDoesNotThrow(() -> app.sortFromStdin(false, false, true, stdin));
-        String expected = joinStringsBySystemLineSeparator("a", "A", "b", "c");
+        String expected = joinStringsByNewline("a", "A", "b", "c");
         assertEquals(expected, result);
     }
 }

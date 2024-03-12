@@ -61,8 +61,8 @@ public class SortApplicationIT {
     @Test
     void run_NullStdout_ThrowsSortException() {
         SortException result = assertThrowsExactly(SortException.class, () -> {
-            InputStream stdin = mock(InputStream.class);
-            app.run(null, stdin, null);
+            InputStream mockStdin = mock(InputStream.class);
+            app.run(null, mockStdin, null);
         });
         String expected = "sort: OutputStream not provided";
         assertEquals(expected, result.getMessage());
@@ -72,10 +72,10 @@ public class SortApplicationIT {
     void run_FailsToWriteToOutputStream_ThrowsSortException() {
         String[] args = {};
         SortException result = assertThrowsExactly(SortException.class, () -> {
-            InputStream stdin = new ByteArrayInputStream("mock data".getBytes());
+            InputStream mockStdin = new ByteArrayInputStream("mock data".getBytes());
             OutputStream mockedStdout = mock(OutputStream.class);
             doThrow(new IOException()).when(mockedStdout).write(any(byte[].class));
-            app.run(args, stdin, mockedStdout);
+            app.run(args, mockStdin, mockedStdout);
         });
         String expected = "sort: Could not write to output stream";
         assertEquals(expected, result.getMessage());
@@ -84,12 +84,12 @@ public class SortApplicationIT {
     @Nested
     class FileInputTests {
 
-        private InputStream stdin;
+        private InputStream mockStdin;
         private String file;
 
         @BeforeEach
         void setUp(@TempDir Path tempDir) throws IOException {
-            stdin = mock(InputStream.class);
+            mockStdin = mock(InputStream.class);
 
             // Create temporary file, automatically deletes after test execution
             String content = joinStringsByNewline(FILE_CONTENT);
@@ -102,7 +102,7 @@ public class SortApplicationIT {
         @Test
         void run_NoFlags_WritesSortedListToStdout() {
             String[] args = {file};
-            assertDoesNotThrow(() -> app.run(args, stdin, stdout));
+            assertDoesNotThrow(() -> app.run(args, mockStdin, stdout));
             String expected = joinStringsByNewline(OUT_NO_FLAGS) + STRING_NEWLINE;
             assertEquals(expected, stdout.toString());
         }
@@ -110,7 +110,7 @@ public class SortApplicationIT {
         @Test
         void run_IsFirstWordNumberFlag_WritesSortedListToStdout() {
             String[] args = {"-n", file};
-            assertDoesNotThrow(() -> app.run(args, stdin, stdout));
+            assertDoesNotThrow(() -> app.run(args, mockStdin, stdout));
             String expected = joinStringsByNewline(OUT_FIRST_NUM) + STRING_NEWLINE;
             assertEquals(expected, stdout.toString());
         }
@@ -118,7 +118,7 @@ public class SortApplicationIT {
         @Test
         void run_IsReverseOrderFlag_WritesReverseSortedListToStdout() {
             String[] args = {"-r", file};
-            assertDoesNotThrow(() -> app.run(args, stdin, stdout));
+            assertDoesNotThrow(() -> app.run(args, mockStdin, stdout));
             String expected = joinStringsByNewline(OUT_REV_ORDER) + STRING_NEWLINE;
             assertEquals(expected, stdout.toString());
         }
@@ -126,7 +126,7 @@ public class SortApplicationIT {
         @Test
         void run_IsCaseIndependentFlag_WritesCaseIndependentSortedListToStdout() {
             String[] args = {"-f", file};
-            assertDoesNotThrow(() -> app.run(args, stdin, stdout));
+            assertDoesNotThrow(() -> app.run(args, mockStdin, stdout));
             String expected = joinStringsByNewline(OUT_CASE_IGNORE) + STRING_NEWLINE;
             assertEquals(expected, stdout.toString());
         }
@@ -134,7 +134,7 @@ public class SortApplicationIT {
         @Test
         void run_IsFirstWordNumberAndIsCaseIndependentFlag_IsFirstWordNumberTakesPrecedence() {
             String[] args = {"-n", "-f", file};
-            assertDoesNotThrow(() -> app.run(args, stdin, stdout));
+            assertDoesNotThrow(() -> app.run(args, mockStdin, stdout));
             String expected = joinStringsByNewline(OUT_FIRST_NUM) + STRING_NEWLINE;
             assertEquals(expected, stdout.toString());
         }

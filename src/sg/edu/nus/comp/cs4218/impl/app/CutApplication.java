@@ -201,16 +201,16 @@ public class CutApplication implements CutInterface {
     public String cutFromFileAndStdin(Boolean isCharPo, Boolean isBytePo, List<int[]> ranges,
                                       InputStream stdin, String... fileName) throws CutException {
         validateCutFlags(isCharPo, isBytePo);
-        List<String> result = new ArrayList<>();
+        List<String> output = new ArrayList<>();
         for (String file : fileName) {
             if ("-".equals(file)) {
-                result.add(cutFromStdin(isCharPo, isBytePo, ranges, stdin));
+                output.add(cutFromStdin(isCharPo, isBytePo, ranges, stdin));
             } else {
-                result.add(cutFromFiles(isCharPo, isBytePo, ranges, file));
+                output.add(cutFromFiles(isCharPo, isBytePo, ranges, file));
             }
         }
 
-        return String.join(STRING_NEWLINE, result);
+        return String.join(STRING_NEWLINE, output);
     }
 
     /**
