@@ -7,7 +7,6 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -27,7 +26,6 @@ class MvApplicationTest {
     private static final String SRC_FILE = "srcFile.txt";
     private static final String DEST_FILE = "destFile.txt";
     private static final String DEST_DIR = "subdirectory";
-    private MvApplication app;
 
     @TempDir
     private Path tempDir;
@@ -37,6 +35,7 @@ class MvApplicationTest {
     private String srcFile;
     private String destFile;
     private String destDir;
+    private MvApplication app;
 
     private String getFileNotFoundMsg(String file) {
         return String.format("mv: cannot find '%s': No such file or directory", file);
@@ -88,13 +87,8 @@ class MvApplicationTest {
     @DisabledOnOs(value = OS.WINDOWS)
     void mvSrcFileToDestFile_SrcFileNoPermissionToRead_ThrowsMvException() {
         boolean isSetReadable = srcFilePath.toFile().setReadable(false);
-        if (!isSetReadable) {
-            fail("Failed to set read permission to false for test source file");
-        }
-
-        MvException result = assertThrowsExactly(MvException.class, () ->
-                app.mvSrcFileToDestFile(false, srcFile, destFile)
-        );
+        assertFalse(isSetReadable, "Failed to set read permission to false for test source file");
+        MvException result = assertThrowsExactly(MvException.class, () -> app.mvSrcFileToDestFile(false, srcFile, destFile));
         String expected = getCannotReadPermissionMsg(srcFile);
         assertEquals(expected, result.getMessage());
     }
@@ -103,13 +97,8 @@ class MvApplicationTest {
     @DisabledOnOs(value = OS.WINDOWS)
     void mvSrcFileToDestFile_DestFileNoPermissionToWrite_ThrowsMvException() {
         boolean isSetWritable = destFilePath.toFile().setWritable(false);
-        if (!isSetWritable) {
-            fail("Failed to set write permission to false for test destination file");
-        }
-
-        MvException result = assertThrowsExactly(MvException.class, () ->
-                app.mvSrcFileToDestFile(false, srcFile, destFile)
-        );
+        assertFalse(isSetWritable, "Failed to set write permission to false for test destination file");
+        MvException result = assertThrowsExactly(MvException.class, () -> app.mvSrcFileToDestFile(false, srcFile, destFile));
         String expected = getCannotWritePermissionMsg(destFile);
         assertEquals(expected, result.getMessage());
     }
@@ -163,13 +152,8 @@ class MvApplicationTest {
     @DisabledOnOs(value = OS.WINDOWS)
     void mvFilesToFolder_DestFolderNoPermissionToWrite_ThrowsMvException() {
         boolean isSetWritable = destDirPath.toFile().setWritable(false);
-        if (!isSetWritable) {
-            fail("Failed to set write permission to false for test destination directory");
-        }
-
-        MvException result = assertThrowsExactly(MvException.class, () ->
-                app.mvFilesToFolder(false, destDir, new String[0])
-        );
+        assertFalse(isSetWritable, "Failed to set write permission to false for test destination directory");
+        MvException result = assertThrowsExactly(MvException.class, () -> app.mvFilesToFolder(false, destDir, new String[0]));
         String expected = getCannotWritePermissionMsg(destDir);
         assertEquals(expected, result.getMessage());
     }
@@ -188,13 +172,8 @@ class MvApplicationTest {
     @DisabledOnOs(value = OS.WINDOWS)
     void mvFilesToFolder_SrcFileNoPermissionToRead_ThrowsMvException() {
         boolean isSetReadable = srcFilePath.toFile().setReadable(false);
-        if (!isSetReadable) {
-            fail("Failed to set read permission to false for test source file");
-        }
-
-        MvException result = assertThrowsExactly(MvException.class, () ->
-                app.mvFilesToFolder(false, destDir, srcFile)
-        );
+        assertFalse(isSetReadable, "Failed to set read permission to false for test source file");
+        MvException result = assertThrowsExactly(MvException.class, () -> app.mvFilesToFolder(false, destDir, srcFile));
         String expected = getCannotReadPermissionMsg(srcFile);
         assertEquals(expected, result.getMessage());
     }

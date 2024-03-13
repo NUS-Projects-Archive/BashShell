@@ -114,7 +114,7 @@ class CatArgsParserTest {
     }
 
     @Test
-    void getFiles_OneNonFlagArg_ReturnsOneArg() {
+    void getFiles_OneNonFlagArg_ReturnsOneFile() {
         assertDoesNotThrow(() -> parser.parse(FILE));
         List<String> result = parser.getFiles();
         List<String> expected = List.of(FILE);
@@ -122,7 +122,7 @@ class CatArgsParserTest {
     }
 
     @Test
-    void getFiles_MultipleNonFlagArgs_ReturnsMultipleArgs() {
+    void getFiles_MultipleNonFlagArgs_ReturnsMultipleFiles() {
         assertDoesNotThrow(() -> parser.parse("file1.txt", "file2.txt", "file3.txt"));
         List<String> result = parser.getFiles();
         List<String> expected = List.of("file1.txt", "file2.txt", "file3.txt");
@@ -130,7 +130,7 @@ class CatArgsParserTest {
     }
 
     @Test
-    void getFiles_ValidFlagAndOneNonFlagArg_ReturnsOneArg() {
+    void getFiles_ValidFlagAndOneNonFlagArg_ReturnsOneFile() {
         assertDoesNotThrow(() -> parser.parse("-n", FILE));
         List<String> result = parser.getFiles();
         List<String> expected = List.of(FILE);

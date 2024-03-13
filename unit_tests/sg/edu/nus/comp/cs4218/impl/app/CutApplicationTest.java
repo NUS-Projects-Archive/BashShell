@@ -2,9 +2,9 @@ package sg.edu.nus.comp.cs4218.impl.app;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 
 import java.io.ByteArrayInputStream;
@@ -33,7 +33,6 @@ class CutApplicationTest {
     private static final String ZERO_TO_SIX = "09876";
     private static final String ERR_NON_EXIST = "cut: 'nonExistFile.txt': No such file or directory";
     private static final String ERR_ONE_FLAG_ONLY = "cut: Exactly one flag (cut by character or byte) should be selected, but not both";
-    private CutApplication app;
 
     @TempDir
     private Path tempDir;
@@ -41,6 +40,7 @@ class CutApplicationTest {
     private String fileOne;
     private String fileTwo;
     private String nonExistFile;
+    private CutApplication app;
 
     @BeforeEach
     void setUp() throws IOException {
@@ -108,10 +108,7 @@ class CutApplicationTest {
     @DisabledOnOs(value = OS.WINDOWS)
     void cutFromFiles_FileNoPermissionToRead_PrintsErrorMessage() {
         boolean isSetReadable = fileOnePath.toFile().setReadable(false);
-        if (!isSetReadable) {
-            fail("Failed to set read permission to false for test");
-        }
-
+        assertFalse(isSetReadable, "Failed to set read permission to false for test");
         String result = assertDoesNotThrow(() -> app.cutFromFiles(true, false, RANGE_ONE_TO_FIVE, fileOne));
         String expected = "cut: 'file1.txt': Permission denied";
         assertEquals(expected, result);

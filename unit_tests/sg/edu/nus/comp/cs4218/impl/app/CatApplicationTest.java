@@ -2,9 +2,9 @@ package sg.edu.nus.comp.cs4218.impl.app;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
-import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static sg.edu.nus.comp.cs4218.impl.util.AssertUtils.assertEmptyString;
@@ -37,8 +37,6 @@ class CatApplicationTest {
     private static final String L1_HEY_L2_JUNIT = "1 Hey" + STRING_NEWLINE + "2 Junit";
     private static final String[] PARAM_TEST_VALUES = {"", "hello", HELLO_WORLD};
     private static final String ERR_NON_EXIST = "cat: 'nonExistFile.txt': No such file or directory";
-    private CatApplication app;
-    private InputStream inputStreamMock;
 
     @TempDir
     private Path tempDir;
@@ -46,6 +44,8 @@ class CatApplicationTest {
     private String fileA;
     private String fileB;
     private String nonExistFile;
+    private CatApplication app;
+    private InputStream inputStreamMock;
 
     private static List<String> getParams() {
         return Arrays.asList(PARAM_TEST_VALUES);
@@ -100,10 +100,7 @@ class CatApplicationTest {
     @DisabledOnOs(value = OS.WINDOWS)
     void catFiles_FileNoPermissionToRead_PrintsErrorMessage() {
         boolean isSetReadable = pathA.toFile().setReadable(false);
-        if (!isSetReadable) {
-            fail("Failed to set read permission to false for test");
-        }
-
+        assertFalse(isSetReadable, "Failed to set read permission to false for test");
         String result = assertDoesNotThrow(() -> app.catFiles(false, fileA));
         String expected = "cat: 'fileA.txt': Permission denied";
         assertEquals(expected, result);

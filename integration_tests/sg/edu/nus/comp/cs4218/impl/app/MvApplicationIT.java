@@ -22,13 +22,12 @@ import sg.edu.nus.comp.cs4218.exception.MvException;
 @SuppressWarnings("PMD.ClassNamingConventions")
 public class MvApplicationIT {
 
-    private MvApplication app;
-
     @TempDir
     private Path tempDir;
     private Path filePath;
     private String subDir;
     private String file;
+    private MvApplication app;
 
     @BeforeEach
     void setUp() throws IOException {

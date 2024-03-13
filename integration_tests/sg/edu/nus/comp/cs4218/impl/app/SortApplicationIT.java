@@ -7,6 +7,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.joinStringsByNewline;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -40,10 +41,6 @@ public class SortApplicationIT {
 
     private SortApplication app;
     private OutputStream stdout;
-
-    private String joinStringsByNewline(String... strings) {
-        return String.join(STRING_NEWLINE, strings);
-    }
 
     @BeforeEach
     void setUp() throws IOException {

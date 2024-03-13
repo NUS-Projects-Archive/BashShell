@@ -16,7 +16,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -46,7 +45,8 @@ public class CatApplication implements CatInterface {
      * @param stdin  An InputStream. The input for the command is read from this InputStream if no
      *               files are specified
      * @param stdout An OutputStream. The output of the command is written to this OutputStream
-     * @throws CatException If the file(s) specified do not exist or are unreadable
+     * @throws CatException If any specified file does not exist, is a directory, is unreadable, or if there
+     *                      is an error occurs while reading from the standard input
      */
     @Override
     public void run(String[] args, InputStream stdin, OutputStream stdout) throws CatException {
@@ -85,13 +85,13 @@ public class CatApplication implements CatInterface {
     }
 
     /**
-     * Returns string containing the content of the specified file
+     * Returns string containing the content of the specified file.
      *
      * @param isLineNumber Prefix lines with their corresponding line number starting from 1
      * @param fileName     Array of String of file names (not including "-" for reading from stdin)
      * @return A string containing the concatenated content of the specified file(s),
      *         optionally prefixed with line numbers
-     * @throws CatException If the file(s) specified do not exist, are directories or are unreadable
+     * @throws CatException If any specified file do not exist, is a directory or is unreadable
      */
     @Override
     public String catFiles(Boolean isLineNumber, String... fileName) throws CatException {
@@ -145,7 +145,7 @@ public class CatApplication implements CatInterface {
 
 
     /**
-     * Returns string containing the content of the standard input
+     * Returns string containing the content of the standard input.
      *
      * @param isLineNumber Prefix lines with their corresponding line number starting from 1
      * @param stdin        InputStream containing arguments from Stdin
@@ -169,14 +169,14 @@ public class CatApplication implements CatInterface {
     }
 
     /**
-     * Returns string containing the content of the standard input and specified file
+     * Returns string containing the content of the standard input and specified file.
      *
      * @param isLineNumber Prefix lines with their corresponding line number starting from 1
      * @param stdin        InputStream containing arguments from Stdin
      * @param fileName     Array of String of file names (including "-" for reading from stdin)
      * @return A string containing the concatenated content of the specified file(s) and stdin(s),
      *         optionally prefixed with line numbers
-     * @throws Exception
+     * @throws CatException
      */
     @Override
     public String catFileAndStdin(Boolean isLineNumber, InputStream stdin, String... fileName) throws CatException {
@@ -194,7 +194,7 @@ public class CatApplication implements CatInterface {
 
     /**
      * Reads lines from the specified {@code inputStream} and optionally
-     * prefixes each line with its corresponding line number
+     * prefixes each line with its corresponding line number.
      *
      * @param isLineNumber Prefix lines with their corresponding line number starting from 1
      * @param inputStream  InputStream to read lines from

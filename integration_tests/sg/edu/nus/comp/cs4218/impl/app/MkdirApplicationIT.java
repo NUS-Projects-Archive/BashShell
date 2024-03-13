@@ -23,12 +23,12 @@ public class MkdirApplicationIT {
 
     private static final String MKDIR_EX_MSG = "mkdir: ";
     private static final String FILE = "file.txt";
-    private MkdirApplication app;
 
     @TempDir
     private Path tempDir;
     private Path filePath;
     private String file;
+    private MkdirApplication app;
 
     @BeforeEach
     void setUp() throws IOException {
