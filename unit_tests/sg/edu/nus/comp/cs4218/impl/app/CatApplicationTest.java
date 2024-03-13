@@ -2,9 +2,9 @@ package sg.edu.nus.comp.cs4218.impl.app;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static sg.edu.nus.comp.cs4218.impl.util.AssertUtils.assertEmptyString;
@@ -100,7 +100,7 @@ class CatApplicationTest {
     @DisabledOnOs(value = OS.WINDOWS)
     void catFiles_FileNoPermissionToRead_PrintsErrorMessage() {
         boolean isSetReadable = pathA.toFile().setReadable(false);
-        assertFalse(isSetReadable, "Failed to set read permission to false for test");
+        assertTrue(isSetReadable, "Failed to set read permission to false for test");
         String result = assertDoesNotThrow(() -> app.catFiles(false, fileA));
         String expected = "cat: 'fileA.txt': Permission denied";
         assertEquals(expected, result);

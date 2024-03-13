@@ -2,8 +2,8 @@ package sg.edu.nus.comp.cs4218.impl.app;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.joinStringsByNewline;
 
 import java.io.ByteArrayInputStream;
@@ -74,7 +74,7 @@ class SortApplicationTest {
     @DisabledOnOs(value = OS.WINDOWS)
     void sortFromFiles_FileNoPermissionToRead_ThrowsSortException() {
         boolean isSetReadable = filePath.toFile().setReadable(false);
-        assertFalse(isSetReadable, "Failed to set read permission to false for test");
+        assertTrue(isSetReadable, "Failed to set read permission to false for test");
         SortException result = assertThrowsExactly(SortException.class, () ->
                 app.sortFromFiles(false, false, false, file)
         );
