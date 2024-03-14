@@ -2,138 +2,94 @@ package sg.edu.nus.comp.cs4218.impl.app.helper;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.mock;
 import static sg.edu.nus.comp.cs4218.impl.app.helper.GrepApplicationHelper.IS_DIRECTORY;
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_INVALID_REGEX;
+import static sg.edu.nus.comp.cs4218.impl.app.helper.GrepApplicationHelper.grepResultsFromFiles;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_NOT_FOUND;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_PERM;
 import static sg.edu.nus.comp.cs4218.impl.util.FileUtils.createNewFileInDir;
 import static sg.edu.nus.comp.cs4218.impl.util.FileUtils.deleteFileOrDirectory;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_STDIN_OUTPUT;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.StringJoiner;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledOnOs;
+import org.junit.jupiter.api.condition.OS;
 import org.junit.jupiter.api.io.TempDir;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
 
 import sg.edu.nus.comp.cs4218.Environment;
-import sg.edu.nus.comp.cs4218.exception.GrepException;
-import sg.edu.nus.comp.cs4218.impl.app.GrepApplication;
 
 @SuppressWarnings("PMD.ClassNamingConventions")
 class GrepApplicationHelperIT {
 
     private static final String VALID_PAT_SMALL = "ab";
+    private static final String VALID_PAT_BIG = "AB";
     private static final String GREP_STRING = "grep: ";
-    private static final String COLON_SPACE = ": ";
-    private static final String DASH = "-";
     private static final String INPUT_CONTENTS = String.join(STRING_NEWLINE, "aabb", "x", "ab");
     private static final String[] OUTPUT_CONTENTS = {"aabb", "ab"};
+    private static final String NON_EXISTENT_FILE = "nonExistentFile";
 
     @TempDir
     private Path tempDir;
     private Path fileOne;
-    private Path fileTwo;
     private String fileOneName;
-    private String fileTwoName;
 
-    private GrepApplication app;
-    private InputStream stdin;
-    private OutputStream stdout;
-
-    private List<String> getValidOutputArrWithFileName(String... fileNames) {
-        List<String> expectedOutputArr = new ArrayList<>();
-        for (String name : fileNames) {
-            for (String line : OUTPUT_CONTENTS) {
-                expectedOutputArr.add(name + COLON_SPACE + line);
-            }
-        }
-        return expectedOutputArr;
-    }
+    private StringJoiner lineResults;
+    private StringJoiner countResults;
 
     @BeforeEach
     void setUp() {
-        app = new GrepApplication();
-        stdin = new ByteArrayInputStream(INPUT_CONTENTS.getBytes(StandardCharsets.UTF_8));
-        stdout = new ByteArrayOutputStream();
-
         Environment.currentDirectory = tempDir.toFile().getAbsolutePath();
 
         fileOne = createNewFileInDir(tempDir, "tempFile1", INPUT_CONTENTS);
         fileOneName = fileOne.getFileName().toString();
 
-        fileTwo = createNewFileInDir(tempDir, "tempFile2", INPUT_CONTENTS);
-        fileTwoName = fileTwo.getFileName().toString();
+        lineResults = new StringJoiner("");
+        countResults = new StringJoiner("");
     }
 
     @AfterEach
     void tearDown() {
         deleteFileOrDirectory(fileOne);
-        deleteFileOrDirectory(fileTwo);
     }
 
     @Test
-    void grepFromFileAndStdin_WithValidPatternAndFileAndStdin_ReturnsMatchingLinesFromFileAndStdin() {
-        // Given
-        String[] args = new String[]{VALID_PAT_SMALL, fileOneName, DASH};
-        String expected = String.join(STRING_NEWLINE,
-                getValidOutputArrWithFileName(fileOneName, STRING_STDIN_OUTPUT)) + STRING_NEWLINE;
-
-        // When
-        assertDoesNotThrow(() -> app.run(args, stdin, stdout));
-
-        // Then
-        assertEquals(expected, stdout.toString());
+    void grepResultsFromFiles_ExistingFileWithValidPatternAndNoFlag_LineResultsAndCountResultsIsExpectedOutput() {
+        String expectedLR = String.join("", OUTPUT_CONTENTS);
+        assertDoesNotThrow(() -> grepResultsFromFiles(VALID_PAT_SMALL, false, lineResults, countResults, false, fileOneName));
+        assertEquals(expectedLR, lineResults.toString());
+        assertEquals("2", countResults.toString());
     }
 
     @Test
-    void grepResultsFromFiles_WithValidPatternAndMultipleValidFiles_ReturnsMatchingLinesFromFiles() {
-        // Given
-        String[] args = new String[]{VALID_PAT_SMALL, fileOneName, fileTwoName};
-        String expected = String.join(STRING_NEWLINE,
-                getValidOutputArrWithFileName(fileOneName, fileTwoName)) + STRING_NEWLINE;
-
-        // When
-        assertDoesNotThrow(() -> app.run(args, mock(InputStream.class), stdout));
-
-        // Then
-        assertEquals(expected, stdout.toString());
+    void grepResultsFromFile_ExistingFileWithValidPatternAndBothFlagsSet_LineResultsAndCountResultsIsExpectedOutput() {
+        String expectedLR = fileOneName + ": " + OUTPUT_CONTENTS[0] + fileOneName + ": " + OUTPUT_CONTENTS[1];
+        String expectedCR = fileOneName + ": " + OUTPUT_CONTENTS.length;
+        assertDoesNotThrow(() -> grepResultsFromFiles(VALID_PAT_BIG, true, lineResults, countResults, true, fileOneName));
+        assertEquals(expectedLR, lineResults.toString());
+        assertEquals(expectedCR, countResults.toString());
     }
 
     @Test
-    void grepResultsFromFiles_WithDirectory_ReturnsIsADirectoryErr() {
-        // Given
-        String[] args = new String[]{VALID_PAT_SMALL, tempDir.toString()};
-        String expected = GREP_STRING + tempDir + COLON_SPACE + IS_DIRECTORY + STRING_NEWLINE;
-
-        // When
-        assertDoesNotThrow(() -> app.run(args, mock(InputStream.class), stdout));
-
-        // Then
-        assertEquals(expected, stdout.toString());
+    void grepResultsFromFiles_NonExistentFile_LineResultsIsFileNotFoundError() {
+        assertDoesNotThrow(() -> grepResultsFromFiles(VALID_PAT_SMALL, false, lineResults, countResults, false, NON_EXISTENT_FILE));
+        assertEquals(GREP_STRING + NON_EXISTENT_FILE + ": " + ERR_FILE_NOT_FOUND, lineResults.toString());
     }
 
-    @ParameterizedTest
-    @ValueSource(strings = {"[", "+", "(", "{"})
-    void grepResultsFromFiles_InvalidPattern_ReturnsInvalidPatternErr(String regex) {
-        // Given
-        String[] args = new String[]{regex, fileOneName};
+    @Test
+    @DisabledOnOs(OS.WINDOWS)
+    void grepResultsFromFiles_NoReadPermissionFile_LineResultsIsNoPermissionError() {
+        fileOne.toFile().setReadable(false);
+        assertDoesNotThrow(() -> grepResultsFromFiles(VALID_PAT_SMALL, false, lineResults, countResults, false, fileOneName));
+        assertEquals(GREP_STRING + fileOneName + ": " + ERR_NO_PERM, lineResults.toString());
+    }
 
-        // When
-        GrepException exception = assertThrows(GrepException.class, () -> app.run(args, mock(InputStream.class), stdout));
-
-        // Then
-        assertEquals(GREP_STRING + ERR_INVALID_REGEX, exception.getMessage());
+    @Test
+    void grepResultsFromFiles_Directory_LineResultsIsDirectoryError() {
+        assertDoesNotThrow(() -> grepResultsFromFiles(VALID_PAT_SMALL, false, lineResults, countResults, false, tempDir.toString()));
+        assertEquals(GREP_STRING + tempDir.toString() + ": " + IS_DIRECTORY, lineResults.toString());
     }
 }
