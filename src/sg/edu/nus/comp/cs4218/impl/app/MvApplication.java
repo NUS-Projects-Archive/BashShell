@@ -20,6 +20,7 @@ import sg.edu.nus.comp.cs4218.app.MvInterface;
 import sg.edu.nus.comp.cs4218.exception.InvalidArgsException;
 import sg.edu.nus.comp.cs4218.exception.MvException;
 import sg.edu.nus.comp.cs4218.impl.parser.MvArgsParser;
+import sg.edu.nus.comp.cs4218.impl.util.CollectionsUtils;
 import sg.edu.nus.comp.cs4218.impl.util.IOUtils;
 
 /**
@@ -61,7 +62,7 @@ public class MvApplication implements MvInterface {
         }
 
         final Boolean isOverwrite = parser.isOverwrite();
-        final String[] srcDirectories = parser.getSourceDirectories().toArray(new String[parser.getSourceDirectories().size()]);
+        final String[] srcDirectories = CollectionsUtils.listToArray(parser.getSourceDirectories());
         final String destDirectory = parser.getDestinationDirectory();
 
         if (srcDirectories.length > 1) {
