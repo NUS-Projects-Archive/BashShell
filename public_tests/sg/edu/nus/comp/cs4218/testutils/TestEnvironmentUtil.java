@@ -41,11 +41,13 @@ public class TestEnvironmentUtil {
 
     // Adapted from https://stackoverflow.com/questions/28678026/how-can-i-get-all-class-files-in-a-specific-package-in-java
     private static List<Class<?>> getClassesInPackage(String packageName) {
-        String path = packageName.replaceAll("\\.", File.separator);
+        String path = packageName
+                .replace("\\", File.separator)
+                .replace(".", File.separator);
         List<Class<?>> classes = new ArrayList<>();
         String[] classPathEntries = System.getProperty("java.class.path").split(
                 System.getProperty("path.separator")
-                                                                               );
+        );
         String name;
         for (String classpathEntry : classPathEntries) {
             if (classpathEntry.endsWith(".jar")) {

@@ -41,6 +41,10 @@ public class GrepApplication implements GrepInterface {
             throw new GrepException(NULL_POINTER);
         }
 
+        if (pattern.isEmpty()) {
+            throw new GrepException(EMPTY_PATTERN);
+        }
+
         StringJoiner lineResults = new StringJoiner(STRING_NEWLINE);
         StringJoiner countResults = new StringJoiner(STRING_NEWLINE);
 
@@ -59,6 +63,10 @@ public class GrepApplication implements GrepInterface {
 
     @Override
     public String grepFromStdin(String pattern, Boolean isCaseInsensitive, Boolean isCountLines, Boolean isPrefixFileName, InputStream stdin) throws AbstractApplicationException {
+        if (pattern.isEmpty()) {
+            throw new GrepException(EMPTY_PATTERN);
+        }
+
         int count = 0;
         StringJoiner stringJoiner = new StringJoiner(STRING_NEWLINE);
 
@@ -141,6 +149,10 @@ public class GrepApplication implements GrepInterface {
 
     @Override
     public String grepFromFileAndStdin(String pattern, Boolean isCaseInsensitive, Boolean isCountLines, Boolean isPrefixFileName, InputStream stdin, String... fileNames) throws AbstractApplicationException {
+        if (pattern.isEmpty()) {
+            throw new GrepException(EMPTY_PATTERN);
+        }
+
         StringBuilder result = new StringBuilder();
         Boolean newIsPfxFileName = isPrefixFileName || fileNames.length > 1;
         for (String fileName : fileNames) {
