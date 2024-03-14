@@ -45,7 +45,7 @@ class SortApplicationTest {
         SortException result = assertThrowsExactly(SortException.class, () ->
                 app.sortFromFiles(false, false, false, new String[0])
         );
-        String expected = "sort: Problem sort from file: Null arguments";
+        String expected = "sort: Null arguments";
         assertEquals(expected, result.getMessage());
     }
 
@@ -55,7 +55,7 @@ class SortApplicationTest {
         SortException result = assertThrowsExactly(SortException.class, () ->
                 app.sortFromFiles(false, false, false, nonExistFile)
         );
-        String expected = "sort: Problem sort from file: 'nonExistFile.txt': No such file or directory";
+        String expected = "sort: 'nonExistFile.txt': No such file or directory";
         assertEquals(expected, result.getMessage());
     }
 
@@ -66,7 +66,7 @@ class SortApplicationTest {
         SortException result = assertThrowsExactly(SortException.class, () ->
                 app.sortFromFiles(false, false, false, subDir.toString())
         );
-        String expected = "sort: Problem sort from file: 'subdirectory': This is a directory";
+        String expected = "sort: 'subdirectory': This is a directory";
         assertEquals(expected, result.getMessage());
     }
 
@@ -78,7 +78,7 @@ class SortApplicationTest {
         SortException result = assertThrowsExactly(SortException.class, () ->
                 app.sortFromFiles(false, false, false, file)
         );
-        String expected = "sort: Problem sort from file: 'file.txt': Permission denied";
+        String expected = "sort: 'file.txt': Could not read file";
         assertEquals(expected, result.getMessage());
     }
 
@@ -123,7 +123,7 @@ class SortApplicationTest {
         SortException result = assertThrowsExactly(SortException.class, () ->
                 app.sortFromStdin(false, false, false, null)
         );
-        String expected = "sort: Problem sort from stdin: Null Pointer Exception";
+        String expected = "sort: Null Pointer Exception";
         assertEquals(expected, result.getMessage());
     }
 
