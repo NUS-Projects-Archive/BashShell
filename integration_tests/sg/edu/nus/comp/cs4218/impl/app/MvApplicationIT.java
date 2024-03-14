@@ -2,9 +2,9 @@ package sg.edu.nus.comp.cs4218.impl.app;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static sg.edu.nus.comp.cs4218.impl.util.AssertUtils.assertFileDoNotExists;
+import static sg.edu.nus.comp.cs4218.impl.util.AssertUtils.assertFileExists;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 
 import java.io.IOException;
@@ -38,8 +38,8 @@ public class MvApplicationIT {
         subDir = subDirPath.toString();
 
         filePath = tempDir.resolve("file");
-        assertDoesNotThrow(() -> Files.createFile(filePath));
         file = filePath.toString();
+        assertDoesNotThrow(() -> Files.createFile(filePath));
     }
 
     @Test
@@ -69,9 +69,9 @@ public class MvApplicationIT {
         String[] args = {file, subDir};
         assertDoesNotThrow(() -> app.run(args, null, null));
 
-        Path movedFile = tempDir.resolve("subdirectory/file");
-        assertTrue(Files.exists(movedFile)); // assert that file has moved to the new location
-        assertFalse(Files.exists(filePath)); // assert that file does not exist in the old location
+        String movedFile = tempDir.resolve("subdirectory/file").toString();
+        assertFileExists(movedFile); // file has moved to the new location
+        assertFileDoNotExists(file); // file does not exist in the old location
     }
 
     @Test
@@ -96,11 +96,10 @@ public class MvApplicationIT {
         String[] args = {file, "nonExistentFile.txt", subDir};
         MvException result = assertThrowsExactly(MvException.class, () -> app.run(args, null, null));
 
-        Path movedFile = tempDir.resolve("subdirectory/file");
-        assertTrue(Files.exists(movedFile)); // assert that file has moved to the new location
-        assertFalse(Files.exists(filePath)); // assert that file does n exist in the old location
-
+        String movedFile = tempDir.resolve("subdirectory/file").toString();
         String expected = "mv: cannot find 'nonExistentFile.txt': No such file or directory";
+        assertFileExists(movedFile); // file has moved to the new location
+        assertFileDoNotExists(file); // file does not exist in the old location
         assertEquals(expected, result.getMessage());
     }
 }

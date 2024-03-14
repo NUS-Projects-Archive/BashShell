@@ -2,11 +2,12 @@ package sg.edu.nus.comp.cs4218.impl.app;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static sg.edu.nus.comp.cs4218.impl.util.AssertUtils.assertFileDoNotExists;
+import static sg.edu.nus.comp.cs4218.impl.util.AssertUtils.assertFileExists;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -107,12 +108,13 @@ class MvApplicationTest {
     void mvSrcFileToDestFile_DestFileDoNotExist_MovesFile() {
         List<String> expectedContent = assertDoesNotThrow(() -> Files.readAllLines(srcFilePath));
         Path nonExistFilePath = tempDir.resolve("nonExistFile.txt");
+        String nonExistFile = nonExistFilePath.toString();
 
-        assertDoesNotThrow(() -> app.mvSrcFileToDestFile(false, srcFile, nonExistFilePath.toString()));
+        assertDoesNotThrow(() -> app.mvSrcFileToDestFile(false, srcFile, nonExistFile));
         List<String> actualContent = assertDoesNotThrow(() -> Files.readAllLines(nonExistFilePath));
 
-        assertTrue(Files.exists(nonExistFilePath)); // assert that the dest file now exists
-        assertFalse(Files.exists(srcFilePath)); // assert that the src file no longer exist
+        assertFileExists(nonExistFile);
+        assertFileDoNotExists(srcFile);
         assertEquals(expectedContent, actualContent);
     }
 
@@ -124,9 +126,9 @@ class MvApplicationTest {
         assertDoesNotThrow(() -> app.mvSrcFileToDestFile(true, srcFile, destFile));
         List<String> actualContent = assertDoesNotThrow(() -> Files.readAllLines(destFilePath));
 
-        assertFalse(Files.exists(srcFilePath)); // assert that the src file no longer exist
-        assertEquals(expectedContent, actualContent); // assert that dest file now holds the content of the src file
-        assertNotEquals(oldContent, actualContent); // assert that dest file content has been overwritten
+        assertFileDoNotExists(srcFile); // src file no longer exist
+        assertEquals(expectedContent, actualContent); // dest file now holds the content of the src file
+        assertNotEquals(oldContent, actualContent);   // dest file content has been overwritten
     }
 
     @Test
@@ -181,53 +183,53 @@ class MvApplicationTest {
     @Test
     void mvFilesToFolder_SrcFileDoNotExistInDestFolder_MovesFile() {
         String result = assertDoesNotThrow(() -> app.mvFilesToFolder(false, destDir, srcFile));
-        Path movedSrcFilePath = destDirPath.resolve(SRC_FILE);
+        String movedSrcFile = destDirPath.resolve(SRC_FILE).toString();
 
         assertNull(result);
-        assertTrue(Files.exists(movedSrcFilePath)); // assert that src file now exist under subdirectory
-        assertFalse(Files.exists(srcFilePath)); // assert that the original src file no longer exist
+        assertFileExists(movedSrcFile); // src file now exist under subdirectory
+        assertFileDoNotExists(srcFile); // original src file no longer exist
     }
 
     @Test
     void mvFilesToFolder_IsOverwrite_MovesFile() {
-        List<String> expectedContent = assertDoesNotThrow(() -> Files.readAllLines(srcFilePath));
-
         String destContent = "destination file content";
         Path destFilePath = destDirPath.resolve(SRC_FILE);
+        String destFile = destFilePath.toString();
         assertDoesNotThrow(() -> Files.createFile(destFilePath));
         assertDoesNotThrow(() -> Files.write(destFilePath, destContent.getBytes()));
+        List<String> expectedContent = assertDoesNotThrow(() -> Files.readAllLines(srcFilePath));
 
         // assert that another src file of different content exist in subdirectory
         List<String> oldContent = assertDoesNotThrow(() -> Files.readAllLines(destFilePath));
-        assertTrue(Files.exists(destFilePath));
+        assertFileExists(destFile);
         assertNotEquals(expectedContent, oldContent);
 
         assertDoesNotThrow(() -> app.mvFilesToFolder(true, destDir, srcFile));
         List<String> actualContent = assertDoesNotThrow(() -> Files.readAllLines(destFilePath));
 
-        assertTrue(Files.exists(destFilePath)); // assert that the src file in subdirectory still exist
-        assertFalse(Files.exists(srcFilePath)); // assert that the original src file no longer exist
-        assertEquals(expectedContent, actualContent); // assert that dest file now holds the content of the src file
-        assertNotEquals(oldContent, actualContent); // assert that dest file content has been overwritten
+        assertFileExists(destFile);     //src file in subdirectory still exist
+        assertFileDoNotExists(srcFile); // original src file no longer exist
+        assertEquals(expectedContent, actualContent); // dest file now holds the content of the src file
+        assertNotEquals(oldContent, actualContent);   // dest file content has been overwritten
     }
 
     @Test
     void mvFilesToFolder_MultipleSrcFilesAllExists_MovesFile() {
         Path srcFileAPath = tempDir.resolve("A");
         Path srcFileBPath = tempDir.resolve("B");
+        String srcFileA = srcFileAPath.toString();
+        String srcFileB = srcFileBPath.toString();
         assertDoesNotThrow(() -> Files.createFile(srcFileAPath));
         assertDoesNotThrow(() -> Files.createFile(srcFileBPath));
 
-        assertDoesNotThrow(() -> app.mvFilesToFolder(false, destDirPath.toString(),
-                srcFileAPath.toString(), srcFileBPath.toString()));
+        assertDoesNotThrow(() -> app.mvFilesToFolder(false, destDir, srcFileA, srcFileB));
+        String movedSrcFileA = destDirPath.resolve("A").toString();
+        String movedSrcFileB = destDirPath.resolve("B").toString();
 
-        Path movedSrcFileAPath = destDirPath.resolve("A");
-        Path movedSrcFileBPath = destDirPath.resolve("B");
-
-        assertTrue(Files.exists(movedSrcFileAPath)); // assert that the src file A exists in subdirectory
-        assertTrue(Files.exists(movedSrcFileBPath)); // assert that the src file B exists in subdirectory
-        assertFalse(Files.exists(srcFileAPath)); // assert that the original src file A no longer exists
-        assertFalse(Files.exists(srcFileBPath)); // assert that the original src file B no longer exists
+        assertFileExists(movedSrcFileA); // src file A exists in subdirectory
+        assertFileExists(movedSrcFileB); // src file B exists in subdirectory
+        assertFileDoNotExists(srcFileA); // original src file A no longer exists
+        assertFileDoNotExists(srcFileB); // original src file B no longer exists
     }
 
     @Test
@@ -235,23 +237,27 @@ class MvApplicationTest {
         Path srcFileAPath = tempDir.resolve("A");
         Path srcFileBPath = tempDir.resolve("B");
         Path srcFileCPath = tempDir.resolve("C"); // do not exist
+        String srcFileA = srcFileAPath.toString();
+        String srcFileB = srcFileBPath.toString();
+        String srcFileC = srcFileCPath.toString();
         assertDoesNotThrow(() -> Files.createFile(srcFileAPath));
         assertDoesNotThrow(() -> Files.createFile(srcFileBPath));
 
         MvException actual = assertThrowsExactly(MvException.class, () ->
-                app.mvFilesToFolder(false, destDirPath.toString(), srcFileAPath.toString(),
-                        srcFileBPath.toString(), srcFileCPath.toString())
+                app.mvFilesToFolder(false, destDir, srcFileA, srcFileB, srcFileC)
         );
+        String movedSrcFileA = destDirPath.resolve("A").toString();
+        String movedSrcFileB = destDirPath.resolve("B").toString();
+        String movedSrcFileC = destDirPath.resolve("C").toString(); // do not exist
+        String expected = getFileNotFoundMsg(srcFileC);
 
-        String expected = getFileNotFoundMsg(srcFileCPath.toString());
-        Path movedSrcFileAPath = destDirPath.resolve("A");
-        Path movedSrcFileBPath = destDirPath.resolve("B");
-
-        assertTrue(Files.exists(movedSrcFileAPath)); // assert that the src file A exists in subdirectory
-        assertTrue(Files.exists(movedSrcFileBPath)); // assert that the src file B exists in subdirectory
-        assertFalse(Files.exists(srcFileAPath)); // assert that the original src file A no longer exists
-        assertFalse(Files.exists(srcFileBPath)); // assert that the original src file B no longer exists
-        assertEquals(expected, actual.getMessage()); // assert that 'C' not found is returned
+        assertFileExists(movedSrcFileA);      // src file A exists in subdirectory
+        assertFileExists(movedSrcFileB);      // src file B exists in subdirectory
+        assertFileDoNotExists(movedSrcFileC); // src file C do not exist in subdirectory
+        assertFileDoNotExists(srcFileA); // original src file A no longer exists
+        assertFileDoNotExists(srcFileB); // original src file B no longer exists
+        assertFileDoNotExists(srcFileC); // original src file C do not exist
+        assertEquals(expected, actual.getMessage()); // 'C' not found is returned
     }
 
     @Test
@@ -259,22 +265,27 @@ class MvApplicationTest {
         Path srcFileAPath = tempDir.resolve("A"); // do not exist
         Path srcFileBPath = tempDir.resolve("B");
         Path srcFileCPath = tempDir.resolve("C");
+        String srcFileA = srcFileAPath.toString();
+        String srcFileB = srcFileBPath.toString();
+        String srcFileC = srcFileCPath.toString();
         assertDoesNotThrow(() -> Files.createFile(srcFileBPath));
         assertDoesNotThrow(() -> Files.createFile(srcFileCPath));
 
         MvException actual = assertThrowsExactly(MvException.class, () ->
-                app.mvFilesToFolder(false, destDirPath.toString(), srcFileAPath.toString(),
-                        srcFileBPath.toString(), srcFileCPath.toString())
+                app.mvFilesToFolder(false, destDir, srcFileA, srcFileB, srcFileC)
         );
 
-        String expected = getFileNotFoundMsg(srcFileAPath.toString());
-        Path movedSrcFileBPath = destDirPath.resolve("B");
-        Path movedSrcFileCPath = destDirPath.resolve("C");
+        String movedSrcFileA = destDirPath.resolve("A").toString(); // do not exist
+        String movedSrcFileB = destDirPath.resolve("B").toString();
+        String movedSrcFileC = destDirPath.resolve("C").toString();
+        String expected = getFileNotFoundMsg(srcFileA);
 
-        assertTrue(Files.exists(movedSrcFileBPath)); // assert that the src file B exists in subdirectory
-        assertTrue(Files.exists(movedSrcFileCPath)); // assert that the src file C exists in subdirectory
-        assertFalse(Files.exists(srcFileBPath)); // assert that the original src file B no longer exists
-        assertFalse(Files.exists(srcFileCPath)); // assert that the original src file C no longer exists
-        assertEquals(expected, actual.getMessage()); // assert that 'A' not found is returned
+        assertFileDoNotExists(movedSrcFileA); // src file A do not exist in subdirectory
+        assertFileExists(movedSrcFileB);      // src file B exists in subdirectory
+        assertFileExists(movedSrcFileC);      // src file C exists in subdirectory
+        assertFileDoNotExists(srcFileA); // original src file A do not exist
+        assertFileDoNotExists(srcFileB); // original src file B no longer exists
+        assertFileDoNotExists(srcFileC); // original src file C no longer exists
+        assertEquals(expected, actual.getMessage()); // 'A' not found is returned
     }
 }
