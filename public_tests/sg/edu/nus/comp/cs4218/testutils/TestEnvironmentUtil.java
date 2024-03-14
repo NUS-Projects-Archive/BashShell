@@ -41,11 +41,10 @@ public class TestEnvironmentUtil {
 
     // Adapted from https://stackoverflow.com/questions/28678026/how-can-i-get-all-class-files-in-a-specific-package-in-java
     private static List<Class<?>> getClassesInPackage(String packageName) {
-        String path = packageName.replaceAll("\\.", File.separator);
+        String path = packageName.replaceAll("\\.", "\\" + File.separator);
         List<Class<?>> classes = new ArrayList<>();
-        String[] classPathEntries = System.getProperty("java.class.path").split(
-                System.getProperty("path.separator")
-                                                                               );
+        String[] classPathEntries = System.getProperty("java.class.path")
+                .split(File.pathSeparator);
         String name;
         for (String classpathEntry : classPathEntries) {
             if (classpathEntry.endsWith(".jar")) {
@@ -61,7 +60,7 @@ public class TestEnvironmentUtil {
                     }
                 }
             } catch (Exception ex) {
-                System.err.println("An error occured while obtaining classes: ");
+                System.err.println("An error occurred while obtaining classes: ");
                 System.err.println(ex.getMessage());
                 ex.printStackTrace();
             }
