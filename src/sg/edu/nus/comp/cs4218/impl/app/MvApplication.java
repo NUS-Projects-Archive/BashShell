@@ -88,15 +88,15 @@ public class MvApplication implements MvInterface {
         Path destPath = IOUtils.resolveFilePath(destFile);
 
         if (!Files.exists(srcPath)) {
-            throw new MvException(String.format("'%s': %s", srcFile, ERR_FILE_NOT_FOUND));
+            throw new MvException(formatFileExceptionMsg(srcFile, ERR_FILE_NOT_FOUND));
         }
 
         if (!Files.isReadable(srcPath)) {
-            throw new MvException(String.format("'%s': %s", srcFile, ERR_READING_FILE));
+            throw new MvException(formatFileExceptionMsg(srcFile, ERR_READING_FILE));
         }
 
         if (Files.exists(destPath) && !Files.isWritable(destPath)) {
-            throw new MvException(String.format("'%s': %s", destPath, ERR_NO_PERM));
+            throw new MvException(formatFileExceptionMsg(destFile, ERR_NO_PERM));
         }
 
         // Append file name to destination directory if destination is a directory
@@ -130,15 +130,15 @@ public class MvApplication implements MvInterface {
         Path destFolderPath = IOUtils.resolveFilePath(destFolder);
 
         if (!Files.exists(destFolderPath)) {
-            throw new MvException(String.format("'%s': %s", destFolder, ERR_FILE_NOT_FOUND));
+            throw new MvException(formatFileExceptionMsg(destFolder, ERR_FILE_NOT_FOUND));
         }
 
         if (!Files.isDirectory(destFolderPath)) {
-            throw new MvException(String.format("'%s': %s", destFolder, ERR_IS_NOT_DIR));
+            throw new MvException(formatFileExceptionMsg(destFolder, ERR_IS_NOT_DIR));
         }
 
         if (!Files.isWritable(destFolderPath)) {
-            throw new MvException(String.format("'%s': %s", destFolder, ERR_NO_PERM));
+            throw new MvException(formatFileExceptionMsg(destFolder, ERR_NO_PERM));
         }
 
         List<MvException> errorList = new ArrayList<>();
@@ -148,11 +148,11 @@ public class MvApplication implements MvInterface {
                 Path destPath = destFolderPath.resolve(srcPath.getFileName());
 
                 if (!Files.exists(srcPath)) {
-                    throw new MvException(String.format("'%s': %s", srcFile, ERR_FILE_NOT_FOUND));
+                    throw new MvException(formatFileExceptionMsg(srcFile, ERR_FILE_NOT_FOUND));
                 }
 
                 if (!Files.isReadable(srcPath)) {
-                    throw new MvException(String.format("'%s': %s", srcFile, ERR_READING_FILE));
+                    throw new MvException(formatFileExceptionMsg(srcFile, ERR_READING_FILE));
                 }
 
                 try {
@@ -173,5 +173,9 @@ public class MvApplication implements MvInterface {
         }
 
         return null;
+    }
+
+    private String formatFileExceptionMsg(String file, String error) {
+        return String.format("'%s': %s", file, error);
     }
 }

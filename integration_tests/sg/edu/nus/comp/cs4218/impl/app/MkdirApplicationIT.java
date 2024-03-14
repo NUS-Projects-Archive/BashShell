@@ -26,7 +26,6 @@ public class MkdirApplicationIT {
 
     @TempDir
     private Path tempDir;
-    private Path filePath;
     private String file;
     private MkdirApplication app;
 
@@ -35,7 +34,7 @@ public class MkdirApplicationIT {
         app = new MkdirApplication();
 
         // Create temporary file, automatically deletes after test execution
-        filePath = tempDir.resolve(FILE);
+        Path filePath = tempDir.resolve(FILE);
         file = filePath.toString();
         Files.createFile(filePath);
     }

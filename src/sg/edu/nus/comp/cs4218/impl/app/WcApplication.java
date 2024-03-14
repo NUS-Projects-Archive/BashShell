@@ -1,16 +1,16 @@
 package sg.edu.nus.comp.cs4218.impl.app;
 
+import static sg.edu.nus.comp.cs4218.impl.app.helper.WcApplicationHelper.formatCount;
+import static sg.edu.nus.comp.cs4218.impl.app.helper.WcApplicationHelper.getCountReport;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_NOT_FOUND;
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_GENERAL;
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IO_EXCEPTION;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IS_DIR;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_ISTREAM;
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_PERM;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NULL_ARGS;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NULL_STREAMS;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_READING_FILE;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_WRITE_STREAM;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -36,20 +36,19 @@ import sg.edu.nus.comp.cs4218.impl.util.IOUtils;
  */
 public class WcApplication implements WcInterface {
 
-    private static final String NUMBER_FORMAT = " %7d";
     private static final int LINES_INDEX = 0;
     private static final int WORDS_INDEX = 1;
     private static final int BYTES_INDEX = 2;
-    private long totalBytes = 0, totalLines = 0, totalWords = 0;
+    private final long[] totals = {0, 0, 0};
 
     /**
      * Runs the wc application with the specified arguments.
      *
      * @param args   Array of arguments for the application. Each array element is the path to a
-     *               file. If no files are specified stdin is used.
+     *               file. If no files are specified stdin is used
      * @param stdin  An InputStream. The input for the command is read from this InputStream if no
-     *               files are specified.
-     * @param stdout An OutputStream. The output of the command is written to this OutputStream.
+     *               files are specified
+     * @param stdout An OutputStream. The output of the command is written to this OutputStream
      * @throws WcException
      */
     @Override
@@ -67,119 +66,99 @@ public class WcApplication implements WcInterface {
         } catch (InvalidArgsException e) {
             throw new WcException(e.getMessage(), e);
         }
-        String result;
         final Boolean isStdinOnly = parser.isStdinOnly();
         final Boolean isByteCount = parser.isByteCount();
         final Boolean isLineCount = parser.isLineCount();
         final Boolean isWordCount = parser.isWordCount();
         final String[] files = CollectionsUtils.listToArray(parser.getFileNames());
 
+        StringBuilder output = new StringBuilder();
         if (isStdinOnly) {
-            result = countFromStdin(isByteCount, isLineCount, isWordCount, stdin);
+            output.append(countFromStdin(isByteCount, isLineCount, isWordCount, stdin));
         } else {
-            result = countFromFileAndStdin(isByteCount, isLineCount, isWordCount, stdin, files);
+            output.append(countFromFileAndStdin(isByteCount, isLineCount, isWordCount, stdin, files));
         }
 
         try {
-            stdout.write(result.getBytes());
-            stdout.write(STRING_NEWLINE.getBytes());
+            if (output.length() != 0) {
+                stdout.write(output.toString().getBytes());
+                stdout.write(STRING_NEWLINE.getBytes());
+            }
         } catch (IOException e) {
             throw new WcException(ERR_WRITE_STREAM, e);
         }
     }
 
     /**
-     * Returns string containing the number of lines, words, and bytes in input files
+     * Returns string containing the number of lines, words, and bytes in input files.
      *
      * @param isBytes  Boolean option to count the number of Bytes
      * @param isLines  Boolean option to count the number of lines
      * @param isWords  Boolean option to count the number of words
-     * @param fileName Array of String of file names
+     * @param fileName Array of String of file names (not including "-" for reading from stdin)
+     * @return A formatted string representing the counts
      * @throws WcException
      */
     @Override
-    public String countFromFiles(Boolean isBytes, Boolean isLines, Boolean isWords, //NOPMD
+    public String countFromFiles(Boolean isBytes, Boolean isLines, Boolean isWords,
                                  String... fileName) throws WcException {
         if (fileName == null) {
-            throw new WcException(ERR_GENERAL);
+            throw new WcException(ERR_NULL_ARGS);
         }
-        List<String> result = new ArrayList<>();
+        List<String> output = new ArrayList<>();
+        List<String> errorList = new ArrayList<>();
         for (String file : fileName) {
-            File node = IOUtils.resolveFilePath(file).toFile();
-            if (!node.exists()) {
-                result.add("wc: " + ERR_FILE_NOT_FOUND);
-                continue;
-            }
-            if (node.isDirectory()) {
-                result.add("wc: " + ERR_IS_DIR);
-                continue;
-            }
-            if (!node.canRead()) {
-                result.add("wc: " + ERR_NO_PERM);
-                continue;
-            }
-
-            InputStream input = null;
-            long[] count;
             try {
-                input = IOUtils.openInputStream(file);
-                count = getCountReport(input); // lines words bytes
-                IOUtils.closeInputStream(input);
-                input.close();
-            } catch (ShellException | IOException e) {
-                throw new WcException(e.getMessage(), e);
-            } finally {
-                try {
-                    if (input != null) {
-                        input.close();
-                    }
-                } catch (IOException e) {
-                    throw new WcException(e.getMessage(), e);
+                File node = IOUtils.resolveFilePath(file).toFile();
+                if (!node.exists()) {
+                    throw new WcException(String.format("'%s': %s", node.getName(), ERR_FILE_NOT_FOUND));
                 }
+                if (node.isDirectory()) {
+                    throw new WcException(String.format("'%s': %s", node.getName(), ERR_IS_DIR));
+                }
+                if (!node.canRead()) {
+                    throw new WcException(String.format("'%s': %s", node.getName(), ERR_READING_FILE));
+                }
+                InputStream input = null;
+                try {
+                    input = IOUtils.openInputStream(file);
+                    long[] count = getCountReport(input);
+                    output.add(String.format("%s %s", formatCount(isLines, isWords, isBytes, count), file));
+                    addToTotal(count);
+                    IOUtils.closeInputStream(input);
+                    input.close();
+                } catch (ShellException | IOException e) {
+                    throw new WcException(e.getMessage(), e);
+                } finally {
+                    try {
+                        if (input != null) {
+                            input.close();
+                        }
+                    } catch (IOException e) {
+                        throw new WcException(e.getMessage(), e);
+                    }
+                }
+            } catch (WcException e) {
+                errorList.add(e.getMessage());
             }
-
-            // Format all output: " %7d %7d %7d %s"
-            // Output in the following order: lines words bytes filename
-            StringBuilder stringBuilder = new StringBuilder();
-            if (isLines) {
-                stringBuilder.append(String.format(NUMBER_FORMAT, count[0]));
-            }
-            if (isWords) {
-                stringBuilder.append(String.format(NUMBER_FORMAT, count[1]));
-            }
-            if (isBytes) {
-                stringBuilder.append(String.format(NUMBER_FORMAT, count[2]));
-            }
-            stringBuilder.append(String.format(" %s", file));
-            result.add(stringBuilder.toString());
         }
-
-        // Print cumulative counts for all the files
         if (fileName.length > 1) {
-            StringBuilder stringBuilder = new StringBuilder();
-            if (isLines) {
-                stringBuilder.append(String.format(NUMBER_FORMAT, totalLines));
-            }
-            if (isWords) {
-                stringBuilder.append(String.format(NUMBER_FORMAT, totalWords));
-            }
-            if (isBytes) {
-                stringBuilder.append(String.format(NUMBER_FORMAT, totalBytes));
-            }
-            stringBuilder.append(" total");
-            result.add(stringBuilder.toString());
+            output.add(String.format("%s total", formatCount(isLines, isWords, isBytes, totals)));
         }
-        return String.join(STRING_NEWLINE, result);
+        if (!errorList.isEmpty()) {
+            output.addAll(errorList);
+        }
+        return String.join(STRING_NEWLINE, output);
     }
 
     /**
-     * Returns string containing the number of lines, words, and bytes in standard input
+     * Returns string containing the number of lines, words, and bytes in standard input.
      *
      * @param isBytes Boolean option to count the number of Bytes
      * @param isLines Boolean option to count the number of lines
      * @param isWords Boolean option to count the number of words
      * @param stdin   InputStream containing arguments from Stdin
-     * @return String of the results
+     * @return A formatted string representing the counts
      * @throws WcException
      */
     @Override
@@ -188,102 +167,46 @@ public class WcApplication implements WcInterface {
         if (stdin == null) {
             throw new WcException(ERR_NULL_STREAMS);
         }
-        long[] count = getCountReport(stdin); // lines words bytes;
 
-        StringBuilder stringBuilder = new StringBuilder();
-        if (isLines) {
-            stringBuilder.append(String.format(NUMBER_FORMAT, count[0]));
-        }
-        if (isWords) {
-            stringBuilder.append(String.format(NUMBER_FORMAT, count[1]));
-        }
-        if (isBytes) {
-            stringBuilder.append(String.format(NUMBER_FORMAT, count[2]));
-        }
-
-        return stringBuilder.toString();
-    }
-
-    @Override
-    public String countFromFileAndStdin(Boolean isBytes, Boolean isLines, Boolean isWords,
-                                        InputStream stdin, String... fileName) throws WcException {
-        try {
-            List<String> result = new ArrayList<>();
-
-            for (String file : fileName) {
-                if (("-").equals(file)) {
-                    result.add(countFromStdin(isBytes, isLines, isWords, stdin) + " -");
-                } else {
-                    result.add(countFromFiles(isBytes, isLines, isWords, file));
-                }
-            }
-            if (fileName.length > 1) {
-                StringBuilder stringBuilder = new StringBuilder();
-                if (isLines) {
-                    stringBuilder.append(String.format(NUMBER_FORMAT, totalLines));
-                }
-                if (isWords) {
-                    stringBuilder.append(String.format(NUMBER_FORMAT, totalWords));
-                }
-                if (isBytes) {
-                    stringBuilder.append(String.format(NUMBER_FORMAT, totalBytes));
-                }
-                stringBuilder.append(" total");
-                result.add(stringBuilder.toString());
-            }
-
-            return String.join(STRING_NEWLINE, result);
-        } catch (WcException e) {
-            throw new WcException(e.getMessage(), e);
-        }
+        long[] count = getCountReport(stdin);
+        addToTotal(count);
+        return formatCount(isLines, isWords, isBytes, count);
     }
 
     /**
-     * Returns array containing the number of lines, words, and bytes based on data in InputStream.
+     * Returns string containing the number of lines, words, and bytes in files and standard input.
      *
-     * @param input An InputStream
+     * @param isBytes  Boolean option to count the number of Bytes
+     * @param isLines  Boolean option to count the number of lines
+     * @param isWords  Boolean option to count the number of words
+     * @param stdin    InputStream containing arguments from Stdin
+     * @param fileName Array of String of file names (including "-" for reading from stdin)
+     * @return A formatted string representing the counts
      * @throws WcException
      */
-    public long[] getCountReport(InputStream input) throws WcException {
-        if (input == null) {
-            throw new WcException(ERR_NULL_STREAMS);
-        }
-        long[] result = new long[3]; // lines, words, bytes
-
-        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-        byte[] data = new byte[1024];
-        int inRead = 0;
-        boolean inWord = false;
-        try {
-            while ((inRead = input.read(data, 0, data.length)) != -1) {
-                for (int i = 0; i < inRead; ++i) {
-                    if (Character.isWhitespace(data[i])) {
-                        // Use <newline> character here. (Ref: UNIX)
-                        if (data[i] == '\n') {
-                            ++result[LINES_INDEX];
-                        }
-                        if (inWord) {
-                            ++result[WORDS_INDEX];
-                        }
-
-                        inWord = false;
-                    } else {
-                        inWord = true;
-                    }
-                }
-                result[BYTES_INDEX] += inRead;
-                buffer.write(data, 0, inRead);
+    @Override
+    public String countFromFileAndStdin(Boolean isBytes, Boolean isLines, Boolean isWords,
+                                        InputStream stdin, String... fileName) throws WcException {
+        List<String> output = new ArrayList<>();
+        for (String file : fileName) {
+            if (("-").equals(file)) {
+                output.add(countFromStdin(isBytes, isLines, isWords, stdin) + " -");
+            } else {
+                output.add(countFromFiles(isBytes, isLines, isWords, file));
             }
-            buffer.flush();
-            if (inWord) {
-                ++result[WORDS_INDEX]; // To handle last word
-            }
-        } catch (IOException e) {
-            throw new WcException(ERR_IO_EXCEPTION, e);
         }
-        totalWords += result[WORDS_INDEX];
-        totalBytes += result[BYTES_INDEX];
-        totalLines += result[LINES_INDEX];
-        return result;
+
+        if (fileName.length > 1) {
+            String totalCount = String.format("%s total", formatCount(isLines, isWords, isBytes, totals));
+            output.add(totalCount);
+        }
+
+        return String.join(STRING_NEWLINE, output);
+    }
+
+    public void addToTotal(long... count) {
+        totals[LINES_INDEX] += count[LINES_INDEX];
+        totals[WORDS_INDEX] += count[WORDS_INDEX];
+        totals[BYTES_INDEX] += count[BYTES_INDEX];
     }
 }
