@@ -78,7 +78,7 @@ public class MvApplicationIT {
     void run_DoNotExistSrcFile_ThrowsMvException() {
         String[] args = {"nonExistentFile.txt", subDir};
         MvException result = assertThrowsExactly(MvException.class, () -> app.run(args, null, null));
-        String expected = "mv: cannot find 'nonExistentFile.txt': No such file or directory";
+        String expected = "mv: 'nonExistentFile.txt': No such file or directory";
         assertEquals(expected, result.getMessage());
     }
 
@@ -86,8 +86,8 @@ public class MvApplicationIT {
     void run_MultipleDoNotExistSrcFile_ThrowsMvException() {
         String[] args = {"nonExistentFile1.txt", "nonExistentFile2.txt", subDir};
         MvException result = assertThrowsExactly(MvException.class, () -> app.run(args, null, null));
-        String expected = "mv: cannot find 'nonExistentFile1.txt': No such file or directory" + STRING_NEWLINE +
-                "mv: cannot find 'nonExistentFile2.txt': No such file or directory";
+        String expected = "mv: 'nonExistentFile1.txt': No such file or directory" + STRING_NEWLINE +
+                "mv: 'nonExistentFile2.txt': No such file or directory";
         assertEquals(expected, result.getMessage());
     }
 
@@ -97,7 +97,7 @@ public class MvApplicationIT {
         MvException result = assertThrowsExactly(MvException.class, () -> app.run(args, null, null));
 
         String movedFile = tempDir.resolve("subdirectory/file").toString();
-        String expected = "mv: cannot find 'nonExistentFile.txt': No such file or directory";
+        String expected = "mv: 'nonExistentFile.txt': No such file or directory";
         assertFileExists(movedFile); // file has moved to the new location
         assertFileDoNotExists(file); // file does not exist in the old location
         assertEquals(expected, result.getMessage());

@@ -109,7 +109,7 @@ class CutApplicationTest {
         boolean isSetReadable = fileOnePath.toFile().setReadable(false);
         assertTrue(isSetReadable, "Failed to set read permission to false for test");
         String result = assertDoesNotThrow(() -> app.cutFromFiles(true, false, RANGE_ONE_TO_FIVE, fileOne));
-        String expected = "cut: 'file1.txt': Permission denied";
+        String expected = "cut: 'file1.txt': Could not read file";
         assertEquals(expected, result);
     }
 

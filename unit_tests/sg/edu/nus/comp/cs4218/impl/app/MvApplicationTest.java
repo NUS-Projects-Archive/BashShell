@@ -39,15 +39,15 @@ class MvApplicationTest {
     private MvApplication app;
 
     private String getFileNotFoundMsg(String file) {
-        return String.format("mv: cannot find '%s': No such file or directory", file);
+        return String.format("mv: '%s': No such file or directory", file);
     }
 
     private String getCannotReadPermissionMsg(String file) {
-        return String.format("mv: cannot read '%s': Permission denied", file);
+        return String.format("mv: '%s': Could not read file", file);
     }
 
     private String getCannotWritePermissionMsg(String file) {
-        return String.format("mv: cannot write '%s': Permission denied", file);
+        return String.format("mv: '%s': Permission denied", file);
     }
 
     @BeforeEach
@@ -146,7 +146,7 @@ class MvApplicationTest {
         MvException result = assertThrowsExactly(MvException.class, () ->
                 app.mvFilesToFolder(false, destFile, new String[0])
         );
-        String expected = String.format("mv: cannot move '%s': This is a directory", destFile);
+        String expected = String.format("mv: '%s': Not a directory", destFile);
         assertEquals(expected, result.getMessage());
     }
 
