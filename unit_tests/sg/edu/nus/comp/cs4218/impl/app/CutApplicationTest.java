@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 
 import java.io.ByteArrayInputStream;
@@ -108,10 +107,7 @@ class CutApplicationTest {
     @DisabledOnOs(value = OS.WINDOWS)
     void cutFromFiles_FileNoPermissionToRead_PrintsErrorMessage() {
         boolean isSetReadable = fileOnePath.toFile().setReadable(false);
-        if (!isSetReadable) {
-            fail("Failed to set read permission to false for test");
-        }
-
+        assertTrue(isSetReadable, "Failed to set read permission to false for test");
         String result = assertDoesNotThrow(() -> app.cutFromFiles(true, false, RANGE_ONE_TO_FIVE, fileOne));
         String expected = "cut: 'file1.txt': Permission denied";
         assertEquals(expected, result);

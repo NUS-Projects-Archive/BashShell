@@ -24,7 +24,7 @@ import sg.edu.nus.comp.cs4218.exception.InvalidArgsException;
 class CatArgsParserTest {
 
     private static final Set<Character> VALID_FLAGS = Set.of('n');
-    private static final String NON_FLAG_ARG = "file";
+    private static final String FILE = "file";
     private CatArgsParser parser;
 
     private static Stream<Arguments> validSyntax() {
@@ -96,44 +96,44 @@ class CatArgsParserTest {
 
     @Test
     void isLineNumber_ValidFlagAndNonFlagArg_ReturnsTrue() {
-        assertDoesNotThrow(() -> parser.parse("-n", NON_FLAG_ARG));
+        assertDoesNotThrow(() -> parser.parse("-n", FILE));
         assertTrue(parser.isLineNumber());
     }
 
     @Test
     void isLineNumber_OnlyNonFlagArg_ReturnsFalse() {
-        assertDoesNotThrow(() -> parser.parse(NON_FLAG_ARG));
+        assertDoesNotThrow(() -> parser.parse(FILE));
         assertFalse(parser.isLineNumber());
     }
 
     @Test
-    void getNonFlagArgs_NoArgs_ReturnsEmpty() {
+    void getFiles_NoArgs_ReturnsEmpty() {
         assertDoesNotThrow(() -> parser.parse());
-        List<String> result = parser.getNonFlagArgs();
+        List<String> result = parser.getFiles();
         assertTrue(result.isEmpty());
     }
 
     @Test
-    void getNonFlagArgs_OneNonFlagArg_ReturnsOneArg() {
-        assertDoesNotThrow(() -> parser.parse(NON_FLAG_ARG));
-        List<String> result = parser.getNonFlagArgs();
-        List<String> expected = List.of(NON_FLAG_ARG);
+    void getFiles_OneNonFlagArg_ReturnsOneFile() {
+        assertDoesNotThrow(() -> parser.parse(FILE));
+        List<String> result = parser.getFiles();
+        List<String> expected = List.of(FILE);
         assertEquals(expected, result);
     }
 
     @Test
-    void getNonFlagArgs_MultipleNonFlagArgs_ReturnsMultipleArgs() {
+    void getFiles_MultipleNonFlagArgs_ReturnsMultipleFiles() {
         assertDoesNotThrow(() -> parser.parse("file1.txt", "file2.txt", "file3.txt"));
-        List<String> result = parser.getNonFlagArgs();
+        List<String> result = parser.getFiles();
         List<String> expected = List.of("file1.txt", "file2.txt", "file3.txt");
         assertEquals(expected, result);
     }
 
     @Test
-    void getNonFlagArgs_ValidFlagAndOneNonFlagArg_ReturnsOneArg() {
-        assertDoesNotThrow(() -> parser.parse("-n", NON_FLAG_ARG));
-        List<String> result = parser.getNonFlagArgs();
-        List<String> expected = List.of(NON_FLAG_ARG);
+    void getFiles_ValidFlagAndOneNonFlagArg_ReturnsOneFile() {
+        assertDoesNotThrow(() -> parser.parse("-n", FILE));
+        List<String> result = parser.getFiles();
+        List<String> expected = List.of(FILE);
         assertEquals(expected, result);
     }
 }

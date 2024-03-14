@@ -5,6 +5,7 @@ import static sg.edu.nus.comp.cs4218.exception.SortException.PROB_SORT_STDIN;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_NOT_FOUND;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IO_EXCEPTION;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IS_DIR;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_ISTREAM;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_OSTREAM;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_PERM;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NULL_ARGS;
@@ -24,10 +25,12 @@ import java.util.List;
 import java.util.Locale;
 
 import sg.edu.nus.comp.cs4218.app.SortInterface;
+import sg.edu.nus.comp.cs4218.exception.CutException;
 import sg.edu.nus.comp.cs4218.exception.InvalidArgsException;
 import sg.edu.nus.comp.cs4218.exception.ShellException;
 import sg.edu.nus.comp.cs4218.exception.SortException;
 import sg.edu.nus.comp.cs4218.impl.parser.SortArgsParser;
+import sg.edu.nus.comp.cs4218.impl.util.CollectionsUtils;
 import sg.edu.nus.comp.cs4218.impl.util.IOUtils;
 
 /**
@@ -52,34 +55,34 @@ public class SortApplication implements SortInterface {
      */
     @Override
     public void run(String[] args, InputStream stdin, OutputStream stdout) throws SortException {
+        if (stdin == null) {
+            throw new SortException(ERR_NO_ISTREAM);
+        }
         if (stdout == null) {
             throw new SortException(ERR_NO_OSTREAM);
         }
-        SortArgsParser sortArgsParser = new SortArgsParser();
+
+        // Parse argument(s) provided
+        final SortArgsParser parser = new SortArgsParser();
         try {
-            sortArgsParser.parse(args);
+            parser.parse(args);
         } catch (InvalidArgsException e) {
             throw new SortException(e.getMessage(), e);
         }
-        StringBuilder output = new StringBuilder();
-        if (sortArgsParser.getFileNames().isEmpty()) {
-            output.append(
-                    sortFromStdin(
-                            sortArgsParser.isFirstWordNumber(),
-                            sortArgsParser.isReverseOrder(),
-                            sortArgsParser.isCaseIndependent(),
-                            stdin));
+        final StringBuilder output = new StringBuilder();
+        final Boolean isFirstWordNumber = parser.isFirstWordNumber();
+        final Boolean isReverseOrder = parser.isReverseOrder();
+        final Boolean isCaseIndependent = parser.isCaseIndependent();
+        final String[] files = CollectionsUtils.listToArray(parser.getFileNames());
+
+        if (files.length == 0) {
+            output.append(sortFromStdin(isFirstWordNumber, isReverseOrder, isCaseIndependent, stdin));
         } else {
-            output.append(
-                    sortFromFiles(
-                            sortArgsParser.isFirstWordNumber(),
-                            sortArgsParser.isReverseOrder(),
-                            sortArgsParser.isCaseIndependent(),
-                            sortArgsParser.getFileNames().toArray(new String[0])));
+            output.append(sortFromFiles(isFirstWordNumber, isReverseOrder, isCaseIndependent, files));
         }
 
         try {
-            if (!output.toString().isEmpty()) {
+            if (output.length() != 0) {
                 stdout.write(output.toString().getBytes());
                 stdout.write(STRING_NEWLINE.getBytes());
             }

@@ -3,9 +3,9 @@ package sg.edu.nus.comp.cs4218.impl.app;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_NOT_FOUND;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IO_EXCEPTION;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IS_DIR;
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_MISSING_ARG;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_ARGS;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_PERM;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NULL_ARGS;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -46,9 +46,8 @@ public class MvApplication implements MvInterface {
     @Override
     public void run(String[] args, InputStream stdin, OutputStream stdout) throws MvException {
         if (args == null || args.length == 0) {
-            throw new MvException(ERR_MISSING_ARG);
+            throw new MvException(ERR_NULL_ARGS);
         }
-
         if (args.length < 2) {
             throw new MvException(ERR_NO_ARGS);
         }

@@ -4,7 +4,7 @@ import java.util.List;
 
 /**
  * CatArgsParser is a class to parse the arguments for cat command.
- * 
+ *
  * <p>
  * <b>Command format:</b> cat [OPTIONS] [FILE]
  * </p>
@@ -23,7 +23,7 @@ public class CatArgsParser extends ArgsParser {
 
     /**
      * Checks if the line number flag is present in the parsed flags.
-     * 
+     *
      * @return true if line number flag is present, false otherwise
      */
     public Boolean isLineNumber() {
@@ -31,11 +31,11 @@ public class CatArgsParser extends ArgsParser {
     }
 
     /**
-     * Returns the non-flag arguments.
-     * 
-     * @return List of non-flag arguments
+     * Returns the non-flag arguments (files).
+     *
+     * @return List of non-flag arguments (files)
      */
-    public List<String> getNonFlagArgs() {
+    public List<String> getFiles() {
         return nonFlagArgs;
     }
 }

@@ -66,14 +66,14 @@ public class CutApplicationIT {
     @Test
     void run_NullArgs_ThrowsCutException() {
         CutException result = assertThrowsExactly(CutException.class, () -> app.run(null, null, null));
-        String expected = "cut: Missing Argument";
+        String expected = "cut: Null arguments";
         assertEquals(expected, result.getMessage());
     }
 
     @Test
     void run_EmptyArgs_ThrowsCutException() {
         CutException result = assertThrowsExactly(CutException.class, () -> app.run(new String[0], null, null));
-        String expected = "cut: Missing Argument";
+        String expected = "cut: Null arguments";
         assertEquals(expected, result.getMessage());
     }
 
@@ -97,8 +97,8 @@ public class CutApplicationIT {
     void run_NoStdout_ThrowsCutException() {
         String[] args = {FLAG_CUT_BY_CHAR, RANGE_ONE_TO_FIVE, fileOne};
         CutException result = assertThrowsExactly(CutException.class, () -> {
-            InputStream mockedStdin = mock(InputStream.class);
-            app.run(args, mockedStdin, null);
+            InputStream mockStdin = mock(InputStream.class);
+            app.run(args, mockStdin, null);
         });
         String expected = "cut: OutputStream not provided";
         assertEquals(expected, result.getMessage());
@@ -108,10 +108,10 @@ public class CutApplicationIT {
     void run_FailsToReadFromInputStream_ThrowsCutException() {
         String[] args = {FLAG_CUT_BY_CHAR, RANGE_ONE_TO_FIVE, "-"};
         CutException result = assertThrowsExactly(CutException.class, () -> {
-            InputStream mockedStdin = mock(InputStream.class);
-            doThrow(new IOException()).when(mockedStdin).read(any(byte[].class));
-            OutputStream mockedStdout = mock(OutputStream.class);
-            app.run(args, mockedStdin, mockedStdout);
+            InputStream mockStdin = mock(InputStream.class);
+            doThrow(new IOException()).when(mockStdin).read(any(byte[].class));
+            OutputStream mockStdout = mock(OutputStream.class);
+            app.run(args, mockStdin, mockStdout);
         });
         String expected = "cut: IOException";
         assertEquals(expected, result.getMessage());
@@ -121,10 +121,10 @@ public class CutApplicationIT {
     void run_FailsToWriteToOutputStream_ThrowsCutException() {
         String[] args = {FLAG_CUT_BY_CHAR, RANGE_ONE_TO_FIVE, fileOne};
         CutException result = assertThrowsExactly(CutException.class, () -> {
-            InputStream mockedStdin = mock(InputStream.class);
-            OutputStream mockedStdout = mock(OutputStream.class);
-            doThrow(new IOException()).when(mockedStdout).write(any(byte[].class));
-            app.run(args, mockedStdin, mockedStdout);
+            InputStream mockStdin = mock(InputStream.class);
+            OutputStream mockStdout = mock(OutputStream.class);
+            doThrow(new IOException()).when(mockStdout).write(any(byte[].class));
+            app.run(args, mockStdin, mockStdout);
         });
         String expected = "cut: Could not write to output stream";
         assertEquals(expected, result.getMessage());

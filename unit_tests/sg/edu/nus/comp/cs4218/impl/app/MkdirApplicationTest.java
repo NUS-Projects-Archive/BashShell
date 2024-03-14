@@ -18,11 +18,11 @@ class MkdirApplicationTest {
     private static final String FILE = "file.txt";
     private static final String NON_EXISTING_FILE = "nonExistingFile.txt";
     private static final String FILE_CONTENT = "12345";
-    private MkdirApplication app;
 
     @TempDir
     private Path tempDir;
     private Path filePath;
+    private MkdirApplication app;
 
     @BeforeEach
     void setUp() throws IOException {

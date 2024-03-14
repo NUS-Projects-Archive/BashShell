@@ -2,12 +2,12 @@ package sg.edu.nus.comp.cs4218.impl.app;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 import static org.mockito.Mockito.mock;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -19,8 +19,11 @@ import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
+
+import sg.edu.nus.comp.cs4218.exception.CatException;
 
 @SuppressWarnings("PMD.ClassNamingConventions")
 public class CatApplicationIT {
@@ -31,227 +34,162 @@ public class CatApplicationIT {
     private static final String L1_HEY_L2_JUNIT = "1 Hey" + STRING_NEWLINE + "2 Junit";
     private static final String FROM_STDIN = "From" + STRING_NEWLINE + "Stdin";
     private static final String L1_FROM_L2_STDIN = "1 From" + STRING_NEWLINE + "2 Stdin";
-    private static final String[] PARAM_TEST_VALUES = {"", "hello", HELLO_WORLD};
+    private static final String[] PARAM_TEST_VALUES = {"hello", HELLO_WORLD};
     private CatApplication app;
-    private InputStream inputStreamMock;
-    private OutputStream out;
+    private InputStream mockStdin;
+    private OutputStream stdout;
     private String fileA;
     private String fileB;
-    private String fileC;
 
     private static List<String> getParams() {
         return Arrays.asList(PARAM_TEST_VALUES);
     }
 
     @BeforeEach
-    void setUp() throws IOException {
+    void setUp(@TempDir Path tempDir) throws IOException {
         app = new CatApplication();
-        out = new ByteArrayOutputStream();
-        inputStreamMock = mock(InputStream.class);
+        stdout = new ByteArrayOutputStream();
+        mockStdin = mock(InputStream.class);
 
-        Path testDir = Files.createTempDirectory("testDir");
-        Path pathA = testDir.resolve("A.txt");
-        Path pathB = testDir.resolve("B.txt");
-        Path pathC = testDir.resolve("C.txt");
+        Path pathA = tempDir.resolve("A.txt");
+        Path pathB = tempDir.resolve("B.txt");
 
         fileA = pathA.toString();
         fileB = pathB.toString();
-        fileC = pathC.toString();
 
         Files.write(pathA, List.of(HELLO_WORLD));
         Files.write(pathB, List.of(HEY_JUNIT));
-        Files.write(pathC, List.of(""));
+    }
+
+    @Test
+    void run_NoStdin_ThrowsCatException() {
+        CatException result = assertThrowsExactly(CatException.class, () -> app.run(null, null, null));
+        String expected = "cat: InputStream not provided";
+        assertEquals(expected, result.getMessage());
+    }
+
+    @Test
+    void run_NoStdout_ThrowsCatException() {
+        CatException result = assertThrowsExactly(CatException.class, () -> {
+            InputStream mockStdin = mock(InputStream.class);
+            app.run(null, mockStdin, null);
+        });
+        String expected = "cat: OutputStream not provided";
+        assertEquals(expected, result.getMessage());
     }
 
     @ParameterizedTest
     @MethodSource("getParams")
-    void run_NoArgsNoLineNumber_PrintsStdin(String args) {
-        // Given
-        String[] tokens = new String[0];
-        inputStreamMock = new ByteArrayInputStream(args.getBytes(StandardCharsets.UTF_8));
-        // When
-        assertDoesNotThrow(() -> app.run(tokens, inputStreamMock, out));
-        // Then
-        assertEquals(args + STRING_NEWLINE, out.toString());
+    void run_NoArgsNoLineNumber_WritesStdinToOutput(String params) {
+        String[] args = new String[0];
+        mockStdin = new ByteArrayInputStream(params.getBytes(StandardCharsets.UTF_8));
+        assertDoesNotThrow(() -> app.run(args, mockStdin, stdout));
+        String expected = params + STRING_NEWLINE;
+        assertEquals(expected, stdout.toString());
     }
 
     @Test
-    void run_NoArgsHasLineNumber_PrintsLineNumberedStdin() {
-        // Given
-        String[] tokens = new String[]{"-n"};
-        inputStreamMock = new ByteArrayInputStream(HELLO_WORLD.getBytes(StandardCharsets.UTF_8));
-        // When
-        assertDoesNotThrow(() -> app.run(tokens, inputStreamMock, out));
-        // Then
-        assertEquals(L1_HELLO_L2_WORLD + STRING_NEWLINE, out.toString());
+    void run_NoArgsHasLineNumber_WritesLineNumberedStdinToOutput() {
+        String[] args = new String[]{"-n"};
+        mockStdin = new ByteArrayInputStream(HELLO_WORLD.getBytes(StandardCharsets.UTF_8));
+        assertDoesNotThrow(() -> app.run(args, mockStdin, stdout));
+        String expected = L1_HELLO_L2_WORLD + STRING_NEWLINE;
+        assertEquals(expected, stdout.toString());
     }
 
     @ParameterizedTest
     @MethodSource("getParams")
-    void run_DashOnlyNoLineNumber_PrintsStdin(String args) {
-        // Given
-        String[] tokens = new String[]{"-"};
-        inputStreamMock = new ByteArrayInputStream(args.getBytes(StandardCharsets.UTF_8));
-        // When
-        assertDoesNotThrow(() -> app.run(tokens, inputStreamMock, out));
-        // Then
-        assertEquals(args + STRING_NEWLINE, out.toString());
+    void run_DashOnlyNoLineNumber_WritesStdinToOutput(String params) {
+        String[] args = new String[]{"-"};
+        mockStdin = new ByteArrayInputStream(params.getBytes(StandardCharsets.UTF_8));
+        assertDoesNotThrow(() -> app.run(args, mockStdin, stdout));
+        String expected = params + STRING_NEWLINE;
+        assertEquals(expected, stdout.toString());
     }
 
     @Test
-    void run_DashOnlyHasLineNumber_PrintsLineNumberedStdin() {
-        // Given
-        String[] tokens = new String[]{"-n", "-"};
-        inputStreamMock = new ByteArrayInputStream(HELLO_WORLD.getBytes(StandardCharsets.UTF_8));
-        // When
-        assertDoesNotThrow(() -> app.run(tokens, inputStreamMock, out));
-        // Then
-        assertEquals(L1_HELLO_L2_WORLD + STRING_NEWLINE, out.toString());
+    void run_DashOnlyHasLineNumber_WritesLineNumberedStdinToOutput() {
+        String[] args = new String[]{"-n", "-"};
+        mockStdin = new ByteArrayInputStream(HELLO_WORLD.getBytes(StandardCharsets.UTF_8));
+        assertDoesNotThrow(() -> app.run(args, mockStdin, stdout));
+        String expected = L1_HELLO_L2_WORLD + STRING_NEWLINE;
+        assertEquals(expected, stdout.toString());
     }
 
     @Test
-    void run_FileOnlyNoLineNumber_PrintsConcatenatedFilesContent() {
-        // Given
-        String[] tokens = new String[]{fileA, fileB};
-        // When
-        assertDoesNotThrow(() -> app.run(tokens, inputStreamMock, out));
-        // Then
-        assertEquals(HELLO_WORLD + STRING_NEWLINE + HEY_JUNIT + STRING_NEWLINE, out.toString());
+    void run_FileOnlyNoLineNumber_WritesConcatenatedFilesContentToOutput() {
+        String[] args = new String[]{fileA, fileB};
+        assertDoesNotThrow(() -> app.run(args, mockStdin, stdout));
+        String expected = HELLO_WORLD + STRING_NEWLINE + HEY_JUNIT + STRING_NEWLINE;
+        assertEquals(expected, stdout.toString());
     }
 
     @Test
-    void run_FileOnlyHasLineNumber_PrintsLineNumberedConcatenatedFilesContent() {
-        // Given
-        String[] tokens = new String[]{"-n", fileA, fileB};
-        // When
-        assertDoesNotThrow(() -> app.run(tokens, inputStreamMock, out));
-        // Then
-        assertEquals(L1_HELLO_L2_WORLD + STRING_NEWLINE + L1_HEY_L2_JUNIT + STRING_NEWLINE, out.toString());
+    void run_FileOnlyHasLineNumber_WritesLineNumberedConcatenatedFilesContentToOutput() {
+        String[] args = new String[]{"-n", fileA, fileB};
+        assertDoesNotThrow(() -> app.run(args, mockStdin, stdout));
+        String expected = L1_HELLO_L2_WORLD + STRING_NEWLINE + L1_HEY_L2_JUNIT + STRING_NEWLINE;
+        assertEquals(expected, stdout.toString());
     }
 
     @Test
-    void run_FileAndDashNoLineNumber_PrintsConcatenatedContent() {
-        // Given
-        String[] tokens = new String[]{"-", fileA, fileB};
-        inputStreamMock = new ByteArrayInputStream(FROM_STDIN.getBytes(StandardCharsets.UTF_8));
-        // When
-        assertDoesNotThrow(() -> app.run(tokens, inputStreamMock, out));
-        // Then
-        assertEquals(FROM_STDIN + STRING_NEWLINE + HELLO_WORLD + STRING_NEWLINE + HEY_JUNIT + STRING_NEWLINE, out.toString());
+    void run_FileAndDashNoLineNumber_WritesConcatenatedContentToOutput() {
+        String[] args = new String[]{"-", fileA, fileB};
+        mockStdin = new ByteArrayInputStream(FROM_STDIN.getBytes(StandardCharsets.UTF_8));
+        assertDoesNotThrow(() -> app.run(args, mockStdin, stdout));
+        String expected = FROM_STDIN + STRING_NEWLINE + HELLO_WORLD + STRING_NEWLINE + HEY_JUNIT + STRING_NEWLINE;
+        assertEquals(expected, stdout.toString());
     }
 
     @Test
-    void run_FileAndDashHasLineNumber_PrintsLineNumberedConcatenatedContent() {
-        // Given
-        String[] tokens = new String[]{"-n", "-", fileA, fileB};
-        inputStreamMock = new ByteArrayInputStream(FROM_STDIN.getBytes(StandardCharsets.UTF_8));
-        // When
-        assertDoesNotThrow(() -> app.run(tokens, inputStreamMock, out));
-        // Then
-        assertEquals(L1_FROM_L2_STDIN + STRING_NEWLINE + L1_HELLO_L2_WORLD + STRING_NEWLINE + L1_HEY_L2_JUNIT + STRING_NEWLINE, out.toString());
+    void run_FileAndDashHasLineNumber_WritesLineNumberedConcatenatedContentToOutput() {
+        String[] args = new String[]{"-n", "-", fileA, fileB};
+        mockStdin = new ByteArrayInputStream(FROM_STDIN.getBytes(StandardCharsets.UTF_8));
+        assertDoesNotThrow(() -> app.run(args, mockStdin, stdout));
+        String expected = L1_FROM_L2_STDIN + STRING_NEWLINE + L1_HELLO_L2_WORLD + STRING_NEWLINE + L1_HEY_L2_JUNIT + STRING_NEWLINE;
+        assertEquals(expected, stdout.toString());
+    }
+
+    @ParameterizedTest
+    @MethodSource("getParams")
+    void catFileAndStdin_StdinOnlyNoLineNumber_ReturnsUserInput(String args) {
+        mockStdin = new ByteArrayInputStream(args.getBytes(StandardCharsets.UTF_8));
+        String result = assertDoesNotThrow(() -> app.catFileAndStdin(false, mockStdin, "-"));
+        assertEquals(args, result);
     }
 
     @Test
-    void run_InputRedirOnlyNoLineNum_PrintsInputStream() {
-        // Given
-        String[] tokens = new String[]{"<", fileA};
-        // When
-        assertDoesNotThrow(() -> app.run(tokens, inputStreamMock, out));
-        // Then
-        assertEquals(HELLO_WORLD + STRING_NEWLINE, out.toString());
+    void catFileAndStdin_StdinOnlyHasLineNumber_ReturnsLineNumberedUserInput() {
+        mockStdin = new ByteArrayInputStream(HELLO_WORLD.getBytes(StandardCharsets.UTF_8));
+        String result = assertDoesNotThrow(() -> app.catFileAndStdin(true, mockStdin, "-"));
+        assertEquals(L1_HELLO_L2_WORLD, result);
     }
 
     @Test
-    void run_InputRedirOnlyHasLineNum_PrintsLineNumberedInputStream() {
-        // Given
-        String[] tokens = new String[]{"-n", "<", fileA};
-        // When
-        assertDoesNotThrow(() -> app.run(tokens, inputStreamMock, out));
-        // Then
-        assertEquals(L1_HELLO_L2_WORLD + STRING_NEWLINE, out.toString());
+    void catFileAndStdin_FileOnlyNoLineNumber_ReturnsFileContent() {
+        String result = assertDoesNotThrow(() -> app.catFileAndStdin(false, mockStdin, fileA, fileB));
+        assertEquals(HELLO_WORLD + STRING_NEWLINE + HEY_JUNIT, result);
     }
 
     @Test
-    void run_MultipleInputRedirNoLineNum_PrintsLatestInputStream() {
-        // Given
-        String[] tokens = new String[]{"<", fileA, "<", fileB};
-        // When
-        assertDoesNotThrow(() -> app.run(tokens, inputStreamMock, out));
-        // Then
-        assertEquals(HEY_JUNIT + STRING_NEWLINE, out.toString());
+    void catFileAndStdin_FileOnlyHasLineNumber_ReturnsLineNumberedFileContent() {
+        String result = assertDoesNotThrow(() -> app.catFileAndStdin(true, mockStdin, fileA, fileB));
+        assertEquals(L1_HELLO_L2_WORLD + STRING_NEWLINE + L1_HEY_L2_JUNIT, result);
     }
 
     @Test
-    void run_MultipleInputRedirHasLineNum_PrintsLineNumberedLatestInputStream() {
-        // Given
-        String[] tokens = new String[]{"-n", "<", fileA, "<", fileB};
-        // When
-        assertDoesNotThrow(() -> app.run(tokens, inputStreamMock, out));
-        // Then
-        assertEquals(L1_HEY_L2_JUNIT + STRING_NEWLINE, out.toString());
+    void catFileAndStdin_FileAndStdInNoLineNumber_ReturnsConcatenatedFileAndStdin() {
+        mockStdin = new ByteArrayInputStream(FROM_STDIN.getBytes(StandardCharsets.UTF_8));
+        String result = assertDoesNotThrow(() -> app.catFileAndStdin(false, mockStdin, fileA, "-", fileB));
+        String expected = HELLO_WORLD + STRING_NEWLINE + FROM_STDIN + STRING_NEWLINE + HEY_JUNIT;
+        assertEquals(expected, result);
     }
 
     @Test
-    void run_InputRedirAndFilesOnlyNoLineNum_PrintsConcatenatedFilesOnly() {
-        // Given
-        String[] tokens = new String[]{"<", fileA, fileB};
-        // When
-        assertDoesNotThrow(() -> app.run(tokens, inputStreamMock, out));
-        // Then
-        assertEquals(HEY_JUNIT + STRING_NEWLINE, out.toString());
-    }
-
-    @Test
-    void run_InputRedirAndFilesOnlyHasLineNum_PrintsLineNumberedConcatenatedFilesOnly() {
-        // Given
-        String[] tokens = new String[]{"-n", "<", fileA, fileB};
-        // When
-        assertDoesNotThrow(() -> app.run(tokens, inputStreamMock, out));
-        // Then
-        assertEquals(L1_HEY_L2_JUNIT + STRING_NEWLINE, out.toString());
-    }
-
-    @Test
-    void run_OutputRedirNoLineNumber_WritesContentIntoOutputFile() {
-        // Given
-        String[] tokens = new String[]{fileA, fileB, ">", fileC};
-        // When
-        assertDoesNotThrow(() -> app.run(tokens, inputStreamMock, out));
-        String result = assertDoesNotThrow(() -> app.readFile(false, new File(fileC)));
-        // Then
-        assertEquals(HELLO_WORLD + STRING_NEWLINE + HEY_JUNIT + STRING_NEWLINE, result);
-    }
-
-    @Test
-    void run_OutputRedirHasLineNumber_WritesLineNumberedContentIntoOutputFile() {
-        // Given
-        String[] tokens = new String[]{"-n", fileA, fileB, ">", fileC};
-        // When
-        assertDoesNotThrow(() -> app.run(tokens, inputStreamMock, out));
-        String result = assertDoesNotThrow(() -> app.readFile(false, new File(fileC)));
-        // Then
-        assertEquals(L1_HELLO_L2_WORLD + STRING_NEWLINE + L1_HEY_L2_JUNIT + STRING_NEWLINE, result);
-    }
-
-    @Test
-    void run_MultipleOutputRedirNoLineNumber_WritesContentIntoLatestOutputFile() {
-        // Given
-        String[] tokens = new String[]{fileA, ">", fileB, ">", fileC};
-        // When
-        assertDoesNotThrow(() -> app.run(tokens, inputStreamMock, out));
-        String result = assertDoesNotThrow(() -> app.readFile(false, new File(fileC)));
-        // Then
-        assertEquals(HELLO_WORLD + STRING_NEWLINE, result);
-    }
-
-    @Test
-    void run_MultipleOutputRedirasLineNumber_WritesLineNumberedContentIntoLatestOutputFile() {
-        // Given
-        String[] tokens = new String[]{"-n", fileA, ">", fileB, ">", fileC};
-        // When
-        assertDoesNotThrow(() -> app.run(tokens, inputStreamMock, out));
-        String result = assertDoesNotThrow(() -> app.readFile(false, new File(fileC)));
-        // Then
-        assertEquals(L1_HELLO_L2_WORLD + STRING_NEWLINE, result);
+    void catFileAndStdin_FileAndStdInHasLineNumber_ReturnsLineNumberedConcatenatedFileAndStdin() {
+        mockStdin = new ByteArrayInputStream(FROM_STDIN.getBytes(StandardCharsets.UTF_8));
+        String result = assertDoesNotThrow(() -> app.catFileAndStdin(true, mockStdin, fileA, "-", fileB));
+        String expected = L1_HELLO_L2_WORLD + STRING_NEWLINE + L1_FROM_L2_STDIN + STRING_NEWLINE + L1_HEY_L2_JUNIT;
+        assertEquals(expected, result);
     }
 }
