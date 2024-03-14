@@ -23,6 +23,7 @@ import sg.edu.nus.comp.cs4218.exception.InvalidArgsException;
 import sg.edu.nus.comp.cs4218.exception.ShellException;
 import sg.edu.nus.comp.cs4218.exception.WcException;
 import sg.edu.nus.comp.cs4218.impl.parser.WcArgsParser;
+import sg.edu.nus.comp.cs4218.impl.util.CollectionsUtils;
 import sg.edu.nus.comp.cs4218.impl.util.IOUtils;
 
 /**
@@ -59,32 +60,26 @@ public class WcApplication implements WcInterface {
         if (stdin == null) {
             throw new WcException(ERR_NO_ISTREAM);
         }
-        WcArgsParser wcArgsParser = new WcArgsParser();
+
+        final WcArgsParser parser = new WcArgsParser();
         try {
-            wcArgsParser.parse(args);
+            parser.parse(args);
         } catch (InvalidArgsException e) {
             throw new WcException(e.getMessage(), e);
         }
         String result;
-        try {
-            if (wcArgsParser.isStdinOnly()) {
-                result = countFromStdin(
-                        wcArgsParser.isByteCount(),
-                        wcArgsParser.isLineCount(),
-                        wcArgsParser.isWordCount(),
-                        stdin);
-            } else {
-                result = countFromFileAndStdin(
-                        wcArgsParser.isByteCount(),
-                        wcArgsParser.isLineCount(),
-                        wcArgsParser.isWordCount(),
-                        stdin,
-                        wcArgsParser.getFileNames().toArray(new String[0]));
-            }
-        } catch (Exception e) {
-            // Will never happen
-            throw new WcException(ERR_GENERAL, e);
+        final Boolean isStdinOnly = parser.isStdinOnly();
+        final Boolean isByteCount = parser.isByteCount();
+        final Boolean isLineCount = parser.isLineCount();
+        final Boolean isWordCount = parser.isWordCount();
+        final String[] files = CollectionsUtils.listToArray(parser.getFileNames());
+
+        if (isStdinOnly) {
+            result = countFromStdin(isByteCount, isLineCount, isWordCount, stdin);
+        } else {
+            result = countFromFileAndStdin(isByteCount, isLineCount, isWordCount, stdin, files);
         }
+
         try {
             stdout.write(result.getBytes());
             stdout.write(STRING_NEWLINE.getBytes());
@@ -135,7 +130,9 @@ public class WcApplication implements WcInterface {
                 throw new WcException(e.getMessage(), e);
             } finally {
                 try {
-                    if (input != null) { input.close(); }
+                    if (input != null) {
+                        input.close();
+                    }
                 } catch (IOException e) {
                     throw new WcException(e.getMessage(), e);
                 }
@@ -182,8 +179,8 @@ public class WcApplication implements WcInterface {
      * @param isLines Boolean option to count the number of lines
      * @param isWords Boolean option to count the number of words
      * @param stdin   InputStream containing arguments from Stdin
-     * @throws WcException
      * @return String of the results
+     * @throws WcException
      */
     @Override
     public String countFromStdin(Boolean isBytes, Boolean isLines, Boolean isWords, InputStream stdin)
