@@ -9,6 +9,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Matcher;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -41,7 +42,7 @@ public class TestEnvironmentUtil {
 
     // Adapted from https://stackoverflow.com/questions/28678026/how-can-i-get-all-class-files-in-a-specific-package-in-java
     private static List<Class<?>> getClassesInPackage(String packageName) {
-        String path = packageName.replaceAll("\\.", "\\" + File.separator);
+        String path = packageName.replaceAll("\\.", Matcher.quoteReplacement(File.separator));
         List<Class<?>> classes = new ArrayList<>();
         String[] classPathEntries = System.getProperty("java.class.path")
                 .split(File.pathSeparator);
