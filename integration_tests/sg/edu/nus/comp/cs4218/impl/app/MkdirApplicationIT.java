@@ -3,7 +3,7 @@ package sg.edu.nus.comp.cs4218.impl.app;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static sg.edu.nus.comp.cs4218.impl.util.AssertUtils.assertFileExists;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_EXISTS;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_TOP_LEVEL_MISSING;
 
@@ -82,32 +82,32 @@ public class MkdirApplicationIT {
 
     @Test
     void run_MissingTopLevelAndIsCreateParent_CreateFolderSuccessfully() {
-        Path missTopLevelPath = tempDir.resolve("missingTopLevel/" + FILE);
-        String[] args = {"-p", missTopLevelPath.toString()};
+        String missTopLevelFile = tempDir.resolve("missingTopLevel/" + FILE).toString();
+        String[] args = {"-p", missTopLevelFile};
         assertDoesNotThrow(() -> app.run(args, null, null));
-        assertTrue(Files.exists(missTopLevelPath));
+        assertFileExists(missTopLevelFile);
     }
 
     @Test
     void run_RootDirectoryAndIsCreateParent_CreateFolderSuccessfully() {
         String[] args = {"-p", "/"};
         assertDoesNotThrow(() -> app.run(args, null, null));
-        Path rootPath = new File("/").toPath();
-        assertTrue(Files.exists(rootPath));
+        String rootFile = new File("/").toString();
+        assertFileExists(rootFile);
     }
 
     @Test
     void run_FolderExistsAndIsCreateParent_CreateFolderSuccessfully() {
         String[] args = {"-p", file};
         assertDoesNotThrow(() -> app.run(args, null, null));
-        assertTrue(Files.exists(filePath));
+        assertFileExists(file);
     }
 
     @Test
     void run_FolderDoNotExists_CreateFolderSuccessfully() {
-        Path nonExistFilePath = tempDir.resolve("nonExistentFile.txt");
-        String[] args = {nonExistFilePath.toString()};
+        String nonExistFile = tempDir.resolve("nonExistentFile.txt").toString();
+        String[] args = {nonExistFile};
         assertDoesNotThrow(() -> app.run(args, null, null));
-        assertTrue(Files.exists(nonExistFilePath));
+        assertFileExists(nonExistFile);
     }
 }

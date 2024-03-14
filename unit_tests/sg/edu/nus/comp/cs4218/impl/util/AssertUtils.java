@@ -1,6 +1,7 @@
 package sg.edu.nus.comp.cs4218.impl.util;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -16,6 +17,42 @@ public final class AssertUtils {
      * Private constructor to prevent instantiation.
      */
     private AssertUtils() { /* Does nothing */ }
+
+    /**
+     * Assert that file exists.
+     *
+     * @param actual {@code String} of path to file
+     */
+    public static void assertFileExists(String actual) {
+        assertFileExists(Paths.get(actual));
+    }
+
+    /**
+     * Assert that file exists.
+     *
+     * @param actual {@code Path} to file
+     */
+    public static void assertFileExists(Path actual) {
+        assertTrue(Files.exists(actual));
+    }
+
+    /**
+     * Assert that file does not exist.
+     *
+     * @param actual {@code String} of path to file
+     */
+    public static void assertFileDoNotExists(String actual) {
+        assertFileDoNotExists(Paths.get(actual));
+    }
+
+    /**
+     * Assert that file exists.
+     *
+     * @param actual {@code Path} to file
+     */
+    public static void assertFileDoNotExists(Path actual) {
+        assertFalse(Files.exists(actual));
+    }
 
     /**
      * Assert that the 2 files contain the same thing.
