@@ -39,7 +39,7 @@ public class WcApplication implements WcInterface {
     private static final int LINES_INDEX = 0;
     private static final int WORDS_INDEX = 1;
     private static final int BYTES_INDEX = 2;
-    private final long[] totals = {0, 0, 0};
+    private final long[] totals = {0, 0, 0}; // represents totalLines, totalWords, totalBytes
 
     /**
      * Runs the wc application with the specified arguments.

@@ -90,7 +90,7 @@ public class CatApplication implements CatInterface {
      * @param isLineNumber Prefix lines with their corresponding line number starting from 1
      * @param fileName     Array of String of file names (not including "-" for reading from stdin)
      * @return A string containing the concatenated content of the specified file(s),
-     * optionally prefixed with line numbers
+     *         optionally prefixed with line numbers
      * @throws CatException If any specified file do not exist, is a directory or is unreadable
      */
     @Override
@@ -175,7 +175,7 @@ public class CatApplication implements CatInterface {
      * @param stdin        InputStream containing arguments from Stdin
      * @param fileName     Array of String of file names (including "-" for reading from stdin)
      * @return A string containing the concatenated content of the specified file(s) and stdin(s),
-     * optionally prefixed with line numbers
+     *         optionally prefixed with line numbers
      * @throws CatException
      */
     @Override
@@ -199,7 +199,7 @@ public class CatApplication implements CatInterface {
      * @param isLineNumber Prefix lines with their corresponding line number starting from 1
      * @param inputStream  InputStream to read lines from
      * @return A {@link List} of strings where each line is optionally prefixed with
-     * its line number (if {@code isLineNumber} is {@code true})
+     *         its line number (if {@code isLineNumber} is {@code true})
      * @throws IOException
      */
     private List<String> prefixLineNumber(Boolean isLineNumber, InputStream inputStream) throws IOException {

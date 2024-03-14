@@ -15,6 +15,7 @@ public final class WcApplicationHelper {
     private static final int LINES_INDEX = 0;
     private static final int WORDS_INDEX = 1;
     private static final int BYTES_INDEX = 2;
+    private static final int EOF = -1;
 
     private WcApplicationHelper() { /* Does nothing*/ }
 
@@ -35,7 +36,7 @@ public final class WcApplicationHelper {
         int inRead = 0;
         boolean inWord = false;
         try {
-            while ((inRead = input.read(data, 0, data.length)) != -1) {
+            while ((inRead = input.read(data, 0, data.length)) != EOF) {
                 for (int i = 0; i < inRead; ++i) {
                     if (Character.isWhitespace(data[i])) {
                         // Use <newline> character here. (Ref: UNIX)
