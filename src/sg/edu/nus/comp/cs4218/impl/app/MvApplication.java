@@ -3,9 +3,9 @@ package sg.edu.nus.comp.cs4218.impl.app;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_NOT_FOUND;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IO_EXCEPTION;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IS_DIR;
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_MISSING_ARG;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_ARGS;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_PERM;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NULL_ARGS;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -20,6 +20,7 @@ import sg.edu.nus.comp.cs4218.app.MvInterface;
 import sg.edu.nus.comp.cs4218.exception.InvalidArgsException;
 import sg.edu.nus.comp.cs4218.exception.MvException;
 import sg.edu.nus.comp.cs4218.impl.parser.MvArgsParser;
+import sg.edu.nus.comp.cs4218.impl.util.CollectionsUtils;
 import sg.edu.nus.comp.cs4218.impl.util.IOUtils;
 
 /**
@@ -46,9 +47,8 @@ public class MvApplication implements MvInterface {
     @Override
     public void run(String[] args, InputStream stdin, OutputStream stdout) throws MvException {
         if (args == null || args.length == 0) {
-            throw new MvException(ERR_MISSING_ARG);
+            throw new MvException(ERR_NULL_ARGS);
         }
-
         if (args.length < 2) {
             throw new MvException(ERR_NO_ARGS);
         }
@@ -62,7 +62,7 @@ public class MvApplication implements MvInterface {
         }
 
         final Boolean isOverwrite = parser.isOverwrite();
-        final String[] srcDirectories = parser.getSourceDirectories().toArray(new String[parser.getSourceDirectories().size()]);
+        final String[] srcDirectories = CollectionsUtils.listToArray(parser.getSourceDirectories());
         final String destDirectory = parser.getDestinationDirectory();
 
         if (srcDirectories.length > 1) {
@@ -91,11 +91,11 @@ public class MvApplication implements MvInterface {
         }
 
         if (!Files.isReadable(srcPath)) {
-            throw new MvException(String.format("cannot open '%s': %s", srcFile, ERR_NO_PERM));
+            throw new MvException(String.format("cannot read '%s': %s", srcFile, ERR_NO_PERM));
         }
 
         if (Files.exists(destPath) && !Files.isWritable(destPath)) {
-            throw new MvException(String.format("cannot create regular file '%s': %s", destPath, ERR_NO_PERM));
+            throw new MvException(String.format("cannot write '%s': %s", destPath, ERR_NO_PERM));
         }
 
         // Append file name to destination directory if destination is a directory
@@ -137,7 +137,7 @@ public class MvApplication implements MvInterface {
         }
 
         if (!Files.isWritable(destFolderPath)) {
-            throw new MvException(String.format("cannot create regular file '%s': %s", destFolder, ERR_NO_PERM));
+            throw new MvException(String.format("cannot write '%s': %s", destFolder, ERR_NO_PERM));
         }
 
         List<MvException> errorList = new ArrayList<>();
@@ -151,7 +151,7 @@ public class MvApplication implements MvInterface {
                 }
 
                 if (!Files.isReadable(srcPath)) {
-                    throw new MvException(String.format("cannot open '%s': %s", srcFile, ERR_NO_PERM));
+                    throw new MvException(String.format("cannot read '%s': %s", srcFile, ERR_NO_PERM));
                 }
 
                 try {
@@ -172,9 +172,5 @@ public class MvApplication implements MvInterface {
         }
 
         return null;
-    }
-
-    private String formatMvErrorMessage(String cause, String error, String file) {
-        return String.format("%s'%s': %s", cause, file, error);
     }
 }

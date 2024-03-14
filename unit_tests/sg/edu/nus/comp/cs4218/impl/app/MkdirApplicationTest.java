@@ -3,6 +3,7 @@ package sg.edu.nus.comp.cs4218.impl.app;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static sg.edu.nus.comp.cs4218.impl.util.AssertUtils.assertFileExists;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -18,11 +19,12 @@ class MkdirApplicationTest {
     private static final String FILE = "file.txt";
     private static final String NON_EXISTING_FILE = "nonExistingFile.txt";
     private static final String FILE_CONTENT = "12345";
-    private MkdirApplication app;
 
     @TempDir
     private Path tempDir;
     private Path filePath;
+    private String file;
+    private MkdirApplication app;
 
     @BeforeEach
     void setUp() throws IOException {
@@ -30,6 +32,7 @@ class MkdirApplicationTest {
 
         // Create temporary file, automatically deletes after test execution
         filePath = tempDir.resolve(FILE);
+        file = filePath.toString();
         Files.createFile(filePath);
         Files.write(filePath, FILE_CONTENT.getBytes());
     }
@@ -37,7 +40,7 @@ class MkdirApplicationTest {
     @Test
     void createFolder_FolderExists_NoActionTaken() {
         // Given
-        assertTrue(filePath.toFile().exists());
+        assertFileExists(file);
         List<String> expectedContent = assertDoesNotThrow(() -> Files.readAllLines(filePath));
 
         // When
@@ -45,23 +48,21 @@ class MkdirApplicationTest {
         List<String> actualContent = assertDoesNotThrow(() -> Files.readAllLines(filePath));
 
         // Then
-        assertTrue(filePath.toFile().exists());
+        assertFileExists(file);
         assertEquals(expectedContent, actualContent);
     }
 
     @Test
     void createFolder_FolderDoNotExists_CreateFolderSuccessfully() {
-        Path nonExistFilePath = tempDir.resolve(NON_EXISTING_FILE);
-        String nonExistFile = nonExistFilePath.toFile().toString();
+        String nonExistFile = tempDir.resolve(NON_EXISTING_FILE).toString();
         assertDoesNotThrow(() -> app.createFolder(nonExistFile));
-        assertTrue(Files.exists(nonExistFilePath));
+        assertFileExists(nonExistFile);
     }
 
     @Test
     void createFolder_FolderAndTopLevelDoNotExist_CreateFolderSuccessfully() {
-        Path nonExistFilePath = tempDir.resolve("missingTopLevel/" + NON_EXISTING_FILE);
-        String nonExistFile = nonExistFilePath.toFile().toString();
+        String nonExistFile = tempDir.resolve("missingTopLevel/" + NON_EXISTING_FILE).toString();
         assertDoesNotThrow(() -> app.createFolder(nonExistFile));
-        assertTrue(Files.exists(nonExistFilePath));
+        assertFileExists(nonExistFile);
     }
 }

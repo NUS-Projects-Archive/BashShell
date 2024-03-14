@@ -4,15 +4,22 @@ import static com.github.stefanbirkner.systemlambda.SystemLambda.catchSystemExit
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class ExitApplicationTest {
 
+    private ExitApplication app;
+
+    @BeforeEach
+    public void setUp() {
+        app = new ExitApplication();
+    }
+
     @Test
-    void run_NoArgs_ExitCodeZero() {
-        ExitApplication exitApp = new ExitApplication(); // Given
+    void terminateExecution_NoArgs_ExitWithCodeZero() {
         int exitCode = assertDoesNotThrow(() ->
-                catchSystemExit(() -> exitApp.run(null, null, null)) // When
+                catchSystemExit(() -> app.terminateExecution())
         );
         assertEquals(0, exitCode);
     }

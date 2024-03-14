@@ -125,4 +125,15 @@ public final class StringUtils {
         String result = str.substring(0, str.length() - sequence.length());
         return str.endsWith(sequence) ? removeTrailing(result, sequence) : str;
     }
+
+
+    /**
+     * Joins an array of strings into a single string with each element separated by a newline character.
+     *
+     * @param strings the strings to be joined
+     * @return a string containing all the input strings joined by newline characters
+     */
+    public static String joinStringsByNewline(String... strings) {
+        return String.join(STRING_NEWLINE, strings);
+    }
 }
