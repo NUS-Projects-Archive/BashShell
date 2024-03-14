@@ -204,7 +204,7 @@ public class WcApplication implements WcInterface {
         return String.join(STRING_NEWLINE, output);
     }
 
-    public void addToTotal(long... count) {
+    private void addToTotal(long... count) {
         totals[LINES_INDEX] += count[LINES_INDEX];
         totals[WORDS_INDEX] += count[WORDS_INDEX];
         totals[BYTES_INDEX] += count[BYTES_INDEX];
