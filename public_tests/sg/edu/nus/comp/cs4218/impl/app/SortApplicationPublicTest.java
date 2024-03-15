@@ -64,7 +64,7 @@ class SortApplicationPublicTest {
     @Test
     void sortFromStdin_NoFlags_ReturnsSortedList() throws Exception {
         InputStream stdin = generateInputStreamFromStrings("a", "c", "b");
-        String expected = joinStringsByLineSeparator("a", "b", "c") + STRING_NEWLINE;
+        String expected = joinStringsByLineSeparator("a", "b", "c");
         String actual = sortApplication.sortFromStdin(false, false, false, stdin);
         assertEquals(expected, actual);
     }
@@ -72,7 +72,7 @@ class SortApplicationPublicTest {
     @Test
     void sortFromStdin_IsFirstWordNumber_ReturnsSortedList() throws Exception {
         InputStream stdin = generateInputStreamFromStrings("10 b", "5 c", "1 a");
-        String expected = joinStringsByLineSeparator("1 a", "5 c", "10 b") + STRING_NEWLINE;
+        String expected = joinStringsByLineSeparator("1 a", "5 c", "10 b");
         String actual = sortApplication.sortFromStdin(true, false, false, stdin);
         assertEquals(expected, actual);
     }
@@ -80,7 +80,7 @@ class SortApplicationPublicTest {
     @Test
     void sortFromStdin_ReverseOrder_ReverseSortedList() throws Exception {
         InputStream stdin = generateInputStreamFromStrings("a", "c", "b");
-        String expected = joinStringsByLineSeparator("c", "b", "a") + STRING_NEWLINE;
+        String expected = joinStringsByLineSeparator("c", "b", "a");
         String actual = sortApplication.sortFromStdin(false, true, false, stdin);
         assertEquals(expected, actual);
     }
@@ -88,7 +88,7 @@ class SortApplicationPublicTest {
     @Test
     void sortFromStdin_CaseIndependent_CaseIndependentSortedList() throws Exception {
         InputStream stdin = generateInputStreamFromStrings("A", "C", "b");
-        String expected = joinStringsByLineSeparator("A", "b", "C") + STRING_NEWLINE;
+        String expected = joinStringsByLineSeparator("A", "b", "C");
         String actual = sortApplication.sortFromStdin(false, false, true, stdin);
         assertEquals(expected, actual);
     }
@@ -98,7 +98,7 @@ class SortApplicationPublicTest {
     @Test
     void sortFromFiles_NoFlags_ReturnsSortedList() throws Exception {
         createFile(joinStringsByLineSeparator("a", "c", "b"));
-        String expected = joinStringsByLineSeparator("a", "b", "c") + STRING_NEWLINE;
+        String expected = joinStringsByLineSeparator("a", "b", "c");
         String actual = sortApplication.sortFromFiles(false, false,
                 false, TEST_FILE);
         assertEquals(expected, actual);
@@ -107,7 +107,7 @@ class SortApplicationPublicTest {
     @Test
     void sortFromFiles_IsFirstWordNumber_ReturnsSortedList() throws Exception {
         createFile(joinStringsByLineSeparator("10 b", "5 c", "1 a"));
-        String expected = joinStringsByLineSeparator("1 a", "5 c", "10 b") + STRING_NEWLINE;
+        String expected = joinStringsByLineSeparator("1 a", "5 c", "10 b");
         String actual = sortApplication.sortFromFiles(true, false,
                 false, TEST_FILE);
         assertEquals(expected, actual);
@@ -116,7 +116,7 @@ class SortApplicationPublicTest {
     @Test
     void sortFromFiles_ReverseOrder_ReverseSortedList() throws Exception {
         createFile(joinStringsByLineSeparator("a", "c", "b"));
-        String expected = joinStringsByLineSeparator("c", "b", "a") + STRING_NEWLINE;
+        String expected = joinStringsByLineSeparator("c", "b", "a");
         String actual = sortApplication.sortFromFiles(false, true,
                 false, TEST_FILE);
         assertEquals(expected, actual);
@@ -125,7 +125,7 @@ class SortApplicationPublicTest {
     @Test
     void sortFromFiles_CaseIndependent_CaseIndependentSortedList() throws Exception {
         createFile(joinStringsByLineSeparator("A", "C", "b"));
-        String expected = joinStringsByLineSeparator("A", "b", "C") + STRING_NEWLINE;
+        String expected = joinStringsByLineSeparator("A", "b", "C");
         String actual = sortApplication.sortFromFiles(false, false,
                 true, TEST_FILE);
         assertEquals(expected, actual);

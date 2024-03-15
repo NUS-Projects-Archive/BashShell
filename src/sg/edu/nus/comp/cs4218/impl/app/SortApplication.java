@@ -1,5 +1,6 @@
 package sg.edu.nus.comp.cs4218.impl.app;
 
+import static sg.edu.nus.comp.cs4218.impl.util.CollectionsUtils.listToArray;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_NOT_FOUND;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IO_EXCEPTION;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IS_DIR;
@@ -27,7 +28,6 @@ import sg.edu.nus.comp.cs4218.exception.InvalidArgsException;
 import sg.edu.nus.comp.cs4218.exception.ShellException;
 import sg.edu.nus.comp.cs4218.exception.SortException;
 import sg.edu.nus.comp.cs4218.impl.parser.SortArgsParser;
-import sg.edu.nus.comp.cs4218.impl.util.CollectionsUtils;
 import sg.edu.nus.comp.cs4218.impl.util.IOUtils;
 
 /**
@@ -70,7 +70,7 @@ public class SortApplication implements SortInterface {
         final Boolean isFirstWordNumber = parser.isFirstWordNumber();
         final Boolean isReverseOrder = parser.isReverseOrder();
         final Boolean isCaseIndependent = parser.isCaseIndependent();
-        final String[] files = CollectionsUtils.listToArray(parser.getFileNames());
+        final String[] files = listToArray(parser.getFileNames());
 
         if (files.length == 0) {
             output.append(sortFromStdin(isFirstWordNumber, isReverseOrder, isCaseIndependent, stdin));
@@ -79,10 +79,8 @@ public class SortApplication implements SortInterface {
         }
 
         try {
-            if (output.length() != 0) {
-                stdout.write(output.toString().getBytes());
-                stdout.write(STRING_NEWLINE.getBytes());
-            }
+            stdout.write(output.toString().getBytes());
+            stdout.write(STRING_NEWLINE.getBytes());
         } catch (IOException e) {
             throw new SortException(ERR_WRITE_STREAM, e);
         }
