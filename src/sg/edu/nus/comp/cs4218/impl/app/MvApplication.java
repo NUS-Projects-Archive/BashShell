@@ -66,10 +66,12 @@ public class MvApplication implements MvInterface {
         final String[] srcDirectories = CollectionsUtils.listToArray(parser.getSourceDirectories());
         final String destDirectory = parser.getDestinationDirectory();
 
-        if (srcDirectories.length > 1) {
-            mvFilesToFolder(isOverwrite, destDirectory, srcDirectories);
-        } else {
+        if (srcDirectories.length == 0) {
+            throw new MvException(ERR_NO_ARGS);
+        } else if (srcDirectories.length == 1) {
             mvSrcFileToDestFile(isOverwrite, srcDirectories[0], destDirectory);
+        } else {
+            mvFilesToFolder(isOverwrite, destDirectory, srcDirectories);
         }
     }
 
@@ -93,6 +95,10 @@ public class MvApplication implements MvInterface {
 
         if (!Files.isReadable(srcPath)) {
             throw new MvException(formatFileExceptionMsg(srcFile, ERR_READING_FILE));
+        }
+
+        if (!Files.isWritable(srcPath)) {
+            throw new MvException(formatFileExceptionMsg(srcFile, ERR_NO_PERM));
         }
 
         if (Files.exists(destPath) && !Files.isWritable(destPath)) {
