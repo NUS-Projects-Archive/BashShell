@@ -1,25 +1,25 @@
 package sg.edu.nus.comp.cs4218.impl.app;
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
-import sg.edu.nus.comp.cs4218.exception.GrepException;
-import sg.edu.nus.comp.cs4218.testutils.TestEnvironmentUtil;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static sg.edu.nus.comp.cs4218.testutils.TestStringUtils.STRING_NEWLINE;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static sg.edu.nus.comp.cs4218.testutils.TestStringUtils.STRING_NEWLINE;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
+import sg.edu.nus.comp.cs4218.exception.GrepException;
+import sg.edu.nus.comp.cs4218.testutils.TestEnvironmentUtil;
 
 public class GrepApplicationPublicTest {
     private final static String LABEL_STDIN = "(standard input)";
@@ -42,6 +42,7 @@ public class GrepApplicationPublicTest {
     @BeforeEach
     void setUp() throws IOException, NoSuchFieldException, IllegalAccessException, NoClassDefFoundError,
             NoSuchMethodException, InvocationTargetException, InstantiationException {
+        TestEnvironmentUtil.setCurrentDirectory(System.getProperty("user.dir"));
         grepApplication = new GrepApplication();
         TEMP_PATH = Paths.get(TestEnvironmentUtil.getCurrentDirectory(), TEMP);
         TEST_FILE_PATH = TEMP_PATH.resolve(TEST_FILE);
@@ -65,7 +66,7 @@ public class GrepApplicationPublicTest {
         InputStream stdin = new ByteArrayInputStream(BYTES_SINGLE_LINE);
 
         assertThrows(GrepException.class,
-                     () -> grepApplication.grepFromStdin("", false, false, false, stdin));
+                () -> grepApplication.grepFromStdin("", false, false, false, stdin));
     }
 
     @Test
@@ -84,7 +85,7 @@ public class GrepApplicationPublicTest {
         InputStream stdin = new ByteArrayInputStream(BYTES_MULTI_LINE);
 
         assertThrows(GrepException.class,
-                     () -> grepApplication.grepFromStdin(PATTERN_INVALID, false, true, false, stdin));
+                () -> grepApplication.grepFromStdin(PATTERN_INVALID, false, true, false, stdin));
     }
 
     @Test
@@ -124,7 +125,7 @@ public class GrepApplicationPublicTest {
         Files.write(createFile(), BYTES_SINGLE_LINE);
 
         assertThrows(GrepException.class,
-                     () -> grepApplication.grepFromFiles("", false, false, false, fileNames));
+                () -> grepApplication.grepFromFiles("", false, false, false, fileNames));
     }
 
     @Test
@@ -156,7 +157,7 @@ public class GrepApplicationPublicTest {
         Files.write(createFile(), BYTES_MULTI_LINE);
 
         assertThrows(GrepException.class,
-                     () -> grepApplication.grepFromFileAndStdin("", false, false, false, stdin, fileNames));
+                () -> grepApplication.grepFromFileAndStdin("", false, false, false, stdin, fileNames));
     }
 
 }

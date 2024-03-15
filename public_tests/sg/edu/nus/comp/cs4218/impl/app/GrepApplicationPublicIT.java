@@ -1,8 +1,8 @@
 package sg.edu.nus.comp.cs4218.impl.app;
 
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static sg.edu.nus.comp.cs4218.testutils.TestStringUtils.STRING_NEWLINE;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -15,9 +15,9 @@ import java.util.ArrayList;
 import java.util.Deque;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static sg.edu.nus.comp.cs4218.testutils.TestStringUtils.STRING_NEWLINE;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import sg.edu.nus.comp.cs4218.exception.GrepException;
 import sg.edu.nus.comp.cs4218.testutils.TestEnvironmentUtil;
@@ -34,6 +34,7 @@ public class GrepApplicationPublicIT {
 
     @BeforeAll
     static void createTemp() throws IOException, NoSuchFieldException, IllegalAccessException {
+        TestEnvironmentUtil.setCurrentDirectory(System.getProperty("user.dir"));
         TEMP_PATH = Paths.get(TestEnvironmentUtil.getCurrentDirectory(), TEMP);
         Files.createDirectory(TEMP_PATH);
     }
