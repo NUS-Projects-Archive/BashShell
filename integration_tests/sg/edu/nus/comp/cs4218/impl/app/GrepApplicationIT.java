@@ -11,8 +11,8 @@ import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_INVALID_REGEX;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_INPUT;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_PERM;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_SYNTAX;
-import static sg.edu.nus.comp.cs4218.impl.util.FileUtils.createNewFileInDir;
-import static sg.edu.nus.comp.cs4218.impl.util.FileUtils.deleteFileOrDirectory;
+import static sg.edu.nus.comp.cs4218.test.FileUtils.createNewFileInDir;
+import static sg.edu.nus.comp.cs4218.test.FileUtils.deleteFileOrDirectory;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_STDIN_OUTPUT;
 

@@ -6,9 +6,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 import static sg.edu.nus.comp.cs4218.impl.app.GrepApplication.NULL_POINTER;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_INVALID_REGEX;
-import static sg.edu.nus.comp.cs4218.impl.util.FileUtils.createNewFile;
-import static sg.edu.nus.comp.cs4218.impl.util.FileUtils.createNewFileInDir;
-import static sg.edu.nus.comp.cs4218.impl.util.FileUtils.deleteFileOrDirectory;
+import static sg.edu.nus.comp.cs4218.test.FileUtils.createNewFile;
+import static sg.edu.nus.comp.cs4218.test.FileUtils.createNewFileInDir;
+import static sg.edu.nus.comp.cs4218.test.FileUtils.deleteFileOrDirectory;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 
 import java.io.ByteArrayInputStream;
