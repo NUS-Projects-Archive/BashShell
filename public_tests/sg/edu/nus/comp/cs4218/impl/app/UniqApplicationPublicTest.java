@@ -7,7 +7,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -56,7 +55,7 @@ public class UniqApplicationPublicTest {
     }
 
     public static void writeToFileWithText(File file, String text) throws IOException {
-        try(FileWriter writer = new FileWriter(file)) {
+        try (FileWriter writer = new FileWriter(file)) {
             if (text != null && !text.isBlank()) {
                 writer.write(text);
             }
@@ -244,24 +243,20 @@ public class UniqApplicationPublicTest {
 
     @Test
     void uniqFromFile_NonExistentFile_Throws() {
-        ByteArrayOutputStream output = new ByteArrayOutputStream();
         assertThrows(UniqException.class, () -> uniqApplication.uniqFromFile(false, false, false,
                 NONEXISTENT.toString(), null));
     }
 
     @Test
     void uniqFromFile_Directory_Throws() {
-        ByteArrayOutputStream output = new ByteArrayOutputStream();
         assertThrows(UniqException.class, () -> uniqApplication.uniqFromFile(false, false, false,
                 TEMP.toString(), null));
     }
 
     @Test
     void uniqFromStdIn_NullStream_ThrowsException() {
-        ByteArrayOutputStream output = new ByteArrayOutputStream();
         assertThrows(UniqException.class, () ->
                 uniqApplication.uniqFromStdin(false, false, false, null, null));
-
     }
 
     @Test
