@@ -6,7 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 import static org.junit.jupiter.api.Assertions.fail;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_NOT_FOUND;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IS_NOT_DIR;
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_ARGS;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_PERM;
 import static sg.edu.nus.comp.cs4218.impl.util.FileUtils.createNewDirectory;
 import static sg.edu.nus.comp.cs4218.impl.util.FileUtils.deleteFileOrDirectory;
@@ -96,22 +95,17 @@ class CdApplicationTest {
 
     /**
      * Test case for changeToDirectory method in CdApplication.
-     * Tests with null path and expects a CdException to be thrown.
+     * Tests with empty path and expects the current directory to be changed to the home directory.
      */
     @Test
-    void changeToDirectory_NullPathStr_ThrowsErrNoArgs() {
-        CdException result = assertThrowsExactly(CdException.class, () -> app.changeToDirectory(null));
-        assertEquals(String.format("cd: %s", ERR_NO_ARGS), result.getMessage());
-    }
+    void changeToDirectory_EmptyPathStr_ChangeDirectoryToHome() {
+        String expectedDir = System.getProperty("user.dir");
 
-    /**
-     * Test case for changeToDirectory method in CdApplication.
-     * Tests with empty path and expects a CdException to be thrown.
-     */
-    @Test
-    void changeToDirectory_EmptyPathStr_ThrowsErrNoArgs() {
-        CdException result = assertThrowsExactly(CdException.class, () -> app.changeToDirectory(""));
-        assertEquals(String.format("cd: %s", ERR_NO_ARGS), result.getMessage());
+        // When
+        assertDoesNotThrow(() -> app.changeToDirectory(""));
+
+        // Then
+        assertEquals(expectedDir, Environment.currentDirectory);
     }
 
     /**
