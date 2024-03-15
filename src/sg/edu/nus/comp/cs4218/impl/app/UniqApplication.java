@@ -97,13 +97,12 @@ public class UniqApplication implements UniqInterface {
     @Override
     public String uniqFromFile(Boolean isCount, Boolean isRepeated, Boolean isAllRepeated, String inputFileName,
                                String outputFileName) throws UniqException {
-        BufferedReader reader = null;
-        BufferedWriter writer = null;
-
         try {
-            reader = new BufferedReader(new FileReader(inputFileName));
-            String result = uniq(isCount, isRepeated, isAllRepeated, reader);
-            reader.close();
+            String result;
+
+            try (BufferedReader reader = new BufferedReader(new FileReader(inputFileName))) {
+                result = uniq(isCount, isRepeated, isAllRepeated, reader);
+            }
 
             if (outputFileName == null) {
                 // No output file specified, return result.
@@ -111,24 +110,14 @@ public class UniqApplication implements UniqInterface {
             }
 
             // Write to file
-            writer = new BufferedWriter(new FileWriter(outputFileName));
-            writer.write(result);
-            writer.close();
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(outputFileName))) {
+                writer.write(result);
+            }
+
         } catch (FileNotFoundException e) {
             throw new UniqException(PROB_UNIQ_FILE + ERR_FILE_NOT_FOUND, e);
         } catch (IOException e) {
             throw new UniqException(PROB_UNIQ_FILE + e.getMessage(), e);
-        } finally {
-            try {
-                if (reader != null) {
-                    reader.close();
-                }
-                if (writer != null) {
-                    writer.close();
-                }
-            } catch (IOException e) {
-                throw new UniqException(PROB_UNIQ_FILE + e.getMessage(), e);
-            }
         }
 
         return null;
@@ -148,8 +137,6 @@ public class UniqApplication implements UniqInterface {
     @Override
     public String uniqFromStdin(Boolean isCount, Boolean isRepeated, Boolean isAllRepeated, InputStream stdin,
                                 String outputFileName) throws UniqException {
-        BufferedWriter writer = null;
-
         if (stdin == null) {
             throw new UniqException(ERR_NO_INPUT);
         }
@@ -164,21 +151,13 @@ public class UniqApplication implements UniqInterface {
             }
 
             // Write to file
-            writer = new BufferedWriter(new FileWriter(outputFileName));
-            writer.write(result);
-            writer.close();
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(outputFileName))) {
+                writer.write(result);
+            }
 
             return null;
         } catch (IOException e) {
             throw new UniqException(PROB_UNIQ_STDIN + e.getMessage(), e);
-        } finally {
-            try {
-                if (writer != null) {
-                    writer.close();
-                }
-            } catch (IOException e) {
-                throw new UniqException(PROB_UNIQ_FILE + e.getMessage(), e);
-            }
         }
     }
 
@@ -207,14 +186,10 @@ public class UniqApplication implements UniqInterface {
             line = content.readLine();
 
             // First line does not have anything to read
-            if (prevLine == null && line == null) {
-                break;
-            }
+            if (prevLine == null && line == null) { break; }
 
             // First line
-            if (prevLine == null) {
-                prevLine = line;
-            }
+            if (prevLine == null) { prevLine = line; }
 
             // Duplicate line: track line -> check next line
             if (line != null && line.compareTo(prevLine) == 0) {
@@ -229,9 +204,7 @@ public class UniqApplication implements UniqInterface {
             // isAllRepeated overrides isRepeated
             if (isAllRepeated) {
                 if (prevCount >= 2) {
-                    for (int i = 0; i < prevCount; i++) {
-                        stringBuilder.append(prevLine).append(STRING_NEWLINE);
-                    }
+                    stringBuilder.append((prevLine + STRING_NEWLINE).repeat(prevCount));
                 }
                 continue;
             } else if (isRepeated && prevCount < 2) {
@@ -243,7 +216,7 @@ public class UniqApplication implements UniqInterface {
             }
             stringBuilder.append(prevLine).append(STRING_NEWLINE);
 
-        } while (prevLine != null && line != null);
+        } while (line != null);
 
         return stringBuilder.toString().trim();
     }
