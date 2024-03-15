@@ -89,8 +89,15 @@ public class MkdirApplication implements MkdirInterface {
      * @throws MkdirException If folder already exists
      */
     @Override
-    public void createFolder(String... folderName) {
+    public void createFolder(String... folderName) throws MkdirException {
+        if (folderName == null || folderName.length == 0) {
+            throw new MkdirException(ERR_NULL_ARGS);
+        }
+
         for (String folder : folderName) {
+            if (folder.isEmpty()) {
+                throw new MkdirException(ERR_NO_FOLDERS);
+            }
             String folderAbsPath = getAbsolutePath(folder);
             File file = new File(folderAbsPath);
             file.mkdirs();
