@@ -2,9 +2,9 @@ package sg.edu.nus.comp.cs4218.impl.app;
 
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_NOT_FOUND;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IS_NOT_DIR;
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_ARGS;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_PERM;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NULL_ARGS;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NULL_STREAMS;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_TOO_MANY_ARGS;
 
 import java.io.File;
@@ -39,10 +39,16 @@ public class CdApplication implements CdInterface {
      */
     @Override
     public void run(String[] args, InputStream stdin, OutputStream stdout) throws CdException {
+        if (stdin == null || stdout == null) {
+            throw new CdException(ERR_NULL_STREAMS);
+        }
+
         if (args == null) {
             throw new CdException(ERR_NULL_ARGS);
         } else if (args.length > 1) {
             throw new CdException(ERR_TOO_MANY_ARGS);
+        } else if (args.length == 0) {
+            changeToDirectory("");
         } else if (args.length == 1) {
             changeToDirectory(args[0]);
         }
@@ -58,7 +64,7 @@ public class CdApplication implements CdInterface {
     public void changeToDirectory(String path) throws CdException {
         Environment.currentDirectory = getNormalizedAbsolutePath(path);
     }
-    
+
     /**
      * Returns the normalized absolute path for the given path string.
      *
@@ -68,7 +74,7 @@ public class CdApplication implements CdInterface {
      */
     private String getNormalizedAbsolutePath(String pathStr) throws CdException {
         if (StringUtils.isBlank(pathStr)) {
-            throw new CdException(ERR_NO_ARGS);
+            return System.getProperty("user.dir");
         }
 
         Path path = new File(pathStr).toPath();
