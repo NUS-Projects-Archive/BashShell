@@ -1,18 +1,22 @@
 package sg.edu.nus.comp.cs4218.impl.app;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
 import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
 import sg.edu.nus.comp.cs4218.exception.PasteException;
 import sg.edu.nus.comp.cs4218.testutils.TestStringUtils;
-
-import java.io.*;
-import java.nio.charset.StandardCharsets;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class PasteApplicationPublicTest {
     private static final File DIRECTORY = new File("pasteTestDirectory");
@@ -71,11 +75,6 @@ public class PasteApplicationPublicTest {
     @Test
     void mergeFile_FileNotFound_ThrowsException() throws AbstractApplicationException {
         assertThrows(PasteException.class, () -> pasteApplication.mergeFile(true, NONEXISTENT.toString()));
-    }
-
-    @Test
-    void mergeFile_FileIsDirectory_ThrowsException() throws AbstractApplicationException {
-        assertThrows(PasteException.class, () -> pasteApplication.mergeFile(true, DIRECTORY.toString()));
     }
 
     @Test

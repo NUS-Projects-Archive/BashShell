@@ -19,7 +19,7 @@ public class PasteArgsParser extends ArgsParser {
 
     /**
      * Checks if the serial flag is present in the parsed flags.
-     * 
+     *
      * @return true if serial flag is present, false otherwise
      */
     public Boolean isSerial() {
@@ -28,10 +28,19 @@ public class PasteArgsParser extends ArgsParser {
 
     /**
      * Returns the non-flag arguments.
-     * 
+     *
      * @return List of non-flag arguments
      */
     public List<String> getNonFlagArgs() {
         return nonFlagArgs;
+    }
+
+    /**
+     * Checks if non-flag args includes standard input
+     *
+     * @return true if standard input ("-") called, false otherwise
+     */
+    public Boolean hasStdin() {
+        return nonFlagArgs.contains("-");
     }
 }

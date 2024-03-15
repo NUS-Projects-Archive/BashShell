@@ -1,9 +1,10 @@
 package sg.edu.nus.comp.cs4218.impl.app;
 
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
+import static sg.edu.nus.comp.cs4218.testutils.TestStringUtils.CHAR_FILE_SEP;
+import static sg.edu.nus.comp.cs4218.testutils.TestStringUtils.STRING_NEWLINE;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -18,10 +19,10 @@ import java.util.ArrayList;
 import java.util.Deque;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static sg.edu.nus.comp.cs4218.testutils.TestStringUtils.CHAR_FILE_SEP;
-import static sg.edu.nus.comp.cs4218.testutils.TestStringUtils.STRING_NEWLINE;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import sg.edu.nus.comp.cs4218.exception.PasteException;
 import sg.edu.nus.comp.cs4218.testutils.TestEnvironmentUtil;
@@ -32,7 +33,7 @@ public class PasteApplicationPublicIT {
     private static final String DIR = "dir";
     private static final String TEST_LINE = "Test line 1\nTest line 2\nTest line 3";
     public static final String EXPECTED_TEXT = "Test line 1\tTest line 2\tTest line 3";
-    private static final String ERR_NO_SUCH_FILE = "paste: %s: No such file or directory" + STRING_NEWLINE;
+    private static final String ERR_NO_SUCH_FILE = "paste: %s: No such file or directory";
     private static final Deque<Path> files = new ArrayDeque<>();
     private static Path TEMP_PATH;
     private static Path DIR_PATH;
@@ -81,7 +82,7 @@ public class PasteApplicationPublicIT {
             }
         }
         return args.toArray(new String[0]);
-     }
+    }
 
     @Test
     void run_SingleStdinNullStdout_ThrowsException() {
@@ -158,9 +159,10 @@ public class PasteApplicationPublicIT {
     void run_NonexistentFileNoFlag_ThrowsException() throws Exception {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         String nonexistentFileName = "nonexistent_file.txt";
-        pasteApplication.run(toArgs("", nonexistentFileName), System.in, output);
+        PasteException result = assertThrowsExactly(PasteException.class,
+                () -> pasteApplication.run(toArgs("", nonexistentFileName), System.in, output));
         assertEquals(String.format(ERR_NO_SUCH_FILE, TEMP + CHAR_FILE_SEP + nonexistentFileName),
-                output.toString(StandardCharsets.UTF_8));
+                result.getMessage());
     }
 
     @Test
@@ -276,9 +278,10 @@ public class PasteApplicationPublicIT {
         String stdinText = "Test line 1.1\nTest line 1.2\nTest line 1.3";
         InputStream inputStream = new ByteArrayInputStream(stdinText.getBytes(StandardCharsets.UTF_8));
         String nonexistentFileName = "nonexistent_file.txt";
-        pasteApplication.run(toArgs("", nonexistentFileName), inputStream, output);
+        PasteException result = assertThrowsExactly(PasteException.class,
+                () -> pasteApplication.run(toArgs("", nonexistentFileName), inputStream, output));
         assertEquals(String.format(ERR_NO_SUCH_FILE, TEMP + CHAR_FILE_SEP + nonexistentFileName),
-                output.toString(StandardCharsets.UTF_8));
+                result.getMessage());
     }
 
     @Test

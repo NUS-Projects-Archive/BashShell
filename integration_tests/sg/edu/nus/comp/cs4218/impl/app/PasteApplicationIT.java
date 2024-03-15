@@ -160,8 +160,7 @@ public class PasteApplicationIT {
                 StringUtils.STRING_TAB + "C" + StringUtils.STRING_TAB + "D" +
                 StringUtils.STRING_TAB + "E" + StringUtils.STRING_NEWLINE + "1" +
                 StringUtils.STRING_TAB + "2" + StringUtils.STRING_TAB + "3" +
-                StringUtils.STRING_TAB + "4" + StringUtils.STRING_TAB + "5" + StringUtils.STRING_NEWLINE +
-                StringUtils.STRING_NEWLINE;
+                StringUtils.STRING_TAB + "4" + StringUtils.STRING_TAB + "5" + StringUtils.STRING_NEWLINE;
         assertEquals(expected, outputStream.toString());
     }
 }

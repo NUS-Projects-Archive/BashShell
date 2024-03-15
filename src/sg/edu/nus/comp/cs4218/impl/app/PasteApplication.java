@@ -2,7 +2,6 @@ package sg.edu.nus.comp.cs4218.impl.app;
 
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_NOT_FOUND;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_GENERAL;
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IS_DIR;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_ISTREAM;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_PERM;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NULL_STREAMS;
@@ -23,8 +22,7 @@ import sg.edu.nus.comp.cs4218.exception.InvalidArgsException;
 import sg.edu.nus.comp.cs4218.exception.PasteException;
 import sg.edu.nus.comp.cs4218.exception.ShellException;
 import sg.edu.nus.comp.cs4218.impl.parser.PasteArgsParser;
-import sg.edu.nus.comp.cs4218.impl.util.ArgumentResolver;
-import sg.edu.nus.comp.cs4218.impl.util.IORedirectionHandler;
+import sg.edu.nus.comp.cs4218.impl.util.CollectionsUtils;
 import sg.edu.nus.comp.cs4218.impl.util.IOUtils;
 
 /**
@@ -62,7 +60,7 @@ public class PasteApplication implements PasteInterface {
         if (stdin == null) {
             throw new PasteException(ERR_NO_ISTREAM);
         }
-        PasteArgsParser pasteArgsParser = new PasteArgsParser();
+        final PasteArgsParser pasteArgsParser = new PasteArgsParser();
 
         try {
             pasteArgsParser.parse(args);
@@ -70,57 +68,26 @@ public class PasteApplication implements PasteInterface {
             throw new PasteException(e.getMessage(), e);
         }
 
-        List<String> nonFlagArgs = pasteArgsParser.getNonFlagArgs();
-        boolean noInputs = nonFlagArgs.isEmpty();
-        boolean isRedirect = nonFlagArgs.contains(">") || nonFlagArgs.contains("<");
+        final String[] nonFlagArgs = CollectionsUtils.listToArray(pasteArgsParser.getNonFlagArgs());
         boolean isSerial = pasteArgsParser.isSerial();
+        boolean hasStdin = pasteArgsParser.hasStdin();
         String result = null;
 
-        if (noInputs) {
+        if (nonFlagArgs.length == 0) {
             result = mergeStdin(isSerial, stdin);
-        } else if (!isRedirect) {
-            if (nonFlagArgs.contains("-")) {
-                result = mergeFileAndStdin(isSerial, stdin, nonFlagArgs.toArray(new String[0]));
-            } else {
-                result = mergeFile(isSerial, nonFlagArgs.toArray(new String[0]));
-            }
+        } else if (hasStdin) {
+            result = mergeFileAndStdin(isSerial, stdin, nonFlagArgs);
+        } else {
+            result = mergeFile(isSerial, nonFlagArgs);
         }
 
-        if (noInputs || !isRedirect) {
-            try {
+        try {
+            if (result.length() != 0) {
                 stdout.write(result.getBytes());
                 stdout.write(STRING_NEWLINE.getBytes());
-            } catch (IOException e) {
-                throw new PasteException(ERR_WRITE_STREAM, e);
             }
-        }
-
-        if (isRedirect) {
-            IORedirectionHandler redirHandler = new IORedirectionHandler(nonFlagArgs, stdin, stdout, new ArgumentResolver());
-            try {
-                redirHandler.extractRedirOptions();
-
-                List<String> noRedirArgsList = redirHandler.getNoRedirArgsList();
-                if (noRedirArgsList.isEmpty()) {
-                    result = mergeStdin(isSerial, redirHandler.getInputStream());
-                } else {
-                    if (nonFlagArgs.contains("-")) {
-                        result = mergeFileAndStdin(isSerial, stdin, noRedirArgsList.toArray(new String[0]));
-                    } else {
-                        result = mergeFile(isSerial, noRedirArgsList.toArray(new String[0]));
-                    }
-                }
-
-                if (nonFlagArgs.contains(">")) {
-                    byte[] bytes = result.getBytes();
-                    redirHandler.getOutputStream().write(bytes);
-                } else {
-                    stdout.write(result.getBytes());
-                    stdout.write(STRING_NEWLINE.getBytes());
-                }
-            } catch (Exception e) {
-                throw new PasteException(e.getMessage(), e);
-            }
+        } catch (IOException e) {
+            throw new PasteException(ERR_WRITE_STREAM, e);
         }
     }
 
@@ -168,10 +135,10 @@ public class PasteApplication implements PasteInterface {
         for (String file : fileName) {
             File node = IOUtils.resolveFilePath(file).toFile();
             if (!node.exists()) {
-                throw new PasteException(ERR_FILE_NOT_FOUND);
+                throw new PasteException(file + ": " + ERR_FILE_NOT_FOUND);
             }
             if (node.isDirectory()) {
-                throw new PasteException(ERR_IS_DIR);
+                continue;
             }
             if (!node.canRead()) {
                 throw new PasteException(ERR_NO_PERM);
@@ -213,20 +180,24 @@ public class PasteApplication implements PasteInterface {
      */
     @Override
     public String mergeFileAndStdin(Boolean isSerial, InputStream stdin, String... fileName) throws PasteException { //NOPMD
-        if (stdin == null && fileName == null) {
-            throw new PasteException(ERR_GENERAL);
+        if (stdin == null) {
+            throw new PasteException(ERR_NULL_STREAMS);
         }
+
         for (String file : fileName) {
-            if (file == null || file.compareTo("-") == 0) {
+            if (file.compareTo("-") == 0) {
                 continue;
+            }
+            if (file.equals("")) {
+                throw new PasteException(ERR_GENERAL);
             }
 
             File node = IOUtils.resolveFilePath(file).toFile();
             if (!node.exists()) {
-                throw new PasteException(ERR_FILE_NOT_FOUND);
+                throw new PasteException(file + ": " + ERR_FILE_NOT_FOUND);
             }
             if (node.isDirectory()) {
-                throw new PasteException(ERR_IS_DIR);
+                continue;
             }
             if (!node.canRead()) {
                 throw new PasteException(ERR_NO_PERM);
@@ -261,7 +232,6 @@ public class PasteApplication implements PasteInterface {
                 mergeFile(isSerial, file);
             }
         }
-
         return isSerial ? mergeInSerial(tempListResult) : mergeInParallel(tempListResult);
     }
 
@@ -285,7 +255,13 @@ public class PasteApplication implements PasteInterface {
             interRes.add(String.join(STRING_TAB, lst));
         }
 
-        return String.join(STRING_NEWLINE, interRes);
+        String mergedString = String.join(STRING_NEWLINE, interRes);
+
+        if (mergedString.endsWith(STRING_NEWLINE)) {
+            mergedString = mergedString.substring(0, mergedString.length() - STRING_NEWLINE.length());
+        }
+
+        return mergedString;
     }
 
     /**
