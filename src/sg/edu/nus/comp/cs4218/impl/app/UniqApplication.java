@@ -4,7 +4,8 @@ import static sg.edu.nus.comp.cs4218.exception.UniqException.COUNT_ALL_DUP_ERR;
 import static sg.edu.nus.comp.cs4218.exception.UniqException.PROB_UNIQ_FILE;
 import static sg.edu.nus.comp.cs4218.exception.UniqException.PROB_UNIQ_STDIN;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_NOT_FOUND;
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_READING_FILE;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_INPUT;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_OSTREAM;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_WRITE_STREAM;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 
@@ -71,6 +72,9 @@ public class UniqApplication implements UniqInterface {
         // Print results if no output file specified
         try {
             if (outputFile == null) {
+                if (stdout == null) {
+                    throw new UniqException(ERR_NO_OSTREAM);
+                }
                 stdout.write(output.getBytes());
                 stdout.write(STRING_NEWLINE.getBytes());
             }
@@ -116,8 +120,12 @@ public class UniqApplication implements UniqInterface {
             throw new UniqException(PROB_UNIQ_FILE + e.getMessage(), e);
         } finally {
             try {
-                if (reader != null) { reader.close(); }
-                if (writer != null) { writer.close(); }
+                if (reader != null) {
+                    reader.close();
+                }
+                if (writer != null) {
+                    writer.close();
+                }
             } catch (IOException e) {
                 throw new UniqException(PROB_UNIQ_FILE + e.getMessage(), e);
             }
@@ -142,6 +150,10 @@ public class UniqApplication implements UniqInterface {
                                 String outputFileName) throws UniqException {
         BufferedWriter writer = null;
 
+        if (stdin == null) {
+            throw new UniqException(ERR_NO_INPUT);
+        }
+
         try {
             BufferedReader input = new BufferedReader(new InputStreamReader(stdin));
             String result = uniq(isCount, isRepeated, isAllRepeated, input);
@@ -161,7 +173,9 @@ public class UniqApplication implements UniqInterface {
             throw new UniqException(PROB_UNIQ_STDIN + e.getMessage(), e);
         } finally {
             try {
-                if (writer != null) { writer.close(); }
+                if (writer != null) {
+                    writer.close();
+                }
             } catch (IOException e) {
                 throw new UniqException(PROB_UNIQ_FILE + e.getMessage(), e);
             }
@@ -191,6 +205,11 @@ public class UniqApplication implements UniqInterface {
         do {
             prevLine = line;
             line = content.readLine();
+
+            // First line does not have anything to read
+            if (prevLine == null && line == null) {
+                break;
+            }
 
             // First line
             if (prevLine == null) {
