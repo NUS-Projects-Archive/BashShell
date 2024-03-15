@@ -21,8 +21,8 @@ import org.junit.jupiter.api.Test;
 import sg.edu.nus.comp.cs4218.exception.UniqException;
 
 public class UniqApplicationPublicTest {
-    private static final String LITERAL_CS4218 = "CS4218";
-    private static final String LITERAL_CS1101S = "CS1101S";
+    private static final String CS4218 = "CS4218";
+    private static final String CS1101S = "CS1101S";
 
     private static final File TEMP = new File("temp-uniq");
     private static final File NONEXISTENT = new File("uniq_nonexistent.txt");
@@ -31,19 +31,18 @@ public class UniqApplicationPublicTest {
 
     private static final File FILE_NO_ADJ_DUP = new File("uniq_no_duplicates.txt");
     private static final String TEST_NO_ADJ_DUP = String.join(STRING_NEWLINE,
-            "Hello World", "Alice", "Bob", "Hello World", "Bob", "Alice", LITERAL_CS4218);
+            "Hello World", "Alice", "Bob", "Hello World", "Bob", "Alice", CS4218);
 
     private static final File FILE_ALL_DUP = new File("uniq_all_duplicates.txt");
-    private static final String TEST_ALL_DUP = (LITERAL_CS4218 + STRING_NEWLINE).repeat(50);
+    private static final String TEST_ALL_DUP = (CS4218 + STRING_NEWLINE).repeat(50);
 
     private static final File FILE_MIXED_DUP = new File("uniq_interleaved_duplicates.txt");
-    private static final String TEST_MIXED_DUP = (LITERAL_CS4218 + STRING_NEWLINE).repeat(10)
-            + LITERAL_CS1101S + STRING_NEWLINE
-            + (LITERAL_CS4218 + STRING_NEWLINE).repeat(3)
-            + (LITERAL_CS4218 + STRING_NEWLINE).repeat(3)
-            + (LITERAL_CS1101S + STRING_NEWLINE).repeat(20)
-            + (LITERAL_CS4218 + STRING_NEWLINE).repeat(2);
-
+    private static final String TEST_MIXED_DUP = (CS4218 + STRING_NEWLINE).repeat(10)
+            + CS1101S + STRING_NEWLINE
+            + (CS4218 + STRING_NEWLINE).repeat(3)
+            + (CS4218 + STRING_NEWLINE).repeat(3)
+            + (CS1101S + STRING_NEWLINE).repeat(20)
+            + (CS4218 + STRING_NEWLINE).repeat(2);
     private static UniqApplication uniqApplication;
 
     @BeforeAll
@@ -57,15 +56,11 @@ public class UniqApplicationPublicTest {
     }
 
     public static void writeToFileWithText(File file, String text) throws IOException {
-        FileWriter writer = new FileWriter(file); //NOPMD
-
-        if (text == null || text.isBlank()) {
-            writer.close();
-            return;
+        try(FileWriter writer = new FileWriter(file)) {
+            if (text != null && !text.isBlank()) {
+                writer.write(text);
+            }
         }
-
-        writer.write(text);
-        writer.close();
     }
 
     @AfterAll
@@ -143,7 +138,7 @@ public class UniqApplicationPublicTest {
 
             String result = uniqApplication.uniqFromFile(false, false, false, FILE_ALL_DUP.toString(), null);
 
-            assertEquals(LITERAL_CS4218, result);
+            assertEquals(CS4218, result);
         });
     }
 
@@ -164,7 +159,7 @@ public class UniqApplicationPublicTest {
 
             String result = uniqApplication.uniqFromFile(false, true, false, FILE_ALL_DUP.toString(), null);
 
-            assertEquals(LITERAL_CS4218, result);
+            assertEquals(CS4218, result);
         });
     }
 
@@ -203,7 +198,8 @@ public class UniqApplicationPublicTest {
     void uniqFromFile_FileInterleavedDuplicatesNoArguments_Success() {
         assertDoesNotThrow(() -> {
 
-            String expected = String.join(STRING_NEWLINE, "CS4218", "CS1101S", "CS4218", "CS1101S", "CS4218");
+            String expected = String.join(STRING_NEWLINE,
+                    CS4218, CS1101S, CS4218, CS1101S, CS4218);
             String result = uniqApplication.uniqFromFile(false, false, false, FILE_MIXED_DUP.toString(), null);
 
             assertEquals(expected, result);
@@ -226,7 +222,7 @@ public class UniqApplicationPublicTest {
     void uniqFromFile_FileInterleavedDuplicatesRepeatedOnly_Success() {
         assertDoesNotThrow(() -> {
 
-            String expected = String.join(STRING_NEWLINE, "CS4218", "CS4218", "CS1101S", "CS4218");
+            String expected = String.join(STRING_NEWLINE, CS4218, CS4218, CS1101S, CS4218);
             String result = uniqApplication.uniqFromFile(false, true, false, FILE_MIXED_DUP.toString(), null);
 
             assertEquals(expected, result);
@@ -237,9 +233,9 @@ public class UniqApplicationPublicTest {
     void uniqFromFile_FileInterleavedDuplicatesAllRepeatedOnly_Success() {
         assertDoesNotThrow(() -> {
 
-            String expected = (LITERAL_CS4218 + STRING_NEWLINE).repeat(16)
-                    + ("CS1101S" + STRING_NEWLINE).repeat(20)
-                    + LITERAL_CS4218 + STRING_NEWLINE + LITERAL_CS4218;
+            String expected = (CS4218 + STRING_NEWLINE).repeat(16)
+                    + (CS1101S + STRING_NEWLINE).repeat(20)
+                    + CS4218 + STRING_NEWLINE + CS4218;
             String result = uniqApplication.uniqFromFile(false, false, true, FILE_MIXED_DUP.toString(), null);
 
             assertEquals(expected, result);
@@ -300,7 +296,7 @@ public class UniqApplicationPublicTest {
 
             String result = uniqApplication.uniqFromStdin(false, false, false, stream, null);
 
-            assertEquals(LITERAL_CS4218, result);
+            assertEquals(CS4218, result);
         });
     }
 
@@ -308,7 +304,7 @@ public class UniqApplicationPublicTest {
     void uniqFromStdIn_InterleavedDuplicates_Success() {
         assertDoesNotThrow(() -> {
 
-            String expected = String.join(STRING_NEWLINE, "CS4218", "CS1101S", "CS4218", "CS1101S", "CS4218");
+            String expected = String.join(STRING_NEWLINE, CS4218, CS1101S, CS4218, CS1101S, CS4218);
             InputStream stream = new ByteArrayInputStream(TEST_MIXED_DUP.getBytes());
 
             String result = uniqApplication.uniqFromStdin(false, false, false, stream, null);
