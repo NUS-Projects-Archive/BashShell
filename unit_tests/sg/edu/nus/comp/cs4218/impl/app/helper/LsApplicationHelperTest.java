@@ -26,8 +26,8 @@ class LsApplicationHelperTest {
     private static final String STRING_AZ = "a.z";
     private static final String STRING_ZA = "z.a";
     private static final String STRING_Z = "z";
-    private static final String[] CWD_NON_DIRS = {STRING_AZ, STRING_ZA, STRING_Z};
     private static final String[] CWD_DIRS = {DIR_A_NAME};
+    private static final String[] CWD_NON_DIRS = {STRING_AZ, STRING_ZA, STRING_Z};
     private static final String[] DIR_A_NON_DIRS = {"0"};
 
     // Main temporary dir

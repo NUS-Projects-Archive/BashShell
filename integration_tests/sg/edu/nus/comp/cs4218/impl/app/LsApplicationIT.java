@@ -52,16 +52,18 @@ import sg.edu.nus.comp.cs4218.exception.LsException;
 @SuppressWarnings("PMD.ClassNamingConventions")
 class LsApplicationIT {
 
-    private static final String[] CWD_NON_DIRS = {"a.z", "z.a", "z"};
     private static final String DIR_A_NAME = "dirA";
     private static final String[] CWD_DIRS = {DIR_A_NAME};
+    private static final String[] CWD_NON_DIRS = {"a.z", "z.a", "z"};
     // Temporary dir A in main temporary dir
     private static final String[] DIR_A_NON_DIRS = {"0"};
+
     // Main temporary dir
     @TempDir
     private static Path cwdPath;
     private static String cwdName;
     private static String cwdPathName;
+
     private LsApplication app;
     private ByteArrayOutputStream outContent;
 
