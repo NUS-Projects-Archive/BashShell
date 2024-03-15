@@ -33,7 +33,7 @@ public class UniqApplicationPublicTest {
             "Hello World", "Alice", "Bob", "Hello World", "Bob", "Alice", CS4218);
 
     private static final File FILE_ALL_DUP = new File("uniq_all_duplicates.txt");
-    private static final String TEST_ALL_DUP = (CS4218 + STRING_NEWLINE).repeat(50);
+    private static final String TEST_ALL_DUP = (CS4218 + STRING_NEWLINE).repeat(49) + CS4218;
 
     private static final File FILE_MIXED_DUP = new File("uniq_interleaved_duplicates.txt");
     private static final String TEST_MIXED_DUP = (CS4218 + STRING_NEWLINE).repeat(10)
