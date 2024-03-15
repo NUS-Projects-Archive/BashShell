@@ -38,6 +38,7 @@ public class LsApplicationPublicTest {
 
     @BeforeAll
     static void setUp() throws IOException, NoSuchFieldException, IllegalAccessException {
+        TestEnvironmentUtil.setCurrentDirectory(System.getProperty("user.dir"));
         TEMP_PATH = Paths.get(TestEnvironmentUtil.getCurrentDirectory(), TEMP);
         Files.createDirectories(Paths.get(TEMP_PATH.toString(), FIRST_LEVEL_FOLDER, SECOND_LEVEL_FOLDER));
         Files.createFile(Paths.get(TEMP_PATH.toString(), FIRST_LEVEL_FILE));
@@ -94,7 +95,7 @@ public class LsApplicationPublicTest {
     public void listFolderContent_MultipleFoldersSpecified_ReturnsMultipleFoldersContent() throws Exception {
         String result = application.listFolderContent(false, false,
                 TestStringUtils.STRING_CURR_DIR + TestStringUtils.CHAR_FILE_SEP, TEMP);
-        assertTrue(result.contains("src"));
+        assertTrue(result.contains(SRC));
         assertResultContainsFiles(result, firstLevelTestFiles);
     }
 

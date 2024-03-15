@@ -154,7 +154,7 @@ public final class LsApplicationHelper {
                 return getContentsFromReadableDirectory(directory);
             } else {
                 // Directory has no read access
-                throw new DirectoryAccessDeniedLsException(getRelativeToCwd(directory).toString());
+                throw new DirectoryAccessDeniedLsException(getRelativeToCwd(directory).toString().isEmpty() ? "." : getRelativeToCwd(directory).toString());
             }
         } else if (Files.isRegularFile(directory)) {
             // Path is a non-folder
