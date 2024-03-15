@@ -79,8 +79,10 @@ public class SortApplication implements SortInterface {
         }
 
         try {
-            stdout.write(output.toString().getBytes());
-            stdout.write(STRING_NEWLINE.getBytes());
+            if (output.length() != 0) {
+                stdout.write(output.toString().getBytes());
+                stdout.write(STRING_NEWLINE.getBytes());
+            }
         } catch (IOException e) {
             throw new SortException(ERR_WRITE_STREAM, e);
         }
