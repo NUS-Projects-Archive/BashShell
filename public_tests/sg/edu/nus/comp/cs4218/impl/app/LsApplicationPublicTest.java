@@ -1,18 +1,11 @@
 package sg.edu.nus.comp.cs4218.impl.app;
 
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
-import sg.edu.nus.comp.cs4218.testutils.TestEnvironmentUtil;
-import sg.edu.nus.comp.cs4218.testutils.TestStringUtils;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Array;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -20,8 +13,14 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
+import sg.edu.nus.comp.cs4218.testutils.TestEnvironmentUtil;
+import sg.edu.nus.comp.cs4218.testutils.TestStringUtils;
 
 public class LsApplicationPublicTest {
 
@@ -75,7 +74,7 @@ public class LsApplicationPublicTest {
 
     @Test
     public void listFolderContent_NoFoldersSpecified_ReturnsCurrentFolderContent() throws AbstractApplicationException {
-        String result =  application.listFolderContent(false, false);
+        String result = application.listFolderContent(false, false);
         assertTrue(result.contains(SRC));
     }
 
@@ -93,8 +92,8 @@ public class LsApplicationPublicTest {
 
     @Test
     public void listFolderContent_MultipleFoldersSpecified_ReturnsMultipleFoldersContent() throws Exception {
-        String result =  application.listFolderContent(false, false,
-                                                      TestStringUtils.STRING_CURR_DIR + TestStringUtils.CHAR_FILE_SEP, TEMP);
+        String result = application.listFolderContent(false, false,
+                TestStringUtils.STRING_CURR_DIR + TestStringUtils.CHAR_FILE_SEP, TEMP);
         assertTrue(result.contains("src"));
         assertResultContainsFiles(result, firstLevelTestFiles);
     }
@@ -102,7 +101,7 @@ public class LsApplicationPublicTest {
     @Test
     public void listFolderContent_SingleFolder2LevelsDownSpecified_ReturnsFolderContent() throws Exception {
         String result = application.listFolderContent(false, false,
-                                                      Paths.get(TEMP_PATH.toString(), FIRST_LEVEL_FOLDER).toString());
+                Paths.get(TEMP_PATH.toString(), FIRST_LEVEL_FOLDER).toString());
         assertTrue(result.contains(SECOND_LEVEL_FOLDER));
     }
 }

@@ -134,8 +134,8 @@ public class LsApplicationPublicIT {
         createFile("file_in_folderB.txt", folderBPath);
         lsApplication.run(toArgs("R"), System.in, output);
         TestEnvironmentUtil.setCurrentDirectory(currPathString);
-        assertEquals(("." + CHAR_FILE_SEP + COLON + STRING_NEWLINE + FILE_A_TXT + STRING_NEWLINE + FOLDER_B + STRING_NEWLINE + STRING_NEWLINE +
-                FOLDER_B + COLON + STRING_NEWLINE + "file_in_folderB.txt" + STRING_NEWLINE), output.toString(StandardCharsets.UTF_8));
+        assertEquals(("." + COLON + STRING_NEWLINE + FILE_A_TXT + STRING_NEWLINE + FOLDER_B + STRING_NEWLINE + STRING_NEWLINE +
+                "." + CHAR_FILE_SEP + FOLDER_B + COLON + STRING_NEWLINE + "file_in_folderB.txt" + STRING_NEWLINE), output.toString(StandardCharsets.UTF_8));
     }
 
     @Test
