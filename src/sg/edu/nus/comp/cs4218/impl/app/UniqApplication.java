@@ -43,7 +43,10 @@ public class UniqApplication implements UniqInterface {
      *               files are specified.
      * @param stdout An OutputStream. The output of the command is written to this OutputStream
      *               if no files are specified.
-     * @throws UniqException
+     * @throws UniqException When {@code stdin} is null, or
+     *                       when cannot find {@code inputFileName}, or
+     *                       when IO problems while writing to {@code outputFileName}, or
+     *                       when arguments for both count and allRepeated are provided
      */
     @Override
     public void run(String[] args, InputStream stdin, OutputStream stdout) throws UniqException {
@@ -91,8 +94,8 @@ public class UniqApplication implements UniqInterface {
      * @param isAllRepeated  Boolean option to print all duplicate lines (takes precedence if isRepeated is true)
      * @param inputFileName  String of path to input file
      * @param outputFileName String of path to output file
-     * @return String of the results. Null if {@code outputFile} is given.
-     * @throws UniqException
+     * @return String of the results. Null if {@code outputFileName} is given.
+     * @throws UniqException When cannot find {@code inputFileName}, or when IO problems while writing to {@code outputFileName}
      */
     @Override
     public String uniqFromFile(Boolean isCount, Boolean isRepeated, Boolean isAllRepeated, String inputFileName,
@@ -113,7 +116,6 @@ public class UniqApplication implements UniqInterface {
             try (BufferedWriter writer = new BufferedWriter(new FileWriter(outputFileName))) {
                 writer.write(result);
             }
-
         } catch (FileNotFoundException e) {
             throw new UniqException(PROB_UNIQ_FILE + ERR_FILE_NOT_FOUND, e);
         } catch (IOException e) {
@@ -132,7 +134,7 @@ public class UniqApplication implements UniqInterface {
      * @param stdin          InputStream containing arguments from Stdin
      * @param outputFileName String of path to output file
      * @return String of the results. Null if {@code outputFile} is given.
-     * @throws UniqException
+     * @throws UniqException When {@code stdin} is null, or when IO problems while writing to {@code outputFileName}
      */
     @Override
     public String uniqFromStdin(Boolean isCount, Boolean isRepeated, Boolean isAllRepeated, InputStream stdin,
@@ -169,7 +171,7 @@ public class UniqApplication implements UniqInterface {
      * @param isAllRepeated Boolean option to print all duplicate lines (takes precedence if isRepeated is true)
      * @param content       BufferedReader holding the content to be processed
      * @return String of the results
-     * @throws IOException
+     * @throws IOException When both {@code isCount} and {@code isAllRepeated} are true
      */
     private String uniq(Boolean isCount, Boolean isRepeated, Boolean isAllRepeated, BufferedReader content)
             throws IOException, UniqException {
