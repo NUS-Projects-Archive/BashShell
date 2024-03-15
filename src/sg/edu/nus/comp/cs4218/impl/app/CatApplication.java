@@ -1,5 +1,6 @@
 package sg.edu.nus.comp.cs4218.impl.app;
 
+import static sg.edu.nus.comp.cs4218.impl.util.CollectionsUtils.listToArray;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_NOT_FOUND;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IO_EXCEPTION;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IS_DIR;
@@ -25,7 +26,6 @@ import sg.edu.nus.comp.cs4218.exception.CatException;
 import sg.edu.nus.comp.cs4218.exception.InvalidArgsException;
 import sg.edu.nus.comp.cs4218.exception.ShellException;
 import sg.edu.nus.comp.cs4218.impl.parser.CatArgsParser;
-import sg.edu.nus.comp.cs4218.impl.util.CollectionsUtils;
 import sg.edu.nus.comp.cs4218.impl.util.IOUtils;
 
 /**
@@ -65,7 +65,7 @@ public class CatApplication implements CatInterface {
         }
 
         final Boolean isLineNumber = parser.isLineNumber();
-        final String[] files = CollectionsUtils.listToArray(parser.getFiles());
+        final String[] files = listToArray(parser.getFiles());
 
         StringBuilder output = new StringBuilder();
         if (files.length == 0) {
@@ -100,44 +100,35 @@ public class CatApplication implements CatInterface {
         }
 
         List<String> output = new ArrayList<>();
-        List<String> errorList = new ArrayList<>();
         for (String file : fileName) {
-            try {
-                File node = IOUtils.resolveFilePath(file).toFile();
-                if (!node.exists()) {
-                    throw new CatException(String.format("'%s': %s", node.getName(), ERR_FILE_NOT_FOUND));
-                }
-                if (node.isDirectory()) {
-                    throw new CatException(String.format("'%s': %s", node.getName(), ERR_IS_DIR));
-                }
-                if (!node.canRead()) {
-                    throw new CatException(String.format("'%s': %s", node.getName(), ERR_READING_FILE));
-                }
-
-                InputStream input = null;
-                try {
-                    input = IOUtils.openInputStream(file);
-                    output.addAll(prefixLineNumber(isLineNumber, input));
-                    IOUtils.closeInputStream(input);
-                    input.close();
-                } catch (ShellException | IOException e) {
-                    throw new CatException(e.getMessage(), e);
-                } finally {
-                    try {
-                        if (input != null) {
-                            input.close();
-                        }
-                    } catch (IOException e) {
-                        throw new CatException(e.getMessage(), e);
-                    }
-                }
-            } catch (CatException e) {
-                errorList.add(e.getMessage());
+            File node = IOUtils.resolveFilePath(file).toFile();
+            if (!node.exists()) {
+                throw new CatException(String.format("'%s': %s", node.getName(), ERR_FILE_NOT_FOUND));
             }
-        }
+            if (node.isDirectory()) {
+                throw new CatException(String.format("'%s': %s", node.getName(), ERR_IS_DIR));
+            }
+            if (!node.canRead()) {
+                throw new CatException(String.format("'%s': %s", node.getName(), ERR_READING_FILE));
+            }
 
-        if (!errorList.isEmpty()) {
-            output.addAll(errorList);
+            InputStream input = null;
+            try {
+                input = IOUtils.openInputStream(file);
+                output.addAll(prefixLineNumber(isLineNumber, input));
+                IOUtils.closeInputStream(input);
+                input.close();
+            } catch (ShellException | IOException e) {
+                throw new CatException(e.getMessage(), e);
+            } finally {
+                try {
+                    if (input != null) {
+                        input.close();
+                    }
+                } catch (IOException e) {
+                    throw new CatException(e.getMessage(), e);
+                }
+            }
         }
 
         return String.join(STRING_NEWLINE, output);
@@ -179,16 +170,21 @@ public class CatApplication implements CatInterface {
      * @throws CatException
      */
     @Override
-    public String catFileAndStdin(Boolean isLineNumber, InputStream stdin, String... fileName) throws CatException {
+    public String catFileAndStdin(Boolean isLineNumber, InputStream stdin, String... fileName) {
         List<String> output = new ArrayList<>();
         for (String file : fileName) {
-            if ("-".equals(file)) {
-                output.add(catStdin(isLineNumber, stdin));
-            } else {
-                output.add(catFiles(isLineNumber, file));
+            try {
+                if ("-".equals(file)) {
+                    output.add(catStdin(isLineNumber, stdin));
+                } else {
+                    output.add(catFiles(isLineNumber, file));
+                }
+            } catch (CatException e) {
+                output.add(e.getMessage());
             }
         }
 
+        output.removeIf(String::isEmpty); // remove empty lines that represents cases of blank files
         return String.join(STRING_NEWLINE, output);
     }
 

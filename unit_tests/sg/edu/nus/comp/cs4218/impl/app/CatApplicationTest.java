@@ -77,27 +77,27 @@ class CatApplicationTest {
     }
 
     @Test
-    void catFiles_FileDoNotExist_PrintsErrorMessage() {
-        String result = assertDoesNotThrow(() -> app.catFiles(false, nonExistFile));
-        assertEquals(ERR_NON_EXIST, result);
+    void catFiles_FileDoNotExist_ThrowsCatException() {
+        CatException result = assertThrowsExactly(CatException.class, () -> app.catFiles(false, nonExistFile));
+        assertEquals(ERR_NON_EXIST, result.getMessage());
     }
 
     @Test
-    void catFiles_FileGivenAsDirectory_PrintsErrorMessage(@TempDir Path tempDir) {
+    void catFiles_FileGivenAsDirectory_ThrowsCatException(@TempDir Path tempDir) {
         String dir = createNewDirectory(tempDir, "directory").toString();
-        String result = assertDoesNotThrow(() -> app.catFiles(false, dir));
-        String expected = "cat: 'directory': This is a directory";
-        assertEquals(expected, result);
+        CatException result = assertThrowsExactly(CatException.class, () -> app.catFiles(false, dir));
+        String expected = "cat: 'directory': Is a directory";
+        assertEquals(expected, result.getMessage());
     }
 
     @Test
     @DisabledOnOs(value = OS.WINDOWS)
-    void catFiles_FileNoPermissionToRead_PrintsErrorMessage() {
+    void catFiles_FileNoPermissionToRead_ThrowsCatException() {
         boolean isSetReadable = pathA.toFile().setReadable(false);
         assertTrue(isSetReadable, "Failed to set read permission to false for test");
-        String result = assertDoesNotThrow(() -> app.catFiles(false, fileA));
+        CatException result = assertThrowsExactly(CatException.class, () -> app.catFiles(false, fileA));
         String expected = "cat: 'fileA.txt': Could not read file";
-        assertEquals(expected, result);
+        assertEquals(expected, result.getMessage());
     }
 
     @Test
@@ -134,17 +134,15 @@ class CatApplicationTest {
     }
 
     @Test
-    void catFiles_SomeFilesDoNotExistsNoLineNumber_ReturnsConcatenatedFileContentAndErrorMessage() {
-        String result = assertDoesNotThrow(() -> app.catFiles(false, fileA, nonExistFile, fileB));
-        String expected = HELLO_WORLD + STRING_NEWLINE + HEY_JUNIT + STRING_NEWLINE + ERR_NON_EXIST;
-        assertEquals(expected, result);
+    void catFiles_SomeFilesDoNotExistsNoLineNumber_ThrowsCatException() {
+        CatException result = assertThrowsExactly(CatException.class, () -> app.catFiles(false, fileA, nonExistFile, fileB));
+        assertEquals(ERR_NON_EXIST, result.getMessage());
     }
 
     @Test
-    void catFiles_SomeFilesDoNotExistsHasLineNumber_ReturnsConcatenatedFileContentAndErrorMessage() {
-        String result = assertDoesNotThrow(() -> app.catFiles(true, fileA, nonExistFile, fileB));
-        String expected = L1_HELLO_L2_WORLD + STRING_NEWLINE + L1_HEY_L2_JUNIT + STRING_NEWLINE + ERR_NON_EXIST;
-        assertEquals(expected, result);
+    void catFiles_SomeFilesDoNotExistsHasLineNumber_ThrowsCatException() {
+        CatException result = assertThrowsExactly(CatException.class, () -> app.catFiles(true, fileA, nonExistFile, fileB));
+        assertEquals(ERR_NON_EXIST, result.getMessage());
     }
 
     @Test

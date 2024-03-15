@@ -5,6 +5,8 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
+import sg.edu.nus.comp.cs4218.exception.CatException;
+import sg.edu.nus.comp.cs4218.exception.PasteException;
 import sg.edu.nus.comp.cs4218.testutils.TestEnvironmentUtil;
 
 import java.io.ByteArrayInputStream;
@@ -17,13 +19,14 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static sg.edu.nus.comp.cs4218.testutils.TestStringUtils.STRING_NEWLINE;
 
 public class CatApplicationPublicTest {
     private static final String TEXT_ONE = "Test line 1" + STRING_NEWLINE + "Test line 2" + STRING_NEWLINE +
             "Test line 3";
-    private static final String EXPECT_ONE_NUM = "1\tTest line 1" + STRING_NEWLINE + "2\tTest line 2" +
-            STRING_NEWLINE + "3\tTest line 3";
+    private static final String EXPECT_ONE_NUM = "1 Test line 1" + STRING_NEWLINE + "2 Test line 2" +
+            STRING_NEWLINE + "3 Test line 3";
     private static final String TEST_DIR = "temp-cat";
     private static final String TEST_FILE = "fileA.txt";
     private static Path TEST_DIR_PATH;
@@ -60,15 +63,15 @@ public class CatApplicationPublicTest {
 
     @Test
     void catFiles_FolderSpecifiedAbsolutePath_ThrowsException() throws AbstractApplicationException {
-        String actual = catApplication.catFiles(false, TEST_DIR_PATH.toString());
-        assertEquals(String.format("cat: %s: Is a directory", TEST_DIR), actual);
+        Throwable actual = assertThrows(CatException.class, () -> catApplication.catFiles(false, TEST_DIR_PATH.toString()));
+        assertEquals(String.format("cat: '%s': Is a directory", TEST_DIR), actual.getMessage());
     }
 
     @Test
     void catStdin_NoFlag_ReturnsStdinString() throws AbstractApplicationException {
         InputStream inputStream = new ByteArrayInputStream(TEXT_ONE.getBytes());
         String actual = catApplication.catStdin(false, inputStream);
-        assertEquals(TEXT_ONE + STRING_NEWLINE, actual);
+        assertEquals(TEXT_ONE, actual);
     }
 
     @Test
@@ -83,6 +86,6 @@ public class CatApplicationPublicTest {
     void catStdin_IsLineNumberFlag_ReturnsStdinStringLineNo() throws AbstractApplicationException {
         InputStream inputStream = new ByteArrayInputStream(TEXT_ONE.getBytes());
         String actual = catApplication.catStdin(true, inputStream);
-        assertEquals(EXPECT_ONE_NUM + STRING_NEWLINE, actual);
+        assertEquals(EXPECT_ONE_NUM, actual);
     }
 }

@@ -29,7 +29,7 @@ public final class ErrorConstants {
     // Files and folders related
     public static final String ERR_FILE_NOT_FOUND = "No such file or directory";
     public static final String ERR_READING_FILE = "Could not read file";
-    public static final String ERR_IS_DIR = "This is a directory";
+    public static final String ERR_IS_DIR = "Is a directory";
     public static final String ERR_IS_NOT_DIR = "Not a directory";
     public static final String ERR_NO_PERM = "Permission denied";
 
