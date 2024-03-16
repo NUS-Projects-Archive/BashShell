@@ -1,17 +1,15 @@
 package sg.edu.nus.comp.cs4218.impl.app;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import sg.edu.nus.comp.cs4218.exception.CutException;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static sg.edu.nus.comp.cs4218.testutils.TestStringUtils.STRING_NEWLINE;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static sg.edu.nus.comp.cs4218.testutils.TestStringUtils.STRING_NEWLINE;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class CutApplicationPublicIT {
     public static final String CHAR_FLAG = "-c";
@@ -70,10 +68,12 @@ public class CutApplicationPublicIT {
     }
 
     @Test
-    void cutFromFile_InvalidFile_ThrowsException() {
+    void cutFromFile_InvalidFile_WritesErrorMessageToStdout() throws Exception {
         String[] argList = new String[]{BYTE_FLAG, TEST_RANGE, "invalidFile"};
-        assertThrows(CutException.class,
-                     () -> cutApplication.run(argList, System.in, System.out));
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        cutApplication.run(argList, System.in, output);
+        String expected = "cut: 'invalidFile': No such file or directory" + STRING_NEWLINE;
+        assertEquals(expected, output.toString());
     }
 
 }

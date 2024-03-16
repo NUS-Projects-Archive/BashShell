@@ -42,7 +42,7 @@ public class CutApplicationPublicTest {
         int[] ranges = new int[]{1, 3};
         InputStream stdin = generateInputStreamFromStrings("hello world");
         String actual = cutApplication.cutFromStdin(true, false, List.of(ranges), stdin);
-        assertEquals("hel" + STRING_NEWLINE, actual);
+        assertEquals("hel", actual);
     }
 
     @Test
@@ -51,7 +51,7 @@ public class CutApplicationPublicTest {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         InputStream stdin = generateInputStreamFromStrings("hello world");
         String actual = cutApplication.cutFromStdin(false, true, List.of(ranges), stdin);
-        assertEquals("hel" + STRING_NEWLINE, actual);
+        assertEquals("hel", actual);
     }
 
     @Test
@@ -60,7 +60,7 @@ public class CutApplicationPublicTest {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         InputStream stdin = generateInputStreamFromStrings("hello", "world");
         String actual = cutApplication.cutFromStdin(true, false, List.of(ranges), stdin);
-        assertEquals("hel" + STRING_NEWLINE + "wor" + STRING_NEWLINE, actual);
+        assertEquals("hel" + STRING_NEWLINE + "wor", actual);
     }
 
     @Test
@@ -69,7 +69,7 @@ public class CutApplicationPublicTest {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         InputStream stdin = generateInputStreamFromStrings("hello", "world");
         String actual = cutApplication.cutFromStdin(false, true, List.of(ranges), stdin);
-        assertEquals("hel" + STRING_NEWLINE + "wor" + STRING_NEWLINE, actual);
+        assertEquals("hel" + STRING_NEWLINE + "wor", actual);
     }
 
 
