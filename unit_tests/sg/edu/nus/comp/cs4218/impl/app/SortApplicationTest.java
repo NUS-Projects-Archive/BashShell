@@ -40,6 +40,7 @@ class SortApplicationTest {
     private InputStream stdin;
     private Path filePath;
     private String file;
+    private String fileName;
 
     @BeforeEach
     void setUp() throws IOException {
@@ -50,6 +51,7 @@ class SortApplicationTest {
         stdin = new ByteArrayInputStream(content.getBytes());
         filePath = createNewFile(FILE, content);
         file = filePath.toString();
+        fileName = filePath.toFile().getName();
     }
 
     @Test
@@ -89,7 +91,7 @@ class SortApplicationTest {
         SortException result = assertThrowsExactly(SortException.class, () ->
                 app.sortFromFiles(false, false, false, file)
         );
-        String expected = "sort: 'file.txt': Could not read file";
+        String expected = String.format("sort: '%s': Could not read file", fileName);
         assertEquals(expected, result.getMessage());
     }
 
