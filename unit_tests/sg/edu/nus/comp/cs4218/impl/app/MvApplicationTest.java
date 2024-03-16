@@ -6,8 +6,8 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static sg.edu.nus.comp.cs4218.impl.util.AssertUtils.assertFileDoNotExists;
-import static sg.edu.nus.comp.cs4218.impl.util.AssertUtils.assertFileExists;
+import static sg.edu.nus.comp.cs4218.test.AssertUtils.assertFileDoNotExists;
+import static sg.edu.nus.comp.cs4218.test.AssertUtils.assertFileExists;
 
 import java.io.IOException;
 import java.nio.file.Files;

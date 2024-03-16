@@ -2,7 +2,7 @@ package sg.edu.nus.comp.cs4218.impl.util;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static sg.edu.nus.comp.cs4218.impl.util.AssertUtils.assertSameType;
+import static sg.edu.nus.comp.cs4218.test.AssertUtils.assertSameType;
 import static sg.edu.nus.comp.cs4218.impl.util.CustomAssertUtils.assertCallCommandListEquals;
 import static sg.edu.nus.comp.cs4218.impl.util.CustomAssertUtils.assertCommandListEquals;
 
