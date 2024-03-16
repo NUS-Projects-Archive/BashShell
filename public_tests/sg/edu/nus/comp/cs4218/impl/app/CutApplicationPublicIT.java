@@ -41,7 +41,7 @@ public class CutApplicationPublicIT {
     }
 
     @Test
-    void cutFromStdin_SingleLineByByteRange_ReturnCutByByte() throws Exception {
+    void run_SingleLineByByteRange_ReturnCutByByte() throws Exception {
         String[] argList = new String[]{BYTE_FLAG, TEST_RANGE};
         InputStream stdin = generateInputStreamFromStrings("hello world");
         ByteArrayOutputStream output = new ByteArrayOutputStream();
@@ -50,7 +50,7 @@ public class CutApplicationPublicIT {
     }
 
     @Test
-    void cutFromStdin_MultipleLinesByCharRange_ReturnCutContentAtEachLineByByte() throws Exception {
+    void run_MultipleLinesByCharRange_ReturnCutContentAtEachLineByByte() throws Exception {
         String[] argList = new String[]{CHAR_FLAG, TEST_RANGE};
         InputStream stdin = generateInputStreamFromStrings("hello", "world");
         ByteArrayOutputStream output = new ByteArrayOutputStream();
@@ -59,7 +59,7 @@ public class CutApplicationPublicIT {
     }
 
     @Test
-    void cutFromStdin_MultipleLinesByByteRange_ReturnCutContentAtEachLineByByte() throws Exception {
+    void run_MultipleLinesByByteRange_ReturnCutContentAtEachLineByByte() throws Exception {
         String[] argList = new String[]{BYTE_FLAG, TEST_RANGE};
         InputStream stdin = generateInputStreamFromStrings("hello", "world");
         ByteArrayOutputStream output = new ByteArrayOutputStream();
@@ -68,12 +68,11 @@ public class CutApplicationPublicIT {
     }
 
     @Test
-    void cutFromFile_InvalidFile_WritesErrorMessageToStdout() throws Exception {
+    void run_InvalidFile_WritesErrorMessageToStdout() throws Exception {
         String[] argList = new String[]{BYTE_FLAG, TEST_RANGE, "invalidFile"};
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         cutApplication.run(argList, System.in, output);
         String expected = "cut: 'invalidFile': No such file or directory" + STRING_NEWLINE;
         assertEquals(expected, output.toString());
     }
-
 }

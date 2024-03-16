@@ -1,8 +1,8 @@
 package sg.edu.nus.comp.cs4218.impl.app;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import sg.edu.nus.comp.cs4218.exception.CutException;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static sg.edu.nus.comp.cs4218.testutils.TestStringUtils.STRING_NEWLINE;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -10,9 +10,10 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static sg.edu.nus.comp.cs4218.testutils.TestStringUtils.STRING_NEWLINE;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import sg.edu.nus.comp.cs4218.exception.CutException;
 
 public class CutApplicationPublicTest {
     CutApplication cutApplication;
@@ -78,7 +79,6 @@ public class CutApplicationPublicTest {
         int[] ranges = new int[]{1, 3};
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         assertThrows(CutException.class,
-                     () -> cutApplication.cutFromFiles(false, true, List.of(ranges), "invalidFile"));
+                () -> cutApplication.cutFromFiles(false, true, List.of(ranges), "invalidFile"));
     }
-
 }
