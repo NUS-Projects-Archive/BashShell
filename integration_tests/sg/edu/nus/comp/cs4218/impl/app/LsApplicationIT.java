@@ -11,11 +11,11 @@ import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_OSTREAM;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_PERM;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NULL_ARGS;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_WRITE_STREAM;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_FILE_SEP;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 import static sg.edu.nus.comp.cs4218.test.FileUtils.createNewDirectory;
 import static sg.edu.nus.comp.cs4218.test.FileUtils.createNewFile;
 import static sg.edu.nus.comp.cs4218.test.FileUtils.deleteFileOrDirectory;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_FILE_SEP;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -159,7 +159,8 @@ class LsApplicationIT {
     @Test
     void run_NullStdOut_ThrowsLsException() {
         InputStream mockedInputStream = new ByteArrayInputStream("".getBytes());
-        LsException result = assertThrowsExactly(LsException.class, () -> app.run(new String[0], mockedInputStream, null));
+        LsException result = assertThrowsExactly(LsException.class, () -> app.run(new String[0], mockedInputStream,
+                null));
         assertEquals(String.format("ls: %s", ERR_NO_OSTREAM), result.getMessage());
     }
 

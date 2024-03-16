@@ -6,9 +6,9 @@ import static sg.edu.nus.comp.cs4218.impl.app.helper.GrepApplicationHelper.IS_DI
 import static sg.edu.nus.comp.cs4218.impl.app.helper.GrepApplicationHelper.grepResultsFromFiles;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_NOT_FOUND;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_PERM;
-import static sg.edu.nus.comp.cs4218.impl.util.FileUtils.createNewFileInDir;
-import static sg.edu.nus.comp.cs4218.impl.util.FileUtils.deleteFileOrDirectory;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
+import static sg.edu.nus.comp.cs4218.test.FileUtils.createNewFileInDir;
+import static sg.edu.nus.comp.cs4218.test.FileUtils.deleteFileOrDirectory;
 
 import java.nio.file.Path;
 import java.util.StringJoiner;
@@ -59,7 +59,8 @@ class GrepApplicationHelperIT {
     @Test
     void grepResultsFromFiles_ExistingFileWithValidPatternAndNoFlag_LineResultsAndCountResultsIsExpectedOutput() {
         String expectedLR = String.join("", OUTPUT_CONTENTS);
-        assertDoesNotThrow(() -> grepResultsFromFiles(VALID_PAT_SMALL, false, lineResults, countResults, false, fileOneName));
+        assertDoesNotThrow(() -> grepResultsFromFiles(VALID_PAT_SMALL, false, lineResults, countResults, false,
+                fileOneName));
         assertEquals(expectedLR, lineResults.toString());
         assertEquals("2", countResults.toString());
     }
@@ -68,14 +69,16 @@ class GrepApplicationHelperIT {
     void grepResultsFromFile_ExistingFileWithValidPatternAndBothFlagsSet_LineResultsAndCountResultsIsExpectedOutput() {
         String expectedLR = fileOneName + ": " + OUTPUT_CONTENTS[0] + fileOneName + ": " + OUTPUT_CONTENTS[1];
         String expectedCR = fileOneName + ": " + OUTPUT_CONTENTS.length;
-        assertDoesNotThrow(() -> grepResultsFromFiles(VALID_PAT_BIG, true, lineResults, countResults, true, fileOneName));
+        assertDoesNotThrow(() -> grepResultsFromFiles(VALID_PAT_BIG, true, lineResults, countResults, true,
+                fileOneName));
         assertEquals(expectedLR, lineResults.toString());
         assertEquals(expectedCR, countResults.toString());
     }
 
     @Test
     void grepResultsFromFiles_NonExistentFile_LineResultsIsFileNotFoundError() {
-        assertDoesNotThrow(() -> grepResultsFromFiles(VALID_PAT_SMALL, false, lineResults, countResults, false, NON_EXISTENT_FILE));
+        assertDoesNotThrow(() -> grepResultsFromFiles(VALID_PAT_SMALL, false, lineResults, countResults, false,
+                NON_EXISTENT_FILE));
         assertEquals(GREP_STRING + NON_EXISTENT_FILE + ": " + ERR_FILE_NOT_FOUND, lineResults.toString());
     }
 
@@ -83,13 +86,15 @@ class GrepApplicationHelperIT {
     @DisabledOnOs(OS.WINDOWS)
     void grepResultsFromFiles_NoReadPermissionFile_LineResultsIsNoPermissionError() {
         fileOne.toFile().setReadable(false);
-        assertDoesNotThrow(() -> grepResultsFromFiles(VALID_PAT_SMALL, false, lineResults, countResults, false, fileOneName));
+        assertDoesNotThrow(() -> grepResultsFromFiles(VALID_PAT_SMALL, false, lineResults, countResults, false,
+                fileOneName));
         assertEquals(GREP_STRING + fileOneName + ": " + ERR_NO_PERM, lineResults.toString());
     }
 
     @Test
     void grepResultsFromFiles_Directory_LineResultsIsDirectoryError() {
-        assertDoesNotThrow(() -> grepResultsFromFiles(VALID_PAT_SMALL, false, lineResults, countResults, false, tempDir.toString()));
-        assertEquals(GREP_STRING + tempDir.toString() + ": " + IS_DIRECTORY, lineResults.toString());
+        assertDoesNotThrow(() -> grepResultsFromFiles(VALID_PAT_SMALL, false, lineResults, countResults, false,
+                tempDir.toString()));
+        assertEquals(GREP_STRING + tempDir + ": " + IS_DIRECTORY, lineResults.toString());
     }
 }

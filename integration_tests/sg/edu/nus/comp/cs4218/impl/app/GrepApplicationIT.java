@@ -11,10 +11,10 @@ import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_INVALID_REGEX;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_INPUT;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_PERM;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_SYNTAX;
-import static sg.edu.nus.comp.cs4218.test.FileUtils.createNewFileInDir;
-import static sg.edu.nus.comp.cs4218.test.FileUtils.deleteFileOrDirectory;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_STDIN_OUTPUT;
+import static sg.edu.nus.comp.cs4218.test.FileUtils.createNewFileInDir;
+import static sg.edu.nus.comp.cs4218.test.FileUtils.deleteFileOrDirectory;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -94,6 +94,84 @@ class GrepApplicationIT {
     void tearDown() {
         deleteFileOrDirectory(fileOne);
         deleteFileOrDirectory(fileTwo);
+    }
+
+    /**
+     * Tests with valid regex but no input file and stdin specified.
+     */
+    @Test
+    void run_NullStdinAndNoInputFilesSpecified_ThrowsGrepException() {
+        // When
+        GrepException result = assertThrowsExactly(GrepException.class, () ->
+                app.run(new String[]{"abc"}, null, mock(OutputStream.class))
+        );
+
+        // Then
+        assertEquals(GREP_STRING + ERR_NO_INPUT, result.getMessage());
+    }
+
+    /**
+     * Test case where no flags are specified.
+     */
+    @Test
+    void grepFromFileAndStdin_NoFlagsSpecified_ReturnsCorrectOutput() {
+        String result = assertDoesNotThrow(() ->
+                app.grepFromFileAndStdin(VALID_PAT_SMALL, false, false, false, stdin, fileOneName, "-")
+        );
+        String expected = String.join(STRING_NEWLINE, getValidOutputArrWithFileName(fileOneName, STRING_STDIN_OUTPUT)) +
+                STRING_NEWLINE;
+        assertEquals(expected, result);
+    }
+
+    /**
+     * Test case where -i is specified only.
+     */
+    @Test
+    void grepFromFileAndStdin_isCaseSensitiveIsFalse_ReturnsCorrectOutput() {
+        String result = assertDoesNotThrow(() ->
+                app.grepFromFileAndStdin(VALID_PAT_BIG, true, false, false, stdin, fileOneName, "-")
+        );
+        String expected = String.join(STRING_NEWLINE, getValidOutputArrWithFileName(fileOneName, STRING_STDIN_OUTPUT)) +
+                STRING_NEWLINE;
+        assertEquals(expected, result);
+    }
+
+    /**
+     * Test case where -c is specified only.
+     */
+    @Test
+    void grepFromFileAndStdin_isCountLinesIsTrue_ReturnsCorrectOutput() {
+        String result = assertDoesNotThrow(() ->
+                app.grepFromFileAndStdin(VALID_PAT_BIG, false, true, false, stdin, fileOneName, "-")
+        );
+        String expected =
+                String.join(STRING_NEWLINE, fileOneName + ": 0", STRING_STDIN_OUTPUT + ": 0") + STRING_NEWLINE;
+        assertEquals(expected, result);
+    }
+
+    /**
+     * Test case where -H is specified and filename is to be specified in output.
+     */
+    @Test
+    void grepFromFileStdin_isPrefixFileNameIsTrue_ReturnsCorrectOutput() {
+        String result = assertDoesNotThrow(() ->
+                app.grepFromFileAndStdin(VALID_PAT_SMALL, false, false, true, stdin, fileOneName, "-")
+        );
+        String expected = String.join(STRING_NEWLINE, getValidOutputArrWithFileName(fileOneName, STRING_STDIN_OUTPUT)) +
+                STRING_NEWLINE;
+        assertEquals(expected, result);
+    }
+
+    /**
+     * Test case where -i -c -H are specified.
+     */
+    @Test
+    void grepFromFileAndStdin_AllFlagsSpecified_ReturnsCorrectOutput() {
+        String result = assertDoesNotThrow(() ->
+                app.grepFromFileAndStdin(VALID_PAT_SMALL, true, true, true, stdin, fileOneName)
+        );
+        String expected = String.join(STRING_NEWLINE, fileOneName + ": 2") + STRING_NEWLINE;
+        assertEquals(expected, result);
     }
 
     @Nested
@@ -448,7 +526,8 @@ class GrepApplicationIT {
         void run_GetInputFromValidFileAndDashWithIFlagCFlagHFlag_ReturnsCaseInsensitiveCountOfMatchingLinesAndFileNameFromFileAndStdin() {
             // Given
             String[] args = new String[]{FLAG_I, FLAG_C, FLAG_H, VALID_PAT_BIG, fileOneName, DASH};
-            String expected = fileOneName + ": " + "2" + STRING_NEWLINE + STRING_STDIN_OUTPUT + ": " + "2" + STRING_NEWLINE;
+            String expected =
+                    fileOneName + ": " + "2" + STRING_NEWLINE + STRING_STDIN_OUTPUT + ": " + "2" + STRING_NEWLINE;
 
             // When
             assertDoesNotThrow(() -> app.run(args, stdin, stdout));
@@ -456,82 +535,5 @@ class GrepApplicationIT {
             // Then
             assertEquals(expected, stdout.toString());
         }
-    }
-
-    /**
-     * Tests with valid regex but no input file and stdin specified.
-     */
-    @Test
-    void run_NullStdinAndNoInputFilesSpecified_ThrowsGrepException() {
-        // When
-        GrepException result = assertThrowsExactly(GrepException.class, () ->
-                app.run(new String[]{"abc"}, null, mock(OutputStream.class))
-        );
-
-        // Then
-        assertEquals(GREP_STRING + ERR_NO_INPUT, result.getMessage());
-    }
-
-    /**
-     * Test case where no flags are specified.
-     */
-    @Test
-    void grepFromFileAndStdin_NoFlagsSpecified_ReturnsCorrectOutput() {
-        String result = assertDoesNotThrow(() ->
-                app.grepFromFileAndStdin(VALID_PAT_SMALL, false, false, false, stdin, fileOneName, "-")
-        );
-        String expected = String.join(STRING_NEWLINE, getValidOutputArrWithFileName(fileOneName, STRING_STDIN_OUTPUT)) +
-                STRING_NEWLINE;
-        assertEquals(expected, result);
-    }
-
-    /**
-     * Test case where -i is specified only.
-     */
-    @Test
-    void grepFromFileAndStdin_isCaseSensitiveIsFalse_ReturnsCorrectOutput() {
-        String result = assertDoesNotThrow(() ->
-                app.grepFromFileAndStdin(VALID_PAT_BIG, true, false, false, stdin, fileOneName, "-")
-        );
-        String expected = String.join(STRING_NEWLINE, getValidOutputArrWithFileName(fileOneName, STRING_STDIN_OUTPUT)) +
-                STRING_NEWLINE;
-        assertEquals(expected, result);
-    }
-
-    /**
-     * Test case where -c is specified only.
-     */
-    @Test
-    void grepFromFileAndStdin_isCountLinesIsTrue_ReturnsCorrectOutput() {
-        String result = assertDoesNotThrow(() ->
-                app.grepFromFileAndStdin(VALID_PAT_BIG, false, true, false, stdin, fileOneName, "-")
-        );
-        String expected = String.join(STRING_NEWLINE, fileOneName + ": 0", STRING_STDIN_OUTPUT + ": 0") + STRING_NEWLINE;
-        assertEquals(expected, result);
-    }
-
-    /**
-     * Test case where -H is specified and filename is to be specified in output.
-     */
-    @Test
-    void grepFromFileStdin_isPrefixFileNameIsTrue_ReturnsCorrectOutput() {
-        String result = assertDoesNotThrow(() ->
-                app.grepFromFileAndStdin(VALID_PAT_SMALL, false, false, true, stdin, fileOneName, "-")
-        );
-        String expected = String.join(STRING_NEWLINE, getValidOutputArrWithFileName(fileOneName, STRING_STDIN_OUTPUT)) +
-                STRING_NEWLINE;
-        assertEquals(expected, result);
-    }
-
-    /**
-     * Test case where -i -c -H are specified.
-     */
-    @Test
-    void grepFromFileAndStdin_AllFlagsSpecified_ReturnsCorrectOutput() {
-        String result = assertDoesNotThrow(() ->
-                app.grepFromFileAndStdin(VALID_PAT_SMALL, true, true, true, stdin, fileOneName)
-        );
-        String expected = String.join(STRING_NEWLINE, fileOneName + ": 2") + STRING_NEWLINE;
-        assertEquals(expected, result);
     }
 }
