@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class MkdirApplicationPublicTest {
     MkdirApplication mkdirApplication;
-    String pathToTestDir = "TestResources" + File.separator + "mkdirTestDir" + File.separator;
+    String pathToTestDir = "testing_utilities" + File.separator + "mkdirTestDir" + File.separator;
     String tempDir = pathToTestDir + "mkdirTest";
     String tempDir2 = pathToTestDir + "mkdirTest2";
     String tempParent = pathToTestDir + "mkdirTestParent";
