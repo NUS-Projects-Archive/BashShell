@@ -4,6 +4,7 @@ import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_INVALID_APP;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Arrays;
 
 import sg.edu.nus.comp.cs4218.Application;
 import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
@@ -59,28 +60,51 @@ public class ApplicationRunner {
      */
     public void runApp(String app, String[] argsArray, InputStream inputStream, OutputStream outputStream)
             throws AbstractApplicationException, ShellException {
-        Application application;
+        Application application = createApp(app);
+        application.run(argsArray, inputStream, outputStream);
+    }
 
+    /**
+     * Creates and returns an instance of the specified application.
+     *
+     * @param app The name of the application to create
+     * @return An instance of the specified application
+     * @throws ShellException If the specified application is invalid
+     */
+    public Application createApp(String app) throws ShellException {
         switch (app) {
-            case APP_ECHO:  application = new EchoApplication();    break;
-            case APP_CD:    application = new CdApplication();      break;
-            case APP_WC:    application = new WcApplication();      break;
-            case APP_MKDIR: application = new MkdirApplication();   break;
-            case APP_SORT:  application = new SortApplication();    break;
-            case APP_CAT:   application = new CatApplication();     break;
-            case APP_EXIT:  application = new ExitApplication();    break;
-            case APP_LS:    application = new LsApplication();      break;
-            case APP_PASTE: application = new PasteApplication();   break;
-            case APP_UNIQ:  application = new UniqApplication();    break;
-            case APP_MV:    application = new MvApplication();      break;
-            case APP_CUT:   application = new CutApplication();     break;
-            case APP_RM:    application = new RmApplication();      break;
-            case APP_TEE:   application = new TeeApplication();     break;
-            case APP_GREP:  application = new GrepApplication();    break;
+            case APP_ECHO:
+                return new EchoApplication();
+            case APP_CD:
+                return new CdApplication();
+            case APP_WC:
+                return new WcApplication();
+            case APP_MKDIR:
+                return new MkdirApplication();
+            case APP_SORT:
+                return new SortApplication();
+            case APP_CAT:
+                return new CatApplication();
+            case APP_EXIT:
+                return new ExitApplication();
+            case APP_LS:
+                return new LsApplication();
+            case APP_PASTE:
+                return new PasteApplication();
+            case APP_UNIQ:
+                return new UniqApplication();
+            case APP_MV:
+                return new MvApplication();
+            case APP_CUT:
+                return new CutApplication();
+            case APP_RM:
+                return new RmApplication();
+            case APP_TEE:
+                return new TeeApplication();
+            case APP_GREP:
+                return new GrepApplication();
             default:
                 throw new ShellException(app + ": " + ERR_INVALID_APP);
         }
-
-        application.run(argsArray, inputStream, outputStream);
     }
 }

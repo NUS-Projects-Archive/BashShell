@@ -102,7 +102,7 @@ class CatApplicationTest {
         boolean isSetReadable = pathA.toFile().setReadable(false);
         assertTrue(isSetReadable, "Failed to set read permission to false for test");
         String result = assertDoesNotThrow(() -> app.catFiles(false, fileA));
-        String expected = "cat: 'fileA.txt': Permission denied";
+        String expected = "cat: 'fileA.txt': Could not read file";
         assertEquals(expected, result);
     }
 

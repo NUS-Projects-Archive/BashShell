@@ -3,6 +3,7 @@ package sg.edu.nus.comp.cs4218.impl.app;
 import static sg.edu.nus.comp.cs4218.exception.UniqException.COUNT_ALL_DUP_ERR;
 import static sg.edu.nus.comp.cs4218.exception.UniqException.PROB_UNIQ_FILE;
 import static sg.edu.nus.comp.cs4218.exception.UniqException.PROB_UNIQ_STDIN;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_NOT_FOUND;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_READING_FILE;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_WRITE_STREAM;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
@@ -110,7 +111,7 @@ public class UniqApplication implements UniqInterface {
             writer.write(result);
             writer.close();
         } catch (FileNotFoundException e) {
-            throw new UniqException(PROB_UNIQ_FILE + ERR_READING_FILE, e);
+            throw new UniqException(PROB_UNIQ_FILE + ERR_FILE_NOT_FOUND, e);
         } catch (IOException e) {
             throw new UniqException(PROB_UNIQ_FILE + e.getMessage(), e);
         } finally {

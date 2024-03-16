@@ -1,11 +1,13 @@
 package sg.edu.nus.comp.cs4218.impl.app;
 
+import static sg.edu.nus.comp.cs4218.impl.util.CollectionsUtils.listToArray;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_NOT_FOUND;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IO_EXCEPTION;
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IS_DIR;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IS_NOT_DIR;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_ARGS;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_PERM;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NULL_ARGS;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_READING_FILE;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -20,7 +22,6 @@ import sg.edu.nus.comp.cs4218.app.MvInterface;
 import sg.edu.nus.comp.cs4218.exception.InvalidArgsException;
 import sg.edu.nus.comp.cs4218.exception.MvException;
 import sg.edu.nus.comp.cs4218.impl.parser.MvArgsParser;
-import sg.edu.nus.comp.cs4218.impl.util.CollectionsUtils;
 import sg.edu.nus.comp.cs4218.impl.util.IOUtils;
 
 /**
@@ -62,13 +63,15 @@ public class MvApplication implements MvInterface {
         }
 
         final Boolean isOverwrite = parser.isOverwrite();
-        final String[] srcDirectories = CollectionsUtils.listToArray(parser.getSourceDirectories());
+        final String[] srcDirectories = listToArray(parser.getSourceDirectories());
         final String destDirectory = parser.getDestinationDirectory();
 
-        if (srcDirectories.length > 1) {
-            mvFilesToFolder(isOverwrite, destDirectory, srcDirectories);
-        } else {
+        if (srcDirectories.length == 0) {
+            throw new MvException(ERR_NO_ARGS);
+        } else if (srcDirectories.length == 1) {
             mvSrcFileToDestFile(isOverwrite, srcDirectories[0], destDirectory);
+        } else {
+            mvFilesToFolder(isOverwrite, destDirectory, srcDirectories);
         }
     }
 
@@ -87,15 +90,19 @@ public class MvApplication implements MvInterface {
         Path destPath = IOUtils.resolveFilePath(destFile);
 
         if (!Files.exists(srcPath)) {
-            throw new MvException(String.format("cannot find '%s': %s", srcFile, ERR_FILE_NOT_FOUND));
+            throw new MvException(formatFileExceptionMsg(srcFile, ERR_FILE_NOT_FOUND));
         }
 
         if (!Files.isReadable(srcPath)) {
-            throw new MvException(String.format("cannot read '%s': %s", srcFile, ERR_NO_PERM));
+            throw new MvException(formatFileExceptionMsg(srcFile, ERR_READING_FILE));
+        }
+
+        if (!Files.isWritable(srcPath)) {
+            throw new MvException(formatFileExceptionMsg(srcFile, ERR_NO_PERM));
         }
 
         if (Files.exists(destPath) && !Files.isWritable(destPath)) {
-            throw new MvException(String.format("cannot write '%s': %s", destPath, ERR_NO_PERM));
+            throw new MvException(formatFileExceptionMsg(destFile, ERR_NO_PERM));
         }
 
         // Append file name to destination directory if destination is a directory
@@ -129,15 +136,15 @@ public class MvApplication implements MvInterface {
         Path destFolderPath = IOUtils.resolveFilePath(destFolder);
 
         if (!Files.exists(destFolderPath)) {
-            throw new MvException(String.format("cannot find '%s': %s", destFolder, ERR_FILE_NOT_FOUND));
+            throw new MvException(formatFileExceptionMsg(destFolder, ERR_FILE_NOT_FOUND));
         }
 
         if (!Files.isDirectory(destFolderPath)) {
-            throw new MvException(String.format("cannot move '%s': %s", destFolder, ERR_IS_DIR));
+            throw new MvException(formatFileExceptionMsg(destFolder, ERR_IS_NOT_DIR));
         }
 
         if (!Files.isWritable(destFolderPath)) {
-            throw new MvException(String.format("cannot write '%s': %s", destFolder, ERR_NO_PERM));
+            throw new MvException(formatFileExceptionMsg(destFolder, ERR_NO_PERM));
         }
 
         List<MvException> errorList = new ArrayList<>();
@@ -147,11 +154,11 @@ public class MvApplication implements MvInterface {
                 Path destPath = destFolderPath.resolve(srcPath.getFileName());
 
                 if (!Files.exists(srcPath)) {
-                    throw new MvException(String.format("cannot find '%s': %s", srcFile, ERR_FILE_NOT_FOUND));
+                    throw new MvException(formatFileExceptionMsg(srcFile, ERR_FILE_NOT_FOUND));
                 }
 
                 if (!Files.isReadable(srcPath)) {
-                    throw new MvException(String.format("cannot read '%s': %s", srcFile, ERR_NO_PERM));
+                    throw new MvException(formatFileExceptionMsg(srcFile, ERR_READING_FILE));
                 }
 
                 try {
@@ -172,5 +179,9 @@ public class MvApplication implements MvInterface {
         }
 
         return null;
+    }
+
+    private String formatFileExceptionMsg(String file, String error) {
+        return String.format("'%s': %s", file, error);
     }
 }

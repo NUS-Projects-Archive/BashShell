@@ -8,19 +8,17 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.joinStringsByNewline;
+import static sg.edu.nus.comp.cs4218.test.FileUtils.createNewFile;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir;
 
 import sg.edu.nus.comp.cs4218.exception.SortException;
 
@@ -33,7 +31,7 @@ public class SortApplicationIT {
     private static final String SMALL_B = "b";
     private static final String SMALL_O = "o";
 
-    private static final String[] FILE_CONTENT = {"5", BIG_A, "2", BIG_B, "10", SMALL_O, "1", SMALL_A, "3", SMALL_B};
+    private static final String[] CONTENT = {"5", BIG_A, "2", BIG_B, "10", SMALL_O, "1", SMALL_A, "3", SMALL_B};
     private static final String[] OUT_NO_FLAGS = {"1", "10", "2", "3", "5", BIG_A, BIG_B, SMALL_A, SMALL_B, SMALL_O};
     private static final String[] OUT_FIRST_NUM = {"1", "2", "3", "5", "10", BIG_A, BIG_B, SMALL_A, SMALL_B, SMALL_O};
     private static final String[] OUT_REV_ORDER = {SMALL_O, SMALL_B, SMALL_A, BIG_B, BIG_A, "5", "3", "2", "10", "1"};
@@ -58,7 +56,7 @@ public class SortApplicationIT {
     @Test
     void run_NullStdout_ThrowsSortException() {
         SortException result = assertThrowsExactly(SortException.class, () -> {
-            InputStream mockStdin = mock(InputStream.class);
+            InputStream mockStdin = System.in;
             app.run(null, mockStdin, null);
         });
         String expected = "sort: OutputStream not provided";
@@ -68,11 +66,12 @@ public class SortApplicationIT {
     @Test
     void run_FailsToWriteToOutputStream_ThrowsSortException() {
         String[] args = {};
+        String content = joinStringsByNewline(CONTENT);
         SortException result = assertThrowsExactly(SortException.class, () -> {
-            InputStream mockStdin = new ByteArrayInputStream("mock data".getBytes());
-            OutputStream mockedStdout = mock(OutputStream.class);
-            doThrow(new IOException()).when(mockedStdout).write(any(byte[].class));
-            app.run(args, mockStdin, mockedStdout);
+            InputStream mockStdin = new ByteArrayInputStream(content.getBytes());
+            OutputStream mockStdout = mock(OutputStream.class);
+            doThrow(new IOException()).when(mockStdout).write(any(byte[].class));
+            app.run(args, mockStdin, mockStdout);
         });
         String expected = "sort: Could not write to output stream";
         assertEquals(expected, result.getMessage());
@@ -85,15 +84,12 @@ public class SortApplicationIT {
         private String file;
 
         @BeforeEach
-        void setUp(@TempDir Path tempDir) throws IOException {
+        void setUp() throws IOException {
             mockStdin = mock(InputStream.class);
 
             // Create temporary file, automatically deletes after test execution
-            String content = joinStringsByNewline(FILE_CONTENT);
-            Path filePath = tempDir.resolve("file.txt");
-            Files.createFile(filePath);
-            Files.write(filePath, content.getBytes());
-            file = filePath.toString();
+            String content = joinStringsByNewline(CONTENT);
+            file = createNewFile("file.txt", content).toString();
         }
 
         @Test
@@ -144,7 +140,7 @@ public class SortApplicationIT {
 
         @BeforeEach
         void setUp() {
-            String content = joinStringsByNewline(FILE_CONTENT);
+            String content = joinStringsByNewline(CONTENT);
             stdin = new ByteArrayInputStream(content.getBytes());
         }
 

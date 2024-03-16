@@ -13,6 +13,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
+import sg.edu.nus.comp.cs4218.exception.MkdirException;
+
 class MkdirApplicationTest {
 
     private static final String FILE = "file.txt";
@@ -37,13 +39,27 @@ class MkdirApplicationTest {
     }
 
     @Test
+    void createFolder_NullArguments_ThrowsMkdirException() {
+        MkdirException result = assertThrowsExactly(MkdirException.class, () -> app.createFolder());
+        String expected = "mkdir: Null arguments";
+        assertEquals(expected, result.getMessage());
+    }
+
+    @Test
+    void createFolder_FolderAsEmptyString_ThrowsMkdirException() {
+        MkdirException result = assertThrowsExactly(MkdirException.class, () -> app.createFolder(""));
+        String expected = "mkdir: No folder names are supplied";
+        assertEquals(expected, result.getMessage());
+    }
+
+    @Test
     void createFolder_FolderExists_NoActionTaken() {
         // Given
         assertFileExists(file);
         List<String> expectedContent = assertDoesNotThrow(() -> Files.readAllLines(filePath));
 
         // When
-        app.createFolder(filePath.toString());
+        assertDoesNotThrow(() -> app.createFolder(filePath.toString()));
         List<String> actualContent = assertDoesNotThrow(() -> Files.readAllLines(filePath));
 
         // Then

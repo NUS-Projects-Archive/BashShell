@@ -110,12 +110,14 @@ class CdApplicationIT {
     }
 
     /**
-     * Tests run method in CdApplication with empty args and expects the current directory to remain unchanged.
+     * Tests run method in CdApplication with no args and expects the current directory to be changed to the home.
      */
     @Test
-    void run_EmptyArgs_DoNothing() {
+    void run_EmptyArgs_ChangesToHomeDir() {
+        String expectedDir = System.getProperty("user.dir");
         assertDoesNotThrow(() -> app.run(new String[]{}, mockInputStream, mockOutputStream));
-        assertEquals(Environment.currentDirectory, Environment.currentDirectory);
+        String currDir = Environment.currentDirectory;
+        assertEquals(expectedDir, currDir);
     }
 
     /**
