@@ -1,11 +1,7 @@
 package sg.edu.nus.comp.cs4218.impl.app;
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import sg.edu.nus.comp.cs4218.exception.RmException;
-import sg.edu.nus.comp.cs4218.testutils.TestEnvironmentUtil;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.io.File;
 import java.nio.file.Files;
@@ -13,8 +9,13 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Comparator;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import sg.edu.nus.comp.cs4218.exception.RmException;
+import sg.edu.nus.comp.cs4218.testutils.TestEnvironmentUtil;
 
 public class RmApplicationPublicTest {
     private static final String TEMP = "temp-rm" + File.separator;
@@ -25,19 +26,19 @@ public class RmApplicationPublicTest {
     private static final String FILE_C = "rmC";
     private static final String FILE_D = "rmD";
 
-    private static Path TEMP_PATH;
+    private static Path tempPath;
     private RmApplication rmApplication;
 
 
     @BeforeAll
     static void createTemp() throws NoSuchFieldException, IllegalAccessException {
-        TEMP_PATH = Paths.get(TestEnvironmentUtil.getCurrentDirectory(), TEMP);
+        tempPath = Paths.get(TestEnvironmentUtil.getCurrentDirectory(), TEMP);
     }
 
     @BeforeEach
     public void setUp() throws Exception {
         rmApplication = new RmApplication();
-        Files.createDirectory(TEMP_PATH);
+        Files.createDirectory(tempPath);
         Files.createFile(Paths.get(TEMP + FILE_A));
         Files.createFile(Paths.get(TEMP + FILE_B));
         Files.createFile(Paths.get(TEMP + FILE_C));

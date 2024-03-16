@@ -1,9 +1,7 @@
 package sg.edu.nus.comp.cs4218.impl.app;
 
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -14,57 +12,60 @@ import java.util.ArrayList;
 import java.util.Deque;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import sg.edu.nus.comp.cs4218.exception.RmException;
 import sg.edu.nus.comp.cs4218.testutils.TestEnvironmentUtil;
 
+@SuppressWarnings("PMD.ClassNamingConventions")
 public class RmApplicationPublicIT {
     private static final String TEMP = "temp-rm";
-    private static final Deque<Path> files = new ArrayDeque<>();
-    private static Path TEMP_PATH;
+    private static final Deque<Path> FILES = new ArrayDeque<>();
+    private static Path tempPath;
 
     private RmApplication rmApplication;
-    
+
     @BeforeAll
     static void createTemp() throws IOException, NoSuchFieldException, IllegalAccessException {
-        TEMP_PATH = Paths.get(TestEnvironmentUtil.getCurrentDirectory(), TEMP);
-        Files.createDirectory(TEMP_PATH);
+        tempPath = Paths.get(TestEnvironmentUtil.getCurrentDirectory(), TEMP);
+        Files.createDirectory(tempPath);
     }
-    
+
+    @AfterAll
+    static void deleteTemp() throws IOException {
+        for (Path file : FILES) {
+            Files.deleteIfExists(file);
+        }
+        Files.delete(tempPath);
+    }
+
     @BeforeEach
     void setUp() {
         rmApplication = new RmApplication();
     }
 
-    @AfterAll
-    static void deleteTemp() throws IOException {
-        for (Path file : files) {
-            Files.deleteIfExists(file);
-        }
-        Files.delete(TEMP_PATH);
-    }
-
     private Path createFile(String name) throws IOException {
-        return createFile(name, TEMP_PATH);
+        return createFile(name, tempPath);
     }
 
     private Path createDirectory(String folder) throws IOException {
-        return createDirectory(folder, TEMP_PATH);
+        return createDirectory(folder, tempPath);
     }
 
     private Path createFile(String name, Path inPath) throws IOException {
         Path path = inPath.resolve(name);
         Files.createFile(path);
-        files.push(path);
+        FILES.push(path);
         return path;
     }
 
     private Path createDirectory(String folder, Path inPath) throws IOException {
         Path path = inPath.resolve(folder);
         Files.createDirectory(path);
-        files.push(path);
+        FILES.push(path);
         return path;
     }
 
@@ -91,7 +92,7 @@ public class RmApplicationPublicIT {
     @Test
     void run_SpaceInName_DeletesFile() throws Exception {
         Path fileC = createFile("c   c");
-        rmApplication.run(toArgs("","c   c"), System.in, System.out);
+        rmApplication.run(toArgs("", "c   c"), System.in, System.out);
         assertTrue(Files.notExists(fileC));
     }
 
@@ -99,7 +100,7 @@ public class RmApplicationPublicIT {
     void run_MultipleFiles_DeletesFiles() throws Exception {
         Path fileD = createFile("d.txt");
         Path fileE = createFile("eerie");
-        rmApplication.run(toArgs("","d.txt", "eerie"), System.in, System.out);
+        rmApplication.run(toArgs("", "d.txt", "eerie"), System.in, System.out);
         assertTrue(Files.notExists(fileD));
         assertTrue(Files.notExists(fileE));
     }
@@ -167,7 +168,7 @@ public class RmApplicationPublicIT {
     void run_AbsolutePath_DeletesDirectory() throws Exception {
         Path directory = createDirectory("directoryAbs");
         createDirectory("innerAbs", directory);
-        rmApplication.run(new String[]{"-r", TEMP_PATH.resolve("directoryAbs").toString()}, System.in, System.out);
+        rmApplication.run(new String[]{"-r", tempPath.resolve("directoryAbs").toString()}, System.in, System.out);
         assertTrue(Files.notExists(directory));
     }
 
