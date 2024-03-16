@@ -7,7 +7,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.LinkedList;
 import java.util.List;
 
 import sg.edu.nus.comp.cs4218.Command;
@@ -41,7 +40,6 @@ public class SequenceCommand implements Command {
     public void evaluate(InputStream stdin, OutputStream stdout)
             throws AbstractApplicationException, ShellException, FileNotFoundException {
         ExitException exitException = null;
-        List<String> outputLines = new LinkedList<>();
 
         for (Command command : commands) {
             try {
@@ -50,26 +48,26 @@ public class SequenceCommand implements Command {
 
                 String outputLine = outputStream.toString();
                 if (!outputLine.isEmpty()) {
-                    outputLines.add(outputLine);
+                    write(stdout, outputLine);
                 }
             } catch (ExitException e) {
                 exitException = e;
 
             } catch (AbstractApplicationException | ShellException e) {
-                outputLines.add(e.getMessage() + STRING_NEWLINE);
-            }
-        }
-
-        for (String outputLine : outputLines) {
-            try {
-                stdout.write(outputLine.getBytes());
-            } catch (IOException e) {
-                throw new ShellException(e.getMessage(), e);
+                write(stdout, e.getMessage() + STRING_NEWLINE);
             }
         }
 
         if (exitException != null) {
             throw exitException;
+        }
+    }
+
+    public void write(OutputStream outputStream, String message) throws ShellException {
+        try {
+            outputStream.write(message.getBytes());
+        } catch (IOException e) {
+            throw new ShellException(e.getMessage(), e);
         }
     }
 
