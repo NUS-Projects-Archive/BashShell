@@ -44,6 +44,7 @@ class CatApplicationTest {
     private InputStream mockStdin;
     private Path pathA;
     private String fileA;
+    private String fileAName;
     private String fileB;
     private String nonExistFile;
 
@@ -58,6 +59,7 @@ class CatApplicationTest {
 
         pathA = createNewFile("fileA.txt", HELLO_WORLD);
         fileA = pathA.toString();
+        fileAName = pathA.toFile().getName();
         fileB = createNewFile("fileB.txt", HEY_JUNIT).toString();
         nonExistFile = tempDir.resolve("nonExistFile.txt").toString();
     }
@@ -92,11 +94,11 @@ class CatApplicationTest {
 
     @Test
     @DisabledOnOs(value = OS.WINDOWS)
-    void catFiles_FileNoPermissionToRead_ThrowsCatException() {
+    void catFiles_FileNoPermissionToRead_ThrowsCatException(@TempDir Path tempDir) {
         boolean isSetReadable = pathA.toFile().setReadable(false);
         assertTrue(isSetReadable, "Failed to set read permission to false for test");
         CatException result = assertThrowsExactly(CatException.class, () -> app.catFiles(false, fileA));
-        String expected = String.format("cat: '%s': Could not read file", fileA);
+        String expected = String.format("cat: '%s': Could not read file", fileAName);
         assertEquals(expected, result.getMessage());
     }
 

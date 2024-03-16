@@ -63,8 +63,8 @@ public class CatApplicationPublicTest {
 
     @Test
     void catFiles_FolderSpecifiedAbsolutePath_ThrowsException() throws AbstractApplicationException {
-        Throwable actual = assertThrows(CatException.class, () -> catApplication.catFiles(false, TEST_DIR_PATH.toString()));
-        assertEquals(String.format("cat: '%s': Is a directory", TEST_DIR), actual.getMessage());
+        String actual = catApplication.catFiles(false, TEST_DIR_PATH.toString());
+        assertEquals(String.format("cat: '%s': Is a directory", TEST_DIR), actual);
     }
 
     @Test
