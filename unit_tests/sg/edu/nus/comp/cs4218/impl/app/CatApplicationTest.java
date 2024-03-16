@@ -96,7 +96,7 @@ class CatApplicationTest {
         boolean isSetReadable = pathA.toFile().setReadable(false);
         assertTrue(isSetReadable, "Failed to set read permission to false for test");
         CatException result = assertThrowsExactly(CatException.class, () -> app.catFiles(false, fileA));
-        String expected = "cat: 'fileA.txt': Could not read file";
+        String expected = String.format("cat: '%s': Could not read file", fileA);
         assertEquals(expected, result.getMessage());
     }
 
