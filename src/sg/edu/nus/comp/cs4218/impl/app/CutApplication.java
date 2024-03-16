@@ -124,22 +124,11 @@ public class CutApplication implements CutInterface {
             if (!node.canRead()) {
                 throw new CutException(String.format("'%s': %s", node.getName(), ERR_READING_FILE));
             }
-            InputStream input = null;
-            try {
-                input = IOUtils.openInputStream(file);
+
+            try (InputStream input = IOUtils.openInputStream(file)) {
                 output.addAll(cutSelectedPortions(isCharPo, isBytePo, ranges, input));
-                IOUtils.closeInputStream(input);
-                input.close();
             } catch (ShellException | IOException e) {
                 throw new CutException(e.getMessage(), e);
-            } finally {
-                try {
-                    if (input != null) {
-                        input.close();
-                    }
-                } catch (IOException e) {
-                    throw new CutException(e.getMessage(), e);
-                }
             }
         }
 
