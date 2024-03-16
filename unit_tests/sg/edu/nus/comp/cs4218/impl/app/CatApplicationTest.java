@@ -7,8 +7,10 @@ import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static sg.edu.nus.comp.cs4218.test.AssertUtils.assertEmptyString;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
+import static sg.edu.nus.comp.cs4218.test.AssertUtils.assertEmptyString;
+import static sg.edu.nus.comp.cs4218.test.FileUtils.createNewDirectory;
+import static sg.edu.nus.comp.cs4218.test.FileUtils.createNewFile;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -38,33 +40,26 @@ class CatApplicationTest {
     private static final String[] PARAM_TEST_VALUES = {"", "hello", HELLO_WORLD};
     private static final String ERR_NON_EXIST = "cat: 'nonExistFile.txt': No such file or directory";
 
-    @TempDir
-    private Path tempDir;
+    private CatApplication app;
+    private InputStream mockStdin;
     private Path pathA;
     private String fileA;
     private String fileB;
     private String nonExistFile;
-    private CatApplication app;
-    private InputStream inputStreamMock;
 
     private static List<String> getParams() {
         return Arrays.asList(PARAM_TEST_VALUES);
     }
 
     @BeforeEach
-    void setUp() throws IOException {
+    void setUp(@TempDir Path tempDir) throws IOException {
         app = new CatApplication();
-        inputStreamMock = mock(InputStream.class);
+        mockStdin = mock(InputStream.class);
 
-        pathA = tempDir.resolve("fileA.txt");
-        Path pathB = tempDir.resolve("fileB.txt");
-
+        pathA = createNewFile("fileA.txt", HELLO_WORLD);
         fileA = pathA.toString();
-        fileB = pathB.toString();
+        fileB = createNewFile("fileB.txt", HEY_JUNIT).toString();
         nonExistFile = tempDir.resolve("nonExistFile.txt").toString();
-
-        Files.write(pathA, List.of(HELLO_WORLD));
-        Files.write(pathB, List.of(HEY_JUNIT));
     }
 
     @Test
@@ -88,11 +83,10 @@ class CatApplicationTest {
     }
 
     @Test
-    void catFiles_FileGivenAsDirectory_PrintsErrorMessage() {
-        Path subDir = tempDir.resolve("subdirectory");
-        assertDoesNotThrow(() -> Files.createDirectories(subDir));
-        String result = assertDoesNotThrow(() -> app.catFiles(false, subDir.toString()));
-        String expected = "cat: 'subdirectory': This is a directory";
+    void catFiles_FileGivenAsDirectory_PrintsErrorMessage(@TempDir Path tempDir) {
+        String dir = createNewDirectory(tempDir, "directory").toString();
+        String result = assertDoesNotThrow(() -> app.catFiles(false, dir));
+        String expected = "cat: 'directory': This is a directory";
         assertEquals(expected, result);
     }
 
@@ -128,25 +122,29 @@ class CatApplicationTest {
     @Test
     void catFiles_MultipleFilesNoLineNumber_ReturnsConcatenatedFileContent() {
         String result = assertDoesNotThrow(() -> app.catFiles(false, fileA, fileB));
-        assertEquals(HELLO_WORLD + STRING_NEWLINE + HEY_JUNIT, result);
+        String expected = HELLO_WORLD + STRING_NEWLINE + HEY_JUNIT;
+        assertEquals(expected, result);
     }
 
     @Test
     void catFiles_MultipleFilesHasLineNumber_ReturnsLineNumberedConcatenatedFileContent() {
         String result = assertDoesNotThrow(() -> app.catFiles(true, fileA, fileB));
-        assertEquals(L1_HELLO_L2_WORLD + STRING_NEWLINE + L1_HEY_L2_JUNIT, result);
+        String expected = L1_HELLO_L2_WORLD + STRING_NEWLINE + L1_HEY_L2_JUNIT;
+        assertEquals(expected, result);
     }
 
     @Test
     void catFiles_SomeFilesDoNotExistsNoLineNumber_ReturnsConcatenatedFileContentAndErrorMessage() {
         String result = assertDoesNotThrow(() -> app.catFiles(false, fileA, nonExistFile, fileB));
-        assertEquals(HELLO_WORLD + STRING_NEWLINE + HEY_JUNIT + STRING_NEWLINE + ERR_NON_EXIST, result);
+        String expected = HELLO_WORLD + STRING_NEWLINE + HEY_JUNIT + STRING_NEWLINE + ERR_NON_EXIST;
+        assertEquals(expected, result);
     }
 
     @Test
     void catFiles_SomeFilesDoNotExistsHasLineNumber_ReturnsConcatenatedFileContentAndErrorMessage() {
         String result = assertDoesNotThrow(() -> app.catFiles(true, fileA, nonExistFile, fileB));
-        assertEquals(L1_HELLO_L2_WORLD + STRING_NEWLINE + L1_HEY_L2_JUNIT + STRING_NEWLINE + ERR_NON_EXIST, result);
+        String expected = L1_HELLO_L2_WORLD + STRING_NEWLINE + L1_HEY_L2_JUNIT + STRING_NEWLINE + ERR_NON_EXIST;
+        assertEquals(expected, result);
     }
 
     @Test
@@ -158,22 +156,22 @@ class CatApplicationTest {
 
     @Test
     void catStdin_IOExceptionWhenReadingInput_ThrowsCatException() {
-        when(assertDoesNotThrow(() -> inputStreamMock.read())).thenThrow(new IOException());
-        assertThrows(CatException.class, () -> app.catStdin(false, inputStreamMock));
+        when(assertDoesNotThrow(() -> mockStdin.read())).thenThrow(new IOException());
+        assertThrows(CatException.class, () -> app.catStdin(false, mockStdin));
     }
 
     @ParameterizedTest
     @MethodSource("getParams")
     void catStdin_ValidInputStreamNoLineNumber_ReturnsUserInput(String args) {
-        inputStreamMock = new ByteArrayInputStream(args.getBytes(StandardCharsets.UTF_8));
-        String result = assertDoesNotThrow(() -> app.catStdin(false, inputStreamMock));
+        mockStdin = new ByteArrayInputStream(args.getBytes(StandardCharsets.UTF_8));
+        String result = assertDoesNotThrow(() -> app.catStdin(false, mockStdin));
         assertEquals(args, result);
     }
 
     @Test
     void catStdin_ValidInputStreamHasLineNumber_ReturnsLineNumberedUserInput() {
-        inputStreamMock = new ByteArrayInputStream(HELLO_WORLD.getBytes(StandardCharsets.UTF_8));
-        String result = assertDoesNotThrow(() -> app.catStdin(true, inputStreamMock));
+        mockStdin = new ByteArrayInputStream(HELLO_WORLD.getBytes(StandardCharsets.UTF_8));
+        String result = assertDoesNotThrow(() -> app.catStdin(true, mockStdin));
         assertEquals(L1_HELLO_L2_WORLD, result);
     }
 }
