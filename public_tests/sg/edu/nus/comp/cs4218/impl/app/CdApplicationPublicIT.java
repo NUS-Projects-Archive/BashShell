@@ -1,20 +1,22 @@
 package sg.edu.nus.comp.cs4218.impl.app;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.condition.OS.WINDOWS;
+
+import java.io.File;
+import java.io.IOException;
+
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledOnOs;
 import org.junit.jupiter.api.io.TempDir;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.condition.OS.WINDOWS;
-
-import java.io.File;
-import java.io.IOException;
 
 import sg.edu.nus.comp.cs4218.exception.CdException;
-import sg.edu.nus.comp.cs4218.testutils.TestStringUtils;
 import sg.edu.nus.comp.cs4218.testutils.TestEnvironmentUtil;
+import sg.edu.nus.comp.cs4218.testutils.TestStringUtils;
 
 class CdApplicationPublicIT {
 

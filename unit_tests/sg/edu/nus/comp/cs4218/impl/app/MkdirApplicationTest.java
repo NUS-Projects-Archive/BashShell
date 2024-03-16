@@ -2,8 +2,8 @@ package sg.edu.nus.comp.cs4218.impl.app;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static sg.edu.nus.comp.cs4218.impl.util.AssertUtils.assertFileExists;
+import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
+import static sg.edu.nus.comp.cs4218.test.AssertUtils.assertFileExists;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -13,6 +13,8 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+
+import sg.edu.nus.comp.cs4218.exception.MkdirException;
 
 class MkdirApplicationTest {
 
@@ -38,13 +40,27 @@ class MkdirApplicationTest {
     }
 
     @Test
+    void createFolder_NullArguments_ThrowsMkdirException() {
+        MkdirException result = assertThrowsExactly(MkdirException.class, () -> app.createFolder());
+        String expected = "mkdir: Null arguments";
+        assertEquals(expected, result.getMessage());
+    }
+
+    @Test
+    void createFolder_FolderAsEmptyString_ThrowsMkdirException() {
+        MkdirException result = assertThrowsExactly(MkdirException.class, () -> app.createFolder(""));
+        String expected = "mkdir: No folder names are supplied";
+        assertEquals(expected, result.getMessage());
+    }
+
+    @Test
     void createFolder_FolderExists_NoActionTaken() {
         // Given
         assertFileExists(file);
         List<String> expectedContent = assertDoesNotThrow(() -> Files.readAllLines(filePath));
 
         // When
-        app.createFolder(filePath.toString());
+        assertDoesNotThrow(() -> app.createFolder(filePath.toString()));
         List<String> actualContent = assertDoesNotThrow(() -> Files.readAllLines(filePath));
 
         // Then

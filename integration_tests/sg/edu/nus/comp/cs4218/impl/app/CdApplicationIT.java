@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 import static org.mockito.Mockito.mock;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NULL_ARGS;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_TOO_MANY_ARGS;
-import static sg.edu.nus.comp.cs4218.impl.util.FileUtils.createNewDirectory;
+import static sg.edu.nus.comp.cs4218.test.FileUtils.createNewDirectory;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_FILE_SEP;
 
 import java.io.IOException;
@@ -110,12 +110,14 @@ class CdApplicationIT {
     }
 
     /**
-     * Tests run method in CdApplication with empty args and expects the current directory to remain unchanged.
+     * Tests run method in CdApplication with no args and expects the current directory to be changed to the home.
      */
     @Test
-    void run_EmptyArgs_DoNothing() {
+    void run_EmptyArgs_ChangesToHomeDir() {
+        String expectedDir = System.getProperty("user.dir");
         assertDoesNotThrow(() -> app.run(new String[]{}, mockInputStream, mockOutputStream));
-        assertEquals(Environment.currentDirectory, Environment.currentDirectory);
+        String currDir = Environment.currentDirectory;
+        assertEquals(expectedDir, currDir);
     }
 
     /**

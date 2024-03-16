@@ -1,8 +1,11 @@
 package sg.edu.nus.comp.cs4218.impl.app;
 
-import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.condition.DisabledOnOs;
-import org.junit.jupiter.api.io.TempDir;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.condition.OS.WINDOWS;
+import static sg.edu.nus.comp.cs4218.testutils.TestStringUtils.CHAR_FILE_SEP;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -13,9 +16,12 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.condition.OS.WINDOWS;
-import static sg.edu.nus.comp.cs4218.testutils.TestStringUtils.CHAR_FILE_SEP;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledOnOs;
+import org.junit.jupiter.api.io.TempDir;
 
 import sg.edu.nus.comp.cs4218.exception.MvException;
 import sg.edu.nus.comp.cs4218.testutils.TestEnvironmentUtil;
@@ -41,7 +47,7 @@ public class MvApplicationPublicIT {
     private static final String SUBFILE2_CONTENTS = "This is a subfolder1 file2.txt content";
 
     private MvApplication mvApplication;
-    
+
     @BeforeEach
     void setUp() throws IOException, NoSuchFieldException, IllegalAccessException {
         mvApplication = new MvApplication();
@@ -135,10 +141,10 @@ public class MvApplicationPublicIT {
     }
 
     @Test
-    public void run_UnwritableDestFileWithFlag_NoChange() throws Exception {
+    public void run_UnwritableDestFileWithFlag_ThrowsException() throws Exception {
         // not overriding unwritable, so no error thrown
         String[] argList = new String[]{"-n", FILE_2_TXT, UNWRITABLE_FILE};
-        mvApplication.run(argList, System.in, System.out);
+        assertThrows(MvException.class, () -> mvApplication.run(argList, System.in, System.out));
 
         // no change
         File expectedSrcFile = new File(tempDir, FILE_2_TXT);
@@ -229,7 +235,7 @@ public class MvApplicationPublicIT {
         mvApplication.run(argList, System.in, System.out);
 
         File expectedRemovedFile = new File(tempDir, SUBFOLDER_1 + CHAR_FILE_SEP + FILE_2_TXT);
-        File expectedNewFile = new File(tempDir,SUBFOLDER_2 + CHAR_FILE_SEP + "file5.txt");
+        File expectedNewFile = new File(tempDir, SUBFOLDER_2 + CHAR_FILE_SEP + "file5.txt");
 
         assertFalse(expectedRemovedFile.exists());
         assertTrue(expectedNewFile.exists());
@@ -294,12 +300,6 @@ public class MvApplicationPublicIT {
         assertTrue(expectedFile.exists());
         List<String> expectedNewFileContents = Files.readAllLines(expectedFile.toPath());
         assertEquals(FILE1_CONTENTS, expectedNewFileContents.get(0));
-    }
-
-    @Test
-    public void run_WithoutFlagsSameSrcToCurrFolder_ThrowException() {
-        String[] argList = new String[]{FILE_1_TXT, "."};
-        assertThrows(MvException.class, () -> mvApplication.run(argList, System.in, System.out));
     }
 
     @Test
@@ -487,8 +487,8 @@ public class MvApplicationPublicIT {
         String[] argList = new String[]{"f", SUBFOLDER_2, SUBFOLDER_1};
         assertThrows(MvException.class, () -> mvApplication.run(argList, System.in, System.out));
 
-        File expectedRemainingFile = new File(tempDir, SUBFOLDER_2);
-        assertTrue(expectedRemainingFile.exists());
+        File expectedNewFile = new File(tempDir, SUBFOLDER_1 + CHAR_FILE_SEP + SUBFOLDER_2);
+        assertTrue(expectedNewFile.exists());
     }
 
     @Test
