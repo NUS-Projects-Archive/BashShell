@@ -74,6 +74,7 @@
                             <sources>
                                 <source>unit_tests</source>
                                 <source>integration_tests</source>
+                                <source>testing_utilities</source>
                             </sources>
                         </configuration>
                     </execution>
