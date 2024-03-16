@@ -4,6 +4,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import sg.edu.nus.comp.cs4218.exception.MkdirException;
+import sg.edu.nus.comp.cs4218.testutils.TestEnvironmentUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -20,8 +21,9 @@ public class MkdirApplicationPublicIT {
     String tempChild = tempParent + File.separator + "mkdirTestChild";
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws NoSuchFieldException, IllegalAccessException {
         mkdirApplication = new MkdirApplication();
+        TestEnvironmentUtil.setCurrentDirectory(System.getProperty("user.dir"));
         deleteDirectory(null, new File(pathToTestDir).listFiles());
     }
 

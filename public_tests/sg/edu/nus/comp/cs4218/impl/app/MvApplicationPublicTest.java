@@ -16,6 +16,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import sg.edu.nus.comp.cs4218.testutils.TestEnvironmentUtil;
+
 public class MvApplicationPublicTest {
     private MvApplication application;
     private static final String TEMP = "temp-mv" + File.separator;
@@ -50,6 +52,7 @@ public class MvApplicationPublicTest {
     @BeforeEach
     void setup() throws Exception {
         application = new MvApplication();
+        TestEnvironmentUtil.setCurrentDirectory(System.getProperty("user.dir"));
         createMvResourcesAndFolders();
         createAndWriteFile(TEXT_A_PATH);
         createAndWriteFile(TEXT_B_PATH);
