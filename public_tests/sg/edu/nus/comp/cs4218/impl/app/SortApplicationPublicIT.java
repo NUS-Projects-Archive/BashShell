@@ -72,7 +72,7 @@ class SortApplicationPublicIT {
     void sortFromStdin_NoFlags_ReturnsSortedList() throws Exception {
         InputStream stdin = generateInputStreamFromStrings("a", "c", "b");
         String expected = joinStringsByLineSeparator("a", "b", "c") + STRING_NEWLINE;
-        String[] argList = new String[]{""};
+        String[] argList = new String[0];
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         sortApplication.run(argList, stdin, output);
         assertEquals(expected, output.toString(StandardCharsets.UTF_8));
