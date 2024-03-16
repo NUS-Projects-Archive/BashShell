@@ -37,6 +37,7 @@ class CutApplicationTest {
 
     private Path fileOnePath;
     private String fileOne;
+    private String fileOneName;
     private String fileTwo;
     private String subDir;
     private String nonExistFile;
@@ -49,6 +50,7 @@ class CutApplicationTest {
         // Create temporary file, automatically deletes after test execution
         fileOnePath = createNewFile(FILE_ONE, FILE_ONE_CONTENT);
         fileOne = fileOnePath.toString();
+        fileOneName = fileOnePath.toFile().getName();
         fileTwo = createNewFile(FILE_TWO, FILE_TWO_CONTENT).toString();
         subDir = createNewDirectory(tempDir, "subdirectory").toString();
         nonExistFile = tempDir.resolve("nonExistFile.txt").toString();
@@ -106,7 +108,7 @@ class CutApplicationTest {
         CutException result = assertThrowsExactly(CutException.class, () ->
                 app.cutFromFiles(true, false, RANGE_ONE_TO_FIVE, fileOne)
         );
-        String expected = "cut: 'file1.txt': Could not read file";
+        String expected = String.format("cut: '%s': Could not read file", fileOneName);
         assertEquals(expected, result.getMessage());
     }
 
