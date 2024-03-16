@@ -5,6 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.joinStringsByNewline;
+import static sg.edu.nus.comp.cs4218.test.FileUtils.createNewDirectory;
+import static sg.edu.nus.comp.cs4218.test.FileUtils.createNewFile;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -18,7 +20,6 @@ import org.junit.jupiter.api.condition.OS;
 import org.junit.jupiter.api.io.TempDir;
 
 import sg.edu.nus.comp.cs4218.exception.SortException;
-import sg.edu.nus.comp.cs4218.impl.util.FileUtils;
 
 class SortApplicationTest {
 
@@ -47,7 +48,7 @@ class SortApplicationTest {
         // Create temporary file, automatically deletes after test execution
         String content = joinStringsByNewline(CONTENT);
         stdin = new ByteArrayInputStream(content.getBytes());
-        filePath = FileUtils.createNewFile(FILE, content);
+        filePath = createNewFile(FILE, content);
         file = filePath.toString();
     }
 
@@ -72,7 +73,7 @@ class SortApplicationTest {
 
     @Test
     void sortFromFiles_FileGivenAsDirectory_ThrowsSortException(@TempDir Path tempDir) {
-        String directory = FileUtils.createNewDirectory(tempDir, "directory").toString();
+        String directory = createNewDirectory(tempDir, "directory").toString();
         SortException result = assertThrowsExactly(SortException.class, () ->
                 app.sortFromFiles(false, false, false, directory)
         );

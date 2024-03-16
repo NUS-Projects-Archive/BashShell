@@ -8,6 +8,7 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.joinStringsByNewline;
+import static sg.edu.nus.comp.cs4218.test.FileUtils.createNewFile;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -20,7 +21,6 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import sg.edu.nus.comp.cs4218.exception.SortException;
-import sg.edu.nus.comp.cs4218.impl.util.FileUtils;
 
 @SuppressWarnings("PMD.ClassNamingConventions")
 public class SortApplicationIT {
@@ -89,7 +89,7 @@ public class SortApplicationIT {
 
             // Create temporary file, automatically deletes after test execution
             String content = joinStringsByNewline(CONTENT);
-            file = FileUtils.createNewFile("file.txt", content).toString();
+            file = createNewFile("file.txt", content).toString();
         }
 
         @Test
