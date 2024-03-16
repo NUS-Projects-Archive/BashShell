@@ -29,8 +29,8 @@ public class CatApplicationPublicTest {
             STRING_NEWLINE + "3 Test line 3";
     private static final String TEST_DIR = "temp-cat";
     private static final String TEST_FILE = "fileA.txt";
-    private static Path TEST_DIR_PATH;
-    private static Path TEST_FILE_PATH;
+    private static Path tempDirPath;
+    private static Path testFilePath;
 
     private CatApplication catApplication;
 
@@ -41,29 +41,29 @@ public class CatApplicationPublicTest {
 
     @BeforeAll
     static void createTemp() throws IOException, NoSuchFieldException, IllegalAccessException {
-        TEST_DIR_PATH = Paths.get(TestEnvironmentUtil.getCurrentDirectory(), TEST_DIR);
-        Files.createDirectory(TEST_DIR_PATH);
+        tempDirPath = Paths.get(TestEnvironmentUtil.getCurrentDirectory(), TEST_DIR);
+        Files.createDirectory(tempDirPath);
 
-        TEST_FILE_PATH = TEST_DIR_PATH.resolve(TEST_FILE);
-        Files.createFile(TEST_FILE_PATH);
-        Files.write(TEST_FILE_PATH, TEXT_ONE.getBytes());
+        testFilePath = tempDirPath.resolve(TEST_FILE);
+        Files.createFile(testFilePath);
+        Files.write(testFilePath, TEXT_ONE.getBytes());
     }
 
     @AfterAll
     static void deleteFiles() throws IOException {
-        Files.delete(TEST_FILE_PATH);
-        Files.delete(TEST_DIR_PATH);
+        Files.delete(testFilePath);
+        Files.delete(tempDirPath);
     }
 
     @Test
     void catFiles_SingleFileSpecifiedNoFlagAbsolutePath_ReturnsFileContentString() throws Exception {
-        String actual = catApplication.catFiles(false, TEST_FILE_PATH.toString());
+        String actual = catApplication.catFiles(false, testFilePath.toString());
         assertEquals(TEXT_ONE, actual);
     }
 
     @Test
     void catFiles_FolderSpecifiedAbsolutePath_ThrowsException() throws AbstractApplicationException {
-        String actual = catApplication.catFiles(false, TEST_DIR_PATH.toString());
+        String actual = catApplication.catFiles(false, tempDirPath.toString());
         assertEquals(String.format("cat: '%s': Is a directory", TEST_DIR), actual);
     }
 
