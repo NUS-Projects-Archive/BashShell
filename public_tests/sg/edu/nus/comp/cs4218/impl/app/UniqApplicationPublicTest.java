@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.joinStringsByNewline;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -29,7 +30,7 @@ public class UniqApplicationPublicTest {
     private static final File OUTPUT = new File("output.txt");
 
     private static final File FILE_NO_ADJ_DUP = new File("uniq_no_duplicates.txt");
-    private static final String TEST_NO_ADJ_DUP = String.join(STRING_NEWLINE,
+    private static final String TEST_NO_ADJ_DUP = joinStringsByNewline(
             "Hello World", "Alice", "Bob", "Hello World", "Bob", "Alice", CS4218);
 
     private static final File FILE_ALL_DUP = new File("uniq_all_duplicates.txt");
@@ -102,7 +103,7 @@ public class UniqApplicationPublicTest {
     void uniqFromFile_FileNoDuplicatesCountOnly_AllOneCounts() {
         assertDoesNotThrow(() -> {
 
-            String expected = String.join(STRING_NEWLINE,
+            String expected = joinStringsByNewline(
                     "1 Hello World", "1 Alice", "1 Bob", "1 Hello World", "1 Bob", "1 Alice", "1 CS4218");
             //String expected = "1 Hello World\n1 Alice\n1 Bob\n1 Hello World\n1 Bob\n1 Alice\n1 CS4218\n";
             String result = uniqApplication.uniqFromFile(true, false, false, FILE_NO_ADJ_DUP.toString(), null);
@@ -197,8 +198,7 @@ public class UniqApplicationPublicTest {
     void uniqFromFile_FileInterleavedDuplicatesNoArguments_Success() {
         assertDoesNotThrow(() -> {
 
-            String expected = String.join(STRING_NEWLINE,
-                    CS4218, CS1101S, CS4218, CS1101S, CS4218);
+            String expected = joinStringsByNewline(CS4218, CS1101S, CS4218, CS1101S, CS4218);
             String result = uniqApplication.uniqFromFile(false, false, false, FILE_MIXED_DUP.toString(), null);
 
             assertEquals(expected, result);
@@ -209,8 +209,7 @@ public class UniqApplicationPublicTest {
     void uniqFromFile_FileInterleavedDuplicatesCountOnly_Success() {
         assertDoesNotThrow(() -> {
 
-            String expected = String.join(STRING_NEWLINE,
-                    "10 CS4218", "1 CS1101S", "6 CS4218", "20 CS1101S", "2 CS4218");
+            String expected = joinStringsByNewline("10 CS4218", "1 CS1101S", "6 CS4218", "20 CS1101S", "2 CS4218");
             String result = uniqApplication.uniqFromFile(true, false, false, FILE_MIXED_DUP.toString(), null);
 
             assertEquals(expected, result);
@@ -221,7 +220,7 @@ public class UniqApplicationPublicTest {
     void uniqFromFile_FileInterleavedDuplicatesRepeatedOnly_Success() {
         assertDoesNotThrow(() -> {
 
-            String expected = String.join(STRING_NEWLINE, CS4218, CS4218, CS1101S, CS4218);
+            String expected = joinStringsByNewline(CS4218, CS4218, CS1101S, CS4218);
             String result = uniqApplication.uniqFromFile(false, true, false, FILE_MIXED_DUP.toString(), null);
 
             assertEquals(expected, result);
@@ -299,7 +298,7 @@ public class UniqApplicationPublicTest {
     void uniqFromStdIn_InterleavedDuplicates_Success() {
         assertDoesNotThrow(() -> {
 
-            String expected = String.join(STRING_NEWLINE, CS4218, CS1101S, CS4218, CS1101S, CS4218);
+            String expected = joinStringsByNewline(CS4218, CS1101S, CS4218, CS1101S, CS4218);
             InputStream stream = new ByteArrayInputStream(TEST_MIXED_DUP.getBytes());
 
             String result = uniqApplication.uniqFromStdin(false, false, false, stream, null);
