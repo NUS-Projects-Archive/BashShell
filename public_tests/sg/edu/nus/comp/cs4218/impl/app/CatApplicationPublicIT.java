@@ -47,9 +47,9 @@ public class CatApplicationPublicIT {
 
     @BeforeAll
     static void createTemp() throws IOException, NoSuchFieldException, IllegalAccessException {
-        String initialDir = TestEnvironmentUtil.getCurrentDirectory();
-        TEMP_PATH = Paths.get(initialDir, TEMP);
-        DIR_PATH = Paths.get(TestEnvironmentUtil.getCurrentDirectory(), TEMP + CHAR_FILE_SEP + DIR);
+        Path initialDir = Paths.get(TestEnvironmentUtil.getCurrentDirectory());
+        TEMP_PATH = initialDir.resolve(TEMP);
+        DIR_PATH = initialDir.resolve(TEMP + CHAR_FILE_SEP + DIR);
         Files.createDirectory(TEMP_PATH);
         Files.createDirectory(DIR_PATH);
     }
@@ -309,7 +309,7 @@ public class CatApplicationPublicIT {
         InputStream inputStream = new ByteArrayInputStream(stdinText.getBytes(StandardCharsets.UTF_8));
         String expectedText = "Test line 1.1" + STRING_NEWLINE +
                 "Test line 1.2" + STRING_NEWLINE +
-                "Test line 1.3" +  STRING_NEWLINE +
+                "Test line 1.3" + STRING_NEWLINE +
                 "Test line 2.1" + STRING_NEWLINE +
                 "Test line 2.2";
         catApplication.run(toArgs("", fileName, "-"), inputStream, output);

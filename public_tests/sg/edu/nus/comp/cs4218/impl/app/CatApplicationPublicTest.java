@@ -6,6 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
 import sg.edu.nus.comp.cs4218.exception.CatException;
+import sg.edu.nus.comp.cs4218.exception.CdException;
 import sg.edu.nus.comp.cs4218.exception.PasteException;
 import sg.edu.nus.comp.cs4218.testutils.TestEnvironmentUtil;
 
@@ -29,8 +30,8 @@ public class CatApplicationPublicTest {
             STRING_NEWLINE + "3 Test line 3";
     private static final String TEST_DIR = "temp-cat";
     private static final String TEST_FILE = "fileA.txt";
-    private static Path tempDirPath;
-    private static Path testFilePath;
+    private static Path TEST_DIR_PATH;
+    private static Path TEST_FILE_PATH;
 
     private CatApplication catApplication;
 
@@ -41,30 +42,30 @@ public class CatApplicationPublicTest {
 
     @BeforeAll
     static void createTemp() throws IOException, NoSuchFieldException, IllegalAccessException {
-        tempDirPath = Paths.get(TestEnvironmentUtil.getCurrentDirectory(), TEST_DIR);
-        Files.createDirectory(tempDirPath);
+        Path TEST_CWD_PATH = Paths.get(TestEnvironmentUtil.getCurrentDirectory());
+        TEST_DIR_PATH = TEST_CWD_PATH.resolve(TEST_DIR);
+        Files.createDirectory(TEST_DIR_PATH);
 
-        testFilePath = tempDirPath.resolve(TEST_FILE);
-        Files.createFile(testFilePath);
-        Files.write(testFilePath, TEXT_ONE.getBytes());
+        TEST_FILE_PATH = TEST_DIR_PATH.resolve(TEST_FILE);
+        Files.createFile(TEST_FILE_PATH);
+        Files.write(TEST_FILE_PATH, TEXT_ONE.getBytes());
     }
 
     @AfterAll
     static void deleteFiles() throws IOException {
-        Files.delete(testFilePath);
-        Files.delete(tempDirPath);
+        Files.delete(TEST_FILE_PATH);
+        Files.delete(TEST_DIR_PATH);
     }
 
     @Test
     void catFiles_SingleFileSpecifiedNoFlagAbsolutePath_ReturnsFileContentString() throws Exception {
-        String actual = catApplication.catFiles(false, testFilePath.toString());
+        String actual = catApplication.catFiles(false, TEST_FILE_PATH.toString());
         assertEquals(TEXT_ONE, actual);
     }
 
     @Test
-    void catFiles_FolderSpecifiedAbsolutePath_ThrowsException() throws AbstractApplicationException {
-        String actual = catApplication.catFiles(false, tempDirPath.toString());
-        assertEquals(String.format("cat: '%s': Is a directory", TEST_DIR), actual);
+    void catFiles_FolderSpecifiedAbsolutePath_ThrowsException() {
+        assertThrows(CatException.class, () -> catApplication.catFiles(false, TEST_DIR_PATH.toString()));
     }
 
     @Test
