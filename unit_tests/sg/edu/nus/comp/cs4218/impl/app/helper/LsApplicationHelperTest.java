@@ -3,7 +3,6 @@ package sg.edu.nus.comp.cs4218.impl.app.helper;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 import static sg.edu.nus.comp.cs4218.test.FileUtils.createNewDirectory;
 
 import java.nio.file.Path;
@@ -17,6 +16,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 import sg.edu.nus.comp.cs4218.Environment;
+import sg.edu.nus.comp.cs4218.impl.util.StringUtils;
 
 // To give a meaningful variable name
 @SuppressWarnings("PMD.LongVariable")
@@ -69,7 +69,7 @@ class LsApplicationHelperTest {
     @Test
     void formatContents_IsSortByExtIsTrue_ReturnsSortedFormattedContents() {
         // Given
-        String expected = String.join(STRING_NEWLINE, STRING_Z, STRING_ZA, STRING_AZ);
+        String expected = StringUtils.joinStringsByNewline(STRING_Z, STRING_ZA, STRING_AZ);
         List<Path> contents = Arrays.stream(CWD_NON_DIRS)
                 .map(Paths::get)
                 .collect(Collectors.toList());
@@ -83,7 +83,7 @@ class LsApplicationHelperTest {
     @Test
     void formatContents_IsSortByExtIsFalse_ReturnsFormattedContents() {
         // Given
-        String expected = String.join(STRING_NEWLINE, STRING_AZ, STRING_Z, STRING_ZA);
+        String expected = StringUtils.joinStringsByNewline(STRING_AZ, STRING_Z, STRING_ZA);
         List<Path> contents = Arrays.stream(CWD_NON_DIRS)
                 .map(Paths::get)
                 .collect(Collectors.toList());

@@ -13,7 +13,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.AfterEach;
@@ -25,6 +24,7 @@ import org.junit.jupiter.api.io.TempDir;
 
 import sg.edu.nus.comp.cs4218.Environment;
 import sg.edu.nus.comp.cs4218.exception.LsException;
+import sg.edu.nus.comp.cs4218.impl.util.StringUtils;
 
 // To give a meaningful variable name
 @SuppressWarnings("PMD.LongVariable")
@@ -40,13 +40,14 @@ class LsApplicationHelperIT {
     private static final String[] CWD_DIRS = {DIR_A_NAME};
     private static final String[] DIR_A_NON_DIRS = {"0"};
 
-    private static final String UNSORTED_CWD_CONTENTS = String.join(STRING_NEWLINE, getCwdContents());
-    private static final String UNSORTED_CWD_CONTENTS_WITH_HEADER = String.join(STRING_NEWLINE, ".:",
+    private static final String UNSORTED_CWD_CONTENTS = StringUtils.joinStringsByNewline(getCwdContents());
+    private static final String UNSORTED_CWD_CONTENTS_WITH_HEADER = StringUtils.joinStringsByNewline(".:",
             UNSORTED_CWD_CONTENTS);
-    private static final String UNSORTED_DIR_A_CONTENTS_WITH_HEADER = String.join(STRING_NEWLINE,
+    private static final String UNSORTED_DIR_A_CONTENTS_WITH_HEADER = StringUtils.joinStringsByNewline(
             String.format(".%s%s:", CHAR_FILE_SEP, DIR_A_NAME), getDirAContents());
-    private static final String SORTED_CWD_CONTENTS_STRING = String.join(STRING_NEWLINE, "dirA", STRING_Z, STRING_ZA, STRING_AZ);
-    private static final String SORTED_CWD_CONTENTS_STRING_WITH_HEADER = String.join(STRING_NEWLINE, ".:",
+    private static final String SORTED_CWD_CONTENTS_STRING = StringUtils.joinStringsByNewline("dirA", STRING_Z,
+            STRING_ZA, STRING_AZ);
+    private static final String SORTED_CWD_CONTENTS_STRING_WITH_HEADER = StringUtils.joinStringsByNewline(".:",
             SORTED_CWD_CONTENTS_STRING);
     private static final String SORTED_DIR_A_CONTENTS_WITH_HEADER = UNSORTED_DIR_A_CONTENTS_WITH_HEADER;
 
@@ -57,14 +58,14 @@ class LsApplicationHelperIT {
     private Path dirAPath;
 
     private static String getCwdContents() {
-        List<String> fileList = Stream.concat(Arrays.stream(CWD_NON_DIRS), Arrays.stream(CWD_DIRS))
+        String[] fileList = Stream.concat(Arrays.stream(CWD_NON_DIRS), Arrays.stream(CWD_DIRS))
                 .sorted()
-                .collect(Collectors.toList());
-        return String.join(STRING_NEWLINE, fileList);
+                .toArray(String[]::new);
+        return StringUtils.joinStringsByNewline(fileList);
     }
 
     private static String getDirAContents() {
-        return String.join(STRING_NEWLINE, DIR_A_NON_DIRS) + STRING_NEWLINE;
+        return StringUtils.joinStringsByNewline(DIR_A_NON_DIRS) + STRING_NEWLINE;
     }
 
     /**
@@ -115,7 +116,7 @@ class LsApplicationHelperIT {
     @Test
     void listCwdContent_IsSortByExtIsFalse_ReturnsUnsortedCwdContents() {
         // Given
-        String expected = String.join(STRING_NEWLINE, UNSORTED_CWD_CONTENTS);
+        String expected = StringUtils.joinStringsByNewline(UNSORTED_CWD_CONTENTS);
 
         testListCwdContent(expected, false);
     }
@@ -126,8 +127,7 @@ class LsApplicationHelperIT {
     @Test
     void listCwdContent_IsSortByExtIsTrue_ReturnsSortedCwdContents() {
         // Given
-        String expected = String.join(STRING_NEWLINE, SORTED_CWD_CONTENTS_STRING);
-
+        String expected = StringUtils.joinStringsByNewline(SORTED_CWD_CONTENTS_STRING);
         testListCwdContent(expected, true);
     }
 

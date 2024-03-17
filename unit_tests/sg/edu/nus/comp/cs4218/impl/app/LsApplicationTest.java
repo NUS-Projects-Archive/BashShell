@@ -9,11 +9,7 @@ import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.AfterAll;
@@ -25,6 +21,7 @@ import org.junit.jupiter.api.condition.OS;
 import org.junit.jupiter.api.io.TempDir;
 
 import sg.edu.nus.comp.cs4218.Environment;
+import sg.edu.nus.comp.cs4218.impl.util.StringUtils;
 
 // To give a meaningful variable name
 @SuppressWarnings("PMD.LongVariable")
@@ -44,16 +41,16 @@ class LsApplicationTest {
     private LsApplication app;
 
     private static String getCwdContents() {
-        List<String> fileList = Stream.concat(Arrays.stream(CWD_NON_DIRS), Arrays.stream(CWD_DIRS))
+        String[] fileList = Stream.concat(Arrays.stream(CWD_NON_DIRS), Arrays.stream(CWD_DIRS))
                 .sorted()
-                .collect(Collectors.toList());
-        return String.join(STRING_NEWLINE, fileList);
+                .toArray(String[]::new);
+        return StringUtils.joinStringsByNewline(fileList);
     }
 
     private static String getDirAContents() {
-        List<String> fileList = new ArrayList<>(Arrays.asList(DIR_A_NON_DIRS));
-        Collections.sort(fileList);
-        return String.join(STRING_NEWLINE, fileList);
+        String[] fileList = Arrays.copyOf(DIR_A_NON_DIRS, DIR_A_NON_DIRS.length);
+        Arrays.sort(fileList);
+        return StringUtils.joinStringsByNewline(fileList);
     }
 
     /**
@@ -92,9 +89,8 @@ class LsApplicationTest {
     }
 
     private String getCwdContentsRecursively(String slash) {
-        return String.format("%s%s%s", String.join(STRING_NEWLINE, ".:", getCwdContents()),
-                STRING_NEWLINE + STRING_NEWLINE,
-                String.join(STRING_NEWLINE, STRING_CURR_DIR + slash + DIR_A_NAME + ":", getDirAContents()));
+        return StringUtils.joinStringsByNewline(".:", getCwdContents()) + STRING_NEWLINE + STRING_NEWLINE +
+                StringUtils.joinStringsByNewline(STRING_CURR_DIR + slash + DIR_A_NAME + ":", getDirAContents());
     }
 
     /**
@@ -121,7 +117,7 @@ class LsApplicationTest {
     @Test
     void listFolderContent_OneValidDirNameSpecified_ReturnsDirContent() {
         String actual = assertDoesNotThrow(() -> app.listFolderContent(false, false, DIR_A_NAME));
-        String expected = String.join(STRING_NEWLINE, DIR_A_NAME + ":", getDirAContents());
+        String expected = StringUtils.joinStringsByNewline(DIR_A_NAME + ":", getDirAContents());
         assertEquals(expected, actual);
     }
 
