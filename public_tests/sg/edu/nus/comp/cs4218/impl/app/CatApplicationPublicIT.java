@@ -27,16 +27,37 @@ import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
 import sg.edu.nus.comp.cs4218.exception.CatException;
 import sg.edu.nus.comp.cs4218.testutils.TestEnvironmentUtil;
 
+@SuppressWarnings("PMD.ClassNamingConventions")
 public class CatApplicationPublicIT {
+
     private static final String TEMP = "temp-cat";
     private static final String DIR = "dir";
-    public static final String ERR_IS_DIR = String.format("cat: '%s': Is a directory", DIR);
-    private static final String TEXT_ONE = "Test line 1" + STRING_NEWLINE + "Test line 2" + STRING_NEWLINE +
-            "Test line 3";
-    private static final Deque<Path> files = new ArrayDeque<>();
-    public static final String ERR_NO_SUCH_FILE = "cat: '%s': No such file or directory";
-    private static Path TEMP_PATH;
-    private static Path DIR_PATH;
+    private static final String ERR_IS_DIR = String.format("cat: '%s': Is a directory", DIR);
+    private static final String NON_EXIST_FILE = "nonExistFile.txt";
+    private static final String ERR_NO_SUCH_FILE = String.format("cat: '%s': No such file or directory", NON_EXIST_FILE);
+    private static final String LINE_1 = "Test line 1";
+    private static final String LINE_2 = "Test line 2";
+    private static final String LINE_3 = "Test line 3";
+    private static final String L1_TO_L3 = LINE_1 + STRING_NEWLINE + LINE_2 + STRING_NEWLINE + LINE_3;
+    private static final String NUMBERED_LINE_1 = "1 Test line 1";
+    private static final String NUMBERED_LINE_2 = "2 Test line 2";
+    private static final String NUMBERED_LINE_3 = "3 Test line 3";
+    private static final String NUMBERED_L1_TO_L3 = NUMBERED_LINE_1 + STRING_NEWLINE + NUMBERED_LINE_2 + STRING_NEWLINE + NUMBERED_LINE_3;
+    private static final String LINE_1_DOT_1 = "Test line 1.1";
+    private static final String LINE_1_DOT_2 = "Test line 1.2";
+    private static final String LINE_1_DOT_3 = "Test line 1.3";
+    private static final String L11_TO_L13 = LINE_1_DOT_1 + STRING_NEWLINE + LINE_1_DOT_2 + STRING_NEWLINE + LINE_1_DOT_3;
+    private static final String LINE_2_DOT_1 = "Test line 2.1";
+    private static final String LINE_2_DOT_2 = "Test line 2.2";
+    private static final String L21_TO_L22 = LINE_2_DOT_1 + STRING_NEWLINE + LINE_2_DOT_2;
+    private static final String L11_TO_L22 = LINE_1_DOT_1 + STRING_NEWLINE +
+            LINE_1_DOT_2 + STRING_NEWLINE +
+            LINE_1_DOT_3 + STRING_NEWLINE +
+            LINE_2_DOT_1 + STRING_NEWLINE +
+            LINE_2_DOT_2;
+    private static final Deque<Path> FILES = new ArrayDeque<>();
+    private static Path tempPath;
+    private static Path dirPath;
 
     private CatApplication catApplication;
 
@@ -49,26 +70,26 @@ public class CatApplicationPublicIT {
     static void createTemp() throws IOException, NoSuchFieldException, IllegalAccessException {
         TestEnvironmentUtil.setCurrentDirectory(System.getProperty("user.dir"));
         String initialDir = TestEnvironmentUtil.getCurrentDirectory();
-        TEMP_PATH = Paths.get(initialDir, TEMP);
-        DIR_PATH = Paths.get(TestEnvironmentUtil.getCurrentDirectory(), TEMP + CHAR_FILE_SEP + DIR);
-        Files.createDirectory(TEMP_PATH);
-        Files.createDirectory(DIR_PATH);
+        tempPath = Paths.get(initialDir, TEMP);
+        dirPath = Paths.get(TestEnvironmentUtil.getCurrentDirectory(), TEMP + CHAR_FILE_SEP + DIR);
+        Files.createDirectory(tempPath);
+        Files.createDirectory(dirPath);
     }
 
     @AfterAll
     static void deleteFiles() throws IOException {
-        for (Path file : files) {
+        for (Path file : FILES) {
             Files.deleteIfExists(file);
         }
-        Files.deleteIfExists(DIR_PATH);
-        Files.delete(TEMP_PATH);
+        Files.deleteIfExists(dirPath);
+        Files.delete(tempPath);
     }
 
     private void createFile(String name, String text) throws IOException {
-        Path path = TEMP_PATH.resolve(name);
+        Path path = tempPath.resolve(name);
         Files.createFile(path);
         Files.write(path, text.getBytes(StandardCharsets.UTF_8));
-        files.push(path);
+        FILES.push(path);
     }
 
     private String[] toArgs(String flag, String... files) {
@@ -77,7 +98,7 @@ public class CatApplicationPublicIT {
             args.add("-" + flag);
         }
         for (String file : files) {
-            if (file.equals("-")) {
+            if ("-".equals(file)) {
                 args.add(file);
             } else {
                 args.add(Paths.get(TEMP, file).toString());
@@ -90,35 +111,33 @@ public class CatApplicationPublicIT {
     @Test
     void run_SingleStdinNoFlag_DisplaysStdinContents() throws AbstractApplicationException {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
-        InputStream inputStream = new ByteArrayInputStream(TEXT_ONE.getBytes(StandardCharsets.UTF_8));
+        InputStream inputStream = new ByteArrayInputStream(L1_TO_L3.getBytes(StandardCharsets.UTF_8));
         catApplication.run(toArgs(""), inputStream, output);
-        assertEquals((TEXT_ONE + STRING_NEWLINE), output.toString(StandardCharsets.UTF_8));
+        assertEquals((L1_TO_L3 + STRING_NEWLINE), output.toString(StandardCharsets.UTF_8));
     }
 
     @Test
     void run_SingleStdinFlag_DisplaysNumberedStdinContents() throws Exception {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
-        String expectedText = "1 Test line 1" + STRING_NEWLINE + "2 Test line 2" + STRING_NEWLINE + "3 Test line 3";
-        InputStream inputStream = new ByteArrayInputStream(TEXT_ONE.getBytes(StandardCharsets.UTF_8));
+        InputStream inputStream = new ByteArrayInputStream(L1_TO_L3.getBytes(StandardCharsets.UTF_8));
         catApplication.run(toArgs("n"), inputStream, output);
-        assertEquals(expectedText + STRING_NEWLINE, output.toString(StandardCharsets.UTF_8));
+        assertEquals(NUMBERED_L1_TO_L3 + STRING_NEWLINE, output.toString(StandardCharsets.UTF_8));
     }
 
     @Test
     void run_SingleStdinDashNoFlag_DisplaysStdinContents() throws AbstractApplicationException {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
-        InputStream inputStream = new ByteArrayInputStream(TEXT_ONE.getBytes(StandardCharsets.UTF_8));
+        InputStream inputStream = new ByteArrayInputStream(L1_TO_L3.getBytes(StandardCharsets.UTF_8));
         catApplication.run(toArgs("", "-"), inputStream, output);
-        assertEquals((TEXT_ONE + STRING_NEWLINE), output.toString(StandardCharsets.UTF_8));
+        assertEquals((L1_TO_L3 + STRING_NEWLINE), output.toString(StandardCharsets.UTF_8));
     }
 
     @Test
     void run_SingleStdinDashFlag_DisplaysNumberedStdinContents() throws AbstractApplicationException {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
-        String expectedText = "1 Test line 1" + STRING_NEWLINE + "2 Test line 2" + STRING_NEWLINE + "3 Test line 3";
-        InputStream inputStream = new ByteArrayInputStream(TEXT_ONE.getBytes(StandardCharsets.UTF_8));
+        InputStream inputStream = new ByteArrayInputStream(L1_TO_L3.getBytes(StandardCharsets.UTF_8));
         catApplication.run(toArgs("n", "-"), inputStream, output);
-        assertEquals((expectedText + STRING_NEWLINE), output.toString(StandardCharsets.UTF_8));
+        assertEquals((NUMBERED_L1_TO_L3 + STRING_NEWLINE), output.toString(StandardCharsets.UTF_8));
     }
 
     @Test
@@ -143,10 +162,8 @@ public class CatApplicationPublicIT {
     @Test
     void run_NonexistentFileNoFlag_DisplaysErrMsg() throws AbstractApplicationException {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
-        String nonexistentFileName = "nonexistent_file.txt";
-        catApplication.run(toArgs("", nonexistentFileName), System.in, output);
-        assertEquals(String.format(ERR_NO_SUCH_FILE, nonexistentFileName) + STRING_NEWLINE,
-                output.toString(StandardCharsets.UTF_8));
+        catApplication.run(toArgs("", NON_EXIST_FILE), System.in, output);
+        assertEquals(ERR_NO_SUCH_FILE + STRING_NEWLINE, output.toString(StandardCharsets.UTF_8));
     }
 
     @Test
@@ -160,7 +177,7 @@ public class CatApplicationPublicIT {
     void run_SingleFileNoFlag_DisplaysFileContents() throws AbstractApplicationException, IOException {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         String fileName = "fileA.txt";
-        String text = TEXT_ONE;
+        String text = L1_TO_L3;
         createFile(fileName, text);
         catApplication.run(toArgs("", fileName), System.in, output);
         assertEquals((text + STRING_NEWLINE), output.toString(StandardCharsets.UTF_8));
@@ -170,10 +187,9 @@ public class CatApplicationPublicIT {
     void run_SingleFileFlag_DisplaysNumberedFileContents() throws AbstractApplicationException, IOException {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         String fileName = "fileB.txt";
-        String expectedText = "1 Test line 1" + STRING_NEWLINE + "2 Test line 2" + STRING_NEWLINE + "3 Test line 3";
-        createFile(fileName, TEXT_ONE);
+        createFile(fileName, L1_TO_L3);
         catApplication.run(toArgs("n", fileName), System.in, output);
-        assertEquals(expectedText + STRING_NEWLINE, output.toString(StandardCharsets.UTF_8));
+        assertEquals(NUMBERED_L1_TO_L3 + STRING_NEWLINE, output.toString(StandardCharsets.UTF_8));
     }
 
     @Test
@@ -200,7 +216,7 @@ public class CatApplicationPublicIT {
     void run_SingleFileUnknownFlag_ThrowsException() throws IOException {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         String fileName = "fileE.txt";
-        createFile(fileName, TEXT_ONE);
+        createFile(fileName, L1_TO_L3);
         assertThrows(CatException.class, () -> catApplication.run(toArgs("a", fileName), System.in, output));
     }
 
@@ -209,17 +225,10 @@ public class CatApplicationPublicIT {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         String fileName1 = "fileF.txt";
         String fileName2 = "fileG.txt";
-        String text1 = "Test line 1.1\nTest line 1.2\nTest line 1.3";
-        String text2 = "Test line 2.1\nTest line 2.2";
-        String expectedText = "Test line 1.1" + STRING_NEWLINE +
-                "Test line 1.2" + STRING_NEWLINE +
-                "Test line 1.3" + STRING_NEWLINE +
-                "Test line 2.1" + STRING_NEWLINE +
-                "Test line 2.2";
-        createFile(fileName1, text1);
-        createFile(fileName2, text2);
+        createFile(fileName1, L11_TO_L13);
+        createFile(fileName2, L21_TO_L22);
         catApplication.run(toArgs("", fileName1, fileName2), System.in, output);
-        assertEquals((expectedText + STRING_NEWLINE), output.toString(StandardCharsets.UTF_8));
+        assertEquals((L11_TO_L22 + STRING_NEWLINE), output.toString(StandardCharsets.UTF_8));
     }
 
     @Test
@@ -227,15 +236,13 @@ public class CatApplicationPublicIT {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         String fileName1 = "fileH.txt";
         String fileName2 = "fileI.txt";
-        String text1 = "Test line 1.1\nTest line 1.2\nTest line 1.3";
-        String text2 = "Test line 2.1\nTest line 2.2";
         String expectedText = "1 Test line 1.1" + STRING_NEWLINE +
                 "2 Test line 1.2" + STRING_NEWLINE +
                 "3 Test line 1.3" + STRING_NEWLINE +
                 "1 Test line 2.1" + STRING_NEWLINE +
                 "2 Test line 2.2";
-        createFile(fileName1, text1);
-        createFile(fileName2, text2);
+        createFile(fileName1, L11_TO_L13);
+        createFile(fileName2, L21_TO_L22);
         catApplication.run(toArgs("n", fileName1, fileName2), System.in, output);
         assertEquals((expectedText + STRING_NEWLINE), output.toString(StandardCharsets.UTF_8));
     }
@@ -268,17 +275,15 @@ public class CatApplicationPublicIT {
     @Test
     void run_SingleStdinNonexistentFileNoFlag_DisplaysErrMsg() throws Exception {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
-        InputStream inputStream = new ByteArrayInputStream(TEXT_ONE.getBytes(StandardCharsets.UTF_8));
-        String nonexistentFileName = "nonexistent_file.txt";
-        catApplication.run(toArgs("", nonexistentFileName), inputStream, output);
-        assertEquals(String.format("cat: '%s': No such file or directory", nonexistentFileName) + STRING_NEWLINE,
-                output.toString(StandardCharsets.UTF_8));
+        InputStream inputStream = new ByteArrayInputStream(L1_TO_L3.getBytes(StandardCharsets.UTF_8));
+        catApplication.run(toArgs("", NON_EXIST_FILE), inputStream, output);
+        assertEquals(ERR_NO_SUCH_FILE + STRING_NEWLINE, output.toString(StandardCharsets.UTF_8));
     }
 
     @Test
     void run_SingleStdinDirectoryNoFlag_ThrowsException() throws Exception {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
-        InputStream inputStream = new ByteArrayInputStream(TEXT_ONE.getBytes(StandardCharsets.UTF_8));
+        InputStream inputStream = new ByteArrayInputStream(L1_TO_L3.getBytes(StandardCharsets.UTF_8));
         catApplication.run(toArgs("", DIR), inputStream, output);
         assertEquals(ERR_IS_DIR + STRING_NEWLINE, output.toString(StandardCharsets.UTF_8));
     }
@@ -286,35 +291,21 @@ public class CatApplicationPublicIT {
     @Test
     void run_SingleStdinDashSingleFileNoFlag_DisplaysCatStdinFileContents() throws Exception {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
-        String stdinText = "Test line 1.1\nTest line 1.2\nTest line 1.3";
-        InputStream inputStream = new ByteArrayInputStream(stdinText.getBytes(StandardCharsets.UTF_8));
+        InputStream inputStream = new ByteArrayInputStream(L11_TO_L13.getBytes(StandardCharsets.UTF_8));
         String fileName = "fileN.txt";
-        String fileText = "Test line 2.1\nTest line 2.2";
-        createFile(fileName, fileText);
-        String expectedText = "Test line 1.1" + STRING_NEWLINE +
-                "Test line 1.2" + STRING_NEWLINE +
-                "Test line 1.3" + STRING_NEWLINE +
-                "Test line 2.1" + STRING_NEWLINE +
-                "Test line 2.2";
+        createFile(fileName, L21_TO_L22);
         catApplication.run(toArgs("", "-", fileName), inputStream, output);
-        assertEquals((expectedText + STRING_NEWLINE), output.toString(StandardCharsets.UTF_8));
+        assertEquals((L11_TO_L22 + STRING_NEWLINE), output.toString(StandardCharsets.UTF_8));
     }
 
     @Test
     void run_SingleFileSingleStdinDashNoFlag_DisplaysCatFileStdinContents() throws Exception {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
-        String fileText = "Test line 1.1\nTest line 1.2\nTest line 1.3";
         String fileName = "fileO.txt";
-        createFile(fileName, fileText);
-        String stdinText = "Test line 2.1\nTest line 2.2";
-        InputStream inputStream = new ByteArrayInputStream(stdinText.getBytes(StandardCharsets.UTF_8));
-        String expectedText = "Test line 1.1" + STRING_NEWLINE +
-                "Test line 1.2" + STRING_NEWLINE +
-                "Test line 1.3" + STRING_NEWLINE +
-                "Test line 2.1" + STRING_NEWLINE +
-                "Test line 2.2";
+        createFile(fileName, L11_TO_L13);
+        InputStream inputStream = new ByteArrayInputStream(L21_TO_L22.getBytes(StandardCharsets.UTF_8));
         catApplication.run(toArgs("", fileName, "-"), inputStream, output);
-        assertEquals((expectedText + STRING_NEWLINE), output.toString(StandardCharsets.UTF_8));
+        assertEquals((L11_TO_L22 + STRING_NEWLINE), output.toString(StandardCharsets.UTF_8));
     }
 }
 
