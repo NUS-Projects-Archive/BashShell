@@ -3,9 +3,13 @@ package sg.edu.nus.comp.cs4218.impl.app;
 import static sg.edu.nus.comp.cs4218.impl.util.CollectionsUtils.listToArray;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_NOT_FOUND;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_GENERAL;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IO_EXCEPTION;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IS_DIR;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_ISTREAM;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_PERM;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NULL_ARGS;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NULL_STREAMS;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_READING_FILE;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_WRITE_STREAM;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_TAB;
@@ -90,8 +94,8 @@ public class PasteApplication implements PasteInterface {
     }
 
     /**
-     * Returns string of line-wise concatenated (tab-separated) Stdin arguments. If only one Stdin
-     * arg is specified, echo back the Stdin.
+     * Returns string of line-wise concatenated (tab-separated) Stdin arguments.
+     * If only one Stdin arg is specified, echo back the Stdin.
      *
      * @param isSerial Paste one file at a time instead of in parallel
      * @param stdin    InputStream containing arguments from Stdin
@@ -103,22 +107,20 @@ public class PasteApplication implements PasteInterface {
             throw new PasteException(ERR_NULL_STREAMS);
         }
 
-        List<String> data;
+        List<String> output;
         try {
-            data = IOUtils.getLinesFromInputStream(stdin);
-            tempListResult.add(data);
-        } catch (Exception e) {
-            throw new PasteException(e.getMessage(), e);
+            output = IOUtils.getLinesFromInputStream(stdin);
+        } catch (IOException e) {
+            throw new PasteException(ERR_IO_EXCEPTION, e);
         }
-        maxFileLength = Math.max(maxFileLength, data.size());
 
-        return isSerial ? mergeInSerial(tempListResult) : mergeInParallel(tempListResult);
+        return isSerial ? mergeInSerial(output) : mergeInParallel(output);
     }
 
 
     /**
-     * Returns string of line-wise concatenated (tab-separated) files. If only one file is
-     * specified, echo back the file content.
+     * Returns string of line-wise concatenated (tab-separated) files.
+     * If only one file is specified, echo back the file content.
      *
      * @param isSerial Paste one file at a time instead of in parallel
      * @param fileName Array of file names to be read and merged (not including "-" for reading from stdin)
@@ -126,46 +128,32 @@ public class PasteApplication implements PasteInterface {
      */
     @Override
     public String mergeFile(Boolean isSerial, String... fileName) throws PasteException {
-        if (fileName == null) {
-            throw new PasteException(ERR_GENERAL);
+        if (fileName == null || fileName.length == 0) {
+            throw new PasteException(ERR_NULL_ARGS);
         }
 
+        List<String> output = new ArrayList<>();
         for (String file : fileName) {
             File node = IOUtils.resolveFilePath(file).toFile();
             if (!node.exists()) {
-                throw new PasteException(file + ": " + ERR_FILE_NOT_FOUND);
+                throw new PasteException(String.format("'%s': %s", node.getName(), ERR_FILE_NOT_FOUND));
             }
             if (node.isDirectory()) {
-                continue;
+                throw new PasteException(String.format("'%s': %s", node.getName(), ERR_IS_DIR));
             }
             if (!node.canRead()) {
-                throw new PasteException(ERR_NO_PERM);
+                throw new PasteException(String.format("'%s': %s", node.getName(), ERR_READING_FILE));
             }
 
-            List<String> fileData;
-            InputStream input = null;
-            try {
-                input = IOUtils.openInputStream(file);
-                fileData = IOUtils.getLinesFromInputStream(input);
+            try (InputStream input = IOUtils.openInputStream(file)) {
+                output.addAll(IOUtils.getLinesFromInputStream(input));
                 IOUtils.closeInputStream(input);
-                input.close();
             } catch (ShellException | IOException e) {
                 throw new PasteException(e.getMessage(), e);
-            } finally {
-                try {
-                    if (input != null) {
-                        input.close();
-                    }
-                } catch (IOException e) {
-                    throw new PasteException(e.getMessage(), e);
-                }
             }
-
-            maxFileLength = Math.max(maxFileLength, fileData.size());
-            tempListResult.add(fileData);
         }
 
-        return isSerial ? mergeInSerial(tempListResult) : mergeInParallel(tempListResult);
+        return isSerial ? mergeInSerial(output) : mergeInParallel(output);
     }
 
     /**
