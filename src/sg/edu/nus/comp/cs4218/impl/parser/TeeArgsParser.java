@@ -4,15 +4,18 @@ import java.util.List;
 
 public class TeeArgsParser extends ArgsParser {
 
+    private final static char FLAG_IS_APPEND = 'a';
+
     public TeeArgsParser() {
         super();
+        legalFlags.add(FLAG_IS_APPEND);
     }
 
     public Boolean isAppend() {
-        return false;
+        return flags.contains(FLAG_IS_APPEND);
     }
 
     public List<String> getFileNames() {
-        return null;
+        return nonFlagArgs;
     }
 }

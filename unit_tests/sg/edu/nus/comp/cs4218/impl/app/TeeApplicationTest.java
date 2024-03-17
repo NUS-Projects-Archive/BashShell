@@ -80,7 +80,7 @@ class TeeApplicationTest {
         String outputStdOut = assertDoesNotThrow(() -> app.teeFromStdin(true, inputStream, fileB));
         String outputFile = assertDoesNotThrow(() -> Files.readString(fileBPath));
         String expected = CONTENT_FILE_B + StringUtils.STRING_NEWLINE + CONTENT_FILE_A + StringUtils.STRING_NEWLINE;
-        assertEquals(expected, outputStdOut);
+        assertEquals(CONTENT_FILE_A + StringUtils.STRING_NEWLINE, outputStdOut);
         assertEquals(expected, outputFile);
     }
 }

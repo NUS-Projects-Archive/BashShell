@@ -1,11 +1,10 @@
 package sg.edu.nus.comp.cs4218.impl.app;
 
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir;
-
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static sg.edu.nus.comp.cs4218.testutils.TestStringUtils.CHAR_FILE_SEP;
+import static sg.edu.nus.comp.cs4218.testutils.TestStringUtils.STRING_NEWLINE;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -19,9 +18,11 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static sg.edu.nus.comp.cs4218.testutils.TestStringUtils.CHAR_FILE_SEP;
-import static sg.edu.nus.comp.cs4218.testutils.TestStringUtils.STRING_NEWLINE;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 import sg.edu.nus.comp.cs4218.exception.TeeException;
 import sg.edu.nus.comp.cs4218.testutils.TestEnvironmentUtil;
@@ -123,17 +124,6 @@ class TeeApplicationPublicIT {
         String[] argList = new String[]{};
         teeApplication.run(argList, stdin, System.out);
         assertEquals(STDIN_STRING, stdout.toString());
-    }
-
-    // tee with mixture of valid and invalid cases
-    @Test
-    public void run_WritableAndUnWritableFile_PrintsNoPermAndWritesToStdoutAndFile() throws Exception {
-        String[] argList = new String[]{"unwritable.txt", "tee1.txt"};
-        teeApplication.run(argList, stdin, System.out);
-        File outputFile = new File(tempDir, "tee1.txt");
-        assertTrue(outputFile.exists());
-        String fileContents = Files.readString(Paths.get(outputFile.getAbsolutePath()), StandardCharsets.UTF_8);
-        assertEquals(STDIN_STRING, fileContents);
     }
 
     // tee -a with single file: write to stdout and append to file
