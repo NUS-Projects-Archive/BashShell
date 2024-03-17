@@ -42,10 +42,10 @@ public class RmApplicationPublicTest {
         Files.createDirectories(tempPath);
         FileUtils.createNewDirectory(tempPath, DIR_A);
         FileUtils.createNewDirectory(tempPath, DIR_B);
+        FileUtils.createNewFile(tempPath, FILE_A);
+        FileUtils.createNewFile(tempPath, FILE_B);
+        FileUtils.createNewFile(tempPath, FILE_C);
         Files.createFile(Paths.get(tempPath.toString(), DIR_A, FILE_D));
-        Files.createFile(Paths.get(tempPath.toString(), FILE_A));
-        Files.createFile(Paths.get(tempPath.toString(), FILE_B));
-        Files.createFile(Paths.get(tempPath.toString(), FILE_C));
     }
 
     @AfterEach

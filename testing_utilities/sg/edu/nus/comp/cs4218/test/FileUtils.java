@@ -2,8 +2,10 @@ package sg.edu.nus.comp.cs4218.test;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public final class FileUtils {
     private FileUtils() { /* Does nothing */}
@@ -19,6 +21,20 @@ public final class FileUtils {
         Path file = assertDoesNotThrow(() -> Files.createTempFile(fileName, ""), "Unable to create temporary file");
         assertDoesNotThrow(() -> Files.write(file, contents.getBytes()), "Unable to write to temporary file");
         return file;
+    }
+
+    /**
+     * Creates a new file at the given parent path.
+     * Any non-existent parent directories are created.
+     *
+     * @param parentPath {@code Path} at which the file should be created
+     * @param newFileName {@code String} of the name of the new file
+     * @return {@code Path} of the newly-created file
+     * @throws IOException If an I/O error occurs
+     */
+    public static Path createNewFile(Path parentPath, String newFileName) throws IOException {
+        Files.createDirectories(parentPath);
+        return Files.createFile(Paths.get(parentPath.toString(), newFileName));
     }
 
     /**
