@@ -68,6 +68,7 @@ public class UniqApplicationPublicIT {
 
     @BeforeAll
     static void setUp() throws NoSuchFieldException, IllegalAccessException {
+        TestEnvironmentUtil.setCurrentDirectory(System.getProperty("user.dir"));
         currPath = Paths.get(TestEnvironmentUtil.getCurrentDirectory());
     }
 
