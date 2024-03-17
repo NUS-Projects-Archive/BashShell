@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static sg.edu.nus.comp.cs4218.impl.util.AssertUtils.assertEmptyString;
+import static sg.edu.nus.comp.cs4218.test.AssertUtils.assertEmptyString;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 
 import java.io.ByteArrayInputStream;
