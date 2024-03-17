@@ -1,5 +1,6 @@
 package sg.edu.nus.comp.cs4218.impl.app;
 
+import static sg.edu.nus.comp.cs4218.impl.util.CollectionsUtils.listToArray;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_NOT_FOUND;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_GENERAL;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_ISTREAM;
@@ -22,7 +23,6 @@ import sg.edu.nus.comp.cs4218.exception.InvalidArgsException;
 import sg.edu.nus.comp.cs4218.exception.PasteException;
 import sg.edu.nus.comp.cs4218.exception.ShellException;
 import sg.edu.nus.comp.cs4218.impl.parser.PasteArgsParser;
-import sg.edu.nus.comp.cs4218.impl.util.CollectionsUtils;
 import sg.edu.nus.comp.cs4218.impl.util.IOUtils;
 
 /**
@@ -54,23 +54,24 @@ public class PasteApplication implements PasteInterface {
      */
     @Override
     public void run(String[] args, InputStream stdin, OutputStream stdout) throws PasteException { //NOPMD
-        if (stdout == null) {
-            throw new PasteException(ERR_NULL_STREAMS);
-        }
         if (stdin == null) {
             throw new PasteException(ERR_NO_ISTREAM);
         }
-        final PasteArgsParser pasteArgsParser = new PasteArgsParser();
+        if (stdout == null) {
+            throw new PasteException(ERR_NULL_STREAMS);
+        }
+        final PasteArgsParser parser = new PasteArgsParser();
 
         try {
-            pasteArgsParser.parse(args);
+            parser.parse(args);
         } catch (InvalidArgsException e) {
             throw new PasteException(e.getMessage(), e);
         }
 
-        final String[] nonFlagArgs = CollectionsUtils.listToArray(pasteArgsParser.getNonFlagArgs());
-        boolean isSerial = pasteArgsParser.isSerial();
-        boolean hasStdin = pasteArgsParser.hasStdin();
+        final boolean isSerial = parser.isSerial();
+        final boolean hasStdin = parser.hasStdin();
+        final String[] nonFlagArgs = listToArray(parser.getNonFlagArgs());
+
         String result = null;
 
         if (nonFlagArgs.length == 0) {
