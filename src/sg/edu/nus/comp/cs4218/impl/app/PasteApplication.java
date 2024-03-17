@@ -2,11 +2,9 @@ package sg.edu.nus.comp.cs4218.impl.app;
 
 import static sg.edu.nus.comp.cs4218.impl.util.CollectionsUtils.listToArray;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_NOT_FOUND;
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_GENERAL;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IO_EXCEPTION;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IS_DIR;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_ISTREAM;
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_PERM;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NULL_ARGS;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NULL_STREAMS;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_READING_FILE;
@@ -21,6 +19,7 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import sg.edu.nus.comp.cs4218.app.PasteInterface;
 import sg.edu.nus.comp.cs4218.exception.InvalidArgsException;
@@ -38,13 +37,6 @@ import sg.edu.nus.comp.cs4218.impl.util.IOUtils;
  * </p>
  */
 public class PasteApplication implements PasteInterface {
-
-    private int maxFileLength = 0;
-    private final List<List<String>> tempListResult;
-
-    public PasteApplication() {
-        this.tempListResult = new ArrayList<>();
-    }
 
     /**
      * Runs the paste application with the specified arguments.
@@ -107,9 +99,9 @@ public class PasteApplication implements PasteInterface {
             throw new PasteException(ERR_NULL_STREAMS);
         }
 
-        List<String> output;
+        List<List<String>> output = new ArrayList<>();
         try {
-            output = IOUtils.getLinesFromInputStream(stdin);
+            output.add(IOUtils.getLinesFromInputStream(stdin));
         } catch (IOException e) {
             throw new PasteException(ERR_IO_EXCEPTION, e);
         }
@@ -132,7 +124,7 @@ public class PasteApplication implements PasteInterface {
             throw new PasteException(ERR_NULL_ARGS);
         }
 
-        List<String> output = new ArrayList<>();
+        List<List<String>> output = new ArrayList<>();
         for (String file : fileName) {
             File node = IOUtils.resolveFilePath(file).toFile();
             if (!node.exists()) {
@@ -146,7 +138,7 @@ public class PasteApplication implements PasteInterface {
             }
 
             try (InputStream input = IOUtils.openInputStream(file)) {
-                output.addAll(IOUtils.getLinesFromInputStream(input));
+                output.add(IOUtils.getLinesFromInputStream(input));
                 IOUtils.closeInputStream(input);
             } catch (ShellException | IOException e) {
                 throw new PasteException(e.getMessage(), e);
@@ -165,114 +157,67 @@ public class PasteApplication implements PasteInterface {
      * @throws PasteException
      */
     @Override
-    public String mergeFileAndStdin(Boolean isSerial, InputStream stdin, String... fileName) throws PasteException { //NOPMD
-        if (stdin == null) {
-            throw new PasteException(ERR_NULL_STREAMS);
-        }
-
+    public String mergeFileAndStdin(Boolean isSerial, InputStream stdin, String... fileName) throws PasteException {
+        List<String> output = new ArrayList<>();
         for (String file : fileName) {
-            if (file.compareTo("-") == 0) {
-                continue;
-            }
-            if (file.equals("")) {
-                throw new PasteException(ERR_GENERAL);
-            }
-
-            File node = IOUtils.resolveFilePath(file).toFile();
-            if (!node.exists()) {
-                throw new PasteException(file + ": " + ERR_FILE_NOT_FOUND);
-            }
-            if (node.isDirectory()) {
-                continue;
-            }
-            if (!node.canRead()) {
-                throw new PasteException(ERR_NO_PERM);
-            }
-        }
-        List<String> data;
-        try {
-            data = IOUtils.getLinesFromInputStream(stdin);
-        } catch (IOException e) {
-            throw new PasteException(e.getMessage(), e);
-        }
-        int numOfDash = (int) Arrays.stream(fileName).filter("-"::equals).count();
-        if (numOfDash != 0) {
-            maxFileLength = Math.max(maxFileLength, data.size() / numOfDash);
-            if (data.size() % numOfDash != 0) {
-                maxFileLength = Math.max(maxFileLength, (data.size() / numOfDash) + 1);
-            }
-        }
-        if (isSerial) {
-            numOfDash = 1;
-        }
-        int currStdin = 0;
-        for (String file : fileName) {
-            if (file != null && file.equals("-")) {
-                List<String> currLst = new ArrayList<>();
-                for (int i = currStdin; i < data.size(); i += numOfDash) {
-                    currLst.add(data.get(i));
-                }
-                currStdin = isSerial ? data.size() : currStdin + 1;
-                tempListResult.add(currLst);
+            if ("-".equals(file)) {
+                output.add(mergeStdin(isSerial, stdin));
             } else {
-                mergeFile(isSerial, file);
+                output.add(mergeFile(isSerial, file));
             }
         }
-        return isSerial ? mergeInSerial(tempListResult) : mergeInParallel(tempListResult);
+
+        List<List<String>> totalLines = output.stream().filter(s -> !s.isEmpty())
+                .map(s -> Arrays.asList((s.split(STRING_NEWLINE))))
+                .collect(Collectors.toList());
+
+        String result = isSerial ? mergeInSerial(totalLines) : mergeInParallel(totalLines);
+        return String.join(STRING_NEWLINE, result);
     }
 
     /**
-     * Takes in a List of Lists of Strings and merges lists in serial.
-     * Each inner list represents a row of data, and each element in the inner list represents a column.
-     * Columns within a row are separated by a tab character ('\t'), and rows are separated by a newline character ('\n')
+     * Takes in a List of Lists of Strings and merges the lists in serial.
+     * Each inner list represents data from a file, where each element represents a line of data.
+     * Columns within a row are separated by a tab character ('\t'), and rows are separated by a newline character ('\n').
      *
-     * @param listResult List of Lists of Strings representing the data to be merged
-     * @return Merged data as a single String
+     * @param listOfFiles List of Lists of Strings representing the data from multiple files to be merged
+     * @return Merged data as a single String where columns within a row are separated by a
+     *         tab character ('\t') and rows are separated by a newline character ('\n')
      */
-    public String mergeInSerial(List<List<String>> listResult) {
-        List<List<String>> res = new ArrayList<>();
-        for (List<String> lst : listResult) {
-            List<String> currList = new ArrayList<>(lst);
-            res.add(currList);
+    public String mergeInSerial(List<List<String>> listOfFiles) {
+        List<String> mergedLines = new ArrayList<>();
+        for (List<String> files : listOfFiles) {
+            mergedLines.add(String.join(STRING_TAB, files));
         }
-
-        List<String> interRes = new ArrayList<>();
-        for (List<String> lst : res) {
-            interRes.add(String.join(STRING_TAB, lst));
-        }
-
-        String mergedString = String.join(STRING_NEWLINE, interRes);
-
-        if (mergedString.endsWith(STRING_NEWLINE)) {
-            mergedString = mergedString.substring(0, mergedString.length() - STRING_NEWLINE.length());
-        }
-
-        return mergedString;
+        return String.join(STRING_NEWLINE, mergedLines);
     }
 
     /**
      * Merges lists in parallel, where each sublist corresponds to a column in the merged result.
      * If a sublist does not have an element at a particular index, an empty string is inserted.
      *
-     * @param listResult A List of Lists of Strings representing the data to be merged in parallel
+     * @param listOfFiles A List of Lists of Strings representing the data to be merged in parallel
      * @return A String representing the merged data with elements separated by tabs and rows separated by newlines
      */
-    public String mergeInParallel(List<List<String>> listResult) {
-        List<List<String>> res = new ArrayList<>();
+    public String mergeInParallel(List<List<String>> listOfFiles) {
+        int maxFileLength = listOfFiles.stream()
+                .mapToInt(List::size)
+                .max()
+                .orElse(0);
 
+        List<List<String>> parallelizedFiles = new ArrayList<>();
         for (int i = 0; i < maxFileLength; i++) {
-            List<String> currLstToAdd = new ArrayList<>();
-            for (List<String> currLst : listResult) {
-                currLstToAdd.add(i < currLst.size() ? currLst.get(i) : "");
+            List<String> currIndexList = new ArrayList<>();
+            for (List<String> file : listOfFiles) {
+                currIndexList.add(i < file.size() ? file.get(i) : ""); // Empty string if the list do not have an element at index i
             }
-            res.add(currLstToAdd);
+            parallelizedFiles.add(currIndexList);
         }
 
-        List<String> interRes = new ArrayList<>();
-        for (List<String> lst : res) {
-            interRes.add(String.join(STRING_TAB, lst));
+        List<String> mergedLines = new ArrayList<>();
+        for (List<String> files : parallelizedFiles) {
+            mergedLines.add(String.join(STRING_TAB, files));
         }
-
-        return String.join(STRING_NEWLINE, interRes);
+        return String.join(STRING_NEWLINE, mergedLines);
     }
 }
