@@ -72,10 +72,7 @@ class LsApplicationIT {
     }
 
     private static String getDirAContents() {
-        String[] fileList = Stream.concat(Arrays.stream(DIR_A_NON_DIRS), Arrays.stream(new String[]{DIR_A_NAME}))
-                .sorted()
-                .toArray(String[]::new);
-        return StringUtils.joinStringsByNewline(fileList);
+        return StringUtils.joinStringsByNewline(DIR_A_NON_DIRS);
     }
 
     /**
@@ -83,7 +80,7 @@ class LsApplicationIT {
      */
     static Stream<Arguments> validArgs() {
         String listCwdContents = StringUtils.joinStringsByNewline(".:", getCwdContents()) + STRING_NEWLINE;
-        String listDirAContents = DIR_A_NAME + StringUtils.joinStringsByNewline(":", getDirAContents());
+        String listDirAContents = DIR_A_NAME + StringUtils.joinStringsByNewline(":", getDirAContents()) + STRING_NEWLINE;
         return Stream.of(
                 // Relative paths
                 Arguments.of(new String[]{"."}, listCwdContents),

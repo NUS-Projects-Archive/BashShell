@@ -2,7 +2,7 @@ package sg.edu.nus.comp.cs4218.impl.app.helper;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_FILE_SEP;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 import static sg.edu.nus.comp.cs4218.test.FileUtils.createNewDirectory;
@@ -10,7 +10,6 @@ import static sg.edu.nus.comp.cs4218.test.FileUtils.deleteFileOrDirectory;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
@@ -27,7 +26,7 @@ import sg.edu.nus.comp.cs4218.exception.LsException;
 import sg.edu.nus.comp.cs4218.impl.util.StringUtils;
 
 // To give a meaningful variable name
-@SuppressWarnings("PMD.LongVariable")
+@SuppressWarnings({"PMD.LongVariable", "PMD.ClassNamingConventions"})
 class LsApplicationHelperIT {
 
     private static final String DIR_A_NAME = "dirA";
@@ -54,8 +53,6 @@ class LsApplicationHelperIT {
     // Main temporary dir
     @TempDir
     private Path cwdPath;
-    // Temporary dir A is in main temporary dir
-    private Path dirAPath;
 
     private static String getCwdContents() {
         String[] fileList = Stream.concat(Arrays.stream(CWD_NON_DIRS), Arrays.stream(CWD_DIRS))
@@ -99,10 +96,8 @@ class LsApplicationHelperIT {
             assertDoesNotThrow(() -> cwdPath.resolve(CWD_DIRS[0]).resolve(file).toFile().createNewFile());
         }
 
-        String cwdPathName = cwdPath.toString();
-        dirAPath = Paths.get(cwdPathName, DIR_A_NAME);
         // Set current working directory to cwdPath
-        Environment.currentDirectory = cwdPathName;
+        Environment.currentDirectory = cwdPath.toString();
     }
 
     @AfterEach
@@ -143,7 +138,7 @@ class LsApplicationHelperIT {
         String expected = "ls: cannot open directory '.': Permission denied";
 
         // When
-        String actual = assertThrows(LsException.class, () -> LsApplicationHelper.listCwdContent(false)).getMessage();
+        String actual = assertThrowsExactly(LsException.class, () -> LsApplicationHelper.listCwdContent(false)).getMessage();
 
         // Then
         assertEquals(expected, actual);

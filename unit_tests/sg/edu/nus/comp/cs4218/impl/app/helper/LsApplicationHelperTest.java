@@ -2,7 +2,7 @@ package sg.edu.nus.comp.cs4218.impl.app.helper;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 import static sg.edu.nus.comp.cs4218.test.FileUtils.createNewDirectory;
 
 import java.nio.file.Path;
@@ -63,7 +63,7 @@ class LsApplicationHelperTest {
         List<Path> contents = Arrays.stream(CWD_NON_DIRS)
                 .map(Paths::get)
                 .collect(Collectors.toList());
-        assertThrows(NullPointerException.class, () -> LsApplicationHelper.formatContents(contents, null));
+        assertThrowsExactly(NullPointerException.class, () -> LsApplicationHelper.formatContents(contents, null));
     }
 
     @Test

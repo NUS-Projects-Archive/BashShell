@@ -23,6 +23,7 @@ import org.junit.jupiter.api.Test;
 
 import sg.edu.nus.comp.cs4218.testutils.TestEnvironmentUtil;
 
+@SuppressWarnings({"PMD.ClassNamingConventions"})
 public class LsApplicationPublicIT {
     private static final String TEMP = "temp-ls";
     private static final String FOLDER = "folder";
@@ -55,49 +56,49 @@ public class LsApplicationPublicIT {
     private static final String DOC_IN_SECOND_FDR = "document_in_second_folder.doc";
     private static final String COLON = ":";
 
-    private static final Deque<Path> files = new ArrayDeque<>();
+    private static final Deque<Path> FILES = new ArrayDeque<>();
 
-    private static Path TEMP_PATH;
+    private static Path tempPath;
     private LsApplication lsApplication;
 
     @BeforeAll
     static void setUp() throws NoSuchFieldException, IllegalAccessException {
         Path originalPath = Paths.get(TestEnvironmentUtil.getCurrentDirectory());
-        TEMP_PATH = Paths.get(originalPath.toString(), TEMP);
+        tempPath = Paths.get(originalPath.toString(), TEMP);
     }
 
     @BeforeEach
     void init() throws IOException {
         lsApplication = new LsApplication();
-        Files.createDirectory(TEMP_PATH);
+        Files.createDirectory(tempPath);
     }
 
     @AfterEach
     void deleteTemp() throws IOException {
-        for (Path file : files) {
+        for (Path file : FILES) {
             Files.deleteIfExists(file);
         }
-        Files.delete(TEMP_PATH);
+        Files.delete(tempPath);
     }
 
     private void createFile(String name) throws IOException {
-        createFile(name, TEMP_PATH);
+        createFile(name, tempPath);
     }
 
     private Path createDirectory(String folder) throws IOException {
-        return createDirectory(folder, TEMP_PATH);
+        return createDirectory(folder, tempPath);
     }
 
     private void createFile(String name, Path inPath) throws IOException {
         Path path = inPath.resolve(name);
         Files.createFile(path);
-        files.push(path);
+        FILES.push(path);
     }
 
     private Path createDirectory(String folder, Path inPath) throws IOException {
         Path path = inPath.resolve(folder);
         Files.createDirectory(path);
-        files.push(path);
+        FILES.push(path);
         return path;
     }
 
@@ -116,7 +117,7 @@ public class LsApplicationPublicIT {
     void run_NoDirectoriesNoFlags_DisplaysFilesAndDirectories() throws Exception {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         String currPathString = TestEnvironmentUtil.getCurrentDirectory();
-        TestEnvironmentUtil.setCurrentDirectory(TEMP_PATH.toString());
+        TestEnvironmentUtil.setCurrentDirectory(tempPath.toString());
         createFile(FILE_A_TXT);
         createDirectory(FOLDER_B);
         lsApplication.run(toArgs(""), System.in, output);
@@ -128,7 +129,7 @@ public class LsApplicationPublicIT {
     void run_NoDirectoriesRecursiveFlag_DisplaysFilesAndDirectoriesRecursively() throws Exception {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         String currPathString = TestEnvironmentUtil.getCurrentDirectory();
-        TestEnvironmentUtil.setCurrentDirectory(TEMP_PATH.toString());
+        TestEnvironmentUtil.setCurrentDirectory(tempPath.toString());
         createFile(FILE_A_TXT);
         Path folderBPath = createDirectory(FOLDER_B);
         createFile("file_in_folderB.txt", folderBPath);
@@ -142,7 +143,7 @@ public class LsApplicationPublicIT {
     void run_NoDirectoriesSortFlag_DisplaysSortedFilesAndDirectories() throws Exception {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         String currPathString = TestEnvironmentUtil.getCurrentDirectory();
-        TestEnvironmentUtil.setCurrentDirectory(TEMP_PATH.toString());
+        TestEnvironmentUtil.setCurrentDirectory(tempPath.toString());
         createFile(FILE_A_TXT);
         createFile(IMAGE_B_JPG);
         createFile(DOCUMENT_C_DOC);
