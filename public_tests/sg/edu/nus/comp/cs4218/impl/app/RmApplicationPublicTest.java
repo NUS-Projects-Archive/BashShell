@@ -1,7 +1,7 @@
 package sg.edu.nus.comp.cs4218.impl.app;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static sg.edu.nus.comp.cs4218.test.AssertUtils.assertFileDoNotExists;
 
 import java.io.File;
 import java.nio.file.Files;
@@ -15,6 +15,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import sg.edu.nus.comp.cs4218.exception.RmException;
+import sg.edu.nus.comp.cs4218.test.FileUtils;
 import sg.edu.nus.comp.cs4218.testutils.TestEnvironmentUtil;
 
 public class RmApplicationPublicTest {
@@ -38,18 +39,18 @@ public class RmApplicationPublicTest {
     @BeforeEach
     public void setUp() throws Exception {
         rmApplication = new RmApplication();
-        Files.createDirectory(tempPath);
-        Files.createFile(Paths.get(TEMP + FILE_A));
-        Files.createFile(Paths.get(TEMP + FILE_B));
-        Files.createFile(Paths.get(TEMP + FILE_C));
-        Files.createDirectory(Paths.get(TEMP + DIR_A));
-        Files.createDirectory(Paths.get(TEMP + DIR_B));
-        Files.createFile(Paths.get(TEMP + DIR_A + File.separator + FILE_D));
+        Files.createDirectories(tempPath);
+        FileUtils.createNewDirectory(tempPath, DIR_A);
+        FileUtils.createNewDirectory(tempPath, DIR_B);
+        Files.createFile(Paths.get(tempPath.toString(), DIR_A, FILE_D));
+        Files.createFile(Paths.get(tempPath.toString(), FILE_A));
+        Files.createFile(Paths.get(tempPath.toString(), FILE_B));
+        Files.createFile(Paths.get(tempPath.toString(), FILE_C));
     }
 
     @AfterEach
     public void clean() throws Exception {
-        Files.walk(Paths.get(TEMP))
+        Files.walk(tempPath)
                 .sorted(Comparator.reverseOrder())
                 .map(Path::toFile)
                 .forEach(File::delete);
@@ -58,7 +59,7 @@ public class RmApplicationPublicTest {
     @Test
     public void removeTest_RemoveSingleFileNoFlag_RemovesFile() throws Exception {
         rmApplication.remove(false, false, TEMP + FILE_A);
-        assertFalse(Files.exists(Paths.get(TEMP + FILE_A)));
+        assertFileDoNotExists(Paths.get(TEMP + FILE_A));
     }
 
     @Test
@@ -69,7 +70,7 @@ public class RmApplicationPublicTest {
     @Test
     public void removeTest_RemoveEmptyFolderEmptyFlag_RemovesFolder() throws Exception {
         rmApplication.remove(true, false, TEMP + DIR_B);
-        assertFalse(Files.exists(Paths.get(TEMP + DIR_B)));
+        assertFileDoNotExists(Paths.get(TEMP + DIR_B));
     }
 
     @Test
@@ -85,15 +86,15 @@ public class RmApplicationPublicTest {
     @Test
     public void removeTest_RemoveMultipleFilesNoFlag_RemovesSelectedFiles() throws Exception {
         rmApplication.remove(false, false, TEMP + FILE_A, TEMP + FILE_B, TEMP + FILE_C);
-        assertFalse(Files.exists(Paths.get(TEMP + FILE_A)));
-        assertFalse(Files.exists(Paths.get(TEMP + FILE_B)));
-        assertFalse(Files.exists(Paths.get(TEMP + FILE_C)));
+        assertFileDoNotExists(Paths.get(TEMP + FILE_A));
+        assertFileDoNotExists(Paths.get(TEMP + FILE_B));
+        assertFileDoNotExists(Paths.get(TEMP + FILE_C));
     }
 
     @Test
     public void removeTest_RemoveFolderRecurseFlag_RemovesAllFoldersAndFiles() throws Exception {
         rmApplication.remove(false, true, TEMP + DIR_A);
-        assertFalse(Files.exists(Paths.get(TEMP + DIR_A)));
-        assertFalse(Files.exists(Paths.get(TEMP + DIR_A + File.separator + FILE_D)));
+        assertFileDoNotExists(Paths.get(TEMP + DIR_A));
+        assertFileDoNotExists(Paths.get(TEMP + DIR_A + File.separator + FILE_D));
     }
 }
