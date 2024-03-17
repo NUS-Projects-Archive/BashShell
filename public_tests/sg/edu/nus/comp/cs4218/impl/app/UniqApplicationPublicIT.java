@@ -1,9 +1,11 @@
 package sg.edu.nus.comp.cs4218.impl.app;
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static sg.edu.nus.comp.cs4218.test.AssertUtils.assertEmptyString;
+import static sg.edu.nus.comp.cs4218.testutils.TestStringUtils.STRING_NEWLINE;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -16,76 +18,76 @@ import java.nio.file.Paths;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 import sg.edu.nus.comp.cs4218.exception.UniqException;
 import sg.edu.nus.comp.cs4218.testutils.TestEnvironmentUtil;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static sg.edu.nus.comp.cs4218.testutils.TestStringUtils.STRING_NEWLINE;
-
+@SuppressWarnings({"PMD.ClassNamingConventions", "PMD.LongVariable"})
 public class UniqApplicationPublicIT {
+    private static final String HELLO_WORLD = "Hello World";
+    private static final String ALICE = "Alice";
+    private static final String BOB = "Bob";
+
     private static final String INPUT_FILE_TXT = "input_file.txt";
     private static final String OUTPUT_FILE_TXT = "output_file.txt";
-    
-    private static final Deque<Path> files = new ArrayDeque<>();
-    private static Path CURR_PATH;
-    
-    private UniqApplication uniqApplication;
 
-    private static final String testInput = "Hello World" + STRING_NEWLINE +
-            "Hello World" + STRING_NEWLINE +
-            "Alice" + STRING_NEWLINE +
-            "Alice" + STRING_NEWLINE +
-            "Bob" + STRING_NEWLINE +
-            "Alice" + STRING_NEWLINE +
-            "Bob" + STRING_NEWLINE;
-
-    private static final String withoutFlagOutput = "Hello World" + STRING_NEWLINE +
-            "Alice" + STRING_NEWLINE +
-            "Bob" + STRING_NEWLINE +
-            "Alice" + STRING_NEWLINE +
-            "Bob" + STRING_NEWLINE;
-
-    private static final String withCountFlagOutput = "2 Hello World" + STRING_NEWLINE +
+    private static final Deque<Path> FILES = new ArrayDeque<>();
+    private static final String TEST_INPUT = HELLO_WORLD + STRING_NEWLINE +
+            HELLO_WORLD + STRING_NEWLINE +
+            ALICE + STRING_NEWLINE +
+            ALICE + STRING_NEWLINE +
+            BOB + STRING_NEWLINE +
+            ALICE + STRING_NEWLINE +
+            BOB + STRING_NEWLINE;
+    private static final String WITHOUT_FLAG_OUTPUT = HELLO_WORLD + STRING_NEWLINE +
+            ALICE + STRING_NEWLINE +
+            BOB + STRING_NEWLINE +
+            ALICE + STRING_NEWLINE +
+            BOB;
+    private static final String WITH_COUNT_FLAG_OUTPUT = "2 Hello World" + STRING_NEWLINE +
             "2 Alice" + STRING_NEWLINE +
             "1 Bob" + STRING_NEWLINE +
             "1 Alice" + STRING_NEWLINE +
-            "1 Bob" + STRING_NEWLINE;
+            "1 Bob";
+    private static final String WITH_DUPLICATE_FLAG_OUTPUT = HELLO_WORLD + STRING_NEWLINE +
+            ALICE;
+    private static final String WITH_ALL_DUPLICATE_FLAG_OUTPUT = HELLO_WORLD + STRING_NEWLINE +
+            HELLO_WORLD + STRING_NEWLINE +
+            ALICE + STRING_NEWLINE +
+            ALICE;
+    private static final String WITH_COUNT_AND_DUPLICATE_FLAGS_OUTPUT = "2 Hello World" + STRING_NEWLINE +
+            "2 Alice";
 
-    private static final String withDuplicateFlagOutput = "Hello World" + STRING_NEWLINE +
-            "Alice" + STRING_NEWLINE;
+    private static Path currPath;
 
-    private static final String withAllDuplicateFlagOutput = "Hello World" + STRING_NEWLINE +
-            "Hello World" + STRING_NEWLINE +
-            "Alice" + STRING_NEWLINE +
-            "Alice" + STRING_NEWLINE;
-
-    private static final String withCountAndDuplicateFlagsOutput = "2 Hello World" + STRING_NEWLINE +
-            "2 Alice" + STRING_NEWLINE;
+    private UniqApplication uniqApplication;
 
     @BeforeAll
     static void setUp() throws NoSuchFieldException, IllegalAccessException {
-        CURR_PATH = Paths.get(TestEnvironmentUtil.getCurrentDirectory());
+        TestEnvironmentUtil.setCurrentDirectory(System.getProperty("user.dir"));
+        currPath = Paths.get(TestEnvironmentUtil.getCurrentDirectory());
     }
-    
+
     @BeforeEach
     void init() {
         uniqApplication = new UniqApplication();
     }
-    
+
     @AfterEach
     void deleteTemp() throws IOException {
-        for (Path file : files) {
+        for (Path file : FILES) {
             Files.deleteIfExists(file);
         }
     }
 
     private Path createFile(String name) throws IOException {
-        Path path = CURR_PATH.resolve(name);
+        Path path = currPath.resolve(name);
         Files.createFile(path);
-        files.push(path);
+        FILES.push(path);
         return path;
     }
 
@@ -96,61 +98,61 @@ public class UniqApplicationPublicIT {
     @Test
     void run_NoFilesWithoutFlag_ReadsFromInputAndDisplaysAdjacentLines() throws Exception {
         String[] args = {};
-        InputStream stdin = new ByteArrayInputStream(testInput.getBytes());
+        InputStream stdin = new ByteArrayInputStream(TEST_INPUT.getBytes());
         OutputStream outputStream = new ByteArrayOutputStream();
         uniqApplication.run(args, stdin, outputStream);
-        assertEquals(withoutFlagOutput, outputStream.toString());
+        assertEquals(WITHOUT_FLAG_OUTPUT + STRING_NEWLINE, outputStream.toString());
     }
 
     @Test
     void run_NoFilesWithCountFlag_ReadsFromInputAndDisplaysCountOfAdjacentLines() throws Exception {
         String[] args = {"-c"};
-        InputStream stdin = new ByteArrayInputStream(testInput.getBytes());
+        InputStream stdin = new ByteArrayInputStream(TEST_INPUT.getBytes());
         OutputStream outputStream = new ByteArrayOutputStream();
         uniqApplication.run(args, stdin, outputStream);
-        assertEquals(withCountFlagOutput, outputStream.toString());
+        assertEquals(WITH_COUNT_FLAG_OUTPUT + STRING_NEWLINE, outputStream.toString());
     }
 
     @Test
     void run_NoFilesWithDuplicateFlag_ReadsFromInputAndDisplaysRepeatedAdjacentLinesOnlyOnce() throws Exception {
         String[] args = {"-d"};
-        InputStream stdin = new ByteArrayInputStream(testInput.getBytes());
+        InputStream stdin = new ByteArrayInputStream(TEST_INPUT.getBytes());
         OutputStream outputStream = new ByteArrayOutputStream();
         uniqApplication.run(args, stdin, outputStream);
-        assertEquals(withDuplicateFlagOutput, outputStream.toString());
+        assertEquals(WITH_DUPLICATE_FLAG_OUTPUT + STRING_NEWLINE, outputStream.toString());
     }
 
     @Test
     void run_NoFilesWithAllDuplicateFlag_ReadsFromInputAndDisplaysRepeatedAdjacentLinesRepeatedly() throws Exception {
         String[] args = {"-D"};
-        InputStream stdin = new ByteArrayInputStream(testInput.getBytes());
+        InputStream stdin = new ByteArrayInputStream(TEST_INPUT.getBytes());
         OutputStream outputStream = new ByteArrayOutputStream();
         uniqApplication.run(args, stdin, outputStream);
-        assertEquals(withAllDuplicateFlagOutput, outputStream.toString());
+        assertEquals(WITH_ALL_DUPLICATE_FLAG_OUTPUT + STRING_NEWLINE, outputStream.toString());
     }
 
     @Test
     void run_NoFilesWithDuplicateAndAllDuplicateFlags_ReadsFromInputAndDisplaysRepeatedAdjacentLinesRepeatedly() throws Exception {
         String[] args = {"-d", "-D"};
-        InputStream stdin = new ByteArrayInputStream(testInput.getBytes());
+        InputStream stdin = new ByteArrayInputStream(TEST_INPUT.getBytes());
         OutputStream outputStream = new ByteArrayOutputStream();
         uniqApplication.run(args, stdin, outputStream);
-        assertEquals(withAllDuplicateFlagOutput, outputStream.toString());
+        assertEquals(WITH_ALL_DUPLICATE_FLAG_OUTPUT + STRING_NEWLINE, outputStream.toString());
     }
 
     @Test
     void run_NoFilesWithCountAndDuplicateFlags_ReadsFromInputAndDisplaysCountOfRepeatedAdjacentLinesOnlyOnce() throws Exception {
         String[] args = {"-c", "-d"};
-        InputStream stdin = new ByteArrayInputStream(testInput.getBytes());
+        InputStream stdin = new ByteArrayInputStream(TEST_INPUT.getBytes());
         OutputStream outputStream = new ByteArrayOutputStream();
         uniqApplication.run(args, stdin, outputStream);
-        assertEquals(withCountAndDuplicateFlagsOutput, outputStream.toString());
+        assertEquals(WITH_COUNT_AND_DUPLICATE_FLAGS_OUTPUT + STRING_NEWLINE, outputStream.toString());
     }
 
     @Test
     void run_NoFilesWithUnknownFlag_Throws() {
         String[] args = {"-x"};
-        InputStream stdin = new ByteArrayInputStream(testInput.getBytes());
+        InputStream stdin = new ByteArrayInputStream(TEST_INPUT.getBytes());
         OutputStream outputStream = new ByteArrayOutputStream();
         assertThrows(UniqException.class, () -> uniqApplication.run(args, stdin, outputStream));
     }
@@ -158,12 +160,12 @@ public class UniqApplicationPublicIT {
     @Test
     void run_NonemptyInputFile_ReadsFileAndDisplaysAdjacentLines() throws Exception {
         Path inputPath = createFile(INPUT_FILE_TXT);
-        writeToFile(inputPath, testInput);
+        writeToFile(inputPath, TEST_INPUT);
         String[] args = {INPUT_FILE_TXT};
         InputStream stdin = new ByteArrayInputStream("".getBytes());
         OutputStream outputStream = new ByteArrayOutputStream();
         uniqApplication.run(args, stdin, outputStream);
-        assertEquals(withoutFlagOutput, outputStream.toString());
+        assertEquals(WITHOUT_FLAG_OUTPUT + STRING_NEWLINE, outputStream.toString());
     }
 
     @Test
@@ -188,37 +190,42 @@ public class UniqApplicationPublicIT {
     void run_InputFileToOutputFile_DisplaysNewlineAndOverwritesOutputFile() throws Exception {
         Path inputPath = createFile(INPUT_FILE_TXT);
         Path outputPath = createFile(OUTPUT_FILE_TXT);
-        writeToFile(inputPath, testInput);
+        writeToFile(inputPath, TEST_INPUT);
         writeToFile(outputPath, "This is the output file.");
-        files.push(outputPath);
+        FILES.push(outputPath);
+
         String[] args = {INPUT_FILE_TXT, OUTPUT_FILE_TXT};
         InputStream stdin = new ByteArrayInputStream("".getBytes());
         OutputStream outputStream = new ByteArrayOutputStream();
         uniqApplication.run(args, stdin, outputStream);
-        assertEquals(STRING_NEWLINE, outputStream.toString());
-        assertArrayEquals(withoutFlagOutput.getBytes(), Files.readAllBytes(outputPath));
+
+        assertEmptyString(outputStream.toString());
+        assertArrayEquals(WITHOUT_FLAG_OUTPUT.getBytes(), Files.readAllBytes(outputPath));
     }
 
     @Test
     void run_InputFileToNonexistentOutputFile_DisplaysNewlineAndCreatesOutputFile() throws Exception {
         Path inputPath = createFile(INPUT_FILE_TXT);
-        writeToFile(inputPath, testInput);
+        writeToFile(inputPath, TEST_INPUT);
+
         String[] args = {INPUT_FILE_TXT, OUTPUT_FILE_TXT};
         InputStream stdin = new ByteArrayInputStream("".getBytes());
         OutputStream outputStream = new ByteArrayOutputStream();
         uniqApplication.run(args, stdin, outputStream);
-        Path outputPath = CURR_PATH.resolve(OUTPUT_FILE_TXT);
-        files.push(outputPath);
-        assertEquals(STRING_NEWLINE, outputStream.toString());
+
+        Path outputPath = currPath.resolve(OUTPUT_FILE_TXT);
+        FILES.push(outputPath);
+
+        assertEmptyString(outputStream.toString());
         assertTrue(Files.exists(outputPath));
-        assertArrayEquals(withoutFlagOutput.getBytes(), Files.readAllBytes(outputPath));
+        assertArrayEquals(WITHOUT_FLAG_OUTPUT.getBytes(), Files.readAllBytes(outputPath));
     }
 
     @Test
     void run_NonexistentInputFileToOutputFile_Throws() throws IOException {
         Path outputPath = createFile(OUTPUT_FILE_TXT);
         writeToFile(outputPath, "This is the output file.");
-        files.push(outputPath);
+        FILES.push(outputPath);
         String[] args = {INPUT_FILE_TXT, OUTPUT_FILE_TXT};
         InputStream stdin = new ByteArrayInputStream("".getBytes());
         OutputStream outputStream = new ByteArrayOutputStream();

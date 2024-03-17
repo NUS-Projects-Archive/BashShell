@@ -4,7 +4,8 @@ import static sg.edu.nus.comp.cs4218.exception.UniqException.COUNT_ALL_DUP_ERR;
 import static sg.edu.nus.comp.cs4218.exception.UniqException.PROB_UNIQ_FILE;
 import static sg.edu.nus.comp.cs4218.exception.UniqException.PROB_UNIQ_STDIN;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_NOT_FOUND;
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_READING_FILE;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_INPUT;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_OSTREAM;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_WRITE_STREAM;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 
@@ -42,7 +43,10 @@ public class UniqApplication implements UniqInterface {
      *               files are specified.
      * @param stdout An OutputStream. The output of the command is written to this OutputStream
      *               if no files are specified.
-     * @throws UniqException
+     * @throws UniqException When {@code stdin} is null, or
+     *                       when cannot find {@code inputFileName}, or
+     *                       when IO problems while writing to {@code outputFileName}, or
+     *                       when arguments for both count and allRepeated are provided
      */
     @Override
     public void run(String[] args, InputStream stdin, OutputStream stdout) throws UniqException {
@@ -71,6 +75,9 @@ public class UniqApplication implements UniqInterface {
         // Print results if no output file specified
         try {
             if (outputFile == null) {
+                if (stdout == null) {
+                    throw new UniqException(ERR_NO_OSTREAM);
+                }
                 stdout.write(output.getBytes());
                 stdout.write(STRING_NEWLINE.getBytes());
             }
@@ -87,19 +94,18 @@ public class UniqApplication implements UniqInterface {
      * @param isAllRepeated  Boolean option to print all duplicate lines (takes precedence if isRepeated is true)
      * @param inputFileName  String of path to input file
      * @param outputFileName String of path to output file
-     * @return String of the results. Null if {@code outputFile} is given.
-     * @throws UniqException
+     * @return String of the results. Null if {@code outputFileName} is given.
+     * @throws UniqException When cannot find {@code inputFileName}, or when IO problems while writing to {@code outputFileName}
      */
     @Override
     public String uniqFromFile(Boolean isCount, Boolean isRepeated, Boolean isAllRepeated, String inputFileName,
                                String outputFileName) throws UniqException {
-        BufferedReader reader = null;
-        BufferedWriter writer = null;
-
         try {
-            reader = new BufferedReader(new FileReader(inputFileName));
-            String result = uniq(isCount, isRepeated, isAllRepeated, reader);
-            reader.close();
+            String result;
+
+            try (BufferedReader reader = new BufferedReader(new FileReader(inputFileName))) {
+                result = uniq(isCount, isRepeated, isAllRepeated, reader);
+            }
 
             if (outputFileName == null) {
                 // No output file specified, return result.
@@ -107,20 +113,13 @@ public class UniqApplication implements UniqInterface {
             }
 
             // Write to file
-            writer = new BufferedWriter(new FileWriter(outputFileName));
-            writer.write(result);
-            writer.close();
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(outputFileName))) {
+                writer.write(result);
+            }
         } catch (FileNotFoundException e) {
             throw new UniqException(PROB_UNIQ_FILE + ERR_FILE_NOT_FOUND, e);
         } catch (IOException e) {
             throw new UniqException(PROB_UNIQ_FILE + e.getMessage(), e);
-        } finally {
-            try {
-                if (reader != null) { reader.close(); }
-                if (writer != null) { writer.close(); }
-            } catch (IOException e) {
-                throw new UniqException(PROB_UNIQ_FILE + e.getMessage(), e);
-            }
         }
 
         return null;
@@ -135,12 +134,14 @@ public class UniqApplication implements UniqInterface {
      * @param stdin          InputStream containing arguments from Stdin
      * @param outputFileName String of path to output file
      * @return String of the results. Null if {@code outputFile} is given.
-     * @throws UniqException
+     * @throws UniqException When {@code stdin} is null, or when IO problems while writing to {@code outputFileName}
      */
     @Override
     public String uniqFromStdin(Boolean isCount, Boolean isRepeated, Boolean isAllRepeated, InputStream stdin,
                                 String outputFileName) throws UniqException {
-        BufferedWriter writer = null;
+        if (stdin == null) {
+            throw new UniqException(ERR_NO_INPUT);
+        }
 
         try {
             BufferedReader input = new BufferedReader(new InputStreamReader(stdin));
@@ -152,19 +153,13 @@ public class UniqApplication implements UniqInterface {
             }
 
             // Write to file
-            writer = new BufferedWriter(new FileWriter(outputFileName));
-            writer.write(result);
-            writer.close();
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(outputFileName))) {
+                writer.write(result);
+            }
 
             return null;
         } catch (IOException e) {
             throw new UniqException(PROB_UNIQ_STDIN + e.getMessage(), e);
-        } finally {
-            try {
-                if (writer != null) { writer.close(); }
-            } catch (IOException e) {
-                throw new UniqException(PROB_UNIQ_FILE + e.getMessage(), e);
-            }
         }
     }
 
@@ -176,7 +171,7 @@ public class UniqApplication implements UniqInterface {
      * @param isAllRepeated Boolean option to print all duplicate lines (takes precedence if isRepeated is true)
      * @param content       BufferedReader holding the content to be processed
      * @return String of the results
-     * @throws IOException
+     * @throws IOException When both {@code isCount} and {@code isAllRepeated} are true
      */
     private String uniq(Boolean isCount, Boolean isRepeated, Boolean isAllRepeated, BufferedReader content)
             throws IOException, UniqException {
@@ -192,10 +187,11 @@ public class UniqApplication implements UniqInterface {
             prevLine = line;
             line = content.readLine();
 
+            // First line does not have anything to read
+            if (prevLine == null && line == null) { break; }
+
             // First line
-            if (prevLine == null) {
-                prevLine = line;
-            }
+            if (prevLine == null) { prevLine = line; }
 
             // Duplicate line: track line -> check next line
             if (line != null && line.compareTo(prevLine) == 0) {
@@ -210,9 +206,7 @@ public class UniqApplication implements UniqInterface {
             // isAllRepeated overrides isRepeated
             if (isAllRepeated) {
                 if (prevCount >= 2) {
-                    for (int i = 0; i < prevCount; i++) {
-                        stringBuilder.append(prevLine).append(STRING_NEWLINE);
-                    }
+                    stringBuilder.append((prevLine + STRING_NEWLINE).repeat(prevCount));
                 }
                 continue;
             } else if (isRepeated && prevCount < 2) {
@@ -224,7 +218,7 @@ public class UniqApplication implements UniqInterface {
             }
             stringBuilder.append(prevLine).append(STRING_NEWLINE);
 
-        } while (prevLine != null && line != null);
+        } while (line != null);
 
         return stringBuilder.toString().trim();
     }
