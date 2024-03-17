@@ -75,7 +75,6 @@ public class MkdirApplicationPublicIT {
         assertTrue(new File(TEMP_DIR).exists());
     }
 
-
     @Test
     void run_TwoNewDirectoryInput_Success() {
         String[] args = new String[2];
