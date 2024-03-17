@@ -2,6 +2,8 @@ package sg.edu.nus.comp.cs4218.impl.app;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static sg.edu.nus.comp.cs4218.test.AssertUtils.assertFileDoNotExists;
+import static sg.edu.nus.comp.cs4218.test.AssertUtils.assertFileExists;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -85,15 +87,15 @@ public class RmApplicationPublicIT {
         Path fileA = createFile("a.txt");
         Path fileB = createFile("bobby");
         rmApplication.run(toArgs("", "a.txt"), System.in, System.out);
-        assertTrue(Files.notExists(fileA));
-        assertTrue(Files.exists(fileB));
+        assertFileDoNotExists(fileA);
+        assertFileExists(fileB);
     }
 
     @Test
     void run_SpaceInName_DeletesFile() throws Exception {
         Path fileC = createFile("c   c");
         rmApplication.run(toArgs("", "c   c"), System.in, System.out);
-        assertTrue(Files.notExists(fileC));
+        assertFileDoNotExists(fileC);
     }
 
     @Test
@@ -101,15 +103,15 @@ public class RmApplicationPublicIT {
         Path fileD = createFile("d.txt");
         Path fileE = createFile("eerie");
         rmApplication.run(toArgs("", "d.txt", "eerie"), System.in, System.out);
-        assertTrue(Files.notExists(fileD));
-        assertTrue(Files.notExists(fileE));
+        assertFileDoNotExists(fileD);
+        assertFileDoNotExists(fileE);
     }
 
     @Test
     void run_EmptyDirectory_DeletesDirectory() throws Exception {
         Path folder = createDirectory("folder");
         rmApplication.run(toArgs("d", "folder"), System.in, System.out);
-        assertTrue(Files.notExists(folder));
+        assertFileDoNotExists(folder);
     }
 
     @Test
@@ -119,10 +121,10 @@ public class RmApplicationPublicIT {
         Path directoryA = createDirectory("directoryA");
         Path directoryB = createDirectory("directoryB");
         rmApplication.run(toArgs("d", "g.txt", "high", "directoryA", "directoryB"), System.in, System.out);
-        assertTrue(Files.notExists(fileG));
-        assertTrue(Files.notExists(fileH));
-        assertTrue(Files.notExists(directoryA));
-        assertTrue(Files.notExists(directoryB));
+        assertFileDoNotExists(fileG);
+        assertFileDoNotExists(fileH);
+        assertFileDoNotExists(directoryA);
+        assertFileDoNotExists(directoryB);
     }
 
     @Test
@@ -131,7 +133,7 @@ public class RmApplicationPublicIT {
         createFile("dwf.txt", directory);
         createFile("dwf2.txt", directory);
         rmApplication.run(toArgs("r", "directory"), System.in, System.out);
-        assertTrue(Files.notExists(directory));
+        assertFileDoNotExists(directory);
     }
 
     @Test
@@ -143,7 +145,7 @@ public class RmApplicationPublicIT {
         createFile("did.txt", inner);
         createFile("did2.txt", inner);
         rmApplication.run(toArgs("r", "directoryC"), System.in, System.out);
-        assertTrue(Files.notExists(directoryC));
+        assertFileDoNotExists(directoryC);
     }
 
     @Test
@@ -158,10 +160,10 @@ public class RmApplicationPublicIT {
         Path fileI = createFile("ii");
         Path fileJ = createFile("jar");
         rmApplication.run(toArgs("r", "directoryD", "empty", "ii", "jar"), System.in, System.out);
-        assertTrue(Files.notExists(directoryD));
-        assertTrue(Files.notExists(empty));
-        assertTrue(Files.notExists(fileI));
-        assertTrue(Files.notExists(fileJ));
+        assertFileDoNotExists(directoryD);
+        assertFileDoNotExists(empty);
+        assertFileDoNotExists(fileI);
+        assertFileDoNotExists(fileJ);
     }
 
     @Test
@@ -169,7 +171,7 @@ public class RmApplicationPublicIT {
         Path directory = createDirectory("directoryAbs");
         createDirectory("innerAbs", directory);
         rmApplication.run(new String[]{"-r", tempPath.resolve("directoryAbs").toString()}, System.in, System.out);
-        assertTrue(Files.notExists(directory));
+        assertFileDoNotExists(directory);
     }
 
     @Test
@@ -186,7 +188,7 @@ public class RmApplicationPublicIT {
     void run_UnknownFlag_Throws() throws IOException {
         Path fileK = createFile("kick");
         assertThrows(RmException.class, () -> rmApplication.run(toArgs("x", "kick"), System.in, System.out));
-        assertTrue(Files.exists(fileK));
+        assertFileExists(fileK);
     }
 
     @Test
