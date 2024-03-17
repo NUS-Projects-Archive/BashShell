@@ -53,7 +53,7 @@ public class PasteApplication implements PasteInterface {
      * @param stdout An OutputStream. The output of the command is written to this OutputStream.
      */
     @Override
-    public void run(String[] args, InputStream stdin, OutputStream stdout) throws PasteException { //NOPMD
+    public void run(String[] args, InputStream stdin, OutputStream stdout) throws PasteException {
         if (stdin == null) {
             throw new PasteException(ERR_NO_ISTREAM);
         }
@@ -68,23 +68,20 @@ public class PasteApplication implements PasteInterface {
             throw new PasteException(e.getMessage(), e);
         }
 
-        final boolean isSerial = parser.isSerial();
-        final boolean hasStdin = parser.hasStdin();
+        final Boolean isSerial = parser.isSerial();
+        final Boolean hasStdin = parser.hasStdin();
         final String[] nonFlagArgs = listToArray(parser.getNonFlagArgs());
 
-        String result = null;
-
+        final StringBuilder output = new StringBuilder();
         if (nonFlagArgs.length == 0) {
-            result = mergeStdin(isSerial, stdin);
-        } else if (hasStdin) {
-            result = mergeFileAndStdin(isSerial, stdin, nonFlagArgs);
+            output.append(mergeStdin(isSerial, stdin));
         } else {
-            result = mergeFile(isSerial, nonFlagArgs);
+            output.append(mergeFileAndStdin(isSerial, stdin, nonFlagArgs));
         }
 
         try {
-            if (result.length() != 0) {
-                stdout.write(result.getBytes());
+            if (output.length() != 0) {
+                stdout.write(output.toString().getBytes());
                 stdout.write(STRING_NEWLINE.getBytes());
             }
         } catch (IOException e) {
