@@ -68,12 +68,11 @@ public class CatApplicationPublicIT {
 
     @BeforeAll
     static void createTemp() throws IOException, NoSuchFieldException, IllegalAccessException {
-        TestEnvironmentUtil.setCurrentDirectory(System.getProperty("user.dir"));
         String initialDir = TestEnvironmentUtil.getCurrentDirectory();
         tempPath = Paths.get(initialDir, TEMP);
         dirPath = Paths.get(TestEnvironmentUtil.getCurrentDirectory(), TEMP + CHAR_FILE_SEP + DIR);
-        Files.createDirectory(tempPath);
-        Files.createDirectory(dirPath);
+        Files.createDirectories(tempPath);
+        Files.createDirectories(dirPath);
     }
 
     @AfterAll

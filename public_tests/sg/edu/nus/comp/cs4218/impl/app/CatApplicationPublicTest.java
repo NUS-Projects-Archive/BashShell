@@ -42,9 +42,8 @@ public class CatApplicationPublicTest {
 
     @BeforeAll
     static void createTemp() throws IOException, NoSuchFieldException, IllegalAccessException {
-        TestEnvironmentUtil.setCurrentDirectory(System.getProperty("user.dir"));
         testDirPath = Paths.get(TestEnvironmentUtil.getCurrentDirectory(), TEST_DIR);
-        Files.createDirectory(testDirPath);
+        Files.createDirectories(testDirPath);
         testFilePath = testDirPath.resolve(TEST_FILE);
         Files.createFile(testFilePath);
         Files.write(testFilePath, TEXT_ONE.getBytes());
