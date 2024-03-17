@@ -1,5 +1,6 @@
 package sg.edu.nus.comp.cs4218.impl.app;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -7,7 +8,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.condition.OS.WINDOWS;
 import static sg.edu.nus.comp.cs4218.testutils.TestStringUtils.CHAR_FILE_SEP;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -26,25 +26,28 @@ import org.junit.jupiter.api.io.TempDir;
 import sg.edu.nus.comp.cs4218.exception.MvException;
 import sg.edu.nus.comp.cs4218.testutils.TestEnvironmentUtil;
 
+@SuppressWarnings("PMD.ClassNamingConventions")
 public class MvApplicationPublicIT {
 
     @TempDir
-    File tempDir;
+    private File tempDir;
 
     private static final String SUBFOLDER = "subfolder";
     private static final String SUBFOLDER_1 = "subfolder1";
     private static final String SUBFOLDER_2 = "subfolder2";
     private static final String SUBFOLDER_3 = "subfolder3";
-    private static final String SUB_SUBFOLDER_2 = "subsubfolder2";
     private static final String SUB_SUBFOLDER_1 = "subsubfolder1";
+    private static final String SUB_SUBFOLDER_2 = "subsubfolder2";
     private static final String FILE_1_TXT = "file1.txt";
     private static final String FILE_2_TXT = "file2.txt";
-    private static final String BLOCKED_FILE = "blocked";
-    private static final String UNWRITABLE_FILE = "unwritable";
-
+    private static final String FILE_3_TXT = "file3.txt";
+    private static final String FILE_4_TXT = "file4.txt";
+    private static final String FILE_5_TXT = "file5.txt";
     private static final String FILE1_CONTENTS = "This is file1.txt content";
     private static final String FILE2_CONTENTS = "This is another file2.txt content";
     private static final String SUBFILE2_CONTENTS = "This is a subfolder1 file2.txt content";
+    private static final String BLOCKED_FILE = "blocked";
+    private static final String UNWRITABLE_FILE = "unwritable";
 
     private MvApplication mvApplication;
 
@@ -53,30 +56,33 @@ public class MvApplicationPublicIT {
         mvApplication = new MvApplication();
         TestEnvironmentUtil.setCurrentDirectory(tempDir.getAbsolutePath());
 
+        // create sub-folders
         new File(tempDir, SUBFOLDER_1).mkdir();
-        new File(tempDir, SUBFOLDER_1 + CHAR_FILE_SEP + SUB_SUBFOLDER_1).mkdir();
-        new File(tempDir, SUBFOLDER_1 + CHAR_FILE_SEP + FILE_2_TXT).createNewFile();
-        File subFile2 = new File(tempDir, SUBFOLDER_1 + CHAR_FILE_SEP + FILE_2_TXT);
-        FileWriter subFile2Writer = new FileWriter(subFile2);
-        subFile2Writer.write(SUBFILE2_CONTENTS);
-        subFile2Writer.close();
-
         new File(tempDir, SUBFOLDER_2).mkdir();
-        new File(tempDir, SUBFOLDER_2 + CHAR_FILE_SEP + SUB_SUBFOLDER_2).mkdir();
-
         new File(tempDir, SUBFOLDER_3).mkdir();
 
+        // create sub-sub-folders
+        new File(tempDir, SUBFOLDER_1 + CHAR_FILE_SEP + SUB_SUBFOLDER_1).mkdir();
+        new File(tempDir, SUBFOLDER_2 + CHAR_FILE_SEP + SUB_SUBFOLDER_2).mkdir();
+
+        // create files with contents
         new File(tempDir, FILE_1_TXT).createNewFile();
         File file1 = new File(tempDir, FILE_1_TXT);
-        FileWriter file1Writer = new FileWriter(file1);
-        file1Writer.write(FILE1_CONTENTS);
-        file1Writer.close();
+        try (FileWriter file1Writer = new FileWriter(file1)) {
+            file1Writer.write(FILE1_CONTENTS);
+        }
 
         new File(tempDir, FILE_2_TXT).createNewFile();
         File file2 = new File(tempDir, FILE_2_TXT);
-        FileWriter file2Writer = new FileWriter(file2);
-        file2Writer.write(FILE2_CONTENTS);
-        file2Writer.close();
+        try (FileWriter file2Writer = new FileWriter(file2)) {
+            file2Writer.write(FILE2_CONTENTS);
+        }
+
+        new File(tempDir, SUBFOLDER_1 + CHAR_FILE_SEP + FILE_2_TXT).createNewFile();
+        File subFile2 = new File(tempDir, SUBFOLDER_1 + CHAR_FILE_SEP + FILE_2_TXT);
+        try (FileWriter subFile2Writer = new FileWriter(subFile2)) {
+            subFile2Writer.write(SUBFILE2_CONTENTS);
+        }
 
         File blockedFolder = new File(tempDir, BLOCKED_FILE);
         blockedFolder.mkdir();
@@ -102,388 +108,387 @@ public class MvApplicationPublicIT {
     }
 
     @Test
-    public void run_NullArgs_ThrowsException() {
+    public void run_NullArgs_ThrowsMvException() {
         assertThrows(MvException.class, () -> mvApplication.run(null, System.in, System.out));
     }
 
     @Test
-    public void run_InvalidFlag_ThrowsException() {
+    public void run_InvalidFlag_ThrowsMvException() {
         String[] argList = new String[]{"-a", FILE_1_TXT, FILE_2_TXT};
         assertThrows(MvException.class, () -> mvApplication.run(argList, System.in, System.out));
     }
 
     @Test
-    public void run_InvalidNumOfArgs_ThrowsException() {
+    public void run_InvalidNumOfArgs_ThrowsMvException() {
         String[] argList = new String[]{"-n", FILE_2_TXT};
         assertThrows(MvException.class, () -> mvApplication.run(argList, System.in, System.out));
     }
 
     @Test
-    public void run_WnwritableSrcFile_ThrowsException() {
+    public void run_UnwritableSrcFile_ThrowsMvException() {
         // no permissions to rename unwritable
-        String[] argList = new String[]{UNWRITABLE_FILE, "file4.txt"};
+        String[] argList = new String[]{UNWRITABLE_FILE, FILE_4_TXT};
         assertThrows(MvException.class, () -> mvApplication.run(argList, System.in, System.out));
     }
 
     @Test
-    public void run_UnwritableDestFileWithoutFlag_ThrowsException() throws Exception {
+    public void run_UnwritableDestFileWithoutFlag_ThrowsMvException() {
         // no permissions to override unwritable
         String[] argList = new String[]{FILE_2_TXT, UNWRITABLE_FILE};
         assertThrows(MvException.class, () -> mvApplication.run(argList, System.in, System.out));
 
-        File expectedSrcFile = new File(tempDir, FILE_2_TXT);
-        File expectedDestFile = new File(tempDir, UNWRITABLE_FILE);
+        File srcFile = new File(tempDir, FILE_2_TXT);
+        File destFile = new File(tempDir, UNWRITABLE_FILE);
 
-        assertTrue(expectedSrcFile.exists());
-        assertTrue(expectedDestFile.exists());
-        List<String> expectedNewFileContents = Files.readAllLines(expectedDestFile.toPath());
-        assertEquals(0, expectedNewFileContents.size());
+        assertTrue(srcFile.exists());
+        assertTrue(destFile.exists());
+        List<String> destFileContents = assertDoesNotThrow(() -> Files.readAllLines(destFile.toPath()));
+        assertEquals(0, destFileContents.size());
     }
 
     @Test
-    public void run_UnwritableDestFileWithFlag_ThrowsException() throws Exception {
+    public void run_UnwritableDestFileWithFlag_ThrowsMvException() {
         // not overriding unwritable, so no error thrown
         String[] argList = new String[]{"-n", FILE_2_TXT, UNWRITABLE_FILE};
         assertThrows(MvException.class, () -> mvApplication.run(argList, System.in, System.out));
 
         // no change
-        File expectedSrcFile = new File(tempDir, FILE_2_TXT);
-        File expectedDestFile = new File(tempDir, UNWRITABLE_FILE);
+        File srcFile = new File(tempDir, FILE_2_TXT);
+        File destFile = new File(tempDir, UNWRITABLE_FILE);
 
-        assertTrue(expectedSrcFile.exists());
-        assertTrue(expectedDestFile.exists());
-        List<String> expectedNewFileContents = Files.readAllLines(expectedDestFile.toPath());
-        assertEquals(0, expectedNewFileContents.size());
+        assertTrue(srcFile.exists());
+        assertTrue(destFile.exists());
+        List<String> destFileContents = assertDoesNotThrow(() -> Files.readAllLines(destFile.toPath()));
+        assertEquals(0, destFileContents.size());
     }
 
     @Test
     @DisabledOnOs(WINDOWS)
-    public void run_UnwritableDestFolder_ThrowsException() {
+    public void run_UnwritableDestFolder_ThrowsMvException() {
         // no permissions to move files into blocked folder
         String[] argList = new String[]{FILE_1_TXT, FILE_2_TXT, BLOCKED_FILE};
         assertThrows(MvException.class, () -> mvApplication.run(argList, System.in, System.out));
 
-        File expectedRemainingFile1 = new File(tempDir, FILE_1_TXT);
-        File expectedRemainingFile2 = new File(tempDir, FILE_2_TXT);
+        File remainingSrcFile1 = new File(tempDir, FILE_1_TXT);
+        File remainingSrcFile2 = new File(tempDir, FILE_2_TXT);
 
-        assertTrue(expectedRemainingFile1.exists());
-        assertTrue(expectedRemainingFile2.exists());
+        assertTrue(remainingSrcFile1.exists());
+        assertTrue(remainingSrcFile2.exists());
     }
 
     @Test
-    public void run_WithoutFlag2ArgsDestExist_RemoveSrcAndOverrideFile() throws Exception {
+    public void run_WithoutFlag2ArgsDestExist_RemoveSrcAndOverrideFile() {
         String[] argList = new String[]{FILE_1_TXT, FILE_2_TXT};
-        mvApplication.run(argList, System.in, System.out);
+        assertDoesNotThrow(() -> mvApplication.run(argList, System.in, System.out));
 
-        File expectedRemovedFile = new File(tempDir, FILE_1_TXT);
-        File expectedNewFile = new File(tempDir, FILE_2_TXT);
+        File srcFile = new File(tempDir, FILE_1_TXT);
+        File destFile = new File(tempDir, FILE_2_TXT);
 
-        assertFalse(expectedRemovedFile.exists());
-        assertTrue(expectedNewFile.exists());
-        List<String> expectedNewFileContents = Files.readAllLines(expectedNewFile.toPath());
-        assertEquals(FILE1_CONTENTS, expectedNewFileContents.get(0));
+        assertFalse(srcFile.exists());
+        assertTrue(destFile.exists());
+        List<String> destFileContents = assertDoesNotThrow(() -> Files.readAllLines(destFile.toPath()));
+        assertEquals(FILE1_CONTENTS, destFileContents.get(0));
     }
 
     @Test
-    public void run_WithFlag2ArgsDestFileExist_NoChange() throws Exception {
+    public void run_WithFlag2ArgsDestFileExist_NoChange() {
         String[] argList = new String[]{"-n", FILE_1_TXT, FILE_2_TXT};
-        mvApplication.run(argList, System.in, System.out);
+        assertDoesNotThrow(() -> mvApplication.run(argList, System.in, System.out));
 
-        File expectedOldFile = new File(tempDir, FILE_1_TXT);
-        File expectedNewFile = new File(tempDir, FILE_2_TXT);
+        File srcFile = new File(tempDir, FILE_1_TXT);
+        File destFile = new File(tempDir, FILE_2_TXT);
 
-        assertTrue(expectedOldFile.exists());
-        List<String> expectedOldFileContents = Files.readAllLines(expectedOldFile.toPath());
-        assertEquals(FILE1_CONTENTS, expectedOldFileContents.get(0));
-        assertTrue(expectedNewFile.exists());
-        List<String> expectedNewFileContents = Files.readAllLines(expectedNewFile.toPath());
-        assertEquals(FILE2_CONTENTS, expectedNewFileContents.get(0));
+        assertTrue(srcFile.exists());
+        List<String> srcFileContents = assertDoesNotThrow(() -> Files.readAllLines(srcFile.toPath()));
+        assertEquals(FILE1_CONTENTS, srcFileContents.get(0));
+        assertTrue(destFile.exists());
+        List<String> destFileContents = assertDoesNotThrow(() -> Files.readAllLines(destFile.toPath()));
+        assertEquals(FILE2_CONTENTS, destFileContents.get(0));
     }
 
     @Test
-    public void run_WithoutFlags2ArgsDestFileNonExist_RenameFile() throws Exception {
-        String[] argList = new String[]{FILE_2_TXT, "file4.txt"};
-        mvApplication.run(argList, System.in, System.out);
+    public void run_WithoutFlags2ArgsDestFileNonExist_RenameFile() {
+        String[] argList = new String[]{FILE_2_TXT, FILE_4_TXT};
+        assertDoesNotThrow(() -> mvApplication.run(argList, System.in, System.out));
 
-        File expectedRemovedFile = new File(tempDir, FILE_2_TXT);
-        File expectedNewFile = new File(tempDir, "file4.txt");
+        File srcFile = new File(tempDir, FILE_2_TXT);
+        File destFile = new File(tempDir, FILE_4_TXT);
 
-        assertFalse(expectedRemovedFile.exists());
-        assertTrue(expectedNewFile.exists());
-        List<String> expectedNewFileContents = Files.readAllLines(expectedNewFile.toPath());
-        assertEquals(FILE2_CONTENTS, expectedNewFileContents.get(0));
+        assertFalse(srcFile.exists());
+        assertTrue(destFile.exists());
+        List<String> destFileContents = assertDoesNotThrow(() -> Files.readAllLines(destFile.toPath()));
+        assertEquals(FILE2_CONTENTS, destFileContents.get(0));
     }
 
     @Test
-    public void run_WithFlagRenameOneSubFileIntoFolder_RenameSubFile() throws Exception {
-        String[] argList = new String[]{SUBFOLDER_1 + CHAR_FILE_SEP + FILE_2_TXT, "file5.txt"};
-        mvApplication.run(argList, System.in, System.out);
+    public void run_WithFlagRenameOneSubFileIntoFolder_RenameSubFile() {
+        String[] argList = new String[]{SUBFOLDER_1 + CHAR_FILE_SEP + FILE_2_TXT, FILE_5_TXT};
+        assertDoesNotThrow(() -> mvApplication.run(argList, System.in, System.out));
 
-        File expectedRemovedFile = new File(tempDir, SUBFOLDER_1 + CHAR_FILE_SEP + FILE_2_TXT);
-        File expectedNewFile = new File(tempDir, "file5.txt");
+        File srcFile = new File(tempDir, SUBFOLDER_1 + CHAR_FILE_SEP + FILE_2_TXT);
+        File destFile = new File(tempDir, FILE_5_TXT);
 
-        assertFalse(expectedRemovedFile.exists());
-        assertTrue(expectedNewFile.exists());
-        List<String> expectedNewFileContents = Files.readAllLines(expectedNewFile.toPath());
-        assertEquals(SUBFILE2_CONTENTS, expectedNewFileContents.get(0));
+        assertFalse(srcFile.exists());
+        assertTrue(destFile.exists());
+        List<String> destFileContents = assertDoesNotThrow(() -> Files.readAllLines(destFile.toPath()));
+        assertEquals(SUBFILE2_CONTENTS, destFileContents.get(0));
     }
 
     @Test
-    public void run_WithFlagRenameOneSubFileIntoSubFile_RenameSubFile() throws Exception {
+    public void run_WithFlagRenameOneSubFileIntoSubFile_RenameSubFile() {
         String[] argList = new String[]{SUBFOLDER_1 + CHAR_FILE_SEP + FILE_2_TXT,
-                SUBFOLDER_2 + CHAR_FILE_SEP + "file5.txt"};
-        mvApplication.run(argList, System.in, System.out);
+                SUBFOLDER_2 + CHAR_FILE_SEP + FILE_5_TXT};
+        assertDoesNotThrow(() -> mvApplication.run(argList, System.in, System.out));
 
-        File expectedRemovedFile = new File(tempDir, SUBFOLDER_1 + CHAR_FILE_SEP + FILE_2_TXT);
-        File expectedNewFile = new File(tempDir, SUBFOLDER_2 + CHAR_FILE_SEP + "file5.txt");
+        File srcFile = new File(tempDir, SUBFOLDER_1 + CHAR_FILE_SEP + FILE_2_TXT);
+        File destFile = new File(tempDir, SUBFOLDER_2 + CHAR_FILE_SEP + FILE_5_TXT);
 
-        assertFalse(expectedRemovedFile.exists());
-        assertTrue(expectedNewFile.exists());
-        List<String> expectedNewFileContents = Files.readAllLines(expectedNewFile.toPath());
-        assertEquals(SUBFILE2_CONTENTS, expectedNewFileContents.get(0));
+        assertFalse(srcFile.exists());
+        assertTrue(destFile.exists());
+        List<String> destFileContents = assertDoesNotThrow(() -> Files.readAllLines(destFile.toPath()));
+        assertEquals(SUBFILE2_CONTENTS, destFileContents.get(0));
     }
 
     @Test
-    public void run_WithFlags2ArgsDestFoldersNonExist_RenameFile() throws Exception {
+    public void run_WithFlags2ArgsDestFoldersNonExist_RenameFile() {
         String[] argList = new String[]{"-n", SUBFOLDER_1, "newSubFolder"};
-        mvApplication.run(argList, System.in, System.out);
+        assertDoesNotThrow(() -> mvApplication.run(argList, System.in, System.out));
 
-        File expectedRemovedFile = new File(tempDir, SUBFOLDER_1);
-        File expectedNewFile = new File(tempDir, "newSubFolder");
+        File srcFile = new File(tempDir, SUBFOLDER_1);
+        File destFile = new File(tempDir, "newSubFolder");
 
-        assertFalse(expectedRemovedFile.exists());
-        assertTrue(expectedNewFile.exists());
-        assertTrue(Files.isDirectory(expectedNewFile.toPath()));
-        List<String> subFiles = Arrays.stream(expectedNewFile.listFiles()).map(File::getName).collect(Collectors.toList());
+        assertFalse(srcFile.exists());
+        assertTrue(destFile.exists());
+        assertTrue(Files.isDirectory(destFile.toPath()));
+        List<String> subFiles = Arrays.stream(destFile.listFiles()).map(File::getName).collect(Collectors.toList());
         assertEquals(2, subFiles.size());
         assertTrue(subFiles.contains(FILE_2_TXT));
         assertTrue(subFiles.contains(SUB_SUBFOLDER_1));
     }
 
     @Test
-    public void run_WithFlags2ArgsSrcFolderDestFileNonExist_RenameFile() throws Exception {
-        String[] argList = new String[]{"-n", SUBFOLDER_1, "file3.txt"};
-        mvApplication.run(argList, System.in, System.out);
+    public void run_WithFlags2ArgsSrcFolderDestFileNonExist_RenameFile() {
+        String[] argList = new String[]{"-n", SUBFOLDER_1, FILE_3_TXT};
+        assertDoesNotThrow(() -> mvApplication.run(argList, System.in, System.out));
 
-        File expectedRemovedFile = new File(tempDir, SUBFOLDER_1);
-        File expectedNewFile = new File(tempDir, "file3.txt");
+        File srcFile = new File(tempDir, SUBFOLDER_1);
+        File destFile = new File(tempDir, FILE_3_TXT);
 
-        assertFalse(expectedRemovedFile.exists());
-        assertTrue(expectedNewFile.exists());
-        assertTrue(Files.isDirectory(expectedNewFile.toPath()));
-        List<String> subFiles = Arrays.stream(expectedNewFile.listFiles()).map(File::getName).collect(Collectors.toList());
+        assertFalse(srcFile.exists());
+        assertTrue(destFile.exists());
+        assertTrue(Files.isDirectory(destFile.toPath()));
+        List<String> subFiles = Arrays.stream(destFile.listFiles()).map(File::getName).collect(Collectors.toList());
         assertEquals(2, subFiles.size());
         assertTrue(subFiles.contains(FILE_2_TXT));
         assertTrue(subFiles.contains(SUB_SUBFOLDER_1));
     }
 
     @Test
-    public void run_WithFlags2ArgsDiffFileTypesNonExist_ConvertFolderToFile() throws Exception {
+    public void run_WithFlags2ArgsDiffFileTypesNonExist_ConvertFolderToFile() {
         String[] argList = new String[]{"-n", FILE_1_TXT, "file1.png"};
-        mvApplication.run(argList, System.in, System.out);
+        assertDoesNotThrow(() -> mvApplication.run(argList, System.in, System.out));
 
-        File expectedRemovedFile = new File(tempDir, FILE_1_TXT);
-        File expectedNewFile = new File(tempDir, "file1.png");
+        File srcFile = new File(tempDir, FILE_1_TXT);
+        File destFile = new File(tempDir, "file1.png");
 
-        assertFalse(expectedRemovedFile.exists());
-        assertTrue(expectedNewFile.exists());
-        List<String> expectedNewFileContents = Files.readAllLines(expectedNewFile.toPath());
-        assertEquals(FILE1_CONTENTS, expectedNewFileContents.get(0));
+        assertFalse(srcFile.exists());
+        assertTrue(destFile.exists());
+        List<String> destFileContents = assertDoesNotThrow(() -> Files.readAllLines(destFile.toPath()));
+        assertEquals(FILE1_CONTENTS, destFileContents.get(0));
     }
 
     @Test
-    public void run_WithoutFlagsSameSrcAndDestExist_NoChange() throws Exception {
-        ByteArrayOutputStream output = new ByteArrayOutputStream();
+    public void run_WithoutFlagsSameSrcAndDestExist_NoChange() {
         String[] argList = new String[]{FILE_1_TXT, FILE_1_TXT};
-        mvApplication.run(argList, System.in, output);
-        File expectedFile = new File(tempDir, FILE_1_TXT);
-        assertTrue(expectedFile.exists());
-        List<String> expectedNewFileContents = Files.readAllLines(expectedFile.toPath());
-        assertEquals(FILE1_CONTENTS, expectedNewFileContents.get(0));
+        assertDoesNotThrow(() -> mvApplication.run(argList, System.in, System.out));
+        File srcFile = new File(tempDir, FILE_1_TXT);
+        assertTrue(srcFile.exists());
+        List<String> actualContents = assertDoesNotThrow(() -> Files.readAllLines(srcFile.toPath()));
+        assertEquals(FILE1_CONTENTS, actualContents.get(0));
     }
 
     @Test
-    public void run_invalidSourceFile_ThrowException() {
-        String[] argList = new String[]{"file3.txt", FILE_1_TXT};
+    public void run_invalidSourceFile_ThrowMvException() {
+        String[] argList = new String[]{FILE_3_TXT, FILE_1_TXT};
         assertThrows(MvException.class, () -> mvApplication.run(argList, System.in, System.out));
     }
 
     @Test
-    public void run_WithoutFlagMoveOneFileIntoFolder_MovedIntoFolder() throws Exception {
+    public void run_WithoutFlagMoveOneFileIntoFolder_MovedIntoFolder() {
         String[] argList = new String[]{FILE_1_TXT, SUBFOLDER_1};
-        mvApplication.run(argList, System.in, System.out);
+        assertDoesNotThrow(() -> mvApplication.run(argList, System.in, System.out));
 
-        File expectedRemovedFile = new File(tempDir, FILE_1_TXT);
-        File expectedNewFile = new File(tempDir, SUBFOLDER_1 + CHAR_FILE_SEP + FILE_1_TXT);
+        File srcFile = new File(tempDir, FILE_1_TXT);
+        File destFile = new File(tempDir, SUBFOLDER_1 + CHAR_FILE_SEP + FILE_1_TXT);
 
-        assertFalse(expectedRemovedFile.exists());
-        assertTrue(expectedNewFile.exists());
-        List<String> expectedNewFileContents = Files.readAllLines(expectedNewFile.toPath());
-        assertEquals(FILE1_CONTENTS, expectedNewFileContents.get(0));
+        assertFalse(srcFile.exists());
+        assertTrue(destFile.exists());
+        List<String> destFileContents = assertDoesNotThrow(() -> Files.readAllLines(destFile.toPath()));
+        assertEquals(FILE1_CONTENTS, destFileContents.get(0));
     }
 
     @Test
-    public void run_WithoutFlagMoveOneSubFileIntoFolder_MovedIntoFolder() throws Exception {
+    public void run_WithoutFlagMoveOneSubFileIntoFolder_MovedIntoFolder() {
         String[] argList = new String[]{SUBFOLDER_1 + CHAR_FILE_SEP + FILE_2_TXT, SUBFOLDER_2};
-        mvApplication.run(argList, System.in, System.out);
+        assertDoesNotThrow(() -> mvApplication.run(argList, System.in, System.out));
 
-        File expectedRemovedFile = new File(tempDir, SUBFOLDER_1 + CHAR_FILE_SEP + FILE_2_TXT);
-        File expectedNewFile = new File(tempDir, SUBFOLDER_2 + CHAR_FILE_SEP + FILE_2_TXT);
+        File srcFile = new File(tempDir, SUBFOLDER_1 + CHAR_FILE_SEP + FILE_2_TXT);
+        File destFile = new File(tempDir, SUBFOLDER_2 + CHAR_FILE_SEP + FILE_2_TXT);
 
-        assertFalse(expectedRemovedFile.exists());
-        assertTrue(expectedNewFile.exists());
-        List<String> expectedNewFileContents = Files.readAllLines(expectedNewFile.toPath());
-        assertEquals(SUBFILE2_CONTENTS, expectedNewFileContents.get(0));
+        assertFalse(srcFile.exists());
+        assertTrue(destFile.exists());
+        List<String> destFileContents = assertDoesNotThrow(() -> Files.readAllLines(destFile.toPath()));
+        assertEquals(SUBFILE2_CONTENTS, destFileContents.get(0));
     }
 
     @Test
-    public void run_WithoutFlagMoveOneSubFileIntoSubSFolder_MovedIntoSubFolder() throws Exception {
+    public void run_WithoutFlagMoveOneSubFileIntoSubSFolder_MovedIntoSubFolder() {
         String[] argList = new String[]{SUBFOLDER_1 + CHAR_FILE_SEP + FILE_2_TXT,
                 SUBFOLDER_2 + CHAR_FILE_SEP + SUB_SUBFOLDER_2};
-        mvApplication.run(argList, System.in, System.out);
+        assertDoesNotThrow(() -> mvApplication.run(argList, System.in, System.out));
 
-        File expectedRemovedFile = new File(tempDir, SUBFOLDER_1 + CHAR_FILE_SEP + FILE_2_TXT);
-        File expectedNewFile = new File(tempDir, SUBFOLDER_2 + CHAR_FILE_SEP + SUB_SUBFOLDER_2 +
+        File srcFile = new File(tempDir, SUBFOLDER_1 + CHAR_FILE_SEP + FILE_2_TXT);
+        File destFile = new File(tempDir, SUBFOLDER_2 + CHAR_FILE_SEP + SUB_SUBFOLDER_2 +
                 CHAR_FILE_SEP + FILE_2_TXT);
 
-        assertFalse(expectedRemovedFile.exists());
-        assertTrue(expectedNewFile.exists());
-        List<String> expectedNewFileContents = Files.readAllLines(expectedNewFile.toPath());
-        assertEquals(SUBFILE2_CONTENTS, expectedNewFileContents.get(0));
+        assertFalse(srcFile.exists());
+        assertTrue(destFile.exists());
+        List<String> destFileContents = assertDoesNotThrow(() -> Files.readAllLines(destFile.toPath()));
+        assertEquals(SUBFILE2_CONTENTS, destFileContents.get(0));
     }
 
     @Test
-    public void run_WithoutFlagMoveOneAbsolutePathFileIntoSubFolder_MovedIntoSubFolder() throws Exception {
+    public void run_WithoutFlagMoveOneAbsolutePathFileIntoSubFolder_MovedIntoSubFolder() {
         String[] argList = new String[]{tempDir.getAbsolutePath() + CHAR_FILE_SEP + SUBFOLDER_1 + CHAR_FILE_SEP + FILE_2_TXT,
                 tempDir.getAbsolutePath() + CHAR_FILE_SEP + SUBFOLDER_2 + CHAR_FILE_SEP + SUB_SUBFOLDER_2};
-        mvApplication.run(argList, System.in, System.out);
+        assertDoesNotThrow(() -> mvApplication.run(argList, System.in, System.out));
 
-        File expectedRemovedFile = new File(tempDir, SUBFOLDER_1 + CHAR_FILE_SEP + FILE_2_TXT);
-        File expectedNewFile = new File(tempDir, SUBFOLDER_2 + CHAR_FILE_SEP +
+        File srcFile = new File(tempDir, SUBFOLDER_1 + CHAR_FILE_SEP + FILE_2_TXT);
+        File destFile = new File(tempDir, SUBFOLDER_2 + CHAR_FILE_SEP +
                 SUB_SUBFOLDER_2 + CHAR_FILE_SEP + FILE_2_TXT);
 
-        assertFalse(expectedRemovedFile.exists());
-        assertTrue(expectedNewFile.exists());
-        List<String> expectedNewFileContents = Files.readAllLines(expectedNewFile.toPath());
-        assertEquals(SUBFILE2_CONTENTS, expectedNewFileContents.get(0));
+        assertFalse(srcFile.exists());
+        assertTrue(destFile.exists());
+        List<String> destFileContents = assertDoesNotThrow(() -> Files.readAllLines(destFile.toPath()));
+        assertEquals(SUBFILE2_CONTENTS, destFileContents.get(0));
     }
 
     @Test
-    public void run_WithoutFlagsMoveOneFolderIntoFolder_MovedIntoFolder() throws Exception {
+    public void run_WithoutFlagsMoveOneFolderIntoFolder_MovedIntoFolder() {
         String[] argList = new String[]{SUBFOLDER_2, SUBFOLDER_1};
-        mvApplication.run(argList, System.in, System.out);
+        assertDoesNotThrow(() -> mvApplication.run(argList, System.in, System.out));
 
-        File expectedRemovedFile = new File(tempDir, SUBFOLDER_2);
-        File expectedNewFile = new File(tempDir, SUBFOLDER_1 + CHAR_FILE_SEP + SUBFOLDER_2);
+        File srcFile = new File(tempDir, SUBFOLDER_2);
+        File destFile = new File(tempDir, SUBFOLDER_1 + CHAR_FILE_SEP + SUBFOLDER_2);
 
-        assertFalse(expectedRemovedFile.exists());
-        assertTrue(expectedNewFile.exists());
-        assertTrue(Files.isDirectory(expectedNewFile.toPath()));
-        File[] subFiles = expectedNewFile.listFiles();
+        assertFalse(srcFile.exists());
+        assertTrue(destFile.exists());
+        assertTrue(Files.isDirectory(destFile.toPath()));
+        File[] subFiles = destFile.listFiles();
         assertEquals(1, subFiles.length);
         assertEquals(SUB_SUBFOLDER_2, subFiles[0].getName());
     }
 
     @Test
-    public void run_WithoutFlagsMoveMultipleFilesIntoFolder_MovedAllIntoFolder() throws Exception {
+    public void run_WithoutFlagsMoveMultipleFilesIntoFolder_MovedAllIntoFolder() {
         String[] argList = new String[]{FILE_1_TXT, SUBFOLDER_2, SUBFOLDER_1};
-        mvApplication.run(argList, System.in, System.out);
+        assertDoesNotThrow(() -> mvApplication.run(argList, System.in, System.out));
 
-        File expectedRemainingSubFile2 = new File(tempDir, SUBFOLDER_1 + CHAR_FILE_SEP + FILE_2_TXT);
-        File expectedRemovedFile1 = new File(tempDir, FILE_1_TXT);
-        File expectedRemovedSubFolder2 = new File(tempDir, SUBFOLDER_2);
-        File expectedNewFile1 = new File(tempDir, SUBFOLDER_1 + CHAR_FILE_SEP + FILE_1_TXT);
-        File expectedNewSubFolder2 = new File(tempDir, SUBFOLDER_1 + CHAR_FILE_SEP + SUBFOLDER_2);
+        File remainingSubFile2 = new File(tempDir, SUBFOLDER_1 + CHAR_FILE_SEP + FILE_2_TXT);
+        File removedFile1 = new File(tempDir, FILE_1_TXT);
+        File removedSubFolder2 = new File(tempDir, SUBFOLDER_2);
+        File newFile1 = new File(tempDir, SUBFOLDER_1 + CHAR_FILE_SEP + FILE_1_TXT);
+        File newSubFolder2 = new File(tempDir, SUBFOLDER_1 + CHAR_FILE_SEP + SUBFOLDER_2);
 
-        assertTrue(expectedRemainingSubFile2.exists());
-        assertFalse(expectedRemovedFile1.exists());
-        assertFalse(expectedRemovedSubFolder2.exists());
-        assertTrue(expectedNewFile1.exists());
-        List<String> expectedNewFile1Contents = Files.readAllLines(expectedNewFile1.toPath());
-        assertEquals(FILE1_CONTENTS, expectedNewFile1Contents.get(0));
-        assertTrue(expectedNewSubFolder2.exists());
-        assertTrue(Files.isDirectory(expectedNewSubFolder2.toPath()));
-        File[] subFiles = expectedNewSubFolder2.listFiles();
+        assertTrue(remainingSubFile2.exists());
+        assertFalse(removedFile1.exists());
+        assertFalse(removedSubFolder2.exists());
+        assertTrue(newFile1.exists());
+        List<String> newFile1Contents = assertDoesNotThrow(() -> Files.readAllLines(newFile1.toPath()));
+        assertEquals(FILE1_CONTENTS, newFile1Contents.get(0));
+        assertTrue(newSubFolder2.exists());
+        assertTrue(Files.isDirectory(newSubFolder2.toPath()));
+        File[] subFiles = newSubFolder2.listFiles();
         assertEquals(1, subFiles.length);
         assertEquals(SUB_SUBFOLDER_2, subFiles[0].getName());
     }
 
     @Test
-    public void run_WithoutFlagsMoveFileWithSameNameIntoFolder_MovedIntoFolderWithOverriding() throws Exception {
+    public void run_WithoutFlagsMoveFileWithSameNameIntoFolder_MovedIntoFolderWithOverriding() {
         String[] argList = new String[]{FILE_1_TXT, FILE_2_TXT, SUBFOLDER_2, SUBFOLDER_1};
-        mvApplication.run(argList, System.in, System.out);
+        assertDoesNotThrow(() -> mvApplication.run(argList, System.in, System.out));
 
-        File expectedRemovedFile1 = new File(tempDir, FILE_1_TXT);
-        File expectedRemovedFile2 = new File(tempDir, FILE_2_TXT);
-        File expectedRemovedSubFolder2 = new File(tempDir, SUBFOLDER_2);
-        File expectedNewFile1 = new File(tempDir, SUBFOLDER_1 + CHAR_FILE_SEP + FILE_1_TXT);
-        File expectedNewFile2 = new File(tempDir, SUBFOLDER_1 + CHAR_FILE_SEP + FILE_2_TXT);
-        File expectedNewSubFolder2 = new File(tempDir, SUBFOLDER_1 + CHAR_FILE_SEP + SUBFOLDER_2);
+        File removedFile1 = new File(tempDir, FILE_1_TXT);
+        File removedFile2 = new File(tempDir, FILE_2_TXT);
+        File removedSubFolder2 = new File(tempDir, SUBFOLDER_2);
+        File newFile1 = new File(tempDir, SUBFOLDER_1 + CHAR_FILE_SEP + FILE_1_TXT);
+        File newFile2 = new File(tempDir, SUBFOLDER_1 + CHAR_FILE_SEP + FILE_2_TXT);
+        File newSubFolder2 = new File(tempDir, SUBFOLDER_1 + CHAR_FILE_SEP + SUBFOLDER_2);
 
-        assertFalse(expectedRemovedFile1.exists());
-        assertFalse(expectedRemovedFile2.exists());
-        assertFalse(expectedRemovedSubFolder2.exists());
-        assertTrue(expectedNewFile1.exists());
-        List<String> expectedNewFile1Contents = Files.readAllLines(expectedNewFile1.toPath());
-        assertEquals(FILE1_CONTENTS, expectedNewFile1Contents.get(0));
-        assertTrue(expectedNewFile2.exists());
-        List<String> expectedNewFile2Contents = Files.readAllLines(expectedNewFile2.toPath());
-        assertEquals(FILE2_CONTENTS, expectedNewFile2Contents.get(0)); //override with file2.txt contents
-        assertTrue(expectedNewSubFolder2.exists());
-        assertTrue(Files.isDirectory(expectedNewSubFolder2.toPath()));
-        File[] subFiles = expectedNewSubFolder2.listFiles();
+        assertFalse(removedFile1.exists());
+        assertFalse(removedFile2.exists());
+        assertFalse(removedSubFolder2.exists());
+        assertTrue(newFile1.exists());
+        List<String> newFile1Contents = assertDoesNotThrow(() -> Files.readAllLines(newFile1.toPath()));
+        assertEquals(FILE1_CONTENTS, newFile1Contents.get(0));
+        assertTrue(newFile2.exists());
+        List<String> newFile2Contents = assertDoesNotThrow(() -> Files.readAllLines(newFile2.toPath()));
+        assertEquals(FILE2_CONTENTS, newFile2Contents.get(0)); //override with file2.txt contents
+        assertTrue(newSubFolder2.exists());
+        assertTrue(Files.isDirectory(newSubFolder2.toPath()));
+        File[] subFiles = newSubFolder2.listFiles();
         assertEquals(1, subFiles.length);
         assertEquals(SUB_SUBFOLDER_2, subFiles[0].getName());
     }
 
     @Test
-    public void run_WithFlagsMoveFilesWithSameNameIntoFolder_MovedIntoFolderWithoutOverriding() throws Exception {
+    public void run_WithFlagsMoveFilesWithSameNameIntoFolder_MovedIntoFolderWithoutOverriding() {
         String[] argList = new String[]{"-n", FILE_1_TXT, FILE_2_TXT, SUBFOLDER_2, SUBFOLDER_1};
-        mvApplication.run(argList, System.in, System.out);
+        assertDoesNotThrow(() -> mvApplication.run(argList, System.in, System.out));
 
-        File expectedRemovedFile1 = new File(tempDir, FILE_1_TXT);
-        File expectedRemovedFile2 = new File(tempDir, FILE_2_TXT);
-        File expectedRemovedSubFolder2 = new File(tempDir, SUBFOLDER_2);
-        File expectedNewFile1 = new File(tempDir, SUBFOLDER_1 + CHAR_FILE_SEP + FILE_1_TXT);
-        File expectedNewFile2 = new File(tempDir, SUBFOLDER_1 + CHAR_FILE_SEP + FILE_2_TXT);
-        File expectedNewSubFolder2 = new File(tempDir, SUBFOLDER_1 + CHAR_FILE_SEP + SUBFOLDER_2);
+        File removedFile1 = new File(tempDir, FILE_1_TXT);
+        File removedFile2 = new File(tempDir, FILE_2_TXT);
+        File removedSubFolder2 = new File(tempDir, SUBFOLDER_2);
+        File newFile1 = new File(tempDir, SUBFOLDER_1 + CHAR_FILE_SEP + FILE_1_TXT);
+        File newFile2 = new File(tempDir, SUBFOLDER_1 + CHAR_FILE_SEP + FILE_2_TXT);
+        File newSubFolder2 = new File(tempDir, SUBFOLDER_1 + CHAR_FILE_SEP + SUBFOLDER_2);
 
-        assertFalse(expectedRemovedFile1.exists());
-        assertTrue(expectedRemovedFile2.exists()); // file2.txt not moved
-        assertFalse(expectedRemovedSubFolder2.exists());
-        assertTrue(expectedNewFile1.exists());
-        List<String> expectedNewFile1Contents = Files.readAllLines(expectedNewFile1.toPath());
-        assertEquals(FILE1_CONTENTS, expectedNewFile1Contents.get(0));
-        assertTrue(expectedNewFile2.exists());
-        List<String> expectedNewFile2Contents = Files.readAllLines(expectedNewFile2.toPath());
-        assertEquals(SUBFILE2_CONTENTS, expectedNewFile2Contents.get(0)); //NOT override with file2.txt contents
-        assertTrue(expectedNewSubFolder2.exists());
-        assertTrue(Files.isDirectory(expectedNewSubFolder2.toPath()));
-        File[] subFiles = expectedNewSubFolder2.listFiles();
+        assertFalse(removedFile1.exists());
+        assertTrue(removedFile2.exists()); // file2.txt not moved
+        assertFalse(removedSubFolder2.exists());
+        assertTrue(newFile1.exists());
+        List<String> newFile1Contents = assertDoesNotThrow(() -> Files.readAllLines(newFile1.toPath()));
+        assertEquals(FILE1_CONTENTS, newFile1Contents.get(0));
+        assertTrue(newFile2.exists());
+        List<String> newFile2Contents = assertDoesNotThrow(() -> Files.readAllLines(newFile2.toPath()));
+        assertEquals(SUBFILE2_CONTENTS, newFile2Contents.get(0)); //NOT override with file2.txt contents
+        assertTrue(newSubFolder2.exists());
+        assertTrue(Files.isDirectory(newSubFolder2.toPath()));
+        File[] subFiles = newSubFolder2.listFiles();
         assertEquals(1, subFiles.length);
         assertEquals(SUB_SUBFOLDER_2, subFiles[0].getName());
     }
 
     @Test
-    public void run_NonExistentDestFolder_ThrowsException() {
+    public void run_NonExistentDestFolder_ThrowsMvException() {
         String[] argList = new String[]{"-n", FILE_1_TXT, FILE_2_TXT, "nonExistentFolder"};
         assertThrows(MvException.class, () -> mvApplication.run(argList, System.in, System.out));
     }
 
     @Test
-    public void run_ExistentNonDirDestFile_ThrowsException() {
+    public void run_ExistentNonDirDestFile_ThrowsMvException() {
         String[] argList = new String[]{FILE_1_TXT, SUBFOLDER_2, FILE_2_TXT};
         assertThrows(MvException.class, () -> mvApplication.run(argList, System.in, System.out));
     }
 
     @Test
-    public void run_NonExistentNonDirDestFile_ThrowsException() {
+    public void run_NonExistentNonDirDestFile_ThrowsMvException() {
         String[] argList = new String[]{FILE_1_TXT, SUBFOLDER_2, "f"};
         assertThrows(MvException.class, () -> mvApplication.run(argList, System.in, System.out));
     }
 
     @Test
-    public void run_InvalidSrcFileFirst_ThrowsException() {
+    public void run_InvalidSrcFileFirst_ThrowsMvException() {
         String[] argList = new String[]{"f", SUBFOLDER_2, SUBFOLDER_1};
         assertThrows(MvException.class, () -> mvApplication.run(argList, System.in, System.out));
 
@@ -492,16 +497,16 @@ public class MvApplicationPublicIT {
     }
 
     @Test
-    public void run_InvalidSrcFilesAfter_ThrowsException() {
+    public void run_InvalidSrcFilesAfter_ThrowsMvException() {
         String[] argList = new String[]{SUBFOLDER_2, SUBFOLDER, SUBFOLDER_1};
         assertThrows(MvException.class, () -> mvApplication.run(argList, System.in, System.out));
 
-        File expectedMovedFile = new File(tempDir, SUBFOLDER_2);
-        File expectedNewFile = new File(tempDir, SUBFOLDER_1 + CHAR_FILE_SEP + SUBFOLDER_2);
-        assertFalse(expectedMovedFile.exists());
-        assertTrue(expectedNewFile.exists());
-        assertTrue(Files.isDirectory(expectedNewFile.toPath()));
-        File[] subFiles = expectedNewFile.listFiles();
+        File movedFile = new File(tempDir, SUBFOLDER_2);
+        File newFile = new File(tempDir, SUBFOLDER_1 + CHAR_FILE_SEP + SUBFOLDER_2);
+        assertFalse(movedFile.exists());
+        assertTrue(newFile.exists());
+        assertTrue(Files.isDirectory(newFile.toPath()));
+        File[] subFiles = newFile.listFiles();
         assertEquals(1, subFiles.length);
         assertEquals(SUB_SUBFOLDER_2, subFiles[0].getName());
     }
