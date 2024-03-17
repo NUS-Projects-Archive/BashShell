@@ -114,7 +114,7 @@ public class CatApplication implements CatInterface {
 
             try (InputStream input = IOUtils.openInputStream(file)) {
                 output.addAll(prefixLineNumber(isLineNumber, input));
-
+                IOUtils.closeInputStream(input);
             } catch (ShellException | IOException e) {
                 throw new CatException(e.getMessage(), e);
             }
