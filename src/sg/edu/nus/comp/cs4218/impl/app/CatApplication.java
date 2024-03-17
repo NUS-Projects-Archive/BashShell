@@ -112,22 +112,11 @@ public class CatApplication implements CatInterface {
                 throw new CatException(String.format("'%s': %s", node.getName(), ERR_READING_FILE));
             }
 
-            InputStream input = null;
-            try {
-                input = IOUtils.openInputStream(file);
+            try (InputStream input = IOUtils.openInputStream(file)) {
                 output.addAll(prefixLineNumber(isLineNumber, input));
-                IOUtils.closeInputStream(input);
-                input.close();
+
             } catch (ShellException | IOException e) {
                 throw new CatException(e.getMessage(), e);
-            } finally {
-                try {
-                    if (input != null) {
-                        input.close();
-                    }
-                } catch (IOException e) {
-                    throw new CatException(e.getMessage(), e);
-                }
             }
         }
 
