@@ -3,10 +3,10 @@ package sg.edu.nus.comp.cs4218.impl.app.helper;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static sg.edu.nus.comp.cs4218.impl.util.FileUtils.createNewDirectory;
-import static sg.edu.nus.comp.cs4218.impl.util.FileUtils.deleteFileOrDirectory;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_FILE_SEP;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
+import static sg.edu.nus.comp.cs4218.test.FileUtils.createNewDirectory;
+import static sg.edu.nus.comp.cs4218.test.FileUtils.deleteFileOrDirectory;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -34,6 +34,12 @@ class LsApplicationHelperIT {
     private static final String STRING_AZ = "a.z";
     private static final String STRING_ZA = "z.a";
     private static final String STRING_Z = "z";
+    private static final String TWO_LINE_SEPARATOR = STRING_NEWLINE + STRING_NEWLINE;
+
+    private static final String[] CWD_NON_DIRS = {STRING_AZ, STRING_ZA, STRING_Z};
+    private static final String[] CWD_DIRS = {DIR_A_NAME};
+    private static final String[] DIR_A_NON_DIRS = {"0"};
+
     private static final String UNSORTED_CWD_CONTENTS = String.join(STRING_NEWLINE, getCwdContents());
     private static final String UNSORTED_CWD_CONTENTS_WITH_HEADER = String.join(STRING_NEWLINE, ".:",
             UNSORTED_CWD_CONTENTS);
@@ -43,11 +49,7 @@ class LsApplicationHelperIT {
     private static final String SORTED_CWD_CONTENTS_STRING_WITH_HEADER = String.join(STRING_NEWLINE, ".:",
             SORTED_CWD_CONTENTS_STRING);
     private static final String SORTED_DIR_A_CONTENTS_WITH_HEADER = UNSORTED_DIR_A_CONTENTS_WITH_HEADER;
-    private static final String TWO_LINE_SEPARATOR = STRING_NEWLINE + STRING_NEWLINE;
-    private static final String[] CWD_NON_DIRS = {STRING_AZ, STRING_ZA, STRING_Z};
-    private static final String[] CWD_DIRS = {DIR_A_NAME};
-    private static final String[] DIR_A_NON_DIRS = {"0"};
-    
+
     // Main temporary dir
     @TempDir
     private Path cwdPath;
