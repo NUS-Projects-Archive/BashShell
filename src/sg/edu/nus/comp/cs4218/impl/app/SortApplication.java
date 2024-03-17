@@ -119,6 +119,7 @@ public class SortApplication implements SortInterface {
 
             try (InputStream input = IOUtils.openInputStream(file)) {
                 lines.addAll(IOUtils.getLinesFromInputStream(input));
+                IOUtils.closeInputStream(input);
             } catch (ShellException | IOException e) {
                 throw new SortException(e.getMessage(), e);
             }
