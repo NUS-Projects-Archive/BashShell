@@ -19,7 +19,7 @@ import org.junit.jupiter.api.Test;
 import sg.edu.nus.comp.cs4218.testutils.TestEnvironmentUtil;
 
 public class MvApplicationPublicTest {
-    private MvApplication application;
+
     private static final String TEMP = "temp-mv" + File.separator;
     private static final String TEXT_A = "textA.txt";
     private static final String TEXT_A_PATH = TEMP + TEXT_A;
@@ -31,6 +31,7 @@ public class MvApplicationPublicTest {
     private static final String MOVED_TXT_PATH = TEMP + MOVED_TEXT_TXT;
     private static final String TARGET_FOLDER = "targetFolder" + File.separator;
     private static final String TARGET_FDR_PATH = TEMP + TARGET_FOLDER;
+    private MvApplication application;
 
     void createAndWriteFile(String filePath) throws Exception {
         try (FileWriter writer = new FileWriter(filePath)) {
@@ -138,5 +139,4 @@ public class MvApplicationPublicTest {
         assertEquals(sourceAContent, targetAContent);
         assertEquals(sourceBContent, targetBContent);
     }
-
 }

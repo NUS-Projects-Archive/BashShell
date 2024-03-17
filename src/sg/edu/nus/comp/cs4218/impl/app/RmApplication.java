@@ -80,7 +80,7 @@ public class RmApplication implements RmInterface {
                 if (fileToDelete.isDirectory()) {
                     String[] fileContents = fileToDelete.list();
                     if (isRecursive) {
-                        Environment.currentDirectory = Paths.get(currentDirectory.toString(), file).toString();
+                        Environment.currentDirectory = fileToDelete.getAbsolutePath();
                         if (fileContents != null && fileContents.length > 0) {
                             remove(isEmptyFolder, true, fileContents); // recursively delete contents
                         }

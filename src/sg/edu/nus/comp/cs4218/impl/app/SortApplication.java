@@ -116,22 +116,12 @@ public class SortApplication implements SortInterface {
             if (!node.canRead()) {
                 throw new SortException(String.format("'%s': %s", node.getName(), ERR_READING_FILE));
             }
-            InputStream input = null;
-            try {
-                input = IOUtils.openInputStream(file);
+
+            try (InputStream input = IOUtils.openInputStream(file)) {
                 lines.addAll(IOUtils.getLinesFromInputStream(input));
                 IOUtils.closeInputStream(input);
-                input.close();
             } catch (ShellException | IOException e) {
                 throw new SortException(e.getMessage(), e);
-            } finally {
-                try {
-                    if (input != null) {
-                        input.close();
-                    }
-                } catch (IOException e) {
-                    throw new SortException(e.getMessage(), e);
-                }
             }
         }
         sortInputString(isFirstWordNumber, isReverseOrder, isCaseIndependent, lines);
