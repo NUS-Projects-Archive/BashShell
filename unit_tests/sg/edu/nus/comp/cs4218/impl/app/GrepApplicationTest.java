@@ -2,7 +2,6 @@ package sg.edu.nus.comp.cs4218.impl.app;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 import static sg.edu.nus.comp.cs4218.impl.app.GrepApplication.NULL_POINTER;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_INVALID_REGEX;
@@ -148,7 +147,7 @@ class GrepApplicationTest {
      */
     @Test
     void grepFromStdin_InvalidPattern_ThrowsGrepException() {
-        GrepException result = assertThrows(GrepException.class, () ->
+        GrepException result = assertThrowsExactly(GrepException.class, () ->
                 app.grepFromStdin("*", false, false, false, stdin)
         );
         String expected = "grep: " + ERR_INVALID_REGEX;

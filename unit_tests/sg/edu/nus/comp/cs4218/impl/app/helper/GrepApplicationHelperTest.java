@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 import static sg.edu.nus.comp.cs4218.impl.app.helper.GrepApplicationHelper.getGrepArguments;
 
 import java.util.ArrayList;
@@ -33,13 +33,13 @@ class GrepApplicationHelperTest {
 
     @Test
     void getGrepArguments_NullArgs_ThrowsNullPointerException() {
-        assertThrows(NullPointerException.class, () -> getGrepArguments(null, flags, new ArrayList<>()));
+        assertThrowsExactly(NullPointerException.class, () -> getGrepArguments(null, flags, new ArrayList<>()));
     }
 
     @Test
     void getGrepArguments_NullInputFiles_ThrowsNullPointerException() {
         String[] args = {PATTERN, FILE_NAME_ONE};
-        assertThrows(NullPointerException.class, () -> getGrepArguments(args, flags, null));
+        assertThrowsExactly(NullPointerException.class, () -> getGrepArguments(args, flags, null));
     }
 
     @Test
@@ -97,7 +97,8 @@ class GrepApplicationHelperTest {
     @Test
     void getGrepArguments_PatternAndValidInvalidFlags_ThrowsGrepException() {
         String[] args = {I_FLAG, "-X", C_FLAG, H_FLAG, PATTERN, FILE_NAME_ONE, FILE_NAME_TWO};
-        GrepException exception = assertThrows(GrepException.class, () -> getGrepArguments(args, flags, inputFiles));
+        GrepException exception = assertThrowsExactly(GrepException.class, () ->
+                getGrepArguments(args, flags, inputFiles));
         assertEquals("grep: Invalid syntax", exception.getMessage());
     }
 

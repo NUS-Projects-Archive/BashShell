@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static sg.edu.nus.comp.cs4218.testutils.TestStringUtils.STRING_NEWLINE;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
@@ -34,29 +33,29 @@ public class GrepApplicationPublicTest {
 
     private static final String TEST_FILE = "fileA.txt";
     private static final String TEMP = "temp-grep";
-    private static Path TEMP_PATH;
-    private static Path TEST_FILE_PATH;
+    private static Path tempPath;
+    private static Path testFilePath;
 
     private GrepApplication grepApplication;
 
     @BeforeEach
     void setUp() throws IOException, NoSuchFieldException, IllegalAccessException, NoClassDefFoundError,
             NoSuchMethodException, InvocationTargetException, InstantiationException {
-        TestEnvironmentUtil.setCurrentDirectory(System.getProperty("user.dir"));
         grepApplication = new GrepApplication();
-        TEMP_PATH = Paths.get(TestEnvironmentUtil.getCurrentDirectory(), TEMP);
-        TEST_FILE_PATH = TEMP_PATH.resolve(TEST_FILE);
-        Files.createDirectory(TEMP_PATH);
+        TestEnvironmentUtil.setCurrentDirectory(System.getProperty("user.dir"));
+        tempPath = Paths.get(TestEnvironmentUtil.getCurrentDirectory(), TEMP);
+        testFilePath = tempPath.resolve(TEST_FILE);
+        Files.createDirectory(tempPath);
     }
 
     @AfterEach
     void tearDown() throws IOException {
-        Files.deleteIfExists(TEST_FILE_PATH.toAbsolutePath());
-        Files.delete(TEMP_PATH);
+        Files.deleteIfExists(testFilePath.toAbsolutePath());
+        Files.delete(tempPath);
     }
 
     private Path createFile() throws IOException {
-        Path path = TEMP_PATH.resolve(GrepApplicationPublicTest.TEST_FILE);
+        Path path = tempPath.resolve(GrepApplicationPublicTest.TEST_FILE);
         Files.createFile(path);
         return path;
     }
@@ -65,13 +64,12 @@ public class GrepApplicationPublicTest {
     void grepFromStdin_EmptyPattern_ThrowsException() {
         InputStream stdin = new ByteArrayInputStream(BYTES_SINGLE_LINE);
 
-        assertThrows(GrepException.class,
-                () -> grepApplication.grepFromStdin("", false, false, false, stdin));
+        assertThrows(GrepException.class, () ->
+                grepApplication.grepFromStdin("", false, false, false, stdin));
     }
 
     @Test
     void grepFromStdin_CountLinesOptionPatternStdin_LinesFoundAddedToResults() throws AbstractApplicationException {
-        ByteArrayOutputStream output = new ByteArrayOutputStream();
         InputStream stdin = new ByteArrayInputStream(BYTES_MULTI_LINE);
         String expected = "2";
 
@@ -81,16 +79,14 @@ public class GrepApplicationPublicTest {
 
     @Test
     void grepFromStdin_CountLinesOptionInvalidPatternStdin_LinesFoundAddedToResults() {
-        ByteArrayOutputStream output = new ByteArrayOutputStream();
         InputStream stdin = new ByteArrayInputStream(BYTES_MULTI_LINE);
 
-        assertThrows(GrepException.class,
-                () -> grepApplication.grepFromStdin(PATTERN_INVALID, false, true, false, stdin));
+        assertThrows(GrepException.class, () ->
+                grepApplication.grepFromStdin(PATTERN_INVALID, false, true, false, stdin));
     }
 
     @Test
     void grepFromStdin_CaseInsensitiveCountLinesOptionPatternStdin_LinesFoundAddedToResults() throws AbstractApplicationException {
-        ByteArrayOutputStream output = new ByteArrayOutputStream();
         InputStream stdin = new ByteArrayInputStream(BYTES_MULTI_LINE);
         String expected = "3";
 
@@ -100,7 +96,6 @@ public class GrepApplicationPublicTest {
 
     @Test
     void grepFromStdin_CountLinesPrefixFileNameOptionPatternStdin_LinesFoundAddedToResults() throws AbstractApplicationException {
-        ByteArrayOutputStream output = new ByteArrayOutputStream();
         InputStream stdin = new ByteArrayInputStream(BYTES_MULTI_LINE);
         String expected = String.format("%s: %d", LABEL_STDIN, 2);
 
@@ -110,7 +105,6 @@ public class GrepApplicationPublicTest {
 
     @Test
     void grepFromStdin_CaseInsensitiveCountLinesPrefixFilenamePatternStdin_LinesFoundAddedToResults() throws AbstractApplicationException {
-        ByteArrayOutputStream output = new ByteArrayOutputStream();
         InputStream stdin = new ByteArrayInputStream(BYTES_MULTI_LINE);
         String expected = String.format("%s: %d", LABEL_STDIN, 3);
 
@@ -120,18 +114,15 @@ public class GrepApplicationPublicTest {
 
     @Test
     void grepFromFiles_EmptyPattern_ThrowsException() throws Exception {
-        ByteArrayOutputStream output = new ByteArrayOutputStream();
-        String[] fileNames = new String[]{TEST_FILE_PATH.toString()};
+        String[] fileNames = new String[]{testFilePath.toString()};
         Files.write(createFile(), BYTES_SINGLE_LINE);
 
-        assertThrows(GrepException.class,
-                () -> grepApplication.grepFromFiles("", false, false, false, fileNames));
+        assertThrows(GrepException.class, () -> grepApplication.grepFromFiles("", false, false, false, fileNames));
     }
 
     @Test
     void grepFromFiles_CountLinesOptionPatternFile_LinesFoundAddedToResults() throws Exception {
-        ByteArrayOutputStream output = new ByteArrayOutputStream();
-        String[] fileNames = new String[]{TEST_FILE_PATH.toString()};
+        String[] fileNames = new String[]{testFilePath.toString()};
         Files.write(createFile(), BYTES_MULTI_LINE);
         String expected = "2";
 
@@ -141,8 +132,7 @@ public class GrepApplicationPublicTest {
 
     @Test
     void grepFromFiles_CaseInsensitivePatternFile_LinesFoundAddedToResults() throws Exception {
-        ByteArrayOutputStream output = new ByteArrayOutputStream();
-        String[] fileNames = new String[]{TEST_FILE_PATH.toString()};
+        String[] fileNames = new String[]{testFilePath.toString()};
         Files.write(createFile(), BYTES_MULTI_LINE);
 
         String actual = grepApplication.grepFromFiles(PATTERN_VALID, true, false, false, fileNames);
@@ -151,13 +141,12 @@ public class GrepApplicationPublicTest {
 
     @Test
     void grepFromFileAndStdin_EmptyPattern_ThrowsException() throws Exception {
-        ByteArrayOutputStream output = new ByteArrayOutputStream();
         InputStream stdin = new ByteArrayInputStream(TEXT_ONE.getBytes());
         String[] fileNames = new String[]{TEST_FILE};
         Files.write(createFile(), BYTES_MULTI_LINE);
 
-        assertThrows(GrepException.class,
-                () -> grepApplication.grepFromFileAndStdin("", false, false, false, stdin, fileNames));
+        assertThrows(GrepException.class, () ->
+                grepApplication.grepFromFileAndStdin("", false, false, false, stdin, fileNames));
     }
 
 }

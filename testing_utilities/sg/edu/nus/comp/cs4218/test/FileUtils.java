@@ -1,7 +1,6 @@
 package sg.edu.nus.comp.cs4218.test;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -16,9 +15,13 @@ public final class FileUtils {
      * @return
      */
     public static Path createNewFile(String fileName, String contents) {
-        Path file = assertDoesNotThrow(() -> Files.createTempFile(fileName, ""), "Unable to create temporary file");
-        assertDoesNotThrow(() -> Files.write(file, contents.getBytes()), "Unable to write to temporary file");
-        return file;
+        try {
+            Path file = Files.createTempFile(fileName, "");
+            Files.write(file, contents.getBytes());
+            return file;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
@@ -30,9 +33,13 @@ public final class FileUtils {
      * @return
      */
     public static Path createNewFileInDir(Path dir, String fileName, String contents) {
-        Path file = assertDoesNotThrow(() -> Files.createTempFile(dir, fileName, ""), "Unable to create temporary file");
-        assertDoesNotThrow(() -> Files.write(file, contents.getBytes()), "Unable to write to temporary file");
-        return file;
+        try {
+            Path file = Files.createTempFile(dir, fileName, "");
+            Files.write(file, contents.getBytes());
+            return file;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
@@ -43,8 +50,12 @@ public final class FileUtils {
      * @return
      */
     public static Path createNewDirectory(Path parentPath, String dirName) {
-        Path path = parentPath.resolve(dirName);
-        return assertDoesNotThrow(() -> Files.createDirectories(path), "Unable to create temporary directory");
+        try {
+            Path path = parentPath.resolve(dirName);
+            return Files.createDirectories(path);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
@@ -53,6 +64,10 @@ public final class FileUtils {
      * @param file File/directory to be deleted.
      */
     public static void deleteFileOrDirectory(Path file) {
-        assertDoesNotThrow(() -> Files.deleteIfExists(file), "Unable to delete temporary file/directory");
+        try {
+            Files.deleteIfExists(file);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
