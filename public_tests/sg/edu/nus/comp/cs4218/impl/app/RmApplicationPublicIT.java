@@ -33,7 +33,7 @@ public class RmApplicationPublicIT {
     @BeforeAll
     static void createTemp() throws IOException, NoSuchFieldException, IllegalAccessException {
         tempPath = Paths.get(TestEnvironmentUtil.getCurrentDirectory(), TEMP);
-        Files.createDirectory(tempPath);
+        Files.createDirectories(tempPath);
     }
 
     @AfterAll
