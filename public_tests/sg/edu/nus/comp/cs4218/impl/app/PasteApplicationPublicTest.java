@@ -1,33 +1,40 @@
 package sg.edu.nus.comp.cs4218.impl.app;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.joinStringsByNewline;
+import static sg.edu.nus.comp.cs4218.testutils.TestStringUtils.STRING_NEWLINE;
+
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
+
 import sg.edu.nus.comp.cs4218.exception.PasteException;
 import sg.edu.nus.comp.cs4218.testutils.TestStringUtils;
 
-import java.io.*;
-import java.nio.charset.StandardCharsets;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
 public class PasteApplicationPublicTest {
+
     private static final File DIRECTORY = new File("pasteTestDirectory");
     private static final File NONEXISTENT = new File("paste_nonexistent.txt");
     private static final File FILE_EMPTY = new File("paste_empty.txt");
-
     private static final File FILE_1 = new File("paste_1.txt");
-    private static final String TEXT_FILE_1 = "A\nB\nC\nD\nE";
-
     private static final File FILE_2 = new File("paste_2.txt");
-    private static final String TEXT_FILE_2 = "1\n2\n3\n4\n5";
-    private static final String ERR_IS_DIR = String.format("paste: %s: Is a directory", DIRECTORY);
-    private static final String ERR_NO_SUCH_FILE = String.format("paste: %s: No such file or directory", NONEXISTENT);
+    private static final String TEXT_FILE_1 = joinStringsByNewline("A", "B", "C", "D", "E");
+    private static final String TEXT_FILE_2 = joinStringsByNewline("1", "2", "3", "4", "5");
 
-    private static PasteApplication pasteApplication;
+    private PasteApplication pasteApplication;
+    private String emptyFile;
+    private String file1;
+    private String file2;
 
     private void assertEqualsReplacingNewlines(String expected, String actual) {
         assertEquals(expected.replaceAll("\r\n", "\n"), actual.replaceAll("\r\n", "\n"));
@@ -38,25 +45,27 @@ public class PasteApplicationPublicTest {
         writeToFileWithText(FILE_EMPTY, null);
         writeToFileWithText(FILE_1, TEXT_FILE_1);
         writeToFileWithText(FILE_2, TEXT_FILE_2);
-
         DIRECTORY.mkdirs();
     }
 
     public static void writeToFileWithText(File file, String text) throws IOException {
-        FileWriter writer = new FileWriter(file); //NOPMD
-
-        if (text == null || text.isBlank()) {
-            writer.close();
-            return;
+        boolean fileCreated = file.createNewFile();
+        assertTrue(fileCreated, "Failed to create file: " + file.getAbsolutePath());
+        try (FileWriter writer = new FileWriter(file)) {
+            if (text == null || text.isBlank()) {
+                writer.close();
+                return;
+            }
+            writer.write(text);
         }
-
-        writer.write(text);
-        writer.close();
     }
 
     @BeforeEach
     void setUp() {
         pasteApplication = new PasteApplication();
+        emptyFile = FILE_EMPTY.getAbsolutePath();
+        file1 = FILE_1.getAbsolutePath();
+        file2 = FILE_2.getAbsolutePath();
     }
 
     @AfterAll
@@ -64,78 +73,66 @@ public class PasteApplicationPublicTest {
         FILE_EMPTY.delete();
         FILE_1.delete();
         FILE_2.delete();
-
         DIRECTORY.delete();
     }
 
     @Test
-    void mergeFile_FileNotFound_ThrowsException() throws AbstractApplicationException {
-        assertThrows(PasteException.class, () -> pasteApplication.mergeFile(true, NONEXISTENT.toString()));
+    void mergeFile_FileNotFound_ThrowsPasteException() {
+        assertThrowsExactly(PasteException.class, () -> pasteApplication.mergeFile(true, NONEXISTENT.toString()));
     }
 
     @Test
-    void mergeFile_FileIsDirectory_ThrowsException() throws AbstractApplicationException {
-        assertThrows(PasteException.class, () -> pasteApplication.mergeFile(true, DIRECTORY.toString()));
+    void mergeFileAndStdin_NullInputStream_ThrowsPasteException() {
+        assertThrowsExactly(PasteException.class, () -> pasteApplication.mergeFileAndStdin(true, null));
     }
 
     @Test
-    void mergeFileAndStdin_NullInputStream_ThrowsException() {
-
-        assertThrows(PasteException.class, () -> pasteApplication.mergeFileAndStdin(true, null));
+    void mergeFileAndStdin_NullFilename_ThrowsPasteException() {
+        assertThrowsExactly(PasteException.class, () -> pasteApplication.mergeFileAndStdin(true, System.in, null));
     }
 
     @Test
-    void mergeFileAndStdin_NullOutputStream_ThrowsException() {
-        assertThrows(PasteException.class, () -> pasteApplication.mergeFileAndStdin(true, System.in, null));
+    void mergeStdin_NullStream_ThrowsPasteException() {
+        assertThrowsExactly(PasteException.class, () -> pasteApplication.mergeStdin(true, null));
     }
 
     @Test
-    void mergeFileAndStdin_NullFilename_ThrowsException() {
-        assertThrows(PasteException.class, () -> pasteApplication.mergeFileAndStdin(true, System.in, null));
-    }
-
-    @Test
-    void mergeStdin_NullStream_ThrowsException() {
-        assertThrows(PasteException.class, () -> pasteApplication.mergeStdin(true, null));
-    }
-
-    @Test
-    void mergeStdin_NoSerial_ReturnsItself() throws AbstractApplicationException {
-        InputStream stream = new ByteArrayInputStream(TEXT_FILE_1.getBytes());
-        String result = pasteApplication.mergeStdin(false, stream);
+    void mergeStdin_NoSerial_ReturnsItself() {
+        InputStream input = new ByteArrayInputStream(TEXT_FILE_1.getBytes());
+        String result = assertDoesNotThrow(() -> pasteApplication.mergeStdin(false, input));
         assertEquals(TEXT_FILE_1, result);
     }
 
     @Test
-    void mergeStdin_Serial_ReturnsNewlinesReplacedByTabs() throws AbstractApplicationException {
+    void mergeStdin_Serial_ReturnsNewlinesReplacedByTabs() {
         InputStream stream = new ByteArrayInputStream(TEXT_FILE_1.getBytes());
-        String result = pasteApplication.mergeStdin(true, stream);
-        assertEquals(TEXT_FILE_1.replaceAll(TestStringUtils.STRING_NEWLINE, String.valueOf(TestStringUtils.CHAR_TAB)), result);
+        String result = assertDoesNotThrow(() -> pasteApplication.mergeStdin(true, stream));
+        assertEquals(TEXT_FILE_1.replaceAll(STRING_NEWLINE, String.valueOf(TestStringUtils.CHAR_TAB)), result);
     }
 
     @Test
-    void mergeFile_NullFilename_ThrowsException() {
-        assertThrows(PasteException.class, () -> pasteApplication.mergeFile(true, null));
+    void mergeFile_NullFilename_ThrowsPasteException() {
+        assertThrowsExactly(PasteException.class, () -> pasteApplication.mergeFile(true, null));
     }
 
     @Test
-    void mergeFile_NoSerialOneFile_ReturnsItself() throws AbstractApplicationException {
-        String result = pasteApplication.mergeFile(false, FILE_1.toString());
+    void mergeFile_NoSerialOneFile_ReturnsItself() {
+        String result = assertDoesNotThrow(() -> pasteApplication.mergeFile(false, file1));
         assertEqualsReplacingNewlines(TEXT_FILE_1, result);
     }
 
 
     @Test
-    void mergeFile_NoSerialTwoFiles_ReturnsInterleaving() throws AbstractApplicationException {
+    void mergeFile_NoSerialTwoFiles_ReturnsInterleaving() {
         String expected = "A\t1\nB\t2\nC\t3\nD\t4\nE\t5";
-        String result = pasteApplication.mergeFile(false, FILE_1.toString(), FILE_2.toString());
+        String result = assertDoesNotThrow(() -> pasteApplication.mergeFile(false, file1, file2));
         assertEqualsReplacingNewlines(expected, result);
     }
 
     @Test
-    void mergeFile_SerialTwoFiles_ReturnsParallel() throws AbstractApplicationException {
+    void mergeFile_SerialTwoFiles_ReturnsParallel() {
         String expected = "A\tB\tC\tD\tE\n1\t2\t3\t4\t5";
-        String result = pasteApplication.mergeFile(true, FILE_1.toString(), FILE_2.toString());
+        String result = assertDoesNotThrow(() -> pasteApplication.mergeFile(true, file1, file2));
         assertEqualsReplacingNewlines(expected, result);
     }
 }

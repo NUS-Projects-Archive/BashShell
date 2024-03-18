@@ -1,30 +1,29 @@
 package sg.edu.nus.comp.cs4218.impl.app;
 
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_NOT_FOUND;
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_GENERAL;
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IS_DIR;
+import static sg.edu.nus.comp.cs4218.impl.app.helper.PasteApplicationHelper.checkPasteFileValidity;
+import static sg.edu.nus.comp.cs4218.impl.app.helper.PasteApplicationHelper.mergeInParallel;
+import static sg.edu.nus.comp.cs4218.impl.app.helper.PasteApplicationHelper.mergeInSerial;
+import static sg.edu.nus.comp.cs4218.impl.util.CollectionsUtils.listToArray;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IO_EXCEPTION;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_ISTREAM;
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_PERM;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NULL_ARGS;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NULL_STREAMS;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_WRITE_STREAM;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_TAB;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import sg.edu.nus.comp.cs4218.app.PasteInterface;
 import sg.edu.nus.comp.cs4218.exception.InvalidArgsException;
 import sg.edu.nus.comp.cs4218.exception.PasteException;
 import sg.edu.nus.comp.cs4218.exception.ShellException;
 import sg.edu.nus.comp.cs4218.impl.parser.PasteArgsParser;
-import sg.edu.nus.comp.cs4218.impl.util.ArgumentResolver;
-import sg.edu.nus.comp.cs4218.impl.util.IORedirectionHandler;
 import sg.edu.nus.comp.cs4218.impl.util.IOUtils;
 
 /**
@@ -37,13 +36,6 @@ import sg.edu.nus.comp.cs4218.impl.util.IOUtils;
  */
 public class PasteApplication implements PasteInterface {
 
-    private int maxFileLength = 0;
-    private final List<List<String>> tempListResult;
-
-    public PasteApplication() {
-        this.tempListResult = new ArrayList<>();
-    }
-
     /**
      * Runs the paste application with the specified arguments.
      *
@@ -55,78 +47,44 @@ public class PasteApplication implements PasteInterface {
      * @param stdout An OutputStream. The output of the command is written to this OutputStream.
      */
     @Override
-    public void run(String[] args, InputStream stdin, OutputStream stdout) throws PasteException { //NOPMD
-        if (stdout == null) {
-            throw new PasteException(ERR_NULL_STREAMS);
-        }
+    public void run(String[] args, InputStream stdin, OutputStream stdout) throws PasteException {
         if (stdin == null) {
             throw new PasteException(ERR_NO_ISTREAM);
         }
-        PasteArgsParser pasteArgsParser = new PasteArgsParser();
+        if (stdout == null) {
+            throw new PasteException(ERR_NULL_STREAMS);
+        }
 
+        final PasteArgsParser parser = new PasteArgsParser();
         try {
-            pasteArgsParser.parse(args);
+            parser.parse(args);
         } catch (InvalidArgsException e) {
             throw new PasteException(e.getMessage(), e);
         }
 
-        List<String> nonFlagArgs = pasteArgsParser.getNonFlagArgs();
-        boolean noInputs = nonFlagArgs.isEmpty();
-        boolean isRedirect = nonFlagArgs.contains(">") || nonFlagArgs.contains("<");
-        boolean isSerial = pasteArgsParser.isSerial();
-        String result = null;
+        final Boolean isSerial = parser.isSerial();
+        final String[] nonFlagArgs = listToArray(parser.getNonFlagArgs());
 
-        if (noInputs) {
-            result = mergeStdin(isSerial, stdin);
-        } else if (!isRedirect) {
-            if (nonFlagArgs.contains("-")) {
-                result = mergeFileAndStdin(isSerial, stdin, nonFlagArgs.toArray(new String[0]));
-            } else {
-                result = mergeFile(isSerial, nonFlagArgs.toArray(new String[0]));
-            }
+        final StringBuilder output = new StringBuilder();
+        if (nonFlagArgs.length == 0) {
+            output.append(mergeStdin(isSerial, stdin));
+        } else {
+            output.append(mergeFileAndStdin(isSerial, stdin, nonFlagArgs));
         }
 
-        if (noInputs || !isRedirect) {
-            try {
-                stdout.write(result.getBytes());
+        try {
+            if (output.length() != 0) {
+                stdout.write(output.toString().getBytes());
                 stdout.write(STRING_NEWLINE.getBytes());
-            } catch (IOException e) {
-                throw new PasteException(ERR_WRITE_STREAM, e);
             }
-        }
-
-        if (isRedirect) {
-            IORedirectionHandler redirHandler = new IORedirectionHandler(nonFlagArgs, stdin, stdout, new ArgumentResolver());
-            try {
-                redirHandler.extractRedirOptions();
-
-                List<String> noRedirArgsList = redirHandler.getNoRedirArgsList();
-                if (noRedirArgsList.isEmpty()) {
-                    result = mergeStdin(isSerial, redirHandler.getInputStream());
-                } else {
-                    if (nonFlagArgs.contains("-")) {
-                        result = mergeFileAndStdin(isSerial, stdin, noRedirArgsList.toArray(new String[0]));
-                    } else {
-                        result = mergeFile(isSerial, noRedirArgsList.toArray(new String[0]));
-                    }
-                }
-
-                if (nonFlagArgs.contains(">")) {
-                    byte[] bytes = result.getBytes();
-                    redirHandler.getOutputStream().write(bytes);
-                } else {
-                    stdout.write(result.getBytes());
-                    stdout.write(STRING_NEWLINE.getBytes());
-                }
-            } catch (Exception e) {
-                throw new PasteException(e.getMessage(), e);
-            }
+        } catch (IOException e) {
+            throw new PasteException(ERR_WRITE_STREAM, e);
         }
     }
 
     /**
-     * Returns string of line-wise concatenated (tab-separated) Stdin arguments. If only one Stdin
-     * arg is specified, echo back the Stdin.
+     * Returns string of line-wise concatenated (tab-separated) Stdin arguments.
+     * If only one Stdin arg is specified, echo back the Stdin.
      *
      * @param isSerial Paste one file at a time instead of in parallel
      * @param stdin    InputStream containing arguments from Stdin
@@ -138,22 +96,20 @@ public class PasteApplication implements PasteInterface {
             throw new PasteException(ERR_NULL_STREAMS);
         }
 
-        List<String> data;
+        List<List<String>> output = new ArrayList<>();
         try {
-            data = IOUtils.getLinesFromInputStream(stdin);
-            tempListResult.add(data);
-        } catch (Exception e) {
-            throw new PasteException(e.getMessage(), e);
+            output.add(IOUtils.getLinesFromInputStream(stdin));
+        } catch (IOException e) {
+            throw new PasteException(ERR_IO_EXCEPTION, e);
         }
-        maxFileLength = Math.max(maxFileLength, data.size());
 
-        return isSerial ? mergeInSerial(tempListResult) : mergeInParallel(tempListResult);
+        return isSerial ? mergeInSerial(output) : mergeInParallel(output);
     }
 
 
     /**
-     * Returns string of line-wise concatenated (tab-separated) files. If only one file is
-     * specified, echo back the file content.
+     * Returns string of line-wise concatenated (tab-separated) files.
+     * If only one file is specified, echo back the file content.
      *
      * @param isSerial Paste one file at a time instead of in parallel
      * @param fileName Array of file names to be read and merged (not including "-" for reading from stdin)
@@ -161,50 +117,36 @@ public class PasteApplication implements PasteInterface {
      */
     @Override
     public String mergeFile(Boolean isSerial, String... fileName) throws PasteException {
-        if (fileName == null) {
-            throw new PasteException(ERR_GENERAL);
+        if (fileName == null || fileName.length == 0) {
+            throw new PasteException(ERR_NULL_ARGS);
         }
 
+        List<List<String>> output = new ArrayList<>();
         for (String file : fileName) {
-            File node = IOUtils.resolveFilePath(file).toFile();
-            if (!node.exists()) {
-                throw new PasteException(ERR_FILE_NOT_FOUND);
+            if (!checkPasteFileValidity(file)) {
+                continue;
             }
-            if (node.isDirectory()) {
-                throw new PasteException(ERR_IS_DIR);
-            }
-            if (!node.canRead()) {
-                throw new PasteException(ERR_NO_PERM);
-            }
-
-            List<String> fileData;
-            InputStream input = null;
-            try {
-                input = IOUtils.openInputStream(file);
-                fileData = IOUtils.getLinesFromInputStream(input);
+            try (InputStream input = IOUtils.openInputStream(file)) {
+                output.add(IOUtils.getLinesFromInputStream(input));
                 IOUtils.closeInputStream(input);
-                input.close();
             } catch (ShellException | IOException e) {
                 throw new PasteException(e.getMessage(), e);
-            } finally {
-                try {
-                    if (input != null) {
-                        input.close();
-                    }
-                } catch (IOException e) {
-                    throw new PasteException(e.getMessage(), e);
-                }
             }
-
-            maxFileLength = Math.max(maxFileLength, fileData.size());
-            tempListResult.add(fileData);
         }
 
-        return isSerial ? mergeInSerial(tempListResult) : mergeInParallel(tempListResult);
+        return isSerial ? mergeInSerial(output) : mergeInParallel(output);
     }
 
     /**
      * Returns string of line-wise concatenated (tab-separated) files and Stdin arguments.
+     * <p>
+     * Assumptions:
+     * - When processing in parallel and there are multiple standard input ("-") entries,
+     *   each standard input entry takes one line at a time sequentially, rotating among them.
+     *   For example, the first "-" entry takes the first line, the second "-" entry takes the second line,
+     *   and so on. Once all "-" entries have taken one line each, the process repeats.
+     * - When processing in serial and there are multiple standard input ("-") entries,
+     *   the first standard input entry will consume the entire line
      *
      * @param isSerial Paste one file at a time instead of in parallel
      * @param stdin    InputStream containing arguments from Stdin
@@ -212,105 +154,50 @@ public class PasteApplication implements PasteInterface {
      * @throws PasteException
      */
     @Override
-    public String mergeFileAndStdin(Boolean isSerial, InputStream stdin, String... fileName) throws PasteException { //NOPMD
-        if (stdin == null && fileName == null) {
-            throw new PasteException(ERR_GENERAL);
+    public String mergeFileAndStdin(Boolean isSerial, InputStream stdin, String... fileName) throws PasteException {
+        if (stdin == null) {
+            throw new PasteException(ERR_NULL_STREAMS);
         }
-        for (String file : fileName) {
-            if (file == null || file.compareTo("-") == 0) {
-                continue;
-            }
+        if (fileName == null || fileName.length == 0) {
+            throw new PasteException(ERR_NULL_ARGS);
+        }
 
-            File node = IOUtils.resolveFilePath(file).toFile();
-            if (!node.exists()) {
-                throw new PasteException(ERR_FILE_NOT_FOUND);
-            }
-            if (node.isDirectory()) {
-                throw new PasteException(ERR_IS_DIR);
-            }
-            if (!node.canRead()) {
-                throw new PasteException(ERR_NO_PERM);
-            }
+        // Check to ensure the files (not including "-") are valid
+        for (String file : fileName) {
+            checkPasteFileValidity(file);
         }
-        List<String> data;
+
+        int numOfStdin = (int) Arrays.stream(fileName).filter("-"::equals).count();
+        List<String> stdinData = new ArrayList<>();
         try {
-            data = IOUtils.getLinesFromInputStream(stdin);
+            if (numOfStdin > 0) {
+                stdinData = IOUtils.getLinesFromInputStream(stdin);
+            }
         } catch (IOException e) {
-            throw new PasteException(e.getMessage(), e);
+            throw new PasteException(ERR_IO_EXCEPTION, e);
         }
-        int numOfDash = (int) Arrays.stream(fileName).filter("-"::equals).count();
-        if (numOfDash != 0) {
-            maxFileLength = Math.max(maxFileLength, data.size() / numOfDash);
-            if (data.size() % numOfDash != 0) {
-                maxFileLength = Math.max(maxFileLength, (data.size() / numOfDash) + 1);
-            }
-        }
-        if (isSerial) {
-            numOfDash = 1;
-        }
+
         int currStdin = 0;
+        List<String> output = new ArrayList<>();
         for (String file : fileName) {
-            if (file != null && file.equals("-")) {
-                List<String> currLst = new ArrayList<>();
-                for (int i = currStdin; i < data.size(); i += numOfDash) {
-                    currLst.add(data.get(i));
+            if (("-").equals(file)) {
+                List<String> currList = new ArrayList<>();
+                int step = isSerial ? 1 : numOfStdin;
+                for (int i = currStdin; i < stdinData.size(); i += step) {
+                    currList.add(stdinData.get(i));
                 }
-                currStdin = isSerial ? data.size() : currStdin + 1;
-                tempListResult.add(currLst);
+                currStdin += isSerial ? stdinData.size() : 1;
+                output.add(String.join(STRING_NEWLINE, currList));
             } else {
-                mergeFile(isSerial, file);
+                output.add(mergeFile(isSerial, file));
             }
         }
 
-        return isSerial ? mergeInSerial(tempListResult) : mergeInParallel(tempListResult);
-    }
+        List<List<String>> totalLines = output.stream().filter(s -> !s.isEmpty())
+                .map(s -> Arrays.asList((s.split(STRING_NEWLINE))))
+                .collect(Collectors.toList());
 
-    /**
-     * Takes in a List of Lists of Strings and merges lists in serial.
-     * Each inner list represents a row of data, and each element in the inner list represents a column.
-     * Columns within a row are separated by a tab character ('\t'), and rows are separated by a newline character ('\n')
-     *
-     * @param listResult List of Lists of Strings representing the data to be merged
-     * @return Merged data as a single String
-     */
-    public String mergeInSerial(List<List<String>> listResult) {
-        List<List<String>> res = new ArrayList<>();
-        for (List<String> lst : listResult) {
-            List<String> currList = new ArrayList<>(lst);
-            res.add(currList);
-        }
-
-        List<String> interRes = new ArrayList<>();
-        for (List<String> lst : res) {
-            interRes.add(String.join(STRING_TAB, lst));
-        }
-
-        return String.join(STRING_NEWLINE, interRes);
-    }
-
-    /**
-     * Merges lists in parallel, where each sublist corresponds to a column in the merged result.
-     * If a sublist does not have an element at a particular index, an empty string is inserted.
-     *
-     * @param listResult A List of Lists of Strings representing the data to be merged in parallel
-     * @return A String representing the merged data with elements separated by tabs and rows separated by newlines
-     */
-    public String mergeInParallel(List<List<String>> listResult) {
-        List<List<String>> res = new ArrayList<>();
-
-        for (int i = 0; i < maxFileLength; i++) {
-            List<String> currLstToAdd = new ArrayList<>();
-            for (List<String> currLst : listResult) {
-                currLstToAdd.add(i < currLst.size() ? currLst.get(i) : "");
-            }
-            res.add(currLstToAdd);
-        }
-
-        List<String> interRes = new ArrayList<>();
-        for (List<String> lst : res) {
-            interRes.add(String.join(STRING_TAB, lst));
-        }
-
-        return String.join(STRING_NEWLINE, interRes);
+        String result = isSerial ? mergeInSerial(totalLines) : mergeInParallel(totalLines);
+        return String.join(STRING_NEWLINE, result);
     }
 }
