@@ -1,5 +1,6 @@
 package sg.edu.nus.comp.cs4218.impl.app.helper;
 
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_NOT_FOUND;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_GENERAL;
 
 import java.io.File;
@@ -55,6 +56,9 @@ public final class TeeApplicationHelper {
     public static void writeToFile(Boolean isAppend, String content, String filePath) throws TeeException {
         try {
             Path path = Paths.get(filePath);
+            if (!Files.exists(path)) {
+                throw new TeeException(ERR_FILE_NOT_FOUND);
+            }
             if (isAppend) {
                 Files.write(path, content.getBytes(StandardCharsets.UTF_8), StandardOpenOption.APPEND);
             } else {
