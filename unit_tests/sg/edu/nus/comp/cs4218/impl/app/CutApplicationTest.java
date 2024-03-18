@@ -5,6 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
+import static sg.edu.nus.comp.cs4218.test.FileUtils.createNewDirectory;
+import static sg.edu.nus.comp.cs4218.test.FileUtils.createNewFile;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -33,32 +35,25 @@ class CutApplicationTest {
     private static final String ERR_NON_EXIST = "cut: 'nonExistFile.txt': No such file or directory";
     private static final String ERR_ONE_FLAG_ONLY = "cut: Exactly one flag (cut by character or byte) should be selected, but not both";
 
-    @TempDir
-    private Path tempDir;
     private Path fileOnePath;
     private String fileOne;
+    private String fileOneName;
     private String fileTwo;
+    private String subDir;
     private String nonExistFile;
     private CutApplication app;
 
     @BeforeEach
-    void setUp() throws IOException {
+    void setUp(@TempDir Path tempDir) throws IOException {
         app = new CutApplication();
 
         // Create temporary file, automatically deletes after test execution
-        fileOnePath = tempDir.resolve(FILE_ONE);
-        Path fileTwoPath = tempDir.resolve(FILE_TWO);
-
+        fileOnePath = createNewFile(FILE_ONE, FILE_ONE_CONTENT);
         fileOne = fileOnePath.toString();
-        fileTwo = fileTwoPath.toString();
+        fileOneName = fileOnePath.toFile().getName();
+        fileTwo = createNewFile(FILE_TWO, FILE_TWO_CONTENT).toString();
+        subDir = createNewDirectory(tempDir, "subdirectory").toString();
         nonExistFile = tempDir.resolve("nonExistFile.txt").toString();
-
-        Files.createFile(fileOnePath);
-        Files.createFile(fileTwoPath);
-
-        // Writes content to temporary file
-        Files.write(fileOnePath, FILE_ONE_CONTENT.getBytes());
-        Files.write(fileTwoPath, FILE_TWO_CONTENT.getBytes());
     }
 
     // The tests do not cover scenarios where no flag is provided, more than one flag is given,
@@ -89,28 +84,32 @@ class CutApplicationTest {
     }
 
     @Test
-    void cutFromFiles_FileDoNotExist_PrintsErrorMessage() {
-        String result = assertDoesNotThrow(() -> app.cutFromFiles(true, false, null, nonExistFile));
-        assertEquals(ERR_NON_EXIST, result);
+    void cutFromFiles_FileDoNotExist_ThrowsCutException() {
+        CutException result = assertThrowsExactly(CutException.class, () ->
+                app.cutFromFiles(true, false, null, nonExistFile)
+        );
+        assertEquals(ERR_NON_EXIST, result.getMessage());
     }
 
     @Test
-    void cutFromFiles_FileGivenAsDirectory_PrintsErrorMessage() {
-        Path subDir = tempDir.resolve("subdirectory");
-        assertDoesNotThrow(() -> Files.createDirectories(subDir));
-        String result = assertDoesNotThrow(() -> app.cutFromFiles(true, false, RANGE_ONE_TO_FIVE, subDir.toString()));
+    void cutFromFiles_FileGivenAsDirectory_ThrowsCutException() {
+        CutException result = assertThrowsExactly(CutException.class, () ->
+                app.cutFromFiles(true, false, RANGE_ONE_TO_FIVE, subDir)
+        );
         String expected = "cut: 'subdirectory': This is a directory";
-        assertEquals(expected, result);
+        assertEquals(expected, result.getMessage());
     }
 
     @Test
     @DisabledOnOs(value = OS.WINDOWS)
-    void cutFromFiles_FileNoPermissionToRead_PrintsErrorMessage() {
+    void cutFromFiles_FileNoPermissionToRead_ThrowsCutException() {
         boolean isSetReadable = fileOnePath.toFile().setReadable(false);
         assertTrue(isSetReadable, "Failed to set read permission to false for test");
-        String result = assertDoesNotThrow(() -> app.cutFromFiles(true, false, RANGE_ONE_TO_FIVE, fileOne));
-        String expected = "cut: 'file1.txt': Could not read file";
-        assertEquals(expected, result);
+        CutException result = assertThrowsExactly(CutException.class, () ->
+                app.cutFromFiles(true, false, RANGE_ONE_TO_FIVE, fileOne)
+        );
+        String expected = String.format("cut: '%s': Could not read file", fileOneName);
+        assertEquals(expected, result.getMessage());
     }
 
     @Test
@@ -130,8 +129,6 @@ class CutApplicationTest {
         // Given: overwrites the file content with an empty string
         assertDoesNotThrow(() -> Files.write(fileOnePath, "".getBytes()));
         String expected = assertDoesNotThrow(() -> String.join("", Files.readAllLines(fileOnePath)));
-        assertTrue(expected.isEmpty());
-
         String result = assertDoesNotThrow(() -> app.cutFromFiles(true, false, RANGE_ONE_TO_FIVE, fileOne));
         assertEquals(expected, result);
     }
@@ -144,24 +141,27 @@ class CutApplicationTest {
     }
 
     @Test
-    void cutFromFiles_SomeFilesAtTheStartDoNotExist_ReturnsCutStringAndErrorMessage() {
-        String result = assertDoesNotThrow(() -> app.cutFromFiles(true, false, RANGE_ONE_TO_FIVE, nonExistFile, fileOne, fileTwo));
-        String expected = ONE_TO_FIVE + STRING_NEWLINE + ZERO_TO_SIX + STRING_NEWLINE + ERR_NON_EXIST;
-        assertEquals(expected, result);
+    void cutFromFiles_SomeFilesAtTheStartDoNotExist_ThrowsCutException() {
+        CutException result = assertThrowsExactly(CutException.class, () ->
+                app.cutFromFiles(true, false, RANGE_ONE_TO_FIVE, nonExistFile, fileOne, fileTwo)
+        );
+        assertEquals(ERR_NON_EXIST, result.getMessage());
     }
 
     @Test
-    void cutFromFiles_SomeFilesInTheMiddleDoNotExist_ReturnsCutStringAndErrorMessage() {
-        String result = assertDoesNotThrow(() -> app.cutFromFiles(true, false, RANGE_ONE_TO_FIVE, fileOne, nonExistFile, fileTwo));
-        String expected = ONE_TO_FIVE + STRING_NEWLINE + ZERO_TO_SIX + STRING_NEWLINE + ERR_NON_EXIST;
-        assertEquals(expected, result);
+    void cutFromFiles_SomeFilesInTheMiddleDoNotExist_ThrowsCutException() {
+        CutException result = assertThrowsExactly(CutException.class, () ->
+                app.cutFromFiles(true, false, RANGE_ONE_TO_FIVE, fileOne, nonExistFile, fileTwo)
+        );
+        assertEquals(ERR_NON_EXIST, result.getMessage());
     }
 
     @Test
-    void cutFromFiles_SomeFilesAtTheEndDoNotExist_ReturnsCutStringAndErrorMessage() {
-        String result = assertDoesNotThrow(() -> app.cutFromFiles(true, false, RANGE_ONE_TO_FIVE, fileOne, fileTwo, nonExistFile));
-        String expected = ONE_TO_FIVE + STRING_NEWLINE + ZERO_TO_SIX + STRING_NEWLINE + ERR_NON_EXIST;
-        assertEquals(expected, result);
+    void cutFromFiles_SomeFilesAtTheEndDoNotExist_ThrowsCutException() {
+        CutException result = assertThrowsExactly(CutException.class, () ->
+                app.cutFromFiles(true, false, RANGE_ONE_TO_FIVE, fileOne, fileTwo, nonExistFile)
+        );
+        assertEquals(ERR_NON_EXIST, result.getMessage());
     }
 
     @Test

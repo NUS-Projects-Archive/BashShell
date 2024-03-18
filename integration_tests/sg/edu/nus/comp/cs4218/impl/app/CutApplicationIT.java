@@ -6,15 +6,15 @@ import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
-import static sg.edu.nus.comp.cs4218.test.AssertUtils.assertEmptyString;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
+import static sg.edu.nus.comp.cs4218.test.AssertUtils.assertEmptyString;
+import static sg.edu.nus.comp.cs4218.test.FileUtils.createNewFile;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
@@ -38,8 +38,6 @@ public class CutApplicationIT {
     private static final String STDIN_FIRST_FIVE = "lorem";
     private static final String RANGE_ONE_TO_FIVE = "1-5";
 
-    @TempDir
-    private Path tempDir;
     private String fileOne;
     private String fileTwo;
     private CutApplication app;
@@ -49,18 +47,8 @@ public class CutApplicationIT {
         app = new CutApplication();
 
         // Create temporary file, automatically deletes after test execution
-        Path fileOnePath = tempDir.resolve(FILE_ONE);
-        Path fileTwoPath = tempDir.resolve(FILE_TWO);
-
-        fileOne = fileOnePath.toString();
-        fileTwo = fileTwoPath.toString();
-
-        Files.createFile(fileOnePath);
-        Files.createFile(fileTwoPath);
-
-        // Writes content to temporary file
-        Files.write(fileOnePath, FILE_ONE_CONTENT.getBytes());
-        Files.write(fileTwoPath, FILE_TWO_CONTENT.getBytes());
+        fileOne = createNewFile(FILE_ONE, FILE_ONE_CONTENT).toString();
+        fileTwo = createNewFile(FILE_TWO, FILE_TWO_CONTENT).toString();
     }
 
     @Test
@@ -106,7 +94,7 @@ public class CutApplicationIT {
 
     @Test
     void run_FailsToReadFromInputStream_ThrowsCutException() {
-        String[] args = {FLAG_CUT_BY_CHAR, RANGE_ONE_TO_FIVE, "-"};
+        String[] args = {FLAG_CUT_BY_CHAR, RANGE_ONE_TO_FIVE};
         CutException result = assertThrowsExactly(CutException.class, () -> {
             InputStream mockStdin = mock(InputStream.class);
             doThrow(new IOException()).when(mockStdin).read(any(byte[].class));
@@ -141,7 +129,7 @@ public class CutApplicationIT {
     }
 
     @Test
-    void run_SomeInvalidFiles_WritesToOutput() {
+    void run_SomeInvalidFiles_WritesToOutput(@TempDir Path tempDir) {
         String nonExistFile = tempDir.resolve("nonExistFile.txt").toString();
         String[] args = {FLAG_CUT_BY_CHAR, RANGE_ONE_TO_FIVE, fileOne, "-", fileTwo, nonExistFile};
         InputStream stdin = new ByteArrayInputStream(STDIN_CONTENT.getBytes());
