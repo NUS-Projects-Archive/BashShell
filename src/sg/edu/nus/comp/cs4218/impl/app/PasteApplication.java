@@ -63,20 +63,15 @@ public class PasteApplication implements PasteInterface {
         } catch (InvalidArgsException e) {
             throw new PasteException(e.getMessage(), e);
         }
-
-        System.out.println("has parsed");
-
+        
         final Boolean isSerial = parser.isSerial();
         final String[] nonFlagArgs = listToArray(parser.getNonFlagArgs());
 
         final StringBuilder output = new StringBuilder();
         if (nonFlagArgs.length == 0) {
-            System.out.println("is stdin");
             output.append(mergeStdin(isSerial, stdin));
         } else {
-            System.out.println("is mergeFileAndStdin");
             output.append(mergeFileAndStdin(isSerial, stdin, nonFlagArgs));
-            System.out.println("finish mergeFileAndStdin");
         }
 
         try {
@@ -200,7 +195,6 @@ public class PasteApplication implements PasteInterface {
                 currStdin += isSerial ? stdinData.size() : 1;
                 output.add(String.join(STRING_NEWLINE, currList));
             } else {
-                System.out.println("is file: " + file);
                 output.add(mergeFile(isSerial, file));
             }
         }
