@@ -11,11 +11,11 @@ import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_OSTREAM;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_PERM;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NULL_ARGS;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_WRITE_STREAM;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_FILE_SEP;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 import static sg.edu.nus.comp.cs4218.test.FileUtils.createNewDirectory;
 import static sg.edu.nus.comp.cs4218.test.FileUtils.createNewFile;
 import static sg.edu.nus.comp.cs4218.test.FileUtils.deleteFileOrDirectory;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_FILE_SEP;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -26,11 +26,7 @@ import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.AfterAll;
@@ -48,43 +44,43 @@ import org.mockito.Mockito;
 import sg.edu.nus.comp.cs4218.Environment;
 import sg.edu.nus.comp.cs4218.exception.InvalidDirectoryLsException;
 import sg.edu.nus.comp.cs4218.exception.LsException;
+import sg.edu.nus.comp.cs4218.impl.util.StringUtils;
 
 @SuppressWarnings("PMD.ClassNamingConventions")
 class LsApplicationIT {
 
-    private static final String[] CWD_NON_DIRS = {"a.z", "z.a", "z"};
     private static final String DIR_A_NAME = "dirA";
     private static final String[] CWD_DIRS = {DIR_A_NAME};
+    private static final String[] CWD_NON_DIRS = {"a.z", "z.a", "z"};
     // Temporary dir A in main temporary dir
     private static final String[] DIR_A_NON_DIRS = {"0"};
+
     // Main temporary dir
     @TempDir
     private static Path cwdPath;
     private static String cwdName;
     private static String cwdPathName;
+
     private LsApplication app;
     private ByteArrayOutputStream outContent;
 
     private static String getCwdContents() {
-        List<String> fileList = Stream.concat(Arrays.stream(CWD_NON_DIRS), Arrays.stream(CWD_DIRS))
+        String[] fileList = Stream.concat(Arrays.stream(CWD_NON_DIRS), Arrays.stream(CWD_DIRS))
                 .sorted()
-                .collect(Collectors.toList());
-        return String.join(STRING_NEWLINE, fileList);
+                .toArray(String[]::new);
+        return StringUtils.joinStringsByNewline(fileList);
     }
 
     private static String getDirAContents() {
-        List<String> fileList = new ArrayList<>(Arrays.asList(DIR_A_NON_DIRS));
-        Collections.sort(fileList);
-        return String.join(STRING_NEWLINE, fileList) + STRING_NEWLINE;
+        return StringUtils.joinStringsByNewline(DIR_A_NON_DIRS);
     }
 
     /**
      * Provides valid arguments and expected output for run_ValidArgs_PrintsCorrectDirectoryContents.
      */
     static Stream<Arguments> validArgs() {
-        String listCwdContents = String.format("%s%s", String.join(STRING_NEWLINE, ".:", getCwdContents()),
-                STRING_NEWLINE);
-        String listDirAContents = DIR_A_NAME + String.join(STRING_NEWLINE, ":", getDirAContents());
+        String listCwdContents = StringUtils.joinStringsByNewline(".:", getCwdContents()) + STRING_NEWLINE;
+        String listDirAContents = DIR_A_NAME + StringUtils.joinStringsByNewline(":", getDirAContents()) + STRING_NEWLINE;
         return Stream.of(
                 // Relative paths
                 Arguments.of(new String[]{"."}, listCwdContents),

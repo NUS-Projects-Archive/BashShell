@@ -154,7 +154,7 @@ public final class LsApplicationHelper {
                 return getContentsFromReadableDirectory(directory);
             } else {
                 // Directory has no read access
-                throw new DirectoryAccessDeniedLsException(getRelativeToCwd(directory).toString());
+                throw new DirectoryAccessDeniedLsException(getRelativeToCwd(directory).toString().isEmpty() ? "." : getRelativeToCwd(directory).toString());
             }
         } else if (Files.isRegularFile(directory)) {
             // Path is a non-folder
@@ -212,7 +212,8 @@ public final class LsApplicationHelper {
     private static Path resolvePath(String directory) throws InvalidDirectoryLsException {
         try {
             Path path;
-            if (directory.charAt(0) == '/' || directory.equals(Environment.currentDirectory)) {
+            if (directory.charAt(0) == '/' || (directory.length() > 2 && directory.charAt(1) == ':') ||
+                    directory.equals(Environment.currentDirectory)) {
                 path = Paths.get(directory).normalize();
             } else {
                 // Construct path relative to current directory
