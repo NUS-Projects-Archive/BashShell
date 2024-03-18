@@ -1,5 +1,13 @@
 package sg.edu.nus.comp.cs4218.impl.app.helper;
 
+import static sg.edu.nus.comp.cs4218.impl.app.GrepApplication.CASE_INSEN_IDENT;
+import static sg.edu.nus.comp.cs4218.impl.app.GrepApplication.CASE_INSEN_IDX;
+import static sg.edu.nus.comp.cs4218.impl.app.GrepApplication.COUNT_IDENT;
+import static sg.edu.nus.comp.cs4218.impl.app.GrepApplication.COUNT_INDEX;
+import static sg.edu.nus.comp.cs4218.impl.app.GrepApplication.GREP_STRING;
+import static sg.edu.nus.comp.cs4218.impl.app.GrepApplication.IS_DIRECTORY;
+import static sg.edu.nus.comp.cs4218.impl.app.GrepApplication.PREFIX_FN;
+import static sg.edu.nus.comp.cs4218.impl.app.GrepApplication.PREFIX_FN_IDX;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_NOT_FOUND;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_INVALID_REGEX;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IO_EXCEPTION;
@@ -23,20 +31,9 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 import sg.edu.nus.comp.cs4218.Environment;
-import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
 import sg.edu.nus.comp.cs4218.exception.GrepException;
 
 public final class GrepApplicationHelper {
-
-    public static final String GREP_STRING = "grep: ";
-    public static final String IS_DIRECTORY = "Is a directory";
-
-    private static final char CASE_INSEN_IDENT = 'i';
-    private static final char COUNT_IDENT = 'c';
-    private static final char PREFIX_FN = 'H';
-    private static final int CASE_INSEN_IDX = 0;
-    private static final int COUNT_INDEX = 1;
-    private static final int PREFIX_FN_IDX = 2;
 
     private GrepApplicationHelper() { /* Does nothing */ }
 
@@ -52,10 +49,9 @@ public final class GrepApplicationHelper {
      */
     public static void grepResultsFromFiles(String pattern, Boolean isCaseInsensitive, StringJoiner lineResults,
                                             StringJoiner countResults, Boolean isPrefixFileName, String... fileNames)
-            throws AbstractApplicationException {
+            throws GrepException {
         boolean isSingleFile = (fileNames.length == 1);
         for (String f : fileNames) {
-            BufferedReader reader = null;
             try {
                 String path = convertToAbsolutePath(f);
                 File file = new File(path);
@@ -78,24 +74,16 @@ public final class GrepApplicationHelper {
                     continue;
                 }
 
-                reader = new BufferedReader(new FileReader(path));
-                grepResults(pattern, isCaseInsensitive, lineResults, countResults, isPrefixFileName, isSingleFile, f,
-                        reader);
-                reader.close();
+                try (BufferedReader bufferedReader = new BufferedReader(new FileReader(path))) {
+                    grepResults(pattern, isCaseInsensitive, lineResults, countResults, isPrefixFileName, isSingleFile,
+                            f, bufferedReader);
+                }
             } catch (PatternSyntaxException pse) {
                 throw new GrepException(ERR_INVALID_REGEX, pse);
             } catch (FileNotFoundException e) {
                 throw new GrepException(ERR_FILE_NOT_FOUND, e);
             } catch (IOException e) {
                 throw new GrepException(ERR_IO_EXCEPTION, e);
-            } finally {
-                if (reader != null) {
-                    try {
-                        reader.close();
-                    } catch (IOException e) {
-                        throw new GrepException(ERR_IO_EXCEPTION, e);
-                    }
-                }
             }
         }
     }
@@ -183,7 +171,8 @@ public final class GrepApplicationHelper {
      * @param inputFiles a ArrayList<String> of file names supplied by user
      * @return regex pattern supplied by user. An empty String if not supplied.
      */
-    public static String getGrepArguments(String[] args, boolean[] grepFlags, ArrayList<String> inputFiles) throws AbstractApplicationException {
+    public static String getGrepArguments(String[] args, boolean[] grepFlags, ArrayList<String> inputFiles)
+            throws GrepException {
         String pattern = null;
         boolean isFile = false; // files can only appear after pattern
 

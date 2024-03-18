@@ -2,6 +2,7 @@ package sg.edu.nus.comp.cs4218.impl.app;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.joinStringsByNewline;
 import static sg.edu.nus.comp.cs4218.testutils.TestStringUtils.STRING_NEWLINE;
 
 import java.io.ByteArrayInputStream;
@@ -27,10 +28,17 @@ public class GrepApplicationPublicIT {
     private static final String TEMP = "temp-grep";
     private static final String COLON_SPACE = ": ";
     private static final String FIRST_LINE = "First line";
+    private static final String SECOND_LINE = "Second line";
+    private static final String THIRD_LINE = "Third line";
     private static final String FOURTH_LINE = "Fourth line";
     private static final String FIFTH_LINE = "Fifth line";
-    private static final byte[] BYTES_A = "First line\nSecond line\nThird line\nFourth line\n".getBytes();
-    private static final byte[] BYTES_B = "Fifth line\nSixth line\nSeventh line\nEighth line\n".getBytes();
+    private static final String SIXTH_LINE = "Sixth line";
+    private static final String SEVENTH_LINE = "Seventh line";
+    private static final String EIGHTH_LINE = "Eighth line";
+    private static final byte[] BYTES_A = (joinStringsByNewline(FIRST_LINE, SECOND_LINE, THIRD_LINE, FOURTH_LINE) +
+            STRING_NEWLINE).getBytes();
+    private static final byte[] BYTES_B = (joinStringsByNewline(FIFTH_LINE, SIXTH_LINE, SEVENTH_LINE, EIGHTH_LINE) +
+            STRING_NEWLINE).getBytes();
 
     private static final Deque<Path> FILES = new ArrayDeque<>();
     private static Path tempPath;

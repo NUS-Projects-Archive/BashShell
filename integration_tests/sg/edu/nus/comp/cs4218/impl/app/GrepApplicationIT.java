@@ -3,9 +3,9 @@ package sg.edu.nus.comp.cs4218.impl.app;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
-import static sg.edu.nus.comp.cs4218.impl.app.GrepApplication.EMPTY_PATTERN;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_EMPTY_PATTERN;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_NOT_FOUND;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_INVALID_REGEX;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_INPUT;
@@ -13,6 +13,7 @@ import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_PERM;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_SYNTAX;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_STDIN_OUTPUT;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.joinStringsByNewline;
 import static sg.edu.nus.comp.cs4218.test.FileUtils.createNewFileInDir;
 import static sg.edu.nus.comp.cs4218.test.FileUtils.deleteFileOrDirectory;
 
@@ -23,6 +24,7 @@ import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.jupiter.api.AfterEach;
@@ -49,7 +51,7 @@ class GrepApplicationIT {
     private static final String GREP_STRING = "grep: ";
     private static final String COLON_SPACE = ": ";
     private static final String DASH = "-";
-    private static final String INPUT_CONTENTS = String.join(STRING_NEWLINE, "aabb", "x", "ab");
+    private static final String INPUT_CONTENTS = joinStringsByNewline("aabb", "x", "ab");
     private static final String[] OUTPUT_CONTENTS = {"aabb", "ab"};
 
     @TempDir
@@ -64,14 +66,14 @@ class GrepApplicationIT {
     private InputStream stdin;
     private OutputStream stdout;
 
-    private List<String> getValidOutputArrWithFileName(String... fileNames) {
+    private String[] getValidOutputArrWithFileName(String... fileNames) {
         List<String> expectedOutputArr = new ArrayList<>();
         for (String name : fileNames) {
             for (String line : OUTPUT_CONTENTS) {
                 expectedOutputArr.add(name + COLON_SPACE + line);
             }
         }
-        return expectedOutputArr;
+        return expectedOutputArr.toArray(new String[0]);
     }
 
     @BeforeEach
@@ -118,7 +120,7 @@ class GrepApplicationIT {
         String result = assertDoesNotThrow(() ->
                 app.grepFromFileAndStdin(VALID_PAT_SMALL, false, false, false, stdin, fileOneName, "-")
         );
-        String expected = String.join(STRING_NEWLINE, getValidOutputArrWithFileName(fileOneName, STRING_STDIN_OUTPUT)) +
+        String expected = joinStringsByNewline(getValidOutputArrWithFileName(fileOneName, STRING_STDIN_OUTPUT)) +
                 STRING_NEWLINE;
         assertEquals(expected, result);
     }
@@ -131,7 +133,7 @@ class GrepApplicationIT {
         String result = assertDoesNotThrow(() ->
                 app.grepFromFileAndStdin(VALID_PAT_BIG, true, false, false, stdin, fileOneName, "-")
         );
-        String expected = String.join(STRING_NEWLINE, getValidOutputArrWithFileName(fileOneName, STRING_STDIN_OUTPUT)) +
+        String expected = joinStringsByNewline(getValidOutputArrWithFileName(fileOneName, STRING_STDIN_OUTPUT)) +
                 STRING_NEWLINE;
         assertEquals(expected, result);
     }
@@ -144,8 +146,7 @@ class GrepApplicationIT {
         String result = assertDoesNotThrow(() ->
                 app.grepFromFileAndStdin(VALID_PAT_BIG, false, true, false, stdin, fileOneName, "-")
         );
-        String expected =
-                String.join(STRING_NEWLINE, fileOneName + ": 0", STRING_STDIN_OUTPUT + ": 0") + STRING_NEWLINE;
+        String expected = joinStringsByNewline(fileOneName + ": 0", STRING_STDIN_OUTPUT + ": 0") + STRING_NEWLINE;
         assertEquals(expected, result);
     }
 
@@ -157,7 +158,7 @@ class GrepApplicationIT {
         String result = assertDoesNotThrow(() ->
                 app.grepFromFileAndStdin(VALID_PAT_SMALL, false, false, true, stdin, fileOneName, "-")
         );
-        String expected = String.join(STRING_NEWLINE, getValidOutputArrWithFileName(fileOneName, STRING_STDIN_OUTPUT)) +
+        String expected = joinStringsByNewline(getValidOutputArrWithFileName(fileOneName, STRING_STDIN_OUTPUT)) +
                 STRING_NEWLINE;
         assertEquals(expected, result);
     }
@@ -170,7 +171,7 @@ class GrepApplicationIT {
         String result = assertDoesNotThrow(() ->
                 app.grepFromFileAndStdin(VALID_PAT_SMALL, true, true, true, stdin, fileOneName)
         );
-        String expected = String.join(STRING_NEWLINE, fileOneName + ": 2") + STRING_NEWLINE;
+        String expected = joinStringsByNewline(fileOneName + ": 2") + STRING_NEWLINE;
         assertEquals(expected, result);
     }
 
@@ -201,7 +202,7 @@ class GrepApplicationIT {
             );
 
             // Then
-            assertEquals(GREP_STRING + EMPTY_PATTERN, result.getMessage());
+            assertEquals(GREP_STRING + ERR_EMPTY_PATTERN, result.getMessage());
         }
 
         /**
@@ -236,7 +237,7 @@ class GrepApplicationIT {
             assertDoesNotThrow(() -> app.run(args, stdin, stdout));
 
             // Then
-            String expected = String.join(STRING_NEWLINE, OUTPUT_CONTENTS) + STRING_NEWLINE;
+            String expected = joinStringsByNewline(OUTPUT_CONTENTS) + STRING_NEWLINE;
             assertEquals(expected, stdout.toString());
         }
 
@@ -249,7 +250,7 @@ class GrepApplicationIT {
             assertDoesNotThrow(() -> app.run(args, stdin, stdout));
 
             // Then
-            String expected = String.join(STRING_NEWLINE, OUTPUT_CONTENTS) + STRING_NEWLINE;
+            String expected = joinStringsByNewline(OUTPUT_CONTENTS) + STRING_NEWLINE;
             assertEquals(expected, stdout.toString());
         }
 
@@ -275,8 +276,7 @@ class GrepApplicationIT {
             assertDoesNotThrow(() -> app.run(args, stdin, stdout));
 
             // Then
-            String expected = String.join(STRING_NEWLINE, getValidOutputArrWithFileName(STRING_STDIN_OUTPUT)) +
-                    STRING_NEWLINE;
+            String expected = joinStringsByNewline(getValidOutputArrWithFileName(STRING_STDIN_OUTPUT)) + STRING_NEWLINE;
             assertEquals(expected, stdout.toString());
         }
 
@@ -302,8 +302,7 @@ class GrepApplicationIT {
             assertDoesNotThrow(() -> app.run(args, stdin, stdout));
 
             // Then
-            String expected = String.join(STRING_NEWLINE, getValidOutputArrWithFileName(STRING_STDIN_OUTPUT)) +
-                    STRING_NEWLINE;
+            String expected = joinStringsByNewline(getValidOutputArrWithFileName(STRING_STDIN_OUTPUT)) + STRING_NEWLINE;
             assertEquals(expected, stdout.toString());
         }
 
@@ -335,7 +334,7 @@ class GrepApplicationIT {
             assertDoesNotThrow(() -> app.run(args, mock(InputStream.class), stdout));
 
             // Then
-            String expected = String.join(STRING_NEWLINE, OUTPUT_CONTENTS) + STRING_NEWLINE;
+            String expected = joinStringsByNewline(OUTPUT_CONTENTS) + STRING_NEWLINE;
             assertEquals(expected, stdout.toString());
         }
 
@@ -348,7 +347,7 @@ class GrepApplicationIT {
             assertDoesNotThrow(() -> app.run(args, mock(InputStream.class), stdout));
 
             // Then
-            String expected = String.join(STRING_NEWLINE, OUTPUT_CONTENTS) + STRING_NEWLINE;
+            String expected = joinStringsByNewline(OUTPUT_CONTENTS) + STRING_NEWLINE;
             assertEquals(expected, stdout.toString());
         }
 
@@ -361,11 +360,9 @@ class GrepApplicationIT {
             assertDoesNotThrow(() -> app.run(args, stdin, stdout));
 
             // Then
-            String expected = String.join(STRING_NEWLINE, OUTPUT_CONTENTS) + STRING_NEWLINE;
+            String expected = joinStringsByNewline(OUTPUT_CONTENTS) + STRING_NEWLINE;
             assertEquals(expected, stdout.toString());
         }
-
-        // TODO: Test involving multiple dashes
 
         @Test
         void run_GetInputFromMultipleValidFilesAndDash_ReturnsMatchingLinesFromFilesAndStdin() {
@@ -376,9 +373,8 @@ class GrepApplicationIT {
             assertDoesNotThrow(() -> app.run(args, stdin, stdout));
 
             // Then
-            String expected = String.join(STRING_NEWLINE,
-                    getValidOutputArrWithFileName(fileOneAbsPath, STRING_STDIN_OUTPUT, fileTwoAbsPath)) +
-                    STRING_NEWLINE;
+            String expected = joinStringsByNewline(getValidOutputArrWithFileName(fileOneAbsPath, STRING_STDIN_OUTPUT,
+                    fileTwoAbsPath)) + STRING_NEWLINE;
             assertEquals(expected, stdout.toString());
         }
 
@@ -387,9 +383,10 @@ class GrepApplicationIT {
             // Given
             String invalidFileName = "invalidFile";
             String[] args = new String[]{VALID_PAT_SMALL, fileOneName, DASH, invalidFileName};
-            List<String> expectedOutputArr = getValidOutputArrWithFileName(fileOneName, STRING_STDIN_OUTPUT);
-            expectedOutputArr.add(GREP_STRING + invalidFileName + COLON_SPACE + ERR_FILE_NOT_FOUND);
-            String expected = String.join(STRING_NEWLINE, expectedOutputArr) + STRING_NEWLINE;
+            String[] validExpected = getValidOutputArrWithFileName(fileOneName, STRING_STDIN_OUTPUT);
+            String[] expectedArray = Arrays.copyOf(validExpected, validExpected.length + 1);
+            expectedArray[validExpected.length] = GREP_STRING + invalidFileName + COLON_SPACE + ERR_FILE_NOT_FOUND;
+            String expected = joinStringsByNewline(expectedArray) + STRING_NEWLINE;
 
             // When
             assertDoesNotThrow(() -> app.run(args, stdin, stdout));
@@ -420,35 +417,23 @@ class GrepApplicationIT {
         @DisabledOnOs(OS.WINDOWS)
         void run_GetInputFromFileWithNoReadPermission_ReturnsPermDeniedErr() {
             // Given
-            Path file = createNewFileInDir(tempDir, "noReadPermTempFile", INPUT_CONTENTS);
-            boolean isSetReadable = file.toFile().setReadable(false);
-
-            if (!isSetReadable) {
-                fail("Unable to set file to not readable");
-                deleteFileOrDirectory(file);
-                return;
-            }
-
-            String fileAbsPath = file.toString();
-            String[] args = new String[]{VALID_PAT_SMALL, fileAbsPath};
-
-            String expected = GREP_STRING + fileAbsPath + COLON_SPACE + ERR_NO_PERM + STRING_NEWLINE;
+            String[] args = new String[]{VALID_PAT_SMALL, fileOneAbsPath};
+            String expected = GREP_STRING + fileOneAbsPath + COLON_SPACE + ERR_NO_PERM + STRING_NEWLINE;
+            boolean isSetReadable = fileOne.toFile().setReadable(false);
+            assertTrue(isSetReadable, "Unable to set file to not readable");
 
             // When
             assertDoesNotThrow(() -> app.run(args, mock(InputStream.class), stdout));
 
             // Then
             assertEquals(expected, stdout.toString());
-
-            // Clean up
-            deleteFileOrDirectory(file);
         }
 
         @Test
         void run_GetInputFromValidFileWithIFlag_ReturnsCaseInsensitiveMatchingLinesFromFile() {
             // Given
             String[] args = new String[]{FLAG_I, VALID_PAT_SMALL, fileOneName};
-            String expected = String.join(STRING_NEWLINE, OUTPUT_CONTENTS) + STRING_NEWLINE;
+            String expected = joinStringsByNewline(OUTPUT_CONTENTS) + STRING_NEWLINE;
 
             // When
             assertDoesNotThrow(() -> app.run(args, mock(InputStream.class), stdout));
@@ -474,7 +459,7 @@ class GrepApplicationIT {
         void run_GetInputFromValidFileWithHFlag_ReturnsFileNameWithMatchingLinesFromFile() {
             // Given
             String[] args = new String[]{FLAG_H, VALID_PAT_SMALL, fileOneName};
-            String expected = String.join(STRING_NEWLINE, getValidOutputArrWithFileName(fileOneName)) + STRING_NEWLINE;
+            String expected = joinStringsByNewline(getValidOutputArrWithFileName(fileOneName)) + STRING_NEWLINE;
 
             // When
             assertDoesNotThrow(() -> app.run(args, mock(InputStream.class), stdout));
@@ -500,7 +485,7 @@ class GrepApplicationIT {
         void run_GetInputFromValidFileWithIFlagHFlag_ReturnsCaseInsensitiveFileNameWithMatchingLinesFromFile() {
             // Given
             String[] args = new String[]{FLAG_I, FLAG_H, VALID_PAT_BIG, fileOneName};
-            String expected = String.join(STRING_NEWLINE, getValidOutputArrWithFileName(fileOneName)) + STRING_NEWLINE;
+            String expected = joinStringsByNewline(getValidOutputArrWithFileName(fileOneName)) + STRING_NEWLINE;
 
             // When
             assertDoesNotThrow(() -> app.run(args, mock(InputStream.class), stdout));

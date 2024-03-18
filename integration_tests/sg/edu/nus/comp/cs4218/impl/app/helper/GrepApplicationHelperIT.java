@@ -2,11 +2,11 @@ package sg.edu.nus.comp.cs4218.impl.app.helper;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static sg.edu.nus.comp.cs4218.impl.app.helper.GrepApplicationHelper.IS_DIRECTORY;
+import static sg.edu.nus.comp.cs4218.impl.app.GrepApplication.IS_DIRECTORY;
 import static sg.edu.nus.comp.cs4218.impl.app.helper.GrepApplicationHelper.grepResultsFromFiles;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_NOT_FOUND;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_PERM;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.joinStringsByNewline;
 import static sg.edu.nus.comp.cs4218.test.FileUtils.createNewFileInDir;
 import static sg.edu.nus.comp.cs4218.test.FileUtils.deleteFileOrDirectory;
 
@@ -28,7 +28,7 @@ class GrepApplicationHelperIT {
     private static final String VALID_PAT_SMALL = "ab";
     private static final String VALID_PAT_BIG = "AB";
     private static final String GREP_STRING = "grep: ";
-    private static final String INPUT_CONTENTS = String.join(STRING_NEWLINE, "aabb", "x", "ab");
+    private static final String INPUT_CONTENTS = joinStringsByNewline("aabb", "x", "ab");
     private static final String[] OUTPUT_CONTENTS = {"aabb", "ab"};
     private static final String NON_EXISTENT_FILE = "nonExistentFile";
 

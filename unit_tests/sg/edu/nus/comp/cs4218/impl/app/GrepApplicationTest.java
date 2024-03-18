@@ -3,9 +3,10 @@ package sg.edu.nus.comp.cs4218.impl.app;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
-import static sg.edu.nus.comp.cs4218.impl.app.GrepApplication.NULL_POINTER;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_INVALID_REGEX;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NULL_STREAMS;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.joinStringsByNewline;
 import static sg.edu.nus.comp.cs4218.test.FileUtils.createNewFile;
 import static sg.edu.nus.comp.cs4218.test.FileUtils.createNewFileInDir;
 import static sg.edu.nus.comp.cs4218.test.FileUtils.deleteFileOrDirectory;
@@ -122,9 +123,8 @@ class GrepApplicationTest {
         String result = assertDoesNotThrow(() ->
                 app.grepFromFiles(PATTERN_SMALL_E, false, false, false, fileAbsPath, secFileAbsPath)
         );
-        String expected = String.join(STRING_NEWLINE,
-                fileAbsPath + SEMICOLON_SPACE + FILE_CONTENTS,
-                secFileAbsPath + SEMICOLON_SPACE + secFileContents) + STRING_NEWLINE;
+        String expected = joinStringsByNewline(fileAbsPath + SEMICOLON_SPACE + FILE_CONTENTS, secFileAbsPath +
+                SEMICOLON_SPACE + secFileContents) + STRING_NEWLINE;
         assertEquals(expected, result);
 
         deleteFileOrDirectory(secFile);
@@ -138,7 +138,7 @@ class GrepApplicationTest {
         GrepException result = assertThrowsExactly(GrepException.class, () ->
                 app.grepFromFiles("", false, false, false, null)
         );
-        String expected = "grep: " + NULL_POINTER;
+        String expected = GREP_STRING + ERR_NULL_STREAMS;
         assertEquals(expected, result.getMessage());
     }
 
@@ -150,7 +150,7 @@ class GrepApplicationTest {
         GrepException result = assertThrowsExactly(GrepException.class, () ->
                 app.grepFromStdin("*", false, false, false, stdin)
         );
-        String expected = "grep: " + ERR_INVALID_REGEX;
+        String expected = GREP_STRING + ERR_INVALID_REGEX;
         assertEquals(expected, result.getMessage());
     }
 
@@ -175,7 +175,7 @@ class GrepApplicationTest {
         String result = assertDoesNotThrow(() ->
                 app.grepFromStdin(PATTERN_SMALL_E, true, false, false, stdin)
         );
-        String expected = String.join(STRING_NEWLINE, STDIN_CONTENTS) + STRING_NEWLINE;
+        String expected = joinStringsByNewline(STDIN_CONTENTS) + STRING_NEWLINE;
         assertEquals(expected, result);
     }
 

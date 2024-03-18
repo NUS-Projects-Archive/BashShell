@@ -2,10 +2,12 @@ package sg.edu.nus.comp.cs4218.impl.app;
 
 import static sg.edu.nus.comp.cs4218.impl.app.helper.GrepApplicationHelper.getGrepArguments;
 import static sg.edu.nus.comp.cs4218.impl.app.helper.GrepApplicationHelper.grepResultsFromFiles;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_EMPTY_PATTERN;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_NOT_FOUND;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_INVALID_REGEX;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IO_EXCEPTION;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_INPUT;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NULL_STREAMS;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_SYNTAX;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_STDIN_OUTPUT;
@@ -22,27 +24,30 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 import sg.edu.nus.comp.cs4218.app.GrepInterface;
-import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
 import sg.edu.nus.comp.cs4218.exception.GrepException;
 
 public class GrepApplication implements GrepInterface {
 
-    public static final String EMPTY_PATTERN = "Pattern should not be empty.";
-    public static final String NULL_POINTER = "Null Pointer Exception";
+    public static final String GREP_STRING = "grep: ";
+    public static final String IS_DIRECTORY = "Is a directory";
 
+    public static final char CASE_INSEN_IDENT = 'i';
+    public static final char COUNT_IDENT = 'c';
+    public static final char PREFIX_FN = 'H';
     private static final int NUM_ARGUMENTS = 3;
-    private static final int CASE_INSEN_IDX = 0;
-    private static final int COUNT_INDEX = 1;
-    private static final int PREFIX_FN_IDX = 2;
+    public static final int CASE_INSEN_IDX = 0;
+    public static final int COUNT_INDEX = 1;
+    public static final int PREFIX_FN_IDX = 2;
 
     @Override
-    public String grepFromFiles(String pattern, Boolean isCaseInsensitive, Boolean isCountLines, Boolean isPrefixFileName, String... fileNames) throws AbstractApplicationException {
+    public String grepFromFiles(String pattern, Boolean isCaseInsensitive, Boolean isCountLines,
+                                Boolean isPrefixFileName, String... fileNames) throws GrepException {
         if (fileNames == null || pattern == null) {
-            throw new GrepException(NULL_POINTER);
+            throw new GrepException(ERR_NULL_STREAMS);
         }
 
         if (pattern.isEmpty()) {
-            throw new GrepException(EMPTY_PATTERN);
+            throw new GrepException(ERR_EMPTY_PATTERN);
         }
 
         StringJoiner lineResults = new StringJoiner(STRING_NEWLINE);
@@ -62,9 +67,10 @@ public class GrepApplication implements GrepInterface {
     }
 
     @Override
-    public String grepFromStdin(String pattern, Boolean isCaseInsensitive, Boolean isCountLines, Boolean isPrefixFileName, InputStream stdin) throws AbstractApplicationException {
+    public String grepFromStdin(String pattern, Boolean isCaseInsensitive, Boolean isCountLines,
+                                Boolean isPrefixFileName, InputStream stdin) throws GrepException {
         if (pattern.isEmpty()) {
-            throw new GrepException(EMPTY_PATTERN);
+            throw new GrepException(ERR_EMPTY_PATTERN);
         }
 
         int count = 0;
@@ -114,7 +120,7 @@ public class GrepApplication implements GrepInterface {
     }
 
     @Override
-    public void run(String[] args, InputStream stdin, OutputStream stdout) throws AbstractApplicationException {
+    public void run(String[] args, InputStream stdin, OutputStream stdout) throws GrepException {
         try {
             boolean[] grepFlags = new boolean[NUM_ARGUMENTS];
             ArrayList<String> inputFiles = new ArrayList<>();
@@ -129,14 +135,16 @@ public class GrepApplication implements GrepInterface {
             }
 
             if (pattern.isEmpty()) {
-                throw new Exception(EMPTY_PATTERN);
+                throw new Exception(ERR_EMPTY_PATTERN);
             } else {
                 if (inputFiles.isEmpty()) {
-                    result = grepFromStdin(pattern, grepFlags[CASE_INSEN_IDX], grepFlags[COUNT_INDEX], grepFlags[PREFIX_FN_IDX], stdin);
+                    result = grepFromStdin(pattern, grepFlags[CASE_INSEN_IDX], grepFlags[COUNT_INDEX],
+                            grepFlags[PREFIX_FN_IDX], stdin);
                 } else {
                     String[] inputFilesArray = new String[inputFiles.size()];
                     inputFilesArray = inputFiles.toArray(inputFilesArray);
-                    result = grepFromFileAndStdin(pattern, grepFlags[CASE_INSEN_IDX], grepFlags[COUNT_INDEX], grepFlags[PREFIX_FN_IDX], stdin, inputFilesArray);
+                    result = grepFromFileAndStdin(pattern, grepFlags[CASE_INSEN_IDX], grepFlags[COUNT_INDEX],
+                            grepFlags[PREFIX_FN_IDX], stdin, inputFilesArray);
                 }
             }
             stdout.write(result.getBytes());
@@ -148,9 +156,11 @@ public class GrepApplication implements GrepInterface {
     }
 
     @Override
-    public String grepFromFileAndStdin(String pattern, Boolean isCaseInsensitive, Boolean isCountLines, Boolean isPrefixFileName, InputStream stdin, String... fileNames) throws AbstractApplicationException {
+    public String grepFromFileAndStdin(String pattern, Boolean isCaseInsensitive, Boolean isCountLines,
+                                       Boolean isPrefixFileName, InputStream stdin, String... fileNames)
+            throws GrepException {
         if (pattern.isEmpty()) {
-            throw new GrepException(EMPTY_PATTERN);
+            throw new GrepException(ERR_EMPTY_PATTERN);
         }
 
         StringBuilder result = new StringBuilder();
