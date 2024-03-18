@@ -15,7 +15,7 @@ import sg.edu.nus.comp.cs4218.Environment;
 import sg.edu.nus.comp.cs4218.exception.TeeException;
 
 public final class TeeApplicationHelper {
-    
+
     private TeeApplicationHelper() { /* Does nothing*/ }
 
     /**

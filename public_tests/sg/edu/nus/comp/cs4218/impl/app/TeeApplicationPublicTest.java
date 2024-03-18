@@ -33,6 +33,11 @@ public class TeeApplicationPublicTest {
 
     private TeeApplication teeApplication;
 
+    @BeforeAll
+    static void setUpAll() throws NoSuchFieldException, IllegalAccessException {
+        initialDir = TestEnvironmentUtil.getCurrentDirectory();
+    }
+
     private InputStream mockInputStream(String input) {
         return new ByteArrayInputStream(input.getBytes());
     }
@@ -55,11 +60,6 @@ public class TeeApplicationPublicTest {
         } catch (Exception e) {
             fail();
         }
-    }
-
-    @BeforeAll
-    static void setUpAll() throws NoSuchFieldException, IllegalAccessException {
-        initialDir = TestEnvironmentUtil.getCurrentDirectory();
     }
 
     @BeforeEach

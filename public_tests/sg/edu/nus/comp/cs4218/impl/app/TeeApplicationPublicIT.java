@@ -16,7 +16,6 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import org.junit.jupiter.api.AfterAll;
@@ -30,20 +29,23 @@ import sg.edu.nus.comp.cs4218.testutils.TestEnvironmentUtil;
 
 @SuppressWarnings("PMD.ClassNamingConventions")
 class TeeApplicationPublicIT {
-    @TempDir
-    static File tempDir;
-
-    private static TeeApplication teeApplication;
-    private static InputStream stdin;
-    private static OutputStream stdout;
-    private static PrintStream standardOut;
-
     private static final String STDIN_STRING = "Hello world!" + STRING_NEWLINE
             + "Welcome to CS4218!" + STRING_NEWLINE;
     private static final String EXISTING_FILE = "existing.txt";
     private static final String EXISTING_FILE_2 = "existing2.txt";
     private static final String NON_EXIST_FILE = "nonExistent.txt";
     private static final String NON_EXIST_FILE2 = "nonExistent2.txt";
+    @TempDir
+    static File tempDir;
+    private static TeeApplication teeApplication;
+    private static InputStream stdin;
+    private static OutputStream stdout;
+    private static PrintStream standardOut;
+
+    @AfterAll
+    static void tearDownAll() throws NoSuchFieldException, IllegalAccessException {
+        TestEnvironmentUtil.setCurrentDirectory(System.getProperty("user.dir"));
+    }
 
     @BeforeEach
     void setUp() throws IOException, NoSuchFieldException, IllegalAccessException {
@@ -77,11 +79,6 @@ class TeeApplicationPublicIT {
         for (File file : tempDir.listFiles()) {
             file.delete();
         }
-    }
-
-    @AfterAll
-    static void tearDownAll() throws NoSuchFieldException, IllegalAccessException {
-        TestEnvironmentUtil.setCurrentDirectory(System.getProperty("user.dir"));
     }
 
     // tee with single file: write to stdout and file
