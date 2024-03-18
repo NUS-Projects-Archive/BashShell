@@ -135,4 +135,14 @@ public final class StringUtils {
     public static String joinStringsByNewline(String... strings) {
         return String.join(STRING_NEWLINE, strings);
     }
+
+    /**
+     * Joins an array of strings into a single string with each element separated by a tab character.
+     *
+     * @param strings the strings to be joined
+     * @return a string containing all the input strings joined by tab characters
+     */
+    public static String joinStringsByTab(String... strings) {
+        return String.join(STRING_TAB, strings);
+    }
 }

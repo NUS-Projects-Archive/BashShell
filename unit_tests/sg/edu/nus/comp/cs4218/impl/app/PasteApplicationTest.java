@@ -3,26 +3,23 @@ package sg.edu.nus.comp.cs4218.impl.app;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_TAB;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.joinStringsByNewline;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.joinStringsByTab;
 import static sg.edu.nus.comp.cs4218.test.FileUtils.createNewFile;
 import static sg.edu.nus.comp.cs4218.testutils.TestStringUtils.STRING_NEWLINE;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir;
 
 import sg.edu.nus.comp.cs4218.exception.PasteException;
 import sg.edu.nus.comp.cs4218.exception.ShellException;
 import sg.edu.nus.comp.cs4218.impl.util.IOUtils;
-import sg.edu.nus.comp.cs4218.impl.util.StringUtils;
 
 public class PasteApplicationTest {
 
@@ -30,16 +27,9 @@ public class PasteApplicationTest {
     private static final String FILE_B = "B.txt";
     private static final String NON_EXISTENT_FILE = "NonExistentFile.txt";
     private static final String STDIN = "-";
-    private static final String FILE_CONTENT_A = "A" +
-            STRING_NEWLINE + "B" +
-            STRING_NEWLINE + "C" +
-            STRING_NEWLINE + "D" +
-            STRING_NEWLINE + "E";
-    private static final String FILE_CONTENT_B = "1" +
-            STRING_NEWLINE + "2" +
-            STRING_NEWLINE + "3" +
-            STRING_NEWLINE + "4" +
-            STRING_NEWLINE + "5";
+    private static final String FILE_CONTENT_A = joinStringsByNewline("A", "B", "C", "D", "E");
+    private static final String FILE_CONTENT_B = joinStringsByNewline("1", "2", "3", "4", "5");
+
     private PasteApplication app;
     private String fileA;
     private String fileB;
@@ -57,11 +47,7 @@ public class PasteApplicationTest {
             InputStream inputStream = IOUtils.openInputStream(fileA);
             return app.mergeStdin(false, inputStream);
         });
-        String expected = "A" +
-                STRING_NEWLINE + "B" +
-                STRING_NEWLINE + "C" +
-                STRING_NEWLINE + "D" +
-                STRING_NEWLINE + "E";
+        String expected = joinStringsByNewline("A", "B", "C", "D", "E");
         assertEquals(expected, result);
     }
 
@@ -71,11 +57,7 @@ public class PasteApplicationTest {
             InputStream inputStream = IOUtils.openInputStream(fileA);
             return app.mergeStdin(true, inputStream);
         });
-        String expected = "A" +
-                StringUtils.STRING_TAB + "B" +
-                StringUtils.STRING_TAB + "C" +
-                StringUtils.STRING_TAB + "D" +
-                StringUtils.STRING_TAB + "E";
+        String expected = joinStringsByTab("A", "B", "C", "D", "E");
         assertEquals(expected, result);
     }
 
@@ -87,23 +69,19 @@ public class PasteApplicationTest {
     @Test
     void mergeFile_FilesWithoutFlag_MergesFilesInParallel() {
         String result = assertDoesNotThrow(() -> app.mergeFile(false, fileA, fileB));
-        String expected = "A" + StringUtils.STRING_TAB + "1" + StringUtils.STRING_NEWLINE +
-                "B" + StringUtils.STRING_TAB + "2" + StringUtils.STRING_NEWLINE +
-                "C" + StringUtils.STRING_TAB + "3" + StringUtils.STRING_NEWLINE +
-                "D" + StringUtils.STRING_TAB + "4" + StringUtils.STRING_NEWLINE +
-                "E" + StringUtils.STRING_TAB + "5";
+        String expected = "A" + STRING_TAB + "1" + STRING_NEWLINE +
+                "B" + STRING_TAB + "2" + STRING_NEWLINE +
+                "C" + STRING_TAB + "3" + STRING_NEWLINE +
+                "D" + STRING_TAB + "4" + STRING_NEWLINE +
+                "E" + STRING_TAB + "5";
         assertEquals(expected, result);
     }
 
     @Test
     void mergeFile_FilesWithFlag_MergesFilesInSerial() {
         String result = assertDoesNotThrow(() -> app.mergeFile(true, fileA, fileB));
-        String expected = "A" + StringUtils.STRING_TAB + "B" + StringUtils.STRING_TAB +
-                "C" + StringUtils.STRING_TAB + "D" + StringUtils.STRING_TAB +
-                "E" + StringUtils.STRING_NEWLINE +
-                "1" + StringUtils.STRING_TAB + "2" + StringUtils.STRING_TAB +
-                "3" + StringUtils.STRING_TAB + "4" + StringUtils.STRING_TAB +
-                "5";
+        String expected = joinStringsByTab("A", "B", "C", "D", "E") + STRING_NEWLINE +
+                joinStringsByTab("1", "2", "3", "4", "5");
         assertEquals(expected, result);
     }
 
@@ -118,12 +96,12 @@ public class PasteApplicationTest {
             InputStream inputStream = IOUtils.openInputStream(fileA);
             return app.mergeFileAndStdin(false, inputStream, STDIN, fileB, STDIN);
         });
-        String expected = "A" + StringUtils.STRING_TAB + "1" + StringUtils.STRING_TAB + "B" +
-                StringUtils.STRING_NEWLINE + "C" + StringUtils.STRING_TAB + "2" + StringUtils.STRING_TAB + "D" +
-                StringUtils.STRING_NEWLINE + "E" + StringUtils.STRING_TAB + "3" +
-                StringUtils.STRING_TAB + StringUtils.STRING_NEWLINE + StringUtils.STRING_TAB + "4" +
-                StringUtils.STRING_TAB + StringUtils.STRING_NEWLINE + StringUtils.STRING_TAB + "5" +
-                StringUtils.STRING_TAB;
+        String expected = "A" + STRING_TAB + "1" + STRING_TAB + "B" +
+                STRING_NEWLINE + "C" + STRING_TAB + "2" + STRING_TAB + "D" +
+                STRING_NEWLINE + "E" + STRING_TAB + "3" +
+                STRING_TAB + STRING_NEWLINE + STRING_TAB + "4" +
+                STRING_TAB + STRING_NEWLINE + STRING_TAB + "5" +
+                STRING_TAB;
         assertEquals(expected, result);
     }
 
@@ -133,11 +111,8 @@ public class PasteApplicationTest {
             InputStream inputStream = IOUtils.openInputStream(fileA);
             return app.mergeFileAndStdin(true, inputStream, STDIN, fileB, STDIN);
         });
-        String expected = "A" + StringUtils.STRING_TAB + "B" +
-                StringUtils.STRING_TAB + "C" + StringUtils.STRING_TAB + "D" +
-                StringUtils.STRING_TAB + "E" + StringUtils.STRING_NEWLINE + "1" +
-                StringUtils.STRING_TAB + "2" + StringUtils.STRING_TAB + "3" +
-                StringUtils.STRING_TAB + "4" + StringUtils.STRING_TAB + "5";
+        String expected = joinStringsByTab("A", "B", "C", "D", "E") + STRING_NEWLINE +
+                joinStringsByTab("1", "2", "3", "4", "5");
         assertEquals(expected, result);
     }
 
@@ -169,5 +144,4 @@ public class PasteApplicationTest {
         String actual = app.mergeInParallel(arg);
         System.out.println(actual);
     }
-
 }

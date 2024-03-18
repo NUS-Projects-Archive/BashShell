@@ -131,7 +131,8 @@ public class PasteApplication implements PasteInterface {
                 throw new PasteException(String.format("'%s': %s", node.getName(), ERR_FILE_NOT_FOUND));
             }
             if (node.isDirectory()) {
-                throw new PasteException(String.format("'%s': %s", node.getName(), ERR_IS_DIR));
+                // throw new PasteException(String.format("'%s': %s", node.getName(), ERR_IS_DIR));
+                continue;
             }
             if (!node.canRead()) {
                 throw new PasteException(String.format("'%s': %s", node.getName(), ERR_READING_FILE));
@@ -158,6 +159,13 @@ public class PasteApplication implements PasteInterface {
      */
     @Override
     public String mergeFileAndStdin(Boolean isSerial, InputStream stdin, String... fileName) throws PasteException {
+        if (stdin == null) {
+            throw new PasteException(ERR_NULL_STREAMS);
+        }
+        if (fileName == null || fileName.length == 0) {
+            throw new PasteException(ERR_NULL_ARGS);
+        }
+
         List<String> output = new ArrayList<>();
         for (String file : fileName) {
             if ("-".equals(file)) {
@@ -182,7 +190,7 @@ public class PasteApplication implements PasteInterface {
      *
      * @param listOfFiles List of Lists of Strings representing the data from multiple files to be merged
      * @return Merged data as a single String where columns within a row are separated by a
-     *         tab character ('\t') and rows are separated by a newline character ('\n')
+     * tab character ('\t') and rows are separated by a newline character ('\n')
      */
     public String mergeInSerial(List<List<String>> listOfFiles) {
         List<String> mergedLines = new ArrayList<>();

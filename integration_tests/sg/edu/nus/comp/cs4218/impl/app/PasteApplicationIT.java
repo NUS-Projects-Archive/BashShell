@@ -5,162 +5,133 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_ISTREAM;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NULL_STREAMS;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_TAB;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.joinStringsByNewline;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.joinStringsByTab;
+import static sg.edu.nus.comp.cs4218.test.FileUtils.createNewFile;
+import static sg.edu.nus.comp.cs4218.testutils.TestStringUtils.STRING_NEWLINE;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.Arrays;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir;
 
 import sg.edu.nus.comp.cs4218.exception.PasteException;
 import sg.edu.nus.comp.cs4218.impl.util.IOUtils;
-import sg.edu.nus.comp.cs4218.impl.util.StringUtils;
 
 @SuppressWarnings("PMD.ClassNamingConventions")
 public class PasteApplicationIT {
 
-    private static final String FILE_NAME_A = "A.txt";
-    private static final String FILE_NAME_B = "B.txt";
-    private static final String PASTE_EX_MSG = "paste: ";
+    private static final String FILE_A = "A.txt";
+    private static final String FILE_B = "B.txt";
+    private static final String FILE_CONTENT_A = joinStringsByNewline("A", "B", "C", "D", "E");
+    private static final String FILE_CONTENT_B = joinStringsByNewline("1", "2", "3", "4", "5");
     private static final String STDIN = "-";
-    private PasteApplication app;
-    private ByteArrayOutputStream outputStream;
+    private static final String PASTE_EX_MSG = "paste: ";
 
-    @TempDir
-    private Path pasteTestDir;
-    private String filePathA;
-    private String filePathB;
+    private PasteApplication app;
+    private ByteArrayOutputStream output;
+    private String fileA;
+    private String fileB;
 
     @BeforeEach
     void setUp() throws IOException {
         app = new PasteApplication();
-        outputStream = new ByteArrayOutputStream();
-
-        Path pathA = pasteTestDir.resolve(FILE_NAME_A);
-        Path pathB = pasteTestDir.resolve(FILE_NAME_B);
-
-        filePathA = pathA.toString();
-        filePathB = pathB.toString();
-
-        String contentFileA = "A\nB\nC\nD\nE";
-        Files.write(pathA, Arrays.asList(contentFileA.split("\n")));
-
-        String contentFileB = "1\n2\n3\n4\n5";
-        Files.write(pathB, Arrays.asList(contentFileB.split("\n")));
+        output = new ByteArrayOutputStream();
+        fileA = createNewFile(FILE_A, FILE_CONTENT_A).toString();
+        fileB = createNewFile(FILE_B, FILE_CONTENT_B).toString();
     }
 
     @Test
     void run_NullStdin_ThrowsPasteException() {
-        PasteException result = assertThrowsExactly(PasteException.class, () -> app.run(new String[]{filePathA}, null, System.out));
+        PasteException result = assertThrowsExactly(PasteException.class, () -> app.run(new String[]{fileA}, null, System.out));
         assertEquals(PASTE_EX_MSG + ERR_NO_ISTREAM, result.getMessage());
     }
 
     @Test
     void run_NullStdout_ThrowsPasteException() {
-        PasteException result = assertThrowsExactly(PasteException.class, () -> app.run(new String[]{filePathA}, System.in, null));
+        PasteException result = assertThrowsExactly(PasteException.class, () -> app.run(new String[]{fileA}, System.in, null));
         assertEquals(PASTE_EX_MSG + ERR_NULL_STREAMS, result.getMessage());
     }
 
     @Test
     void run_NoFlagsAndOneFile_PrintsFileInParallel() {
-        assertDoesNotThrow(() -> app.run(new String[]{filePathA}, System.in, outputStream));
-        String expected = "A" + StringUtils.STRING_NEWLINE + "B" +
-                StringUtils.STRING_NEWLINE + "C" +
-                StringUtils.STRING_NEWLINE + "D" +
-                StringUtils.STRING_NEWLINE + "E" + StringUtils.STRING_NEWLINE;
-        assertEquals(expected, outputStream.toString());
+        assertDoesNotThrow(() -> app.run(new String[]{fileA}, System.in, output));
+        String expected = joinStringsByNewline("A", "B", "C", "D", "E") + STRING_NEWLINE;
+        assertEquals(expected, output.toString());
     }
 
     @Test
     void run_NoFlagsAndMultipleFiles_PrintsFilesInParallel() {
-        assertDoesNotThrow(() -> app.run(new String[]{filePathA, filePathB}, System.in, outputStream));
-        String expected = "A" + StringUtils.STRING_TAB + "1" +
-                StringUtils.STRING_NEWLINE + "B" + StringUtils.STRING_TAB + "2" +
-                StringUtils.STRING_NEWLINE + "C" + StringUtils.STRING_TAB + "3" +
-                StringUtils.STRING_NEWLINE + "D" + StringUtils.STRING_TAB + "4" +
-                StringUtils.STRING_NEWLINE + "E" + StringUtils.STRING_TAB + "5" + StringUtils.STRING_NEWLINE;
-        assertEquals(expected, outputStream.toString());
+        assertDoesNotThrow(() -> app.run(new String[]{fileA, fileB}, System.in, output));
+        String expected = "A" + STRING_TAB + "1" + STRING_NEWLINE +
+                "B" + STRING_TAB + "2" + STRING_NEWLINE +
+                "C" + STRING_TAB + "3" + STRING_NEWLINE +
+                "D" + STRING_TAB + "4" + STRING_NEWLINE +
+                "E" + STRING_TAB + "5" + STRING_NEWLINE;
+        assertEquals(expected, output.toString());
     }
 
 
     @Test
     void run_SerialFlagAndOneFile_PrintsFileInSerial() {
-        assertDoesNotThrow(() -> app.run(new String[]{filePathA, "-s"}, System.in, outputStream));
-        String expected = "A" + StringUtils.STRING_TAB + "B" +
-                StringUtils.STRING_TAB + "C" +
-                StringUtils.STRING_TAB + "D" +
-                StringUtils.STRING_TAB + "E" + StringUtils.STRING_NEWLINE;
-        assertEquals(expected, outputStream.toString());
+        assertDoesNotThrow(() -> app.run(new String[]{"-s", fileA}, System.in, output));
+        String expected = joinStringsByTab("A", "B", "C", "D", "E") + STRING_NEWLINE;
+        assertEquals(expected, output.toString());
     }
 
     @Test
     void run_SerialFlagAndMultipleFiles_PrintsFilesInSerial() {
-        assertDoesNotThrow(() -> app.run(new String[]{filePathA, filePathB, "-s"}, System.in, outputStream));
-        String expected = "A" + StringUtils.STRING_TAB + "B" +
-                StringUtils.STRING_TAB + "C" + StringUtils.STRING_TAB + "D" +
-                StringUtils.STRING_TAB + "E" + StringUtils.STRING_NEWLINE + "1" +
-                StringUtils.STRING_TAB + "2" + StringUtils.STRING_TAB + "3" +
-                StringUtils.STRING_TAB + "4" + StringUtils.STRING_TAB + "5" + StringUtils.STRING_NEWLINE;
-        assertEquals(expected, outputStream.toString());
+        assertDoesNotThrow(() -> app.run(new String[]{fileA, fileB, "-s"}, System.in, output));
+        String expected = joinStringsByTab("A", "B", "C", "D", "E") + STRING_NEWLINE +
+                joinStringsByTab("1", "2", "3", "4", "5") + STRING_NEWLINE;
+        assertEquals(expected, output.toString());
     }
 
     @Test
     void run_NoFlagAndStdin_PrintsStdinInParallel() {
         assertDoesNotThrow(() -> {
-            InputStream inputStream = IOUtils.openInputStream(filePathA);
-            app.run(new String[]{}, inputStream, outputStream);
+            InputStream input = IOUtils.openInputStream(fileA);
+            app.run(new String[]{}, input, output);
         });
-        String expected = "A" + StringUtils.STRING_NEWLINE + "B" +
-                StringUtils.STRING_NEWLINE + "C" +
-                StringUtils.STRING_NEWLINE + "D" +
-                StringUtils.STRING_NEWLINE + "E" + StringUtils.STRING_NEWLINE;
-        assertEquals(expected, outputStream.toString());
+        String expected = joinStringsByNewline("A", "B", "C", "D", "E") + STRING_NEWLINE;
+        assertEquals(expected, output.toString());
     }
 
     @Test
     void run_ValidFlagAndStdin_PrintsStdinInSerial() {
         assertDoesNotThrow(() -> {
-            InputStream inputStream = IOUtils.openInputStream(filePathA);
-            app.run(new String[]{"-s"}, inputStream, outputStream);
+            InputStream input = IOUtils.openInputStream(fileA);
+            app.run(new String[]{"-s"}, input, output);
         });
-        String expected = "A" + StringUtils.STRING_TAB + "B" +
-                StringUtils.STRING_TAB + "C" +
-                StringUtils.STRING_TAB + "D" +
-                StringUtils.STRING_TAB + "E" + StringUtils.STRING_NEWLINE;
-        assertEquals(expected, outputStream.toString());
+        String expected = joinStringsByTab("A", "B", "C", "D", "E") + STRING_NEWLINE;
+        assertEquals(expected, output.toString());
     }
 
     @Test
     void run_NoFlagStdinAndFile_PrintsStdinAndFileInParallel() {
         assertDoesNotThrow(() -> {
-            InputStream inputStream = IOUtils.openInputStream(filePathA);
-            app.run(new String[]{STDIN, filePathB, STDIN}, inputStream, outputStream);
+            InputStream input = IOUtils.openInputStream(fileA);
+            app.run(new String[]{STDIN, fileB, STDIN}, input, output);
         });
-        String expected = "A" + StringUtils.STRING_TAB + "1" + StringUtils.STRING_TAB + "B" +
-                StringUtils.STRING_NEWLINE + "C" + StringUtils.STRING_TAB + "2" + StringUtils.STRING_TAB + "D" +
-                StringUtils.STRING_NEWLINE + "E" + StringUtils.STRING_TAB + "3" +
-                StringUtils.STRING_TAB + StringUtils.STRING_NEWLINE + StringUtils.STRING_TAB + "4" +
-                StringUtils.STRING_TAB + StringUtils.STRING_NEWLINE + StringUtils.STRING_TAB + "5" +
-                StringUtils.STRING_TAB + StringUtils.STRING_NEWLINE;
-        assertEquals(expected, outputStream.toString());
+        String expected = "A" + STRING_TAB + "1" + STRING_TAB + "B" + STRING_NEWLINE +
+                "C" + STRING_TAB + "2" + STRING_TAB + "D" + STRING_NEWLINE +
+                "E" + STRING_TAB + "3" + STRING_TAB + STRING_NEWLINE +
+                STRING_TAB + "4" + STRING_TAB + STRING_NEWLINE +
+                STRING_TAB + "5" + STRING_TAB + STRING_NEWLINE;
+        assertEquals(expected, output.toString());
     }
 
     @Test
     void run_ValidFlagStdinAndFile_PrintsStdinAndFileInSerial() {
         assertDoesNotThrow(() -> {
-            InputStream inputStream = IOUtils.openInputStream(filePathA);
-            app.run(new String[]{STDIN, filePathB, STDIN, "-s"}, inputStream, outputStream);
+            InputStream input = IOUtils.openInputStream(fileA);
+            app.run(new String[]{STDIN, fileB, STDIN, "-s"}, input, output);
         });
-        String expected = "A" + StringUtils.STRING_TAB + "B" +
-                StringUtils.STRING_TAB + "C" + StringUtils.STRING_TAB + "D" +
-                StringUtils.STRING_TAB + "E" + StringUtils.STRING_NEWLINE + "1" +
-                StringUtils.STRING_TAB + "2" + StringUtils.STRING_TAB + "3" +
-                StringUtils.STRING_TAB + "4" + StringUtils.STRING_TAB + "5" + StringUtils.STRING_NEWLINE;
-        assertEquals(expected, outputStream.toString());
+        String expected = joinStringsByTab("A", "B", "C", "D", "E") + STRING_NEWLINE +
+                joinStringsByTab("1", "2", "3", "4", "5") + STRING_NEWLINE;
+        assertEquals(expected, output.toString());
     }
 }
