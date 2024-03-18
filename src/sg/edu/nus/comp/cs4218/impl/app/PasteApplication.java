@@ -130,7 +130,7 @@ public class PasteApplication implements PasteInterface {
                 throw new PasteException(String.format("'%s': %s", node.getName(), ERR_FILE_NOT_FOUND));
             }
             if (node.isDirectory()) {
-                // throw new PasteException(String.format("'%s': %s", node.getName(), ERR_IS_DIR));
+                // Paste will skip directory without throwing any exception
                 continue;
             }
             if (!node.canRead()) {
