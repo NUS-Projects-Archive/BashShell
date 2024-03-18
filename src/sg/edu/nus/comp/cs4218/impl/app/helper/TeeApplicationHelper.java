@@ -14,10 +14,10 @@ import java.nio.file.StandardOpenOption;
 import sg.edu.nus.comp.cs4218.Environment;
 import sg.edu.nus.comp.cs4218.exception.TeeException;
 
-/**
- * A helper class that provides functionality to write to a file (tee).
- */
 public final class TeeApplicationHelper {
+    
+    private TeeApplicationHelper() { /* Does nothing*/ }
+
     /**
      * Creates an empty file with the given filename if file does not exist.
      * Returns string containing the absolute filepath of the file.

@@ -62,19 +62,17 @@ class TeeApplicationTest {
 
     @Test
     void teeFromStdin_OnlyStdin_ReturnsCorrectString() {
-        String expected = CONTENT_FILE_A;
         String[] filenames = {};
         String outputStdOut = assertDoesNotThrow(() -> app.teeFromStdin(false, inputStream, filenames));
-        assertEquals(expected, outputStdOut);
+        assertEquals(CONTENT_FILE_A, outputStdOut);
     }
 
     @Test
     void teeFromStdin_OneFile_WritesToFile() {
         String outputStdOut = assertDoesNotThrow(() -> app.teeFromStdin(false, inputStream, emptyFile));
         String outputFile = assertDoesNotThrow(() -> Files.readString(emptyFilePath));
-        String expected = CONTENT_FILE_A;
-        assertEquals(expected, outputStdOut);
-        assertEquals(expected, outputFile);
+        assertEquals(CONTENT_FILE_A, outputStdOut);
+        assertEquals(CONTENT_FILE_A, outputFile);
     }
 
     @Test
