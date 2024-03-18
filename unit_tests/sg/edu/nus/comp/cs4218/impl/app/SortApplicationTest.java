@@ -79,7 +79,7 @@ class SortApplicationTest {
         SortException result = assertThrowsExactly(SortException.class, () ->
                 app.sortFromFiles(false, false, false, directory)
         );
-        String expected = "sort: 'directory': This is a directory";
+        String expected = "sort: 'directory': Is a directory";
         assertEquals(expected, result.getMessage());
     }
 
