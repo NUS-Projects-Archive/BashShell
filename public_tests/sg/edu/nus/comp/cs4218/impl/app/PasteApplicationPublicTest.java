@@ -3,6 +3,7 @@ package sg.edu.nus.comp.cs4218.impl.app;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.joinStringsByNewline;
 import static sg.edu.nus.comp.cs4218.testutils.TestStringUtils.STRING_NEWLINE;
 
@@ -31,6 +32,9 @@ public class PasteApplicationPublicTest {
     private static final String TEXT_FILE_2 = joinStringsByNewline("1", "2", "3", "4", "5");
 
     private PasteApplication pasteApplication;
+    private String emptyFile;
+    private String file1;
+    private String file2;
 
     private void assertEqualsReplacingNewlines(String expected, String actual) {
         assertEquals(expected.replaceAll("\r\n", "\n"), actual.replaceAll("\r\n", "\n"));
@@ -45,6 +49,8 @@ public class PasteApplicationPublicTest {
     }
 
     public static void writeToFileWithText(File file, String text) throws IOException {
+        boolean fileCreated = file.createNewFile();
+        assertTrue(fileCreated, "Failed to create file: " + file.getAbsolutePath());
         try (FileWriter writer = new FileWriter(file)) {
             if (text == null || text.isBlank()) {
                 writer.close();
@@ -57,6 +63,9 @@ public class PasteApplicationPublicTest {
     @BeforeEach
     void setUp() {
         pasteApplication = new PasteApplication();
+        emptyFile = FILE_EMPTY.getAbsolutePath();
+        file1 = FILE_1.getAbsolutePath();
+        file2 = FILE_2.getAbsolutePath();
     }
 
     @AfterAll
@@ -108,7 +117,7 @@ public class PasteApplicationPublicTest {
 
     @Test
     void mergeFile_NoSerialOneFile_ReturnsItself() {
-        String result = assertDoesNotThrow(() -> pasteApplication.mergeFile(false, FILE_1.toString()));
+        String result = assertDoesNotThrow(() -> pasteApplication.mergeFile(false, file1));
         assertEqualsReplacingNewlines(TEXT_FILE_1, result);
     }
 
@@ -116,14 +125,14 @@ public class PasteApplicationPublicTest {
     @Test
     void mergeFile_NoSerialTwoFiles_ReturnsInterleaving() {
         String expected = "A\t1\nB\t2\nC\t3\nD\t4\nE\t5";
-        String result = assertDoesNotThrow(() -> pasteApplication.mergeFile(false, FILE_1.toString(), FILE_2.toString()));
+        String result = assertDoesNotThrow(() -> pasteApplication.mergeFile(false, file1, file2));
         assertEqualsReplacingNewlines(expected, result);
     }
 
     @Test
     void mergeFile_SerialTwoFiles_ReturnsParallel() {
         String expected = "A\tB\tC\tD\tE\n1\t2\t3\t4\t5";
-        String result = assertDoesNotThrow(() -> pasteApplication.mergeFile(true, FILE_1.toString(), FILE_2.toString()));
+        String result = assertDoesNotThrow(() -> pasteApplication.mergeFile(true, file1, file2));
         assertEqualsReplacingNewlines(expected, result);
     }
 }

@@ -56,22 +56,27 @@ public class PasteApplication implements PasteInterface {
         if (stdout == null) {
             throw new PasteException(ERR_NULL_STREAMS);
         }
-        final PasteArgsParser parser = new PasteArgsParser();
 
+        final PasteArgsParser parser = new PasteArgsParser();
         try {
             parser.parse(args);
         } catch (InvalidArgsException e) {
             throw new PasteException(e.getMessage(), e);
         }
 
+        System.out.println("has parsed");
+
         final Boolean isSerial = parser.isSerial();
         final String[] nonFlagArgs = listToArray(parser.getNonFlagArgs());
 
         final StringBuilder output = new StringBuilder();
         if (nonFlagArgs.length == 0) {
+            System.out.println("is stdin");
             output.append(mergeStdin(isSerial, stdin));
         } else {
+            System.out.println("is mergeFileAndStdin");
             output.append(mergeFileAndStdin(isSerial, stdin, nonFlagArgs));
+            System.out.println("finish mergeFileAndStdin");
         }
 
         try {
@@ -173,17 +178,18 @@ public class PasteApplication implements PasteInterface {
             throw new PasteException(ERR_NULL_ARGS);
         }
 
-        List<String> stdinData;
+        int numOfStdin = (int) Arrays.stream(fileName).filter("-"::equals).count();
+        List<String> stdinData = new ArrayList<>();
         try {
-            stdinData = IOUtils.getLinesFromInputStream(stdin);
+            if (numOfStdin > 0) {
+                stdinData = IOUtils.getLinesFromInputStream(stdin);
+            }
         } catch (IOException e) {
             throw new PasteException(ERR_IO_EXCEPTION, e);
         }
 
         int currStdin = 0;
-        int numOfStdin = (int) Arrays.stream(fileName).filter("-"::equals).count();
         List<String> output = new ArrayList<>();
-
         for (String file : fileName) {
             if (("-").equals(file)) {
                 List<String> currList = new ArrayList<>();
@@ -194,6 +200,7 @@ public class PasteApplication implements PasteInterface {
                 currStdin += isSerial ? stdinData.size() : 1;
                 output.add(String.join(STRING_NEWLINE, currList));
             } else {
+                System.out.println("is file: " + file);
                 output.add(mergeFile(isSerial, file));
             }
         }
