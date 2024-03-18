@@ -126,7 +126,6 @@ public class PasteApplication implements PasteInterface {
             if (!checkPasteFileValidity(file)) {
                 continue;
             }
-            ;
             try (InputStream input = IOUtils.openInputStream(file)) {
                 output.add(IOUtils.getLinesFromInputStream(input));
                 IOUtils.closeInputStream(input);
