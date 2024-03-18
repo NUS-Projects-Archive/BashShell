@@ -155,7 +155,8 @@ class LsApplicationIT {
     @Test
     void run_NullStdOut_ThrowsLsException() {
         InputStream mockedInputStream = new ByteArrayInputStream("".getBytes());
-        LsException result = assertThrowsExactly(LsException.class, () -> app.run(new String[0], mockedInputStream, null));
+        LsException result = assertThrowsExactly(LsException.class, () -> app.run(new String[0], mockedInputStream,
+                null));
         assertEquals(String.format("ls: %s", ERR_NO_OSTREAM), result.getMessage());
     }
 

@@ -1,8 +1,9 @@
 package sg.edu.nus.comp.cs4218.impl.app;
 
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.joinStringsByNewline;
+import static sg.edu.nus.comp.cs4218.testutils.TestStringUtils.STRING_NEWLINE;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -15,41 +16,54 @@ import java.util.ArrayList;
 import java.util.Deque;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static sg.edu.nus.comp.cs4218.testutils.TestStringUtils.STRING_NEWLINE;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import sg.edu.nus.comp.cs4218.exception.GrepException;
 import sg.edu.nus.comp.cs4218.testutils.TestEnvironmentUtil;
 
+@SuppressWarnings("PMD.ClassNamingConventions")
 public class GrepApplicationPublicIT {
     private static final String TEMP = "temp-grep";
-    private static final byte[] BYTES_A = "First line\nSecond line\nThird line\nFourth line\n".getBytes();
-    private static final byte[] BYTES_B = "Fifth line\nSixth line\nSeventh line\nEighth line\n".getBytes();
+    private static final String COLON_SPACE = ": ";
+    private static final String FIRST_LINE = "First line";
+    private static final String SECOND_LINE = "Second line";
+    private static final String THIRD_LINE = "Third line";
+    private static final String FOURTH_LINE = "Fourth line";
+    private static final String FIFTH_LINE = "Fifth line";
+    private static final String SIXTH_LINE = "Sixth line";
+    private static final String SEVENTH_LINE = "Seventh line";
+    private static final String EIGHTH_LINE = "Eighth line";
+    private static final byte[] BYTES_A = (joinStringsByNewline(FIRST_LINE, SECOND_LINE, THIRD_LINE, FOURTH_LINE) +
+            STRING_NEWLINE).getBytes();
+    private static final byte[] BYTES_B = (joinStringsByNewline(FIFTH_LINE, SIXTH_LINE, SEVENTH_LINE, EIGHTH_LINE) +
+            STRING_NEWLINE).getBytes();
 
-    private static final Deque<Path> files = new ArrayDeque<>();
-    private static Path TEMP_PATH;
+    private static final Deque<Path> FILES = new ArrayDeque<>();
+    private static Path tempPath;
 
     private final GrepApplication grepApplication = new GrepApplication();
 
     @BeforeAll
     static void createTemp() throws IOException, NoSuchFieldException, IllegalAccessException {
-        TEMP_PATH = Paths.get(TestEnvironmentUtil.getCurrentDirectory(), TEMP);
-        Files.createDirectory(TEMP_PATH);
+        TestEnvironmentUtil.setCurrentDirectory(System.getProperty("user.dir"));
+        tempPath = Paths.get(TestEnvironmentUtil.getCurrentDirectory(), TEMP);
+        Files.createDirectory(tempPath);
     }
 
     @AfterAll
     static void deleteTemp() throws IOException {
-        for (Path file : files) {
+        for (Path file : FILES) {
             Files.deleteIfExists(file);
         }
-        Files.delete(TEMP_PATH);
+        Files.delete(tempPath);
     }
 
     private Path createFile(String name) throws IOException {
-        Path path = TEMP_PATH.resolve(name);
+        Path path = tempPath.resolve(name);
         Files.createFile(path);
-        files.push(path);
+        FILES.push(path);
         return path;
     }
 
@@ -60,7 +74,7 @@ public class GrepApplicationPublicIT {
         }
         args.add(pattern);
         for (String file : files) {
-            if (file.equals("-")) {
+            if ("-".equals(file)) {
                 args.add(file);
             } else {
                 args.add(Paths.get(TEMP, file).toString());
@@ -78,7 +92,7 @@ public class GrepApplicationPublicIT {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         Files.write(createFile("a.txt"), BYTES_A);
         grepApplication.run(toArgs("", "th", "a.txt"), System.in, output);
-        assertArrayEquals(("Fourth line" + STRING_NEWLINE).getBytes(), output.toByteArray());
+        assertArrayEquals((FOURTH_LINE + STRING_NEWLINE).getBytes(), output.toByteArray());
     }
 
     @Test
@@ -86,17 +100,19 @@ public class GrepApplicationPublicIT {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         Files.write(createFile("b.txt"), BYTES_A);
         grepApplication.run(toArgs("", "[th] l", "b.txt"), System.in, output);
-        assertArrayEquals(("First line" + STRING_NEWLINE + "Fourth line" + STRING_NEWLINE).getBytes(), output.toByteArray());
+        assertArrayEquals(("First line" + STRING_NEWLINE + FOURTH_LINE + STRING_NEWLINE).getBytes(), output.toByteArray());
     }
 
     @Test
     void run_MultipleFiles_PrintsLinesWithNames() throws Exception {
+        String cTxtFile = "c.txt";
+        String dTxtFile = "d.txt";
         ByteArrayOutputStream output = new ByteArrayOutputStream();
-        Files.write(createFile("c.txt"), BYTES_A);
-        Files.write(createFile("d.txt"), BYTES_B);
-        grepApplication.run(toArgs("", "Fi", "c.txt", "d.txt"), System.in, output);
-        String expected = getRelativePath("c.txt") + ": First line" + STRING_NEWLINE +
-                getRelativePath("d.txt") + ": Fifth line" + STRING_NEWLINE;
+        Files.write(createFile(cTxtFile), BYTES_A);
+        Files.write(createFile(dTxtFile), BYTES_B);
+        grepApplication.run(toArgs("", "Fi", cTxtFile, dTxtFile), System.in, output);
+        String expected = getRelativePath(cTxtFile) + COLON_SPACE + FIRST_LINE + STRING_NEWLINE +
+                getRelativePath(dTxtFile) + COLON_SPACE + FIFTH_LINE + STRING_NEWLINE;
         assertArrayEquals(expected.getBytes(), output.toByteArray());
     }
 
@@ -106,7 +122,8 @@ public class GrepApplicationPublicIT {
         Files.write(createFile("e.txt"), BYTES_A);
         Path path = getRelativePath("e.txt");
         grepApplication.run(toArgs("H", "F", "e.txt"), System.in, output);
-        String expected = path + ": First line" + STRING_NEWLINE + path + ": Fourth line" + STRING_NEWLINE;
+        String expected = path + COLON_SPACE + FIRST_LINE + STRING_NEWLINE + path + COLON_SPACE +
+                FOURTH_LINE + STRING_NEWLINE;
         assertArrayEquals(expected.getBytes(), output.toByteArray());
     }
 
@@ -116,8 +133,8 @@ public class GrepApplicationPublicIT {
         Files.write(createFile("f.txt"), BYTES_A);
         Files.write(createFile("g.txt"), BYTES_B);
         grepApplication.run(toArgs("H", "Fi", "f.txt", "g.txt"), System.in, output);
-        String expected = getRelativePath("f.txt") + ": First line" + STRING_NEWLINE +
-                getRelativePath("g.txt") + ": Fifth line" + STRING_NEWLINE;
+        String expected = getRelativePath("f.txt") + COLON_SPACE + FIRST_LINE + STRING_NEWLINE +
+                getRelativePath("g.txt") + COLON_SPACE + FIFTH_LINE + STRING_NEWLINE;
         assertArrayEquals(expected.getBytes(), output.toByteArray());
     }
 
@@ -126,7 +143,7 @@ public class GrepApplicationPublicIT {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         Files.write(createFile("h.txt"), BYTES_A);
         grepApplication.run(toArgs("i", "th", "h.txt"), System.in, output);
-        String expected = "Third line" + STRING_NEWLINE + "Fourth line" + STRING_NEWLINE;
+        String expected = "Third line" + STRING_NEWLINE + FOURTH_LINE + STRING_NEWLINE;
         assertArrayEquals(expected.getBytes(), output.toByteArray());
     }
 
@@ -136,7 +153,7 @@ public class GrepApplicationPublicIT {
         Files.write(createFile("i.txt"), BYTES_A);
         Path path = getRelativePath("i.txt");
         grepApplication.run(toArgs("Hi", "th", "i.txt"), System.in, output);
-        String expected = path + ": Third line" + STRING_NEWLINE + path + ": Fourth line" + STRING_NEWLINE;
+        String expected = path + ": Third line" + STRING_NEWLINE + path + COLON_SPACE + FOURTH_LINE + STRING_NEWLINE;
         assertArrayEquals(expected.getBytes(), output.toByteArray());
     }
 
@@ -165,8 +182,8 @@ public class GrepApplicationPublicIT {
         Files.write(createFile("m.txt"), BYTES_A);
         Files.write(createFile("n.txt"), BYTES_B);
         grepApplication.run(toArgs("c", "th", "m.txt", "n.txt"), System.in, output);
-        String expected = getRelativePath("m.txt") + ": 1" + STRING_NEWLINE +
-                getRelativePath("n.txt") + ": 4" + STRING_NEWLINE;
+        String expected = getRelativePath("m.txt") + COLON_SPACE + "1" + STRING_NEWLINE +
+                getRelativePath("n.txt") + COLON_SPACE + "4" + STRING_NEWLINE;
         assertArrayEquals(expected.getBytes(), output.toByteArray());
     }
 
@@ -203,7 +220,7 @@ public class GrepApplicationPublicIT {
         Files.write(createFile("s.txt"), BYTES_A);
         Files.write(createFile("t.txt"), BYTES_B);
         grepApplication.run(toArgs("ci", "th", "s.txt", "t.txt"), System.in, output);
-        String expected = getRelativePath("s.txt") + ": 2" + STRING_NEWLINE +
+        String expected = getRelativePath("s.txt") + COLON_SPACE + "2" + STRING_NEWLINE +
                 getRelativePath("t.txt") + ": 4" + STRING_NEWLINE;
         assertArrayEquals(expected.getBytes(), output.toByteArray());
     }
@@ -291,8 +308,8 @@ public class GrepApplicationPublicIT {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         Files.write(createFile("aa.txt"), BYTES_B);
         grepApplication.run(toArgs("", "Fi", "-", "aa.txt"), input, output);
-        String expected = "(standard input): First line" + STRING_NEWLINE +
-                getRelativePath("aa.txt") + ": Fifth line" + STRING_NEWLINE;
+        String expected = "(standard input): " + FIRST_LINE + STRING_NEWLINE +
+                getRelativePath("aa.txt") + COLON_SPACE + FIFTH_LINE + STRING_NEWLINE;
         assertArrayEquals(expected.getBytes(), output.toByteArray());
     }
 
@@ -302,8 +319,8 @@ public class GrepApplicationPublicIT {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         Files.write(createFile("ab.txt"), BYTES_A);
         grepApplication.run(toArgs("Hi", "fi", "-", "ab.txt"), input, output);
-        String expected = "(standard input): Fifth line" + STRING_NEWLINE +
-                getRelativePath("ab.txt") + ": First line" + STRING_NEWLINE;
+        String expected = "(standard input): " + FIFTH_LINE + STRING_NEWLINE +
+                getRelativePath("ab.txt") + COLON_SPACE + FIRST_LINE + STRING_NEWLINE;
         assertArrayEquals(expected.getBytes(), output.toByteArray());
     }
 
