@@ -1,6 +1,7 @@
 package sg.edu.nus.comp.cs4218.impl.app;
 
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_GENERAL;
+import static sg.edu.nus.comp.cs4218.impl.app.helper.TeeApplicationHelper.createEmptyFile;
+import static sg.edu.nus.comp.cs4218.impl.app.helper.TeeApplicationHelper.writeToFile;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_ARGS;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_ISTREAM;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_OSTREAM;
@@ -13,14 +14,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
 import java.util.List;
 
-import sg.edu.nus.comp.cs4218.Environment;
 import sg.edu.nus.comp.cs4218.app.TeeInterface;
 import sg.edu.nus.comp.cs4218.exception.InvalidArgsException;
 import sg.edu.nus.comp.cs4218.exception.TeeException;
@@ -28,8 +23,24 @@ import sg.edu.nus.comp.cs4218.impl.parser.TeeArgsParser;
 import sg.edu.nus.comp.cs4218.impl.util.CollectionsUtils;
 import sg.edu.nus.comp.cs4218.impl.util.IOUtils;
 
+/**
+ * The tee utility takes in a standard input and writes to standard output. If a file is specified,
+ * it either overwrites the file with the standard input, or appends the input to the file.
+ *
+ * <p>
+ * <b>Command format:</b> <code>tee [Options] [FILES]</code>
+ * </p>
+ */
 public class TeeApplication implements TeeInterface {
 
+    /**
+     * Runs the tee application with the specified arguments.
+     *
+     * @param args   Array of arguments for the application. Each array element is the path to a file or a flag.
+     * @param stdin  An InputStream. The input to be used for this command is read from this InputStream.
+     * @param stdout An OutputStream. The output of the command is written to this Output Stream.
+     * @throws TeeException
+     */
     @Override
     public void run(String[] args, InputStream stdin, OutputStream stdout) throws TeeException {
         if (args == null) {
@@ -60,6 +71,15 @@ public class TeeApplication implements TeeInterface {
         }
     }
 
+    /**
+     * Returns string containing standard input.
+     *
+     * @param isAppend Boolean option to append the standard input to the contents of the input files
+     * @param stdin    InputStream containing arguments from Stdin
+     * @param fileName Array of String of file names
+     * @return A formatted string of the given standard input.
+     * @throws TeeException
+     */
     @Override
     public String teeFromStdin(Boolean isAppend, InputStream stdin, String... fileName) throws TeeException {
         if (stdin == null) {
@@ -91,36 +111,5 @@ public class TeeApplication implements TeeInterface {
         }
 
         return dataToString;
-    }
-
-    public String createEmptyFile(String file) throws TeeException {
-        Path path = Paths.get(file).normalize();
-        if (!path.isAbsolute()) {
-            path = Paths.get(Environment.currentDirectory).resolve(path);
-        }
-        File newFile = new File(path.toString());
-
-        try {
-            if (newFile.createNewFile()) {
-                return path.toString();
-            } else {
-                throw new TeeException(ERR_GENERAL);
-            }
-        } catch (IOException e) {
-            throw new TeeException(e.getMessage(), e);
-        }
-    }
-
-    public void writeToFile(Boolean isAppend, String content, String filePath) throws TeeException {
-        try {
-            Path path = Paths.get(filePath);
-            if (isAppend) {
-                Files.write(path, content.getBytes(StandardCharsets.UTF_8), StandardOpenOption.APPEND);
-            } else {
-                Files.write(path, content.getBytes(StandardCharsets.UTF_8));
-            }
-        } catch (IOException e) {
-            throw new TeeException(e.getMessage(), e);
-        }
     }
 }
