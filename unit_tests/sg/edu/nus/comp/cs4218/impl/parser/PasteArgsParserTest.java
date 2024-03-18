@@ -107,24 +107,6 @@ public class PasteArgsParserTest {
     }
 
     @Test
-    void hasStdin_ValidStdinArg_ReturnsTrue() {
-        assertDoesNotThrow(() -> parser.parse(STDIN));
-        assertTrue(parser.hasStdin());
-    }
-
-    @Test
-    void hasStdin_ValidArgAndFlagArg_ReturnsTrue() {
-        assertDoesNotThrow(() -> parser.parse(STDIN, FLAG_SERIAL));
-        assertTrue(parser.hasStdin());
-    }
-
-    @Test
-    void hasStdin_NoArg_ReturnsFalse() {
-        assertDoesNotThrow(() -> parser.parse());
-        assertFalse(parser.hasStdin());
-    }
-
-    @Test
     void getNonFlagArgs_NoArg_ReturnsEmpty() {
         assertDoesNotThrow(() -> parser.parse());
         List<String> result = parser.getNonFlagArgs();

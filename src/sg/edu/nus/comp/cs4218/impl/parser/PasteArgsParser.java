@@ -34,13 +34,4 @@ public class PasteArgsParser extends ArgsParser {
     public List<String> getNonFlagArgs() {
         return nonFlagArgs;
     }
-
-    /**
-     * Checks if non-flag args includes standard input
-     *
-     * @return true if standard input ("-") called, false otherwise
-     */
-    public Boolean hasStdin() {
-        return nonFlagArgs.contains("-");
-    }
 }
