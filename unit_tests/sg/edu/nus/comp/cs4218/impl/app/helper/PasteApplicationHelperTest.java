@@ -112,10 +112,11 @@ class PasteApplicationHelperTest {
     @DisabledOnOs(value = OS.WINDOWS)
     void checkPasteFileValidity_FileNoPermissionToRead_ThrowsPasteException() {
         Path filePath = createNewFile("file.txt", "file content");
+        String file = filePath.toString();
         boolean isSetReadable = filePath.toFile().setReadable(false);
         assertTrue(isSetReadable, "Failed to set read permission to false for test source file");
-        PasteException result = assertThrowsExactly(PasteException.class, () -> checkPasteFileValidity(filePath.toString()));
-        String expected = "paste: 'file.txt': could not read file";
+        PasteException result = assertThrowsExactly(PasteException.class, () -> checkPasteFileValidity(file));
+        String expected = String.format("paste: '%s': could not read file", file);
         assertEquals(expected, result.getMessage());
     }
 
