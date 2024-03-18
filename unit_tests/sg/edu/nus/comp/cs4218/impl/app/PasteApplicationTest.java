@@ -69,11 +69,11 @@ public class PasteApplicationTest {
     @Test
     void mergeFile_FilesWithoutFlag_MergesFilesInParallel() {
         String result = assertDoesNotThrow(() -> app.mergeFile(false, fileA, fileB));
-        String expected = "A" + STRING_TAB + "1" + STRING_NEWLINE +
-                "B" + STRING_TAB + "2" + STRING_NEWLINE +
-                "C" + STRING_TAB + "3" + STRING_NEWLINE +
-                "D" + STRING_TAB + "4" + STRING_NEWLINE +
-                "E" + STRING_TAB + "5";
+        String expected = "A" + STRING_TAB + "1" +
+                STRING_NEWLINE + "B" + STRING_TAB + "2" +
+                STRING_NEWLINE + "C" + STRING_TAB + "3" +
+                STRING_NEWLINE + "D" + STRING_TAB + "4" +
+                STRING_NEWLINE + "E" + STRING_TAB + "5";
         assertEquals(expected, result);
     }
 
@@ -98,10 +98,9 @@ public class PasteApplicationTest {
         });
         String expected = "A" + STRING_TAB + "1" + STRING_TAB + "B" +
                 STRING_NEWLINE + "C" + STRING_TAB + "2" + STRING_TAB + "D" +
-                STRING_NEWLINE + "E" + STRING_TAB + "3" +
-                STRING_TAB + STRING_NEWLINE + STRING_TAB + "4" +
-                STRING_TAB + STRING_NEWLINE + STRING_TAB + "5" +
-                STRING_TAB;
+                STRING_NEWLINE + "E" + STRING_TAB + "3" + STRING_TAB +
+                STRING_NEWLINE + STRING_TAB + "4" + STRING_TAB +
+                STRING_NEWLINE + STRING_TAB + "5" + STRING_TAB;
         assertEquals(expected, result);
     }
 
@@ -123,25 +122,5 @@ public class PasteApplicationTest {
         } catch (IOException | ShellException e) {
             e.printStackTrace();
         }
-    }
-
-    @Test
-    void mergeInSerial() {
-        List<List<String>> arg = new ArrayList<>();
-        arg.add(List.of("A", "B", "C"));
-        arg.add(List.of("1", "2", "3", "4"));
-        arg.add(List.of("5", "4", "3"));
-        arg.add(List.of("a", "b"));
-        String actual = app.mergeInSerial(arg);
-        System.out.println(actual);
-    }
-
-    @Test
-    void mergeInParallel() {
-        List<List<String>> arg = new ArrayList<>();
-        arg.add(List.of("A", "B", "C"));
-        arg.add(List.of("1", "2", "3", "4"));
-        String actual = app.mergeInParallel(arg);
-        System.out.println(actual);
     }
 }
