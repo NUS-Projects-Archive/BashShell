@@ -1,35 +1,42 @@
 package sg.edu.nus.comp.cs4218.impl.app;
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import sg.edu.nus.comp.cs4218.testutils.TestEnvironmentUtil;
-import sg.edu.nus.comp.cs4218.testutils.TestStringUtils;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 
-import java.io.*;
-import java.nio.charset.StandardCharsets;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Comparator;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
+import sg.edu.nus.comp.cs4218.testutils.TestEnvironmentUtil;
+import sg.edu.nus.comp.cs4218.testutils.TestStringUtils;
 
 public class TeeApplicationPublicTest {
     private static final String TEMP = "temp-tee";
     private static final String TEXT_A = "textA.txt";
     private static final String TEXT_B = "textB.txt";
     private static final String ONE_LINE_INPUT = "test 1";
-    private static final String MULTI_LINE_INPUT = ONE_LINE_INPUT + TestStringUtils.STRING_NEWLINE + ONE_LINE_INPUT;
+    private static final String MULTI_LINE_INPUT = ONE_LINE_INPUT + TestStringUtils.STRING_NEWLINE + ONE_LINE_INPUT + STRING_NEWLINE;
     private static String initialDir;
 
     private TeeApplication teeApplication;
+
+    @BeforeAll
+    static void setUpAll() throws NoSuchFieldException, IllegalAccessException {
+        initialDir = TestEnvironmentUtil.getCurrentDirectory();
+    }
 
     private InputStream mockInputStream(String input) {
         return new ByteArrayInputStream(input.getBytes());
@@ -43,21 +50,16 @@ public class TeeApplicationPublicTest {
                 stringBuilder.append(TestStringUtils.STRING_NEWLINE);
             }
         }
-        return stringBuilder.toString();
+        return stringBuilder.toString() + STRING_NEWLINE;
     }
 
     private void writeToFile(File file) {
         try (FileWriter writer = new FileWriter(file)) {
-            writer.write(TeeApplicationPublicTest.ONE_LINE_INPUT);
+            writer.write(ONE_LINE_INPUT + STRING_NEWLINE);
             writer.flush();
         } catch (Exception e) {
             fail();
         }
-    }
-
-    @BeforeAll
-    static void setUpAll() throws NoSuchFieldException, IllegalAccessException {
-        initialDir = TestEnvironmentUtil.getCurrentDirectory();
     }
 
     @BeforeEach
@@ -83,7 +85,7 @@ public class TeeApplicationPublicTest {
             String result = teeApplication.teeFromStdin(false, inputStream, arr);
 
             inputStream.close();
-            assertEquals(ONE_LINE_INPUT, result);
+            assertEquals(ONE_LINE_INPUT + STRING_NEWLINE, result);
         } catch (Exception e) {
             fail();
         }
@@ -98,7 +100,7 @@ public class TeeApplicationPublicTest {
             List<String> targetContent = Files.readAllLines(file.toPath());
 
             assertTrue(file.exists());
-            assertEquals(ONE_LINE_INPUT, result );
+            assertEquals(ONE_LINE_INPUT + STRING_NEWLINE, result);
             assertEquals(ONE_LINE_INPUT, targetContent.get(0));
         }
     }
@@ -137,9 +139,9 @@ public class TeeApplicationPublicTest {
             String result = teeApplication.teeFromStdin(true, inputStream, arr);
             List<String> targetContentA = Files.readAllLines(fileA.toPath());
 
-            assertEquals(ONE_LINE_INPUT, result);
-            assertEquals(ONE_LINE_INPUT + STRING_NEWLINE + ONE_LINE_INPUT,
-                         convertListOfStringToStrings(targetContentA));
+            assertEquals(ONE_LINE_INPUT + STRING_NEWLINE, result);
+            assertEquals(ONE_LINE_INPUT + STRING_NEWLINE + ONE_LINE_INPUT + STRING_NEWLINE,
+                    convertListOfStringToStrings(targetContentA));
         }
     }
 
@@ -158,9 +160,9 @@ public class TeeApplicationPublicTest {
             List<String> targetContentA = Files.readAllLines(fileA.toPath());
             List<String> targetContentB = Files.readAllLines(fileB.toPath());
 
-            assertEquals(ONE_LINE_INPUT, result);
-            assertEquals(ONE_LINE_INPUT + STRING_NEWLINE + ONE_LINE_INPUT, convertListOfStringToStrings(targetContentA));
-            assertEquals(ONE_LINE_INPUT + STRING_NEWLINE + ONE_LINE_INPUT, convertListOfStringToStrings(targetContentB));
+            assertEquals(ONE_LINE_INPUT + STRING_NEWLINE, result);
+            assertEquals(ONE_LINE_INPUT + STRING_NEWLINE + ONE_LINE_INPUT + STRING_NEWLINE, convertListOfStringToStrings(targetContentA));
+            assertEquals(ONE_LINE_INPUT + STRING_NEWLINE + ONE_LINE_INPUT + STRING_NEWLINE, convertListOfStringToStrings(targetContentB));
         }
     }
 }

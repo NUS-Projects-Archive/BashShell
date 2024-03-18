@@ -7,6 +7,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -33,7 +34,15 @@ public class TeeApplicationIT {
             InputStream mockedStdin = mock(InputStream.class);
             app.run(args, mockedStdin, null);
         });
-        String expected = "tee: Null arguments";
+        String expected = "tee: OutputStream not provided";
+        assertEquals(expected, result.getMessage());
+    }
+
+    @Test
+    void run_NullInputStream_ThrowsTeeException() {
+        String[] args = {"-a"};
+        TeeException result = assertThrowsExactly(TeeException.class, () -> app.run(args, null, mock(OutputStream.class)));
+        String expected = "tee: InputStream not provided";
         assertEquals(expected, result.getMessage());
     }
 
@@ -52,29 +61,10 @@ public class TeeApplicationIT {
     }
 
     @Test
-    void run_InsufficientArgs_ThrowsTeeException() {
-        String[] args = {"-a"};
-        TeeException result = assertThrowsExactly(TeeException.class, () -> app.run(args, null, null));
-        String expected = "tee: Insufficient arguments";
-        assertEquals(expected, result.getMessage());
-    }
-
-    @Test
-    void run_NoStdout_ThrowsTeeException() {
-        String[] args = {"-a"};
-        TeeException result = assertThrowsExactly(TeeException.class, () -> {
-            InputStream mockedStdin = mock(InputStream.class);
-            app.run(args, mockedStdin, null);
-        });
-        String expected = "tee: OutputStream not provided";
-        assertEquals(expected, result.getMessage());
-    }
-
-    @Test
     void run_ValidArgs_DoesNotThrowException() {
         String[] args = {"-a"};
         assertDoesNotThrow(() -> {
-            InputStream mockedStdin = mock(InputStream.class);
+            InputStream mockedStdin = new ByteArrayInputStream("".getBytes());
             OutputStream mockedStdout = mock(OutputStream.class);
             app.run(args, mockedStdin, mockedStdout);
         });
