@@ -39,6 +39,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 import sg.edu.nus.comp.cs4218.Environment;
 import sg.edu.nus.comp.cs4218.exception.GrepException;
+import sg.edu.nus.comp.cs4218.impl.util.CollectionsUtils;
 
 @SuppressWarnings("PMD.ClassNamingConventions")
 class GrepApplicationIT {
@@ -73,7 +74,7 @@ class GrepApplicationIT {
                 expectedOutputArr.add(name + COLON_SPACE + line);
             }
         }
-        return expectedOutputArr.toArray(new String[0]);
+        return CollectionsUtils.listToArray(expectedOutputArr);
     }
 
     @BeforeEach
@@ -158,8 +159,8 @@ class GrepApplicationIT {
         String result = assertDoesNotThrow(() ->
                 app.grepFromFileAndStdin(VALID_PAT_SMALL, false, false, true, stdin, fileOneName, "-")
         );
-        String expected = joinStringsByNewline(getValidOutputArrWithFileName(fileOneName, STRING_STDIN_OUTPUT)) +
-                STRING_NEWLINE;
+        String expected = joinStringsByNewline(getValidOutputArrWithFileName(fileOneName, STRING_STDIN_OUTPUT))
+                + STRING_NEWLINE;
         assertEquals(expected, result);
     }
 
@@ -373,8 +374,9 @@ class GrepApplicationIT {
             assertDoesNotThrow(() -> app.run(args, stdin, stdout));
 
             // Then
-            String expected = joinStringsByNewline(getValidOutputArrWithFileName(fileOneAbsPath, STRING_STDIN_OUTPUT,
-                    fileTwoAbsPath)) + STRING_NEWLINE;
+            String expected = joinStringsByNewline(
+                    getValidOutputArrWithFileName(fileOneAbsPath, STRING_STDIN_OUTPUT, fileTwoAbsPath)
+            ) + STRING_NEWLINE;
             assertEquals(expected, stdout.toString());
         }
 
