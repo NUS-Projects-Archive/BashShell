@@ -54,18 +54,20 @@ public class PasteApplicationPublicIT {
     private static Path dirPath;
 
     private PasteApplication pasteApplication;
+    private OutputStream output;
 
     @BeforeEach
     void setUp() {
         pasteApplication = new PasteApplication();
+        output = new ByteArrayOutputStream();
     }
 
     @BeforeAll
     static void createTemp() throws NoSuchFieldException, IllegalAccessException, IOException {
         tempPath = Paths.get(TestEnvironmentUtil.getCurrentDirectory(), TEMP);
         dirPath = Paths.get(TestEnvironmentUtil.getCurrentDirectory(), TEMP + CHAR_FILE_SEP + DIR);
-        Files.createDirectory(tempPath);
-        Files.createDirectory(dirPath);
+        Files.createDirectories(tempPath);
+        Files.createDirectories(dirPath);
     }
 
     @AfterAll
@@ -107,13 +109,11 @@ public class PasteApplicationPublicIT {
 
     @Test
     void run_NullStdinNullFilesNoFlag_ThrowsPasteException() {
-        OutputStream output = new ByteArrayOutputStream();
         assertThrowsExactly(PasteException.class, () -> pasteApplication.run(toArgs(""), null, output));
     }
 
     @Test
     void run_NullStdinNullFilesFlag_ThrowsPasteException() {
-        OutputStream output = new ByteArrayOutputStream();
         assertThrowsExactly(PasteException.class, () -> pasteApplication.run(toArgs("n"), null, output));
     }
 
@@ -121,7 +121,6 @@ public class PasteApplicationPublicIT {
     @Test
     void run_SingleStdinNoFlag_DisplaysStdinContents() {
         InputStream input = new ByteArrayInputStream(L1_TO_L3.getBytes(StandardCharsets.UTF_8));
-        OutputStream output = new ByteArrayOutputStream();
         assertDoesNotThrow(() -> pasteApplication.run(toArgs(""), input, output));
         assertEquals(L1_TO_L3 + STRING_NEWLINE, output.toString());
     }
@@ -130,7 +129,6 @@ public class PasteApplicationPublicIT {
     @Test
     void run_SingleStdinFlag_DisplaysNonParallelStdinContents() {
         InputStream input = new ByteArrayInputStream(L1_TO_L3.getBytes(StandardCharsets.UTF_8));
-        OutputStream output = new ByteArrayOutputStream();
         assertDoesNotThrow(() -> pasteApplication.run(toArgs("s"), input, output));
         assertEquals(L1_TO_L3_TAB + STRING_NEWLINE, output.toString());
     }
@@ -138,7 +136,6 @@ public class PasteApplicationPublicIT {
     @Test
     void run_SingleStdinDashNoFlag_DisplaysStdinContents() {
         InputStream input = new ByteArrayInputStream(L1_TO_L3.getBytes(StandardCharsets.UTF_8));
-        OutputStream output = new ByteArrayOutputStream();
         assertDoesNotThrow(() -> pasteApplication.run(toArgs("", "-"), input, output));
         assertEquals(L1_TO_L3 + STRING_NEWLINE, output.toString());
     }
@@ -146,7 +143,6 @@ public class PasteApplicationPublicIT {
     @Test
     void run_SingleStdinDashFlag_DisplaysNonParallelStdinContents() {
         InputStream input = new ByteArrayInputStream(L1_TO_L3.getBytes(StandardCharsets.UTF_8));
-        OutputStream output = new ByteArrayOutputStream();
         assertDoesNotThrow(() -> pasteApplication.run(toArgs("s", "-"), input, output));
         assertEquals(L1_TO_L3_TAB + STRING_NEWLINE, output.toString());
     }
@@ -155,7 +151,6 @@ public class PasteApplicationPublicIT {
     void run_SingleEmptyStdinNoFlag_DisplaysEmpty() {
         String text = "";
         InputStream input = new ByteArrayInputStream(text.getBytes(StandardCharsets.UTF_8));
-        OutputStream output = new ByteArrayOutputStream();
         assertDoesNotThrow(() -> pasteApplication.run(toArgs(""), input, output));
         assertEquals(text, output.toString());
     }
@@ -164,7 +159,6 @@ public class PasteApplicationPublicIT {
     void run_SingleEmptyStdinFlag_DisplaysEmpty() {
         String text = "";
         InputStream input = new ByteArrayInputStream(text.getBytes(StandardCharsets.UTF_8));
-        OutputStream output = new ByteArrayOutputStream();
         assertDoesNotThrow(() -> pasteApplication.run(toArgs("s"), input, output));
         assertEquals(text, output.toString());
     }
@@ -172,7 +166,6 @@ public class PasteApplicationPublicIT {
     //mergeFiles cases
     @Test
     void run_NonexistentFileNoFlag_ThrowsPasteException() {
-        OutputStream output = new ByteArrayOutputStream();
         String nonExistFile = "nonExistFile.txt";
         PasteException result = assertThrowsExactly(PasteException.class, () ->
                 pasteApplication.run(toArgs("", nonExistFile), System.in, output)
@@ -182,14 +175,12 @@ public class PasteApplicationPublicIT {
 
     @Test
     void run_DirectoryNoFlag_DisplaysEmpty() {
-        OutputStream output = new ByteArrayOutputStream();
         assertDoesNotThrow(() -> pasteApplication.run(toArgs("", DIR), System.in, output));
         assertEquals("", output.toString());
     }
 
     @Test
     void run_SingleFileNoFlag_DisplaysFileContents() {
-        OutputStream output = new ByteArrayOutputStream();
         String fileName = "fileA.txt";
         assertDoesNotThrow(() -> createFile(fileName, L1_TO_L3));
         assertDoesNotThrow(() -> pasteApplication.run(toArgs("", fileName), System.in, output));
@@ -198,7 +189,6 @@ public class PasteApplicationPublicIT {
 
     @Test
     void run_SingleFileFlag_DisplaysNonParallelFileContents() {
-        OutputStream output = new ByteArrayOutputStream();
         String fileName = "fileB.txt";
         assertDoesNotThrow(() -> createFile(fileName, L1_TO_L3));
         assertDoesNotThrow(() -> pasteApplication.run(toArgs("s", fileName), System.in, output));
@@ -207,7 +197,6 @@ public class PasteApplicationPublicIT {
 
     @Test
     void run_SingleEmptyFileNoFlag_DisplaysEmpty() {
-        OutputStream output = new ByteArrayOutputStream();
         String fileName = "fileC.txt";
         String text = "";
         assertDoesNotThrow(() -> createFile(fileName, text));
@@ -217,7 +206,6 @@ public class PasteApplicationPublicIT {
 
     @Test
     void run_SingleEmptyFileFlag_DisplaysEmpty() {
-        OutputStream output = new ByteArrayOutputStream();
         String fileName = "fileD.txt";
         String text = "";
         assertDoesNotThrow(() -> createFile(fileName, text));
@@ -227,7 +215,6 @@ public class PasteApplicationPublicIT {
 
     @Test
     void run_SingleFileUnknownFlag_Throws() {
-        OutputStream output = new ByteArrayOutputStream();
         String fileName = "fileE.txt";
         assertDoesNotThrow(() -> createFile(fileName, L1_TO_L3));
         assertThrowsExactly(PasteException.class, () -> pasteApplication.run(toArgs("a", fileName), System.in, output));
@@ -235,7 +222,6 @@ public class PasteApplicationPublicIT {
 
     @Test
     void run_MultipleFilesNoFlag_DisplaysMergedFileContents() {
-        OutputStream output = new ByteArrayOutputStream();
         String fileName1 = "fileF.txt";
         String fileName2 = "fileG.txt";
         String expected = LINE_1_DOT_1 + STRING_TAB + LINE_2_DOT_1 + STRING_NEWLINE +
@@ -249,7 +235,6 @@ public class PasteApplicationPublicIT {
 
     @Test
     void run_MultipleFilesFlag_DisplaysNonParallelMergedFileContents() {
-        OutputStream output = new ByteArrayOutputStream();
         String fileName1 = "fileH.txt";
         String fileName2 = "fileI.txt";
         String expected = joinStringsByTab(LINE_1_DOT_1, LINE_1_DOT_2, LINE_1_DOT_3) + STRING_NEWLINE +
@@ -262,7 +247,6 @@ public class PasteApplicationPublicIT {
 
     @Test
     void run_MultipleEmptyFilesNoFlag_DisplaysEmpty() {
-        OutputStream output = new ByteArrayOutputStream();
         String fileName1 = "fileJ.txt";
         String fileName2 = "fileK.txt";
         String text = "";
@@ -274,7 +258,6 @@ public class PasteApplicationPublicIT {
 
     @Test
     void run_MultipleEmptyFilesFlag_DisplaysEmpty() {
-        OutputStream output = new ByteArrayOutputStream();
         String fileName1 = "fileL.txt";
         String fileName2 = "fileM.txt";
         String text = "";
@@ -288,7 +271,6 @@ public class PasteApplicationPublicIT {
     @Test
     void run_SingleStdinNonexistentFileNoFlag_ThrowsPasteException() {
         InputStream input = new ByteArrayInputStream(L11_TO_L13.getBytes(StandardCharsets.UTF_8));
-        OutputStream output = new ByteArrayOutputStream();
         String nonExistFile = "nonExistFile.txt";
         PasteException result = assertThrowsExactly(PasteException.class, () ->
                 pasteApplication.run(toArgs("", nonExistFile), input, output)
@@ -299,7 +281,6 @@ public class PasteApplicationPublicIT {
     @Test
     void run_SingleStdinDirectoryNoFlag_DisplaysMergedStdinFileContents() {
         InputStream input = new ByteArrayInputStream(L11_TO_L13.getBytes(StandardCharsets.UTF_8));
-        OutputStream output = new ByteArrayOutputStream();
         assertDoesNotThrow(() -> pasteApplication.run(toArgs("", DIR, "-"), input, output));
         assertEquals(L11_TO_L13 + STRING_NEWLINE, output.toString());
     }
@@ -307,7 +288,6 @@ public class PasteApplicationPublicIT {
     @Test
     void run_SingleStdinDashSingleFileNoFlag_DisplaysMergedStdinFileContents() {
         InputStream input = new ByteArrayInputStream(L11_TO_L13.getBytes(StandardCharsets.UTF_8));
-        OutputStream output = new ByteArrayOutputStream();
         String fileName = "fileN.txt";
         assertDoesNotThrow(() -> createFile(fileName, L21_TO_L22));
         String expected = LINE_1_DOT_1 + STRING_TAB + LINE_2_DOT_1 + STRING_NEWLINE +
@@ -320,7 +300,6 @@ public class PasteApplicationPublicIT {
     @Test
     void run_SingleFileSingleStdinDashNoFlag_DisplaysNonParallelMergedFileStdinContents() {
         InputStream input = new ByteArrayInputStream(L21_TO_L22.getBytes(StandardCharsets.UTF_8));
-        OutputStream output = new ByteArrayOutputStream();
         String fileName = "fileO.txt";
         assertDoesNotThrow(() -> createFile(fileName, L11_TO_L13));
         String expected = LINE_1_DOT_1 + STRING_TAB + LINE_2_DOT_1 + STRING_NEWLINE +
