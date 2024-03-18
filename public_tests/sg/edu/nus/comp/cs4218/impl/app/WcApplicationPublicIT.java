@@ -20,27 +20,24 @@ import java.util.Deque;
 import java.util.List;
 
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import sg.edu.nus.comp.cs4218.exception.WcException;
 import sg.edu.nus.comp.cs4218.testutils.TestEnvironmentUtil;
 
+@SuppressWarnings("PMD.ClassNamingConventions")
 public class WcApplicationPublicIT {
     private static final String TEMP = "temp-wc";
     private static final String NUMBER_FORMAT = " %7d";
-    private static final String STDIN_FILENAME = "-";
-    private static final Deque<Path> files = new ArrayDeque<>();
+    private static final String STDIN = "-";
+    private static final String FILE_CONTENT = "First line" + STRING_NEWLINE + "Second line" +
+            STRING_NEWLINE + "Third line" + STRING_NEWLINE + "Fourth line" + STRING_NEWLINE;
+    private static final Deque<Path> FILES = new ArrayDeque<>();
+    private static final Path TEMP_PATH = Paths.get(TEMP);
     private static String currPathString;
-    private static Path TEMP_PATH;
 
     private WcApplication wcApplication;
-
-    @BeforeAll
-    static void setUp() throws NoSuchFieldException, IllegalAccessException {
-        TEMP_PATH = Paths.get(TestEnvironmentUtil.getCurrentDirectory(), TEMP);
-    }
 
     private static String formatCounts(int lineCount, int wordCount, long byteCount, String lastLine) {
         StringBuilder stringBuilder = new StringBuilder();
@@ -53,8 +50,8 @@ public class WcApplicationPublicIT {
         if (byteCount > -1) {
             stringBuilder.append(String.format(NUMBER_FORMAT, byteCount));
         }
-        if (!lastLine.equals("")) {
-            stringBuilder.append(" " + lastLine);
+        if (!"".equals(lastLine)) {
+            stringBuilder.append(' ').append(lastLine);
         }
         return stringBuilder.toString();
     }
@@ -74,17 +71,16 @@ public class WcApplicationPublicIT {
                 .sorted(Comparator.reverseOrder())
                 .map(Path::toFile)
                 .forEach(File::delete);
-        for (Path file : files) {
+        for (Path file : FILES) {
             Files.deleteIfExists(file);
         }
     }
 
     private Path createFile(String name) throws IOException {
-        String content = "First line\nSecond line\nThird line\nFourth line\n";
         Path path = TEMP_PATH.resolve(name);
         Files.createFile(path);
-        Files.write(path, content.getBytes(StandardCharsets.UTF_8));
-        files.push(path);
+        Files.write(path, FILE_CONTENT.getBytes(StandardCharsets.UTF_8));
+        FILES.push(path);
         return path;
     }
 
@@ -182,7 +178,7 @@ public class WcApplicationPublicIT {
         InputStream inputStream = new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8));
         long fileSize = input.getBytes(StandardCharsets.UTF_8).length;
         wcApplication.run(toArgs("", "-"), inputStream, output);
-        String expected = formatCounts(4, 8, fileSize, STDIN_FILENAME);
+        String expected = formatCounts(4, 8, fileSize, STDIN);
         assertEquals(expected + STRING_NEWLINE, output.toString(StandardCharsets.UTF_8));
     }
 
@@ -216,7 +212,7 @@ public class WcApplicationPublicIT {
         wcApplication.run(toArgs("", fileIName, "-"), inputStream, output);
         List<String> expectedList = new ArrayList<>();
         expectedList.add(formatCounts(4, 8, fileISize, fileIName));
-        expectedList.add(formatCounts(4, 8, inputSize, STDIN_FILENAME));
+        expectedList.add(formatCounts(4, 8, inputSize, STDIN));
         expectedList.add(formatCounts(8, 16, fileISize + inputSize, "total"));
         String expected = String.join(STRING_NEWLINE, expectedList);
         assertEquals(expected + STRING_NEWLINE, output.toString(StandardCharsets.UTF_8));

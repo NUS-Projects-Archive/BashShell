@@ -35,7 +35,7 @@ public class WcApplicationPublicTest {
     private static final long BYTECOUNT_SINGLE = SINGLE_LINE_TEXT.getBytes().length;
     private static final long BYTECOUNT_MULTI = MULTI_LINE_TEXT.getBytes().length;
     private static final long BYTESUM_SINGLE = BYTECOUNT_SINGLE + BYTECOUNT_MULTI;
-    private static final Deque<Path> files = new ArrayDeque<>();
+    private static final Deque<Path> FILES = new ArrayDeque<>();
     private static String initialDir;
     private WcApplication wcApplication;
 
@@ -50,8 +50,8 @@ public class WcApplicationPublicTest {
         if (byteCount > -1) {
             stringBuilder.append(String.format(NUMBER_FORMAT, byteCount));
         }
-        if (!lastLine.equals("")) {
-            stringBuilder.append(" " + lastLine);
+        if (!"".equals(lastLine)) {
+            stringBuilder.append(' ').append(lastLine);
         }
         return stringBuilder.toString();
     }
@@ -71,7 +71,7 @@ public class WcApplicationPublicTest {
                 .map(Path::toFile)
                 .forEach(File::delete);
         TestEnvironmentUtil.setCurrentDirectory(initialDir);
-        for (Path file : files) {
+        for (Path file : FILES) {
             Files.deleteIfExists(file);
         }
     }
@@ -80,7 +80,7 @@ public class WcApplicationPublicTest {
         Path path = TEMP_PATH.resolve(name);
         Files.createFile(path);
         Files.write(path, content.getBytes());
-        files.push(path);
+        FILES.push(path);
     }
 
     @Test
