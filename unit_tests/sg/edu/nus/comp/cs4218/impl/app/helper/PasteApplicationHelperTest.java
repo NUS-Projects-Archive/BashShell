@@ -115,7 +115,7 @@ class PasteApplicationHelperTest {
         boolean isSetReadable = filePath.toFile().setReadable(false);
         assertTrue(isSetReadable, "Failed to set read permission to false for test source file");
         PasteException result = assertThrowsExactly(PasteException.class, () -> checkPasteFileValidity(filePath.toString()));
-        String expected = String.format("paste: '%s': could not read file", filePath.toFile().getName());
+        String expected = String.format("paste: '%s': Could not read file", filePath.toFile().getName());
         assertEquals(expected, result.getMessage());
     }
 
