@@ -29,7 +29,6 @@ public class WcApplicationPublicTest {
     private static final Path TEMP_PATH = Paths.get(TEMP);
     private static final String LABEL_TOTAL = "total";
     private static final String NUMBER_FORMAT = " %7d";
-    private static final String STRING_FORMAT = " %s";
     private static final String MULTI_LINE_TEXT = "This is a test.\nThis is still a test.";
     private static final String STDIN_FILENAME = "-";
     private static final String SINGLE_LINE_TEXT = "This is a test.";
@@ -40,7 +39,7 @@ public class WcApplicationPublicTest {
     private static String initialDir;
     private WcApplication wcApplication;
 
-    private static String appendString(int lineCount, int wordCount, long byteCount, String lastLine) {
+    private static String formatCounts(int lineCount, int wordCount, long byteCount, String lastLine) {
         StringBuilder stringBuilder = new StringBuilder();
         if (lineCount > -1) {
             stringBuilder.append(String.format(NUMBER_FORMAT, lineCount));
@@ -51,7 +50,9 @@ public class WcApplicationPublicTest {
         if (byteCount > -1) {
             stringBuilder.append(String.format(NUMBER_FORMAT, byteCount));
         }
-        stringBuilder.append(lastLine);
+        if (!lastLine.equals("")) {
+            stringBuilder.append(" " + lastLine);
+        }
         return stringBuilder.toString();
     }
 
@@ -93,7 +94,7 @@ public class WcApplicationPublicTest {
         String[] fileNames = new String[]{"file1.txt"};
         String testFileContent = "";
         createFile("file1.txt", testFileContent);
-        String expected = appendString(0, 0, 0, String.format(STRING_FORMAT, "file1.txt"));
+        String expected = formatCounts(0, 0, 0, "file1.txt");
 
         String result = wcApplication.countFromFiles(true, true, true, fileNames);
 
@@ -104,7 +105,7 @@ public class WcApplicationPublicTest {
     void countFromFiles_SingleFileWithSingleLineText_ReturnsLinesWordsBytesCount() throws Exception {
         String[] fileNames = new String[]{"file2.txt"};
         createFile("file2.txt", SINGLE_LINE_TEXT);
-        String expected = appendString(0, 4, BYTECOUNT_SINGLE, String.format(STRING_FORMAT, "file2.txt"));
+        String expected = formatCounts(0, 4, BYTECOUNT_SINGLE, "file2.txt");
 
         String result = wcApplication.countFromFiles(true, true, true, fileNames);
 
@@ -115,7 +116,7 @@ public class WcApplicationPublicTest {
     void countFromFiles_SingleFileWithSingleLineTextBytesOption_ReturnBytesCount() throws Exception {
         String[] fileNames = new String[]{"file3.txt"};
         createFile("file3.txt", SINGLE_LINE_TEXT);
-        String expected = appendString(-1, -1, BYTECOUNT_SINGLE, String.format(STRING_FORMAT, "file3.txt"));
+        String expected = formatCounts(-1, -1, BYTECOUNT_SINGLE, "file3.txt");
 
         String result = wcApplication.countFromFiles(true, false, false, fileNames);
 
@@ -126,7 +127,7 @@ public class WcApplicationPublicTest {
     void countFromFiles_SingleFileWithSingleLineTextLinesOption_ReturnLinesCount() throws Exception {
         String[] fileNames = new String[]{"file4.txt"};
         createFile("file4.txt", SINGLE_LINE_TEXT);
-        String expected = appendString(0, -1, -1, String.format(STRING_FORMAT, "file4.txt"));
+        String expected = formatCounts(0, -1, -1, "file4.txt");
 
         String result = wcApplication.countFromFiles(false, true, false, fileNames);
 
@@ -137,7 +138,7 @@ public class WcApplicationPublicTest {
     void countFromFiles_SingleFileWithSingleLineTextWordsOption_ReturnWordsCount() throws Exception {
         String[] fileNames = new String[]{"file5.txt"};
         createFile("file5.txt", SINGLE_LINE_TEXT);
-        String expected = appendString(-1, 4, -1, String.format(STRING_FORMAT, "file5.txt"));
+        String expected = formatCounts(-1, 4, -1, "file5.txt");
 
         String result = wcApplication.countFromFiles(false, false, true, fileNames);
 
@@ -148,7 +149,7 @@ public class WcApplicationPublicTest {
     void countFromStdin_EmptyFile_ReturnsAllZeros() throws Exception {
         String testFileContent = "";
         InputStream stdin = new ByteArrayInputStream(testFileContent.getBytes());
-        String expected = appendString(0, 0, 0, "");
+        String expected = formatCounts(0, 0, 0, "");
 
         String result = wcApplication.countFromStdin(true, true, true, stdin);
 
@@ -159,7 +160,7 @@ public class WcApplicationPublicTest {
     void countFromStdin_SingleFileWithSingleLineText_ReturnsLinesWordsBytesCount() throws Exception {
 
         InputStream stdin = new ByteArrayInputStream(SINGLE_LINE_TEXT.getBytes());
-        String expected = appendString(0, 4, BYTECOUNT_SINGLE, "");
+        String expected = formatCounts(0, 4, BYTECOUNT_SINGLE, "");
 
         String result = wcApplication.countFromStdin(true, true, true, stdin);
 
@@ -170,7 +171,7 @@ public class WcApplicationPublicTest {
     void countFromStdin_SingleFileWithSingleLineTextBytesOption_ReturnBytesCount() throws Exception {
 
         InputStream stdin = new ByteArrayInputStream(SINGLE_LINE_TEXT.getBytes());
-        String expected = appendString(-1, -1, BYTECOUNT_SINGLE, "");
+        String expected = formatCounts(-1, -1, BYTECOUNT_SINGLE, "");
 
         String result = wcApplication.countFromStdin(true, false, false, stdin);
 
@@ -181,7 +182,7 @@ public class WcApplicationPublicTest {
     void countFromStdin_SingleFileWithSingleLineTextLinesOption_ReturnLinesCount() throws Exception {
 
         InputStream stdin = new ByteArrayInputStream(SINGLE_LINE_TEXT.getBytes());
-        String expected = appendString(0, -1, -1, "");
+        String expected = formatCounts(0, -1, -1, "");
 
         String result = wcApplication.countFromStdin(false, true, false, stdin);
 
@@ -192,7 +193,7 @@ public class WcApplicationPublicTest {
     void countFromStdin_SingleFileWithSingleLineTextWordsOption_ReturnWordsCount() throws Exception {
 
         InputStream stdin = new ByteArrayInputStream(SINGLE_LINE_TEXT.getBytes());
-        String expected = appendString(-1, 4, -1, "");
+        String expected = formatCounts(-1, 4, -1, "");
 
         String result = wcApplication.countFromStdin(false, false, true, stdin);
 
@@ -206,9 +207,9 @@ public class WcApplicationPublicTest {
         InputStream stdin = new ByteArrayInputStream(MULTI_LINE_TEXT.getBytes());
         String[] fileNames = new String[]{"file13.txt", STDIN_FILENAME};
         List<String> expectedList = new ArrayList<>();
-        expectedList.add(appendString(0, 4, BYTECOUNT_SINGLE, String.format(STRING_FORMAT, "file13.txt")));
-        expectedList.add(appendString(1, 9, BYTECOUNT_MULTI, String.format(STRING_FORMAT, STDIN_FILENAME)));
-        expectedList.add(appendString(1, 13, BYTESUM_SINGLE, String.format(STRING_FORMAT, LABEL_TOTAL)));
+        expectedList.add(formatCounts(0, 4, BYTECOUNT_SINGLE, "file13.txt"));
+        expectedList.add(formatCounts(1, 9, BYTECOUNT_MULTI, STDIN_FILENAME));
+        expectedList.add(formatCounts(1, 13, BYTESUM_SINGLE, LABEL_TOTAL));
         String expected = String.join(STRING_NEWLINE, expectedList);
         String result = wcApplication.countFromFileAndStdin(true, true, true, stdin, fileNames);
 
@@ -222,9 +223,9 @@ public class WcApplicationPublicTest {
         InputStream stdin = new ByteArrayInputStream(MULTI_LINE_TEXT.getBytes());
         String[] fileNames = new String[]{STDIN_FILENAME, "file14.txt"};
         List<String> expectedList = new ArrayList<>();
-        expectedList.add(appendString(1, 9, BYTECOUNT_MULTI, String.format(STRING_FORMAT, STDIN_FILENAME)));
-        expectedList.add(appendString(0, 4, BYTECOUNT_SINGLE, String.format(STRING_FORMAT, "file14.txt")));
-        expectedList.add(appendString(1, 13, BYTESUM_SINGLE, String.format(STRING_FORMAT, LABEL_TOTAL)));
+        expectedList.add(formatCounts(1, 9, BYTECOUNT_MULTI, STDIN_FILENAME));
+        expectedList.add(formatCounts(0, 4, BYTECOUNT_SINGLE, "file14.txt"));
+        expectedList.add(formatCounts(1, 13, BYTESUM_SINGLE, LABEL_TOTAL));
         String expected = String.join(STRING_NEWLINE, expectedList);
         String result = wcApplication.countFromFileAndStdin(true, true, true, stdin, fileNames);
 
@@ -238,9 +239,9 @@ public class WcApplicationPublicTest {
         InputStream stdin = new ByteArrayInputStream(MULTI_LINE_TEXT.getBytes());
         String[] fileNames = new String[]{"file15.txt", STDIN_FILENAME};
         List<String> expectedList = new ArrayList<>();
-        expectedList.add(appendString(-1, -1, BYTECOUNT_SINGLE, String.format(STRING_FORMAT, "file15.txt")));
-        expectedList.add(appendString(-1, -1, BYTECOUNT_MULTI, String.format(STRING_FORMAT, STDIN_FILENAME)));
-        expectedList.add(appendString(-1, -1, BYTESUM_SINGLE, String.format(STRING_FORMAT, LABEL_TOTAL)));
+        expectedList.add(formatCounts(-1, -1, BYTECOUNT_SINGLE, "file15.txt"));
+        expectedList.add(formatCounts(-1, -1, BYTECOUNT_MULTI, STDIN_FILENAME));
+        expectedList.add(formatCounts(-1, -1, BYTESUM_SINGLE, LABEL_TOTAL));
         String expected = String.join(STRING_NEWLINE, expectedList);
         String result = wcApplication.countFromFileAndStdin(true, false, false, stdin, fileNames);
 
@@ -254,9 +255,9 @@ public class WcApplicationPublicTest {
         InputStream stdin = new ByteArrayInputStream(MULTI_LINE_TEXT.getBytes());
         String[] fileNames = new String[]{"file16.txt", STDIN_FILENAME};
         List<String> expectedList = new ArrayList<>();
-        expectedList.add(appendString(0, -1, -1, String.format(STRING_FORMAT, "file16.txt")));
-        expectedList.add(appendString(1, -1, -1, String.format(STRING_FORMAT, STDIN_FILENAME)));
-        expectedList.add(appendString(1, -1, -1, String.format(STRING_FORMAT, LABEL_TOTAL)));
+        expectedList.add(formatCounts(0, -1, -1, "file16.txt"));
+        expectedList.add(formatCounts(1, -1, -1, STDIN_FILENAME));
+        expectedList.add(formatCounts(1, -1, -1, LABEL_TOTAL));
         String expected = String.join(STRING_NEWLINE, expectedList);
         String result = wcApplication.countFromFileAndStdin(false, true, false, stdin, fileNames);
 
@@ -270,9 +271,9 @@ public class WcApplicationPublicTest {
         InputStream stdin = new ByteArrayInputStream(MULTI_LINE_TEXT.getBytes());
         String[] fileNames = new String[]{"file17.txt", STDIN_FILENAME};
         List<String> expectedList = new ArrayList<>();
-        expectedList.add(appendString(-1, 4, -1, String.format(STRING_FORMAT, "file17.txt")));
-        expectedList.add(appendString(-1, 9, -1, String.format(STRING_FORMAT, STDIN_FILENAME)));
-        expectedList.add(appendString(-1, 13, -1, String.format(STRING_FORMAT, LABEL_TOTAL)));
+        expectedList.add(formatCounts(-1, 4, -1, "file17.txt"));
+        expectedList.add(formatCounts(-1, 9, -1, STDIN_FILENAME));
+        expectedList.add(formatCounts(-1, 13, -1, LABEL_TOTAL));
         String expected = String.join(STRING_NEWLINE, expectedList);
         String result = wcApplication.countFromFileAndStdin(false, false, true, stdin, fileNames);
         assertEquals(expected, result);

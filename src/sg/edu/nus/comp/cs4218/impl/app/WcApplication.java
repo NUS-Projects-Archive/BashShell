@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import sg.edu.nus.comp.cs4218.app.WcInterface;
+import sg.edu.nus.comp.cs4218.exception.InvalidArgsException;
 import sg.edu.nus.comp.cs4218.exception.ShellException;
 import sg.edu.nus.comp.cs4218.exception.WcException;
 import sg.edu.nus.comp.cs4218.impl.parser.WcArgsParser;
@@ -62,7 +63,7 @@ public class WcApplication implements WcInterface {
         final WcArgsParser parser = new WcArgsParser();
         try {
             parser.parse(args);
-        } catch (Exception e) {
+        } catch (InvalidArgsException | NullPointerException e) {
             throw new WcException(e.getMessage(), e);
         }
         final Boolean isStdinOnly = parser.isStdinOnly();

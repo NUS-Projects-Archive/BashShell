@@ -30,7 +30,6 @@ import sg.edu.nus.comp.cs4218.testutils.TestEnvironmentUtil;
 public class WcApplicationPublicIT {
     private static final String TEMP = "temp-wc";
     private static final String NUMBER_FORMAT = " %7d";
-    private static final String STRING_FORMAT = " %s";
     private static final String STDIN_FILENAME = "-";
     private static final Deque<Path> files = new ArrayDeque<>();
     private static String currPathString;
@@ -43,7 +42,7 @@ public class WcApplicationPublicIT {
         TEMP_PATH = Paths.get(TestEnvironmentUtil.getCurrentDirectory(), TEMP);
     }
 
-    private static String appendString(int lineCount, int wordCount, long byteCount, String lastLine) {
+    private static String formatCounts(int lineCount, int wordCount, long byteCount, String lastLine) {
         StringBuilder stringBuilder = new StringBuilder();
         if (lineCount > -1) {
             stringBuilder.append(String.format(NUMBER_FORMAT, lineCount));
@@ -54,7 +53,9 @@ public class WcApplicationPublicIT {
         if (byteCount > -1) {
             stringBuilder.append(String.format(NUMBER_FORMAT, byteCount));
         }
-        stringBuilder.append(lastLine);
+        if (!lastLine.equals("")) {
+            stringBuilder.append(" " + lastLine);
+        }
         return stringBuilder.toString();
     }
 
@@ -109,7 +110,7 @@ public class WcApplicationPublicIT {
         Path filePath = createFile(fileName);
         long fileSize = Files.size(filePath);
         wcApplication.run(toArgs("", fileName), System.in, output);
-        String expected = appendString(4, 8, fileSize, String.format(STRING_FORMAT, fileName));
+        String expected = formatCounts(4, 8, fileSize, fileName);
         assertEquals(expected + STRING_NEWLINE, output.toString(StandardCharsets.UTF_8));
     }
 
@@ -119,7 +120,7 @@ public class WcApplicationPublicIT {
         String fileName = "fileB.txt";
         createFile(fileName);
         wcApplication.run(toArgs("l", fileName), System.in, output);
-        String expected = appendString(4, -1, -1, String.format(STRING_FORMAT, fileName));
+        String expected = formatCounts(4, -1, -1, fileName);
         assertEquals(expected + STRING_NEWLINE, output.toString(StandardCharsets.UTF_8));
     }
 
@@ -129,7 +130,7 @@ public class WcApplicationPublicIT {
         String fileName = "fileC.txt";
         createFile(fileName);
         wcApplication.run(toArgs("w", fileName), System.in, output);
-        String expected = appendString(-1, 8, -1, String.format(STRING_FORMAT, fileName));
+        String expected = formatCounts(-1, 8, -1, fileName);
         assertEquals(expected + STRING_NEWLINE, output.toString(StandardCharsets.UTF_8));
     }
 
@@ -140,7 +141,7 @@ public class WcApplicationPublicIT {
         Path filePath = createFile(fileName);
         long fileSize = Files.size(filePath);
         wcApplication.run(toArgs("c", fileName), System.in, output);
-        String expected = appendString(-1, -1, fileSize, String.format(STRING_FORMAT, fileName));
+        String expected = formatCounts(-1, -1, fileSize, fileName);
         assertEquals(expected + STRING_NEWLINE, output.toString(StandardCharsets.UTF_8));
     }
 
@@ -151,9 +152,8 @@ public class WcApplicationPublicIT {
         Path filePath = createFile(fileName);
         long fileSize = Files.size(filePath);
         wcApplication.run(toArgs("clw", fileName), System.in, output);
-        String expected = appendString(4, 8, fileSize, String.format(STRING_FORMAT, fileName));
-        assertEquals(expected + STRING_NEWLINE,
-                output.toString(StandardCharsets.UTF_8));
+        String expected = formatCounts(4, 8, fileSize, fileName);
+        assertEquals(expected + STRING_NEWLINE, output.toString(StandardCharsets.UTF_8));
     }
 
     @Test
@@ -171,7 +171,7 @@ public class WcApplicationPublicIT {
         InputStream inputStream = new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8));
         long fileSize = input.getBytes(StandardCharsets.UTF_8).length;
         wcApplication.run(toArgs(""), inputStream, output);
-        String expected = appendString(4, 8, fileSize, "");
+        String expected = formatCounts(4, 8, fileSize, "");
         assertEquals(expected + STRING_NEWLINE, output.toString(StandardCharsets.UTF_8));
     }
 
@@ -182,7 +182,7 @@ public class WcApplicationPublicIT {
         InputStream inputStream = new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8));
         long fileSize = input.getBytes(StandardCharsets.UTF_8).length;
         wcApplication.run(toArgs("", "-"), inputStream, output);
-        String expected = appendString(4, 8, fileSize, String.format(STRING_FORMAT, STDIN_FILENAME));
+        String expected = formatCounts(4, 8, fileSize, STDIN_FILENAME);
         assertEquals(expected + STRING_NEWLINE, output.toString(StandardCharsets.UTF_8));
     }
 
@@ -197,9 +197,9 @@ public class WcApplicationPublicIT {
         long fileHSize = Files.size(fileHPath);
         wcApplication.run(toArgs("", fileGName, fileHName), System.in, output);
         List<String> expectedList = new ArrayList<>();
-        expectedList.add(appendString(4, 8, fileGSize, String.format(STRING_FORMAT, fileGName)));
-        expectedList.add(appendString(4, 8, fileHSize, String.format(STRING_FORMAT, fileHName)));
-        expectedList.add(appendString(8, 16, fileGSize + fileHSize, String.format(STRING_FORMAT, "total")));
+        expectedList.add(formatCounts(4, 8, fileGSize, fileGName));
+        expectedList.add(formatCounts(4, 8, fileHSize, fileHName));
+        expectedList.add(formatCounts(8, 16, fileGSize + fileHSize, "total"));
         String expected = String.join(STRING_NEWLINE, expectedList);
         assertEquals(expected + STRING_NEWLINE, output.toString(StandardCharsets.UTF_8));
     }
@@ -215,9 +215,9 @@ public class WcApplicationPublicIT {
         long inputSize = input.getBytes(StandardCharsets.UTF_8).length;
         wcApplication.run(toArgs("", fileIName, "-"), inputStream, output);
         List<String> expectedList = new ArrayList<>();
-        expectedList.add(appendString(4, 8, fileISize, String.format(STRING_FORMAT, fileIName)));
-        expectedList.add(appendString(4, 8, inputSize, String.format(STRING_FORMAT, STDIN_FILENAME)));
-        expectedList.add(appendString(8, 16, fileISize + inputSize, String.format(STRING_FORMAT, "total")));
+        expectedList.add(formatCounts(4, 8, fileISize, fileIName));
+        expectedList.add(formatCounts(4, 8, inputSize, STDIN_FILENAME));
+        expectedList.add(formatCounts(8, 16, fileISize + inputSize, "total"));
         String expected = String.join(STRING_NEWLINE, expectedList);
         assertEquals(expected + STRING_NEWLINE, output.toString(StandardCharsets.UTF_8));
     }
