@@ -3,7 +3,6 @@ package sg.edu.nus.comp.cs4218.impl.app;
 import static sg.edu.nus.comp.cs4218.impl.util.CollectionsUtils.listToArray;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_NOT_FOUND;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IO_EXCEPTION;
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IS_DIR;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_ISTREAM;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NULL_ARGS;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NULL_STREAMS;
@@ -65,7 +64,6 @@ public class PasteApplication implements PasteInterface {
         }
 
         final Boolean isSerial = parser.isSerial();
-        final Boolean hasStdin = parser.hasStdin();
         final String[] nonFlagArgs = listToArray(parser.getNonFlagArgs());
 
         final StringBuilder output = new StringBuilder();
@@ -166,10 +164,26 @@ public class PasteApplication implements PasteInterface {
             throw new PasteException(ERR_NULL_ARGS);
         }
 
+        List<String> stdinData;
+        try {
+            stdinData = IOUtils.getLinesFromInputStream(stdin);
+        } catch (IOException e) {
+            throw new PasteException(ERR_IO_EXCEPTION, e);
+        }
+
+        int currStdin = 0;
+        int numOfStdin = (int) Arrays.stream(fileName).filter("-"::equals).count();
         List<String> output = new ArrayList<>();
+
         for (String file : fileName) {
-            if ("-".equals(file)) {
-                output.add(mergeStdin(isSerial, stdin));
+            if (("-").equals(file)) {
+                List<String> currList = new ArrayList<>();
+                int step = isSerial ? 1 : numOfStdin;
+                for (int i = currStdin; i < stdinData.size(); i += step) {
+                    currList.add(stdinData.get(i));
+                }
+                currStdin += isSerial ? stdinData.size() : 1;
+                output.add(String.join(STRING_NEWLINE, currList));
             } else {
                 output.add(mergeFile(isSerial, file));
             }

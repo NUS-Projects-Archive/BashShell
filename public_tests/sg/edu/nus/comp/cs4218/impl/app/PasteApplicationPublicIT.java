@@ -13,6 +13,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -62,8 +63,8 @@ public class PasteApplicationPublicIT {
     @BeforeAll
     static void createTemp() throws NoSuchFieldException, IllegalAccessException, IOException {
         tempPath = Paths.get(TestEnvironmentUtil.getCurrentDirectory(), TEMP);
-        Files.createDirectory(tempPath);
         dirPath = Paths.get(TestEnvironmentUtil.getCurrentDirectory(), TEMP + CHAR_FILE_SEP + DIR);
+        Files.createDirectory(tempPath);
         Files.createDirectory(dirPath);
     }
 
@@ -106,72 +107,72 @@ public class PasteApplicationPublicIT {
 
     @Test
     void run_NullStdinNullFilesNoFlag_ThrowsPasteException() {
-        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        OutputStream output = new ByteArrayOutputStream();
         assertThrowsExactly(PasteException.class, () -> pasteApplication.run(toArgs(""), null, output));
     }
 
     @Test
     void run_NullStdinNullFilesFlag_ThrowsPasteException() {
-        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        OutputStream output = new ByteArrayOutputStream();
         assertThrowsExactly(PasteException.class, () -> pasteApplication.run(toArgs("n"), null, output));
     }
 
     //mergeStdin cases
     @Test
     void run_SingleStdinNoFlag_DisplaysStdinContents() {
-        ByteArrayOutputStream output = new ByteArrayOutputStream();
         InputStream input = new ByteArrayInputStream(L1_TO_L3.getBytes(StandardCharsets.UTF_8));
+        OutputStream output = new ByteArrayOutputStream();
         assertDoesNotThrow(() -> pasteApplication.run(toArgs(""), input, output));
-        assertEquals(L1_TO_L3 + STRING_NEWLINE, output.toString(StandardCharsets.UTF_8));
+        assertEquals(L1_TO_L3 + STRING_NEWLINE, output.toString());
     }
 
 
     @Test
     void run_SingleStdinFlag_DisplaysNonParallelStdinContents() {
-        ByteArrayOutputStream output = new ByteArrayOutputStream();
         InputStream input = new ByteArrayInputStream(L1_TO_L3.getBytes(StandardCharsets.UTF_8));
+        OutputStream output = new ByteArrayOutputStream();
         assertDoesNotThrow(() -> pasteApplication.run(toArgs("s"), input, output));
-        assertEquals(L1_TO_L3_TAB + STRING_NEWLINE, output.toString(StandardCharsets.UTF_8));
+        assertEquals(L1_TO_L3_TAB + STRING_NEWLINE, output.toString());
     }
 
     @Test
     void run_SingleStdinDashNoFlag_DisplaysStdinContents() {
-        ByteArrayOutputStream output = new ByteArrayOutputStream();
         InputStream input = new ByteArrayInputStream(L1_TO_L3.getBytes(StandardCharsets.UTF_8));
+        OutputStream output = new ByteArrayOutputStream();
         assertDoesNotThrow(() -> pasteApplication.run(toArgs("", "-"), input, output));
-        assertEquals(L1_TO_L3 + STRING_NEWLINE, output.toString(StandardCharsets.UTF_8));
+        assertEquals(L1_TO_L3 + STRING_NEWLINE, output.toString());
     }
 
     @Test
     void run_SingleStdinDashFlag_DisplaysNonParallelStdinContents() {
-        ByteArrayOutputStream output = new ByteArrayOutputStream();
         InputStream input = new ByteArrayInputStream(L1_TO_L3.getBytes(StandardCharsets.UTF_8));
+        OutputStream output = new ByteArrayOutputStream();
         assertDoesNotThrow(() -> pasteApplication.run(toArgs("s", "-"), input, output));
-        assertEquals(L1_TO_L3_TAB + STRING_NEWLINE, output.toString(StandardCharsets.UTF_8));
+        assertEquals(L1_TO_L3_TAB + STRING_NEWLINE, output.toString());
     }
 
     @Test
     void run_SingleEmptyStdinNoFlag_DisplaysEmpty() {
-        ByteArrayOutputStream output = new ByteArrayOutputStream();
         String text = "";
         InputStream input = new ByteArrayInputStream(text.getBytes(StandardCharsets.UTF_8));
+        OutputStream output = new ByteArrayOutputStream();
         assertDoesNotThrow(() -> pasteApplication.run(toArgs(""), input, output));
-        assertEquals(text, output.toString(StandardCharsets.UTF_8));
+        assertEquals(text, output.toString());
     }
 
     @Test
     void run_SingleEmptyStdinFlag_DisplaysEmpty() {
-        ByteArrayOutputStream output = new ByteArrayOutputStream();
         String text = "";
         InputStream input = new ByteArrayInputStream(text.getBytes(StandardCharsets.UTF_8));
+        OutputStream output = new ByteArrayOutputStream();
         assertDoesNotThrow(() -> pasteApplication.run(toArgs("s"), input, output));
-        assertEquals(text, output.toString(StandardCharsets.UTF_8));
+        assertEquals(text, output.toString());
     }
 
     //mergeFiles cases
     @Test
     void run_NonexistentFileNoFlag_ThrowsPasteException() {
-        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        OutputStream output = new ByteArrayOutputStream();
         String nonExistFile = "nonExistFile.txt";
         PasteException result = assertThrowsExactly(PasteException.class, () ->
                 pasteApplication.run(toArgs("", nonExistFile), System.in, output)
@@ -181,52 +182,52 @@ public class PasteApplicationPublicIT {
 
     @Test
     void run_DirectoryNoFlag_DisplaysEmpty() {
-        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        OutputStream output = new ByteArrayOutputStream();
         assertDoesNotThrow(() -> pasteApplication.run(toArgs("", DIR), System.in, output));
-        assertEquals("", output.toString(StandardCharsets.UTF_8));
+        assertEquals("", output.toString());
     }
 
     @Test
     void run_SingleFileNoFlag_DisplaysFileContents() {
-        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        OutputStream output = new ByteArrayOutputStream();
         String fileName = "fileA.txt";
         assertDoesNotThrow(() -> createFile(fileName, L1_TO_L3));
         assertDoesNotThrow(() -> pasteApplication.run(toArgs("", fileName), System.in, output));
-        assertEquals(L1_TO_L3 + STRING_NEWLINE, output.toString(StandardCharsets.UTF_8));
+        assertEquals(L1_TO_L3 + STRING_NEWLINE, output.toString());
     }
 
     @Test
     void run_SingleFileFlag_DisplaysNonParallelFileContents() {
-        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        OutputStream output = new ByteArrayOutputStream();
         String fileName = "fileB.txt";
         assertDoesNotThrow(() -> createFile(fileName, L1_TO_L3));
         assertDoesNotThrow(() -> pasteApplication.run(toArgs("s", fileName), System.in, output));
-        assertEquals(L1_TO_L3_TAB + STRING_NEWLINE, output.toString(StandardCharsets.UTF_8));
+        assertEquals(L1_TO_L3_TAB + STRING_NEWLINE, output.toString());
     }
 
     @Test
     void run_SingleEmptyFileNoFlag_DisplaysEmpty() {
-        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        OutputStream output = new ByteArrayOutputStream();
         String fileName = "fileC.txt";
         String text = "";
         assertDoesNotThrow(() -> createFile(fileName, text));
         assertDoesNotThrow(() -> pasteApplication.run(toArgs("", fileName), System.in, output));
-        assertEquals(text, output.toString(StandardCharsets.UTF_8));
+        assertEquals(text, output.toString());
     }
 
     @Test
     void run_SingleEmptyFileFlag_DisplaysEmpty() {
-        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        OutputStream output = new ByteArrayOutputStream();
         String fileName = "fileD.txt";
         String text = "";
         assertDoesNotThrow(() -> createFile(fileName, text));
         assertDoesNotThrow(() -> pasteApplication.run(toArgs("s", fileName), System.in, output));
-        assertEquals(text, output.toString(StandardCharsets.UTF_8));
+        assertEquals(text, output.toString());
     }
 
     @Test
     void run_SingleFileUnknownFlag_Throws() {
-        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        OutputStream output = new ByteArrayOutputStream();
         String fileName = "fileE.txt";
         assertDoesNotThrow(() -> createFile(fileName, L1_TO_L3));
         assertThrowsExactly(PasteException.class, () -> pasteApplication.run(toArgs("a", fileName), System.in, output));
@@ -234,7 +235,7 @@ public class PasteApplicationPublicIT {
 
     @Test
     void run_MultipleFilesNoFlag_DisplaysMergedFileContents() {
-        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        OutputStream output = new ByteArrayOutputStream();
         String fileName1 = "fileF.txt";
         String fileName2 = "fileG.txt";
         String expected = LINE_1_DOT_1 + STRING_TAB + LINE_2_DOT_1 + STRING_NEWLINE +
@@ -243,12 +244,12 @@ public class PasteApplicationPublicIT {
         assertDoesNotThrow(() -> createFile(fileName1, L11_TO_L13));
         assertDoesNotThrow(() -> createFile(fileName2, L21_TO_L22));
         assertDoesNotThrow(() -> pasteApplication.run(toArgs("", fileName1, fileName2), System.in, output));
-        assertEquals(expected + STRING_NEWLINE, output.toString(StandardCharsets.UTF_8));
+        assertEquals(expected + STRING_NEWLINE, output.toString());
     }
 
     @Test
     void run_MultipleFilesFlag_DisplaysNonParallelMergedFileContents() {
-        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        OutputStream output = new ByteArrayOutputStream();
         String fileName1 = "fileH.txt";
         String fileName2 = "fileI.txt";
         String expected = joinStringsByTab(LINE_1_DOT_1, LINE_1_DOT_2, LINE_1_DOT_3) + STRING_NEWLINE +
@@ -256,38 +257,38 @@ public class PasteApplicationPublicIT {
         assertDoesNotThrow(() -> createFile(fileName1, L11_TO_L13));
         assertDoesNotThrow(() -> createFile(fileName2, L21_TO_L22));
         assertDoesNotThrow(() -> pasteApplication.run(toArgs("s", fileName1, fileName2), System.in, output));
-        assertEquals(expected + STRING_NEWLINE, output.toString(StandardCharsets.UTF_8));
+        assertEquals(expected + STRING_NEWLINE, output.toString());
     }
 
     @Test
     void run_MultipleEmptyFilesNoFlag_DisplaysEmpty() {
-        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        OutputStream output = new ByteArrayOutputStream();
         String fileName1 = "fileJ.txt";
         String fileName2 = "fileK.txt";
         String text = "";
         assertDoesNotThrow(() -> createFile(fileName1, text));
         assertDoesNotThrow(() -> createFile(fileName2, text));
         assertDoesNotThrow(() -> pasteApplication.run(toArgs("", fileName1, fileName2), System.in, output));
-        assertEquals(text, output.toString(StandardCharsets.UTF_8));
+        assertEquals(text, output.toString());
     }
 
     @Test
     void run_MultipleEmptyFilesFlag_DisplaysEmpty() {
-        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        OutputStream output = new ByteArrayOutputStream();
         String fileName1 = "fileL.txt";
         String fileName2 = "fileM.txt";
         String text = "";
         assertDoesNotThrow(() -> createFile(fileName1, text));
         assertDoesNotThrow(() -> createFile(fileName2, text));
         assertDoesNotThrow(() -> pasteApplication.run(toArgs("s", fileName1, fileName2), System.in, output));
-        assertEquals(text, output.toString(StandardCharsets.UTF_8));
+        assertEquals(text, output.toString());
     }
 
     //mergeFilesAndStdin cases
     @Test
     void run_SingleStdinNonexistentFileNoFlag_ThrowsPasteException() {
-        ByteArrayOutputStream output = new ByteArrayOutputStream();
         InputStream input = new ByteArrayInputStream(L11_TO_L13.getBytes(StandardCharsets.UTF_8));
+        OutputStream output = new ByteArrayOutputStream();
         String nonExistFile = "nonExistFile.txt";
         PasteException result = assertThrowsExactly(PasteException.class, () ->
                 pasteApplication.run(toArgs("", nonExistFile), input, output)
@@ -297,35 +298,35 @@ public class PasteApplicationPublicIT {
 
     @Test
     void run_SingleStdinDirectoryNoFlag_DisplaysMergedStdinFileContents() {
-        ByteArrayOutputStream output = new ByteArrayOutputStream();
         InputStream input = new ByteArrayInputStream(L11_TO_L13.getBytes(StandardCharsets.UTF_8));
+        OutputStream output = new ByteArrayOutputStream();
         assertDoesNotThrow(() -> pasteApplication.run(toArgs("", DIR, "-"), input, output));
-        assertEquals(L11_TO_L13 + STRING_NEWLINE, output.toString(StandardCharsets.UTF_8));
+        assertEquals(L11_TO_L13 + STRING_NEWLINE, output.toString());
     }
 
     @Test
     void run_SingleStdinDashSingleFileNoFlag_DisplaysMergedStdinFileContents() {
-        ByteArrayOutputStream output = new ByteArrayOutputStream();
         InputStream input = new ByteArrayInputStream(L11_TO_L13.getBytes(StandardCharsets.UTF_8));
+        OutputStream output = new ByteArrayOutputStream();
         String fileName = "fileN.txt";
         assertDoesNotThrow(() -> createFile(fileName, L21_TO_L22));
         String expected = LINE_1_DOT_1 + STRING_TAB + LINE_2_DOT_1 + STRING_NEWLINE +
                 LINE_1_DOT_2 + STRING_TAB + LINE_2_DOT_2 + STRING_NEWLINE +
                 LINE_1_DOT_3 + STRING_TAB;
         assertDoesNotThrow(() -> pasteApplication.run(toArgs("", "-", fileName), input, output));
-        assertEquals(expected + STRING_NEWLINE, output.toString(StandardCharsets.UTF_8));
+        assertEquals(expected + STRING_NEWLINE, output.toString());
     }
 
     @Test
     void run_SingleFileSingleStdinDashNoFlag_DisplaysNonParallelMergedFileStdinContents() {
         InputStream input = new ByteArrayInputStream(L21_TO_L22.getBytes(StandardCharsets.UTF_8));
-        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        OutputStream output = new ByteArrayOutputStream();
         String fileName = "fileO.txt";
         assertDoesNotThrow(() -> createFile(fileName, L11_TO_L13));
         String expected = LINE_1_DOT_1 + STRING_TAB + LINE_2_DOT_1 + STRING_NEWLINE +
                 LINE_1_DOT_2 + STRING_TAB + LINE_2_DOT_2 + STRING_NEWLINE +
                 LINE_1_DOT_3 + STRING_TAB;
         assertDoesNotThrow(() -> pasteApplication.run(toArgs("", fileName, "-"), input, output));
-        assertEquals(expected + STRING_NEWLINE, output.toString(StandardCharsets.UTF_8));
+        assertEquals(expected + STRING_NEWLINE, output.toString());
     }
 }
