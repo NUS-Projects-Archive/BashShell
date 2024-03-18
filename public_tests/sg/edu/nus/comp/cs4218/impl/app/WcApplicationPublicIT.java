@@ -2,6 +2,7 @@ package sg.edu.nus.comp.cs4218.impl.app;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.joinStringsByNewline;
 import static sg.edu.nus.comp.cs4218.testutils.TestStringUtils.STRING_NEWLINE;
 
 import java.io.ByteArrayInputStream;
@@ -31,8 +32,8 @@ public class WcApplicationPublicIT {
     private static final String TEMP = "temp-wc";
     private static final String NUMBER_FORMAT = " %7d";
     private static final String STDIN = "-";
-    private static final String FILE_CONTENT = "First line" + STRING_NEWLINE + "Second line" +
-            STRING_NEWLINE + "Third line" + STRING_NEWLINE + "Fourth line" + STRING_NEWLINE;
+    private static final String FILE_CONTENT =
+            joinStringsByNewline("First line", "Second line", "Third line", "Fourth line") + STRING_NEWLINE;
     private static final Deque<Path> FILES = new ArrayDeque<>();
     private static final Path TEMP_PATH = Paths.get(TEMP);
     private static String currPathString;
