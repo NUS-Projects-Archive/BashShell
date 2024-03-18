@@ -55,7 +55,7 @@ public class TeeApplication implements TeeInterface {
         String result = teeFromStdin(isAppend, stdin, files);
         try {
             stdout.write(result.getBytes());
-        } catch (Exception e) {
+        } catch (IOException e) {
             throw new TeeException(ERR_WRITE_STREAM, e);
         }
     }
@@ -82,11 +82,7 @@ public class TeeApplication implements TeeInterface {
             if (node.exists()) {
                 absolutePath = node.getAbsolutePath();
             } else {
-                try {
-                    absolutePath = createEmptyFile(file);
-                } catch (Exception e) {
-                    throw new TeeException(e.getMessage(), e);
-                }
+                absolutePath = createEmptyFile(file);
             }
             if (node.isDirectory()) {
                 return String.format("tee: %s: Is a directory", file) + STRING_NEWLINE + dataToString;

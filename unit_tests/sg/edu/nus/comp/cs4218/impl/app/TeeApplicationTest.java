@@ -2,6 +2,7 @@ package sg.edu.nus.comp.cs4218.impl.app;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -60,7 +61,7 @@ class TeeApplicationTest {
 
     @Test
     void teeFromStdin_OnlyStdin_ReturnsCorrectString() {
-        String expected = CONTENT_FILE_A + StringUtils.STRING_NEWLINE;
+        String expected = CONTENT_FILE_A + STRING_NEWLINE;
         String[] filenames = {};
         String outputStdOut = assertDoesNotThrow(() -> app.teeFromStdin(false, inputStream, filenames));
         assertEquals(expected, outputStdOut);
@@ -70,7 +71,7 @@ class TeeApplicationTest {
     void teeFromStdin_OneFile_WritesToFile() {
         String outputStdOut = assertDoesNotThrow(() -> app.teeFromStdin(false, inputStream, emptyFile));
         String outputFile = assertDoesNotThrow(() -> Files.readString(emptyFilePath));
-        String expected = CONTENT_FILE_A + StringUtils.STRING_NEWLINE;
+        String expected = CONTENT_FILE_A + STRING_NEWLINE;
         assertEquals(expected, outputStdOut);
         assertEquals(expected, outputFile);
     }
@@ -79,8 +80,8 @@ class TeeApplicationTest {
     void teeFromStdin_OneFileAndValidFlag_AppendsToFile() {
         String outputStdOut = assertDoesNotThrow(() -> app.teeFromStdin(true, inputStream, fileB));
         String outputFile = assertDoesNotThrow(() -> Files.readString(fileBPath));
-        String expected = CONTENT_FILE_B + StringUtils.STRING_NEWLINE + CONTENT_FILE_A + StringUtils.STRING_NEWLINE;
-        assertEquals(CONTENT_FILE_A + StringUtils.STRING_NEWLINE, outputStdOut);
+        String expected = CONTENT_FILE_B + STRING_NEWLINE + CONTENT_FILE_A + STRING_NEWLINE;
+        assertEquals(CONTENT_FILE_A + STRING_NEWLINE, outputStdOut);
         assertEquals(expected, outputFile);
     }
 }

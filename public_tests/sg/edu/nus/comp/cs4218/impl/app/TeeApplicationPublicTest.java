@@ -45,12 +45,12 @@ public class TeeApplicationPublicTest {
                 stringBuilder.append(TestStringUtils.STRING_NEWLINE);
             }
         }
-        return stringBuilder + STRING_NEWLINE;
+        return stringBuilder.toString() + STRING_NEWLINE;
     }
 
     private void writeToFile(File file) {
         try (FileWriter writer = new FileWriter(file)) {
-            writer.write(TeeApplicationPublicTest.ONE_LINE_INPUT + STRING_NEWLINE);
+            writer.write(ONE_LINE_INPUT + STRING_NEWLINE);
             writer.flush();
         } catch (Exception e) {
             fail();
