@@ -6,6 +6,7 @@ import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
@@ -23,8 +24,10 @@ class TeeApplicationTest {
     private static final String FILE_A = "A.txt";
     private static final String FILE_B = "B.txt";
     private static final String EMPTY_FILE = "empty.txt";
-    private static final String CONTENT_FILE_A = "A\nB\nC\nD\nE";
-    private static final String CONTENT_FILE_B = "1\n2\n3\n4\n5";
+    private static final String CONTENT_FILE_A = "A" + STRING_NEWLINE + "B" + STRING_NEWLINE + "C" + STRING_NEWLINE +
+            "D" + STRING_NEWLINE + "E" + STRING_NEWLINE;
+    private static final String CONTENT_FILE_B = "1" + STRING_NEWLINE + "2" + STRING_NEWLINE + "3" +
+            STRING_NEWLINE + "4" + STRING_NEWLINE + "5" + STRING_NEWLINE;
     private TeeApplication app;
     private InputStream inputStream;
     @TempDir
@@ -47,8 +50,8 @@ class TeeApplicationTest {
         fileB = fileBPath.toString();
         emptyFile = emptyFilePath.toString();
 
-        Files.write(fileAPath, List.of(CONTENT_FILE_A.split("\n")));
-        Files.write(fileBPath, List.of(CONTENT_FILE_B.split("\n")));
+        Files.write(fileAPath, CONTENT_FILE_A.getBytes(StandardCharsets.UTF_8));
+        Files.write(fileBPath, CONTENT_FILE_B.getBytes(StandardCharsets.UTF_8));
         Files.createFile(emptyFilePath);
 
         inputStream = assertDoesNotThrow(() -> IOUtils.openInputStream(fileA));
@@ -61,7 +64,7 @@ class TeeApplicationTest {
 
     @Test
     void teeFromStdin_OnlyStdin_ReturnsCorrectString() {
-        String expected = CONTENT_FILE_A + STRING_NEWLINE;
+        String expected = CONTENT_FILE_A;
         String[] filenames = {};
         String outputStdOut = assertDoesNotThrow(() -> app.teeFromStdin(false, inputStream, filenames));
         assertEquals(expected, outputStdOut);
@@ -71,7 +74,7 @@ class TeeApplicationTest {
     void teeFromStdin_OneFile_WritesToFile() {
         String outputStdOut = assertDoesNotThrow(() -> app.teeFromStdin(false, inputStream, emptyFile));
         String outputFile = assertDoesNotThrow(() -> Files.readString(emptyFilePath));
-        String expected = CONTENT_FILE_A + STRING_NEWLINE;
+        String expected = CONTENT_FILE_A;
         assertEquals(expected, outputStdOut);
         assertEquals(expected, outputFile);
     }
@@ -80,8 +83,8 @@ class TeeApplicationTest {
     void teeFromStdin_OneFileAndValidFlag_AppendsToFile() {
         String outputStdOut = assertDoesNotThrow(() -> app.teeFromStdin(true, inputStream, fileB));
         String outputFile = assertDoesNotThrow(() -> Files.readString(fileBPath));
-        String expected = CONTENT_FILE_B + STRING_NEWLINE + CONTENT_FILE_A + STRING_NEWLINE;
-        assertEquals(CONTENT_FILE_A + STRING_NEWLINE, outputStdOut);
+        String expected = CONTENT_FILE_B + CONTENT_FILE_A;
+        assertEquals(CONTENT_FILE_A, outputStdOut);
         assertEquals(expected, outputFile);
     }
 }
