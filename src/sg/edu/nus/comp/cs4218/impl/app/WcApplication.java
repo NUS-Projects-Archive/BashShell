@@ -63,7 +63,7 @@ public class WcApplication implements WcInterface {
         final WcArgsParser parser = new WcArgsParser();
         try {
             parser.parse(args);
-        } catch (InvalidArgsException e) {
+        } catch (InvalidArgsException | NullPointerException e) {
             throw new WcException(e.getMessage(), e);
         }
         final Boolean isStdinOnly = parser.isStdinOnly();

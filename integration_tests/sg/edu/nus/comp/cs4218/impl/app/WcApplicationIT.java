@@ -31,7 +31,6 @@ public class WcApplicationIT {
     private static final String FILE_NAME_A = "A.txt";
     private static final String FILE_NAME_B = "B.txt";
     private static final String NON_EXISTENT_FILE = "nonExistentFile.txt";
-    private static final String WC_EXCEPTION_MSG = "wc: ";
     private static final String STDIN = "-";
     private static final String NUMBER_FORMAT = " %7d";
     private static final String STRING_FORMAT = " %s";
