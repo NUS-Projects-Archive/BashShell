@@ -24,12 +24,12 @@ public class CatApplicationPublicTest {
 
     private static final String TEST_DIR = "temp-cat";
     private static final String TEST_FILE = "fileA.txt";
-    private static final String TEXT_ONE = "Test line 1" + STRING_NEWLINE +
-            "Test line 2" + STRING_NEWLINE +
-            "Test line 3";
-    private static final String EXPECT_ONE_NUM = "1 Test line 1" + STRING_NEWLINE +
-            "2 Test line 2" + STRING_NEWLINE +
-            "3 Test line 3";
+    private static final String TEXT_ONE = "Test line 1" +
+            STRING_NEWLINE + "Test line 2" +
+            STRING_NEWLINE + "Test line 3";
+    private static final String EXPECT_ONE_NUM = "1 Test line 1" +
+            STRING_NEWLINE + "2 Test line 2" +
+            STRING_NEWLINE + "3 Test line 3";
     private static Path testDirPath;
     private static Path testFilePath;
 
@@ -43,8 +43,8 @@ public class CatApplicationPublicTest {
     @BeforeAll
     static void createTemp() throws IOException, NoSuchFieldException, IllegalAccessException {
         testDirPath = Paths.get(TestEnvironmentUtil.getCurrentDirectory(), TEST_DIR);
-        Files.createDirectories(testDirPath);
         testFilePath = testDirPath.resolve(TEST_FILE);
+        Files.createDirectories(testDirPath);
         Files.createFile(testFilePath);
         Files.write(testFilePath, TEXT_ONE.getBytes());
     }
@@ -68,23 +68,23 @@ public class CatApplicationPublicTest {
 
     @Test
     void catStdin_NoFlag_ReturnsStdinString() throws AbstractApplicationException {
-        InputStream inputStream = new ByteArrayInputStream(TEXT_ONE.getBytes());
-        String actual = catApplication.catStdin(false, inputStream);
+        InputStream input = new ByteArrayInputStream(TEXT_ONE.getBytes());
+        String actual = catApplication.catStdin(false, input);
         assertEquals(TEXT_ONE, actual);
     }
 
     @Test
     void catStdin_EmptyStringNoFlag_ReturnsEmptyString() throws AbstractApplicationException {
         String text = "";
-        InputStream inputStream = new ByteArrayInputStream(text.getBytes());
-        String actual = catApplication.catStdin(false, inputStream);
+        InputStream input = new ByteArrayInputStream(text.getBytes());
+        String actual = catApplication.catStdin(false, input);
         assertEquals(text, actual);
     }
 
     @Test
     void catStdin_IsLineNumberFlag_ReturnsStdinStringLineNo() throws AbstractApplicationException {
-        InputStream inputStream = new ByteArrayInputStream(TEXT_ONE.getBytes());
-        String actual = catApplication.catStdin(true, inputStream);
+        InputStream input = new ByteArrayInputStream(TEXT_ONE.getBytes());
+        String actual = catApplication.catStdin(true, input);
         assertEquals(EXPECT_ONE_NUM, actual);
     }
 }
