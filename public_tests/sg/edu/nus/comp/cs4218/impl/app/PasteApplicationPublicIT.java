@@ -3,6 +3,7 @@ package sg.edu.nus.comp.cs4218.impl.app;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
+import static sg.edu.nus.comp.cs4218.impl.util.CollectionsUtils.listToArray;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_TAB;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.joinStringsByNewline;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.joinStringsByTab;
@@ -99,8 +100,7 @@ public class PasteApplicationPublicIT {
                 args.add(Paths.get(TEMP, file).toString());
             }
         }
-        System.out.println(Arrays.toString(args.toArray(new String[0])));
-        return args.toArray(new String[0]);
+        return listToArray(args);
     }
 
     @Test
@@ -122,47 +122,47 @@ public class PasteApplicationPublicIT {
     //mergeStdin cases
     @Test
     void run_SingleStdinNoFlag_DisplaysStdinContents() {
-        InputStream input = new ByteArrayInputStream(L1_TO_L3.getBytes(StandardCharsets.UTF_8));
+        InputStream input = new ByteArrayInputStream(L1_TO_L3.getBytes());
         assertDoesNotThrow(() -> pasteApplication.run(toArgs(""), input, output));
-        assertEquals(L1_TO_L3 + STRING_NEWLINE, output.toString(StandardCharsets.UTF_8));
+        assertEquals(L1_TO_L3 + STRING_NEWLINE, output.toString());
     }
 
 
     @Test
     void run_SingleStdinFlag_DisplaysNonParallelStdinContents() {
-        InputStream input = new ByteArrayInputStream(L1_TO_L3.getBytes(StandardCharsets.UTF_8));
+        InputStream input = new ByteArrayInputStream(L1_TO_L3.getBytes());
         assertDoesNotThrow(() -> pasteApplication.run(toArgs("s"), input, output));
-        assertEquals(L1_TO_L3_TAB + STRING_NEWLINE, output.toString(StandardCharsets.UTF_8));
+        assertEquals(L1_TO_L3_TAB + STRING_NEWLINE, output.toString());
     }
 
     @Test
     void run_SingleStdinDashNoFlag_DisplaysStdinContents() {
-        InputStream input = new ByteArrayInputStream(L1_TO_L3.getBytes(StandardCharsets.UTF_8));
+        InputStream input = new ByteArrayInputStream(L1_TO_L3.getBytes());
         assertDoesNotThrow(() -> pasteApplication.run(toArgs("", "-"), input, output));
-        assertEquals(L1_TO_L3 + STRING_NEWLINE, output.toString(StandardCharsets.UTF_8));
+        assertEquals(L1_TO_L3 + STRING_NEWLINE, output.toString());
     }
 
     @Test
     void run_SingleStdinDashFlag_DisplaysNonParallelStdinContents() {
-        InputStream input = new ByteArrayInputStream(L1_TO_L3.getBytes(StandardCharsets.UTF_8));
+        InputStream input = new ByteArrayInputStream(L1_TO_L3.getBytes());
         assertDoesNotThrow(() -> pasteApplication.run(toArgs("s", "-"), input, output));
-        assertEquals(L1_TO_L3_TAB + STRING_NEWLINE, output.toString(StandardCharsets.UTF_8));
+        assertEquals(L1_TO_L3_TAB + STRING_NEWLINE, output.toString());
     }
 
     @Test
     void run_SingleEmptyStdinNoFlag_DisplaysEmpty() {
         String text = "";
-        InputStream input = new ByteArrayInputStream(text.getBytes(StandardCharsets.UTF_8));
+        InputStream input = new ByteArrayInputStream(text.getBytes());
         assertDoesNotThrow(() -> pasteApplication.run(toArgs(""), input, output));
-        assertEquals(text, output.toString(StandardCharsets.UTF_8));
+        assertEquals(text, output.toString());
     }
 
     @Test
     void run_SingleEmptyStdinFlag_DisplaysEmpty() {
         String text = "";
-        InputStream input = new ByteArrayInputStream(text.getBytes(StandardCharsets.UTF_8));
+        InputStream input = new ByteArrayInputStream(text.getBytes());
         assertDoesNotThrow(() -> pasteApplication.run(toArgs("s"), input, output));
-        assertEquals(text, output.toString(StandardCharsets.UTF_8));
+        assertEquals(text, output.toString());
     }
 
     //mergeFiles cases
@@ -178,7 +178,7 @@ public class PasteApplicationPublicIT {
     @Test
     void run_DirectoryNoFlag_DisplaysEmpty() {
         assertDoesNotThrow(() -> pasteApplication.run(toArgs("", DIR), System.in, output));
-        assertEquals("", output.toString(StandardCharsets.UTF_8));
+        assertEquals("", output.toString());
     }
 
     @Test
@@ -186,7 +186,7 @@ public class PasteApplicationPublicIT {
         String fileName = "fileA.txt";
         assertDoesNotThrow(() -> createFile(fileName, L1_TO_L3));
         assertDoesNotThrow(() -> pasteApplication.run(toArgs("", fileName), System.in, output));
-        assertEquals(L1_TO_L3 + STRING_NEWLINE, output.toString(StandardCharsets.UTF_8));
+        assertEquals(L1_TO_L3 + STRING_NEWLINE, output.toString());
     }
 
     @Test
@@ -194,7 +194,7 @@ public class PasteApplicationPublicIT {
         String fileName = "fileB.txt";
         assertDoesNotThrow(() -> createFile(fileName, L1_TO_L3));
         assertDoesNotThrow(() -> pasteApplication.run(toArgs("s", fileName), System.in, output));
-        assertEquals(L1_TO_L3_TAB + STRING_NEWLINE, output.toString(StandardCharsets.UTF_8));
+        assertEquals(L1_TO_L3_TAB + STRING_NEWLINE, output.toString());
     }
 
     @Test
@@ -203,7 +203,7 @@ public class PasteApplicationPublicIT {
         String text = "";
         assertDoesNotThrow(() -> createFile(fileName, text));
         assertDoesNotThrow(() -> pasteApplication.run(toArgs("", fileName), System.in, output));
-        assertEquals(text, output.toString(StandardCharsets.UTF_8));
+        assertEquals(text, output.toString());
     }
 
     @Test
@@ -212,7 +212,7 @@ public class PasteApplicationPublicIT {
         String text = "";
         assertDoesNotThrow(() -> createFile(fileName, text));
         assertDoesNotThrow(() -> pasteApplication.run(toArgs("s", fileName), System.in, output));
-        assertEquals(text, output.toString(StandardCharsets.UTF_8));
+        assertEquals(text, output.toString());
     }
 
     @Test
@@ -232,7 +232,7 @@ public class PasteApplicationPublicIT {
         assertDoesNotThrow(() -> createFile(fileName1, L11_TO_L13));
         assertDoesNotThrow(() -> createFile(fileName2, L21_TO_L22));
         assertDoesNotThrow(() -> pasteApplication.run(toArgs("", fileName1, fileName2), System.in, output));
-        assertEquals(expected + STRING_NEWLINE, output.toString(StandardCharsets.UTF_8));
+        assertEquals(expected + STRING_NEWLINE, output.toString());
     }
 
     @Test
@@ -244,7 +244,7 @@ public class PasteApplicationPublicIT {
         assertDoesNotThrow(() -> createFile(fileName1, L11_TO_L13));
         assertDoesNotThrow(() -> createFile(fileName2, L21_TO_L22));
         assertDoesNotThrow(() -> pasteApplication.run(toArgs("s", fileName1, fileName2), System.in, output));
-        assertEquals(expected + STRING_NEWLINE, output.toString(StandardCharsets.UTF_8));
+        assertEquals(expected + STRING_NEWLINE, output.toString());
     }
 
     @Test
@@ -255,7 +255,7 @@ public class PasteApplicationPublicIT {
         assertDoesNotThrow(() -> createFile(fileName1, text));
         assertDoesNotThrow(() -> createFile(fileName2, text));
         assertDoesNotThrow(() -> pasteApplication.run(toArgs("", fileName1, fileName2), System.in, output));
-        assertEquals(text, output.toString(StandardCharsets.UTF_8));
+        assertEquals(text, output.toString());
     }
 
     @Test
@@ -266,7 +266,7 @@ public class PasteApplicationPublicIT {
         assertDoesNotThrow(() -> createFile(fileName1, text));
         assertDoesNotThrow(() -> createFile(fileName2, text));
         assertDoesNotThrow(() -> pasteApplication.run(toArgs("s", fileName1, fileName2), System.in, output));
-        assertEquals(text, output.toString(StandardCharsets.UTF_8));
+        assertEquals(text, output.toString());
     }
 
     //mergeFilesAndStdin cases
@@ -284,7 +284,7 @@ public class PasteApplicationPublicIT {
     void run_SingleStdinDirectoryNoFlag_DisplaysMergedStdinFileContents() {
         InputStream input = new ByteArrayInputStream(L11_TO_L13.getBytes());
         assertDoesNotThrow(() -> pasteApplication.run(toArgs("", DIR, "-"), input, output));
-        assertEquals(L11_TO_L13 + STRING_NEWLINE, output.toString(StandardCharsets.UTF_8));
+        assertEquals(L11_TO_L13 + STRING_NEWLINE, output.toString());
     }
 
     @Test
@@ -296,7 +296,7 @@ public class PasteApplicationPublicIT {
                 LINE_1_DOT_2 + STRING_TAB + LINE_2_DOT_2 + STRING_NEWLINE +
                 LINE_1_DOT_3 + STRING_TAB;
         assertDoesNotThrow(() -> pasteApplication.run(toArgs("", "-", fileName), input, output));
-        assertEquals(expected + STRING_NEWLINE, output.toString(StandardCharsets.UTF_8));
+        assertEquals(expected + STRING_NEWLINE, output.toString());
     }
 
     @Test
@@ -308,6 +308,6 @@ public class PasteApplicationPublicIT {
                 LINE_1_DOT_2 + STRING_TAB + LINE_2_DOT_2 + STRING_NEWLINE +
                 LINE_1_DOT_3 + STRING_TAB;
         assertDoesNotThrow(() -> pasteApplication.run(toArgs("", fileName, "-"), input, output));
-        assertEquals(expected + STRING_NEWLINE, output.toString(StandardCharsets.UTF_8));
+        assertEquals(expected + STRING_NEWLINE, output.toString());
     }
 }

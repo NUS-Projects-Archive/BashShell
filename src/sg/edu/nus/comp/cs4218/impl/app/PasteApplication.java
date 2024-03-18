@@ -1,18 +1,16 @@
 package sg.edu.nus.comp.cs4218.impl.app;
 
+import static sg.edu.nus.comp.cs4218.impl.app.helper.PasteApplicationHelper.checkPasteFileValidity;
 import static sg.edu.nus.comp.cs4218.impl.app.helper.PasteApplicationHelper.mergeInParallel;
 import static sg.edu.nus.comp.cs4218.impl.app.helper.PasteApplicationHelper.mergeInSerial;
 import static sg.edu.nus.comp.cs4218.impl.util.CollectionsUtils.listToArray;
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_NOT_FOUND;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IO_EXCEPTION;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_ISTREAM;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NULL_ARGS;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NULL_STREAMS;
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_READING_FILE;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_WRITE_STREAM;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -63,7 +61,7 @@ public class PasteApplication implements PasteInterface {
         } catch (InvalidArgsException e) {
             throw new PasteException(e.getMessage(), e);
         }
-        
+
         final Boolean isSerial = parser.isSerial();
         final String[] nonFlagArgs = listToArray(parser.getNonFlagArgs());
 
@@ -125,18 +123,10 @@ public class PasteApplication implements PasteInterface {
 
         List<List<String>> output = new ArrayList<>();
         for (String file : fileName) {
-            File node = IOUtils.resolveFilePath(file).toFile();
-            if (!node.exists()) {
-                throw new PasteException(String.format("'%s': %s", node.getName(), ERR_FILE_NOT_FOUND));
-            }
-            if (node.isDirectory()) {
-                // Paste will skip directory without throwing any exception
+            if (!checkPasteFileValidity(file)) {
                 continue;
             }
-            if (!node.canRead()) {
-                throw new PasteException(String.format("'%s': %s", node.getName(), ERR_READING_FILE));
-            }
-
+            ;
             try (InputStream input = IOUtils.openInputStream(file)) {
                 output.add(IOUtils.getLinesFromInputStream(input));
                 IOUtils.closeInputStream(input);
@@ -171,6 +161,11 @@ public class PasteApplication implements PasteInterface {
         }
         if (fileName == null || fileName.length == 0) {
             throw new PasteException(ERR_NULL_ARGS);
+        }
+
+        // Check to ensure the files (not including "-") are valid
+        for (String file : fileName) {
+            checkPasteFileValidity(file);
         }
 
         int numOfStdin = (int) Arrays.stream(fileName).filter("-"::equals).count();

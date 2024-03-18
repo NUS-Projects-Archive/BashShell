@@ -1,10 +1,16 @@
 package sg.edu.nus.comp.cs4218.impl.app.helper;
 
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_NOT_FOUND;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_READING_FILE;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_TAB;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+
+import sg.edu.nus.comp.cs4218.exception.PasteException;
+import sg.edu.nus.comp.cs4218.impl.util.IOUtils;
 
 public final class PasteApplicationHelper {
 
@@ -54,5 +60,32 @@ public final class PasteApplicationHelper {
             mergedLines.add(String.join(STRING_TAB, files));
         }
         return String.join(STRING_NEWLINE, mergedLines);
+    }
+
+    /**
+     * Checks if the specified file is a valid file for pasting.
+     *
+     * @param file the file to be checked
+     * @return {@code true} if the file is valid or represents standard input ("-"),
+     *         {@code false} if the file is a directory
+     * @throws PasteException if the file does not exist or cannot be read
+     */
+    public static boolean checkPasteFileValidity(String file) throws PasteException {
+        if (("-").equals(file)) {
+            return true;
+        }
+
+        File node = IOUtils.resolveFilePath(file).toFile();
+        if (!node.exists()) {
+            throw new PasteException(String.format("'%s': %s", node.getName(), ERR_FILE_NOT_FOUND));
+        }
+        if (node.isDirectory()) {
+            return false;
+        }
+        if (!node.canRead()) {
+            throw new PasteException(String.format("'%s': %s", node.getName(), ERR_READING_FILE));
+        }
+
+        return true;
     }
 }
