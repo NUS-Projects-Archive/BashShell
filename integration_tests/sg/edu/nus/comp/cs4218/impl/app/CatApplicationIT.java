@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 import static org.mockito.Mockito.mock;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
+import static sg.edu.nus.comp.cs4218.test.FileUtils.createNewFile;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -12,14 +13,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
@@ -46,19 +44,13 @@ public class CatApplicationIT {
     }
 
     @BeforeEach
-    void setUp(@TempDir Path tempDir) throws IOException {
+    void setUp() throws IOException {
         app = new CatApplication();
         stdout = new ByteArrayOutputStream();
         mockStdin = mock(InputStream.class);
 
-        Path pathA = tempDir.resolve("A.txt");
-        Path pathB = tempDir.resolve("B.txt");
-
-        fileA = pathA.toString();
-        fileB = pathB.toString();
-
-        Files.write(pathA, List.of(HELLO_WORLD));
-        Files.write(pathB, List.of(HEY_JUNIT));
+        fileA = createNewFile("fileA.txt", HELLO_WORLD).toString();
+        fileB = createNewFile("fileB.txt", HEY_JUNIT).toString();
     }
 
     @Test
@@ -168,13 +160,15 @@ public class CatApplicationIT {
     @Test
     void catFileAndStdin_FileOnlyNoLineNumber_ReturnsFileContent() {
         String result = assertDoesNotThrow(() -> app.catFileAndStdin(false, mockStdin, fileA, fileB));
-        assertEquals(HELLO_WORLD + STRING_NEWLINE + HEY_JUNIT, result);
+        String expected = HELLO_WORLD + STRING_NEWLINE + HEY_JUNIT;
+        assertEquals(expected, result);
     }
 
     @Test
     void catFileAndStdin_FileOnlyHasLineNumber_ReturnsLineNumberedFileContent() {
         String result = assertDoesNotThrow(() -> app.catFileAndStdin(true, mockStdin, fileA, fileB));
-        assertEquals(L1_HELLO_L2_WORLD + STRING_NEWLINE + L1_HEY_L2_JUNIT, result);
+        String expected = L1_HELLO_L2_WORLD + STRING_NEWLINE + L1_HEY_L2_JUNIT;
+        assertEquals(expected, result);
     }
 
     @Test

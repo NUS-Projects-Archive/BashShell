@@ -96,7 +96,7 @@ class CutApplicationTest {
         CutException result = assertThrowsExactly(CutException.class, () ->
                 app.cutFromFiles(true, false, RANGE_ONE_TO_FIVE, subDir)
         );
-        String expected = "cut: 'subdirectory': This is a directory";
+        String expected = "cut: 'subdirectory': Is a directory";
         assertEquals(expected, result.getMessage());
     }
 
