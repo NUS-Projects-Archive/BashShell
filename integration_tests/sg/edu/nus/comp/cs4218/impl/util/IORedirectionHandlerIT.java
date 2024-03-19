@@ -1,5 +1,6 @@
 package sg.edu.nus.comp.cs4218.impl.util;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -37,6 +38,7 @@ public class IORedirectionHandlerIT {
     private static final String TEMP1 = "temp1";
     private static final String TEMP2 = "temp2";
     private static final String TXT = ".txt";
+
     private String[] splitArgs(String args) {
         return args.split("\\s+");
     }
@@ -72,8 +74,8 @@ public class IORedirectionHandlerIT {
             IORedirectionHandler ioRedirHandler = new IORedirectionHandler(ambiguousRedirect, inputStream, outputStream, argResolver);
             ShellException shellException = assertThrows(ShellException.class, ioRedirHandler::extractRedirOptions);
             assertEquals("shell: " + ERR_SYNTAX, shellException.getMessage());
-            assertTrue(tempFileOne.delete());
-            assertTrue(tempFileTwo.delete());
+            tempFileOne.delete();
+            tempFileTwo.delete();
         } catch (IOException  e) {
             fail(e.getMessage());
         }
@@ -86,13 +88,13 @@ public class IORedirectionHandlerIT {
             File tempFileTwo = File.createTempFile(TEMP2, TXT, new File(currentDirectory));
             List<String> ioRedirectsOnly = List.of("<", tempFileOne.getAbsolutePath(), ">", tempFileTwo.getAbsolutePath());
             IORedirectionHandler ioRedirHandler = new IORedirectionHandler(ioRedirectsOnly, inputStream, outputStream, argResolver);
-            ioRedirHandler.extractRedirOptions();
+            assertDoesNotThrow(() -> ioRedirHandler.extractRedirOptions());
             assertTrue(ioRedirHandler.getNoRedirArgsList().isEmpty());
             ioRedirHandler.getInputStream().close();
             ioRedirHandler.getOutputStream().close();
-            assertTrue(tempFileOne.delete());
-            assertTrue(tempFileTwo.delete());
-        } catch (IOException | AbstractApplicationException | ShellException e) {
+            tempFileOne.delete();
+            tempFileTwo.delete();
+        } catch (IOException e) {
             fail(e.getMessage());
         }
     }
@@ -104,13 +106,13 @@ public class IORedirectionHandlerIT {
             File tempFileTwo = File.createTempFile(TEMP2, TXT, new File(currentDirectory));
             List<String> noRedirection = List.of(tempFileOne.getAbsolutePath(), tempFileTwo.getAbsolutePath());
             IORedirectionHandler ioRedirHandler = new IORedirectionHandler(noRedirection, inputStream, outputStream, argResolver);
-            ioRedirHandler.extractRedirOptions();
+            assertDoesNotThrow(() -> ioRedirHandler.extractRedirOptions());
             assertFalse(ioRedirHandler.getNoRedirArgsList().isEmpty());
             assertSame(inputStream, ioRedirHandler.getInputStream());
             assertSame(outputStream, ioRedirHandler.getOutputStream());
-            assertTrue(tempFileOne.delete());
-            assertTrue(tempFileTwo.delete());
-        } catch (IOException | AbstractApplicationException | ShellException e) {
+            tempFileOne.delete();
+            tempFileTwo.delete();
+        } catch (IOException e) {
             fail(e.getMessage());
         }
     }
@@ -122,15 +124,15 @@ public class IORedirectionHandlerIT {
             File tempFileTwo = File.createTempFile(TEMP2, TXT, new File(currentDirectory));
             List<String> inputs = List.of(tempFileOne.getAbsolutePath(), "<", tempFileTwo.getAbsolutePath());
             IORedirectionHandler ioRedirHandler = new IORedirectionHandler(inputs, inputStream, outputStream, argResolver);
-            ioRedirHandler.extractRedirOptions();
+            assertDoesNotThrow(() -> ioRedirHandler.extractRedirOptions());
             String expected = new String(inputStream.readAllBytes());
             String result = new String(ioRedirHandler.getInputStream().readAllBytes());
             assertNotEquals(expected, result);
             assertNotSame(inputStream, ioRedirHandler.getInputStream());
             ioRedirHandler.getInputStream().close();
-            assertTrue(tempFileOne.delete());
-            assertTrue(tempFileTwo.delete());
-        } catch (IOException | AbstractApplicationException | ShellException e) {
+            tempFileOne.delete();
+            tempFileTwo.delete();
+        } catch (IOException e) {
             fail(e.getMessage());
         }
     }
@@ -143,14 +145,14 @@ public class IORedirectionHandlerIT {
             Files.write(tempFileTwo.toPath(), "This is a temp file".getBytes());
             List<String> inputs = List.of("<", tempFileOne.getAbsolutePath(), "<", tempFileTwo.getAbsolutePath());
             IORedirectionHandler ioRedirHandler = new IORedirectionHandler(inputs, inputStream, outputStream, argResolver);
-            ioRedirHandler.extractRedirOptions();
+            assertDoesNotThrow(() -> ioRedirHandler.extractRedirOptions());
             String expected = "This is a temp file";
             String result = new String(ioRedirHandler.getInputStream().readAllBytes());
             assertEquals(expected, result);
             ioRedirHandler.getInputStream().close();
-            assertTrue(tempFileOne.delete());
-            assertTrue(tempFileTwo.delete());
-        } catch (IOException | AbstractApplicationException | ShellException e) {
+            tempFileOne.delete();
+            tempFileTwo.delete();
+        } catch (IOException e) {
             fail(e.getMessage());
         }
     }
@@ -162,12 +164,12 @@ public class IORedirectionHandlerIT {
             File tempFileTwo = File.createTempFile(TEMP2, TXT, new File(currentDirectory));
             List<String> inputs = List.of(tempFileOne.getAbsolutePath(), ">", tempFileTwo.getAbsolutePath());
             IORedirectionHandler ioRedirHandler = new IORedirectionHandler(inputs, inputStream, outputStream, argResolver);
-            ioRedirHandler.extractRedirOptions();
+            assertDoesNotThrow(() -> ioRedirHandler.extractRedirOptions());
             assertNotSame(outputStream, ioRedirHandler.getOutputStream());
             ioRedirHandler.getOutputStream().close();
-            assertTrue(tempFileOne.delete());
-            assertTrue(tempFileTwo.delete());
-        } catch (IOException | AbstractApplicationException | ShellException e) {
+            tempFileOne.delete();
+            tempFileTwo.delete();
+        } catch (IOException e) {
             fail(e.getMessage());
         }
     }
@@ -179,7 +181,7 @@ public class IORedirectionHandlerIT {
             File tempFileTwo = File.createTempFile(TEMP2, TXT, new File(currentDirectory));
             List<String> inputs = List.of("<", tempFileOne.getAbsolutePath(), ">", tempFileTwo.getAbsolutePath(), ">", tempFileOne.getAbsolutePath());
             IORedirectionHandler ioRedirHandler = new IORedirectionHandler(inputs, inputStream, outputStream, argResolver);
-            ioRedirHandler.extractRedirOptions();
+            assertDoesNotThrow(() -> ioRedirHandler.extractRedirOptions());
             assertEquals(0, new String(ioRedirHandler.getInputStream().readAllBytes()).length());
             String str = "Not Empty";
             byte[] bytes = str.getBytes(StandardCharsets.UTF_8);
@@ -187,9 +189,9 @@ public class IORedirectionHandlerIT {
             assertTrue(new String(ioRedirHandler.getInputStream().readAllBytes()).length() > 0);
             ioRedirHandler.getInputStream().close();
             ioRedirHandler.getOutputStream().close();
-            assertTrue(tempFileOne.delete());
-            assertTrue(tempFileTwo.delete());
-        } catch (IOException | AbstractApplicationException | ShellException e) {
+            tempFileOne.delete();
+            tempFileTwo.delete();
+        } catch (IOException e) {
             fail(e.getMessage());
         }
     }
