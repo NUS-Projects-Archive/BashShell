@@ -9,7 +9,9 @@ import java.io.ByteArrayOutputStream;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static sg.edu.nus.comp.cs4218.testutils.TestStringUtils.STRING_NEWLINE;
 
+@SuppressWarnings("PMD.ClassNamingConventions")
 public class EchoApplicationPublicIT {
+
     private EchoApplication echoApplication;
 
     @BeforeEach

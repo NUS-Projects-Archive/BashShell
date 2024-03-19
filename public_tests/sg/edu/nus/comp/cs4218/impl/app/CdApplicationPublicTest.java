@@ -17,15 +17,16 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class CdApplicationPublicTest {
-    private static final String TEST_DIR = "temp-cd";
-    private static final Path TEST_DIR_PATH = Paths.get(TEST_DIR).toAbsolutePath();
-    private static final String TEST_INVALID_DIR_PATH = "invalid/testDir";
+
+    private static final String DIR = "temp-cd";
+    private static final Path DIR_PATH = Paths.get(DIR).toAbsolutePath();
+    private static final String INVALID_DIR_PATH = "invalid/testDir";
     private static String initialDirectory;
     private CdApplication cdApplication;
 
     @AfterEach
     void tearDown() throws IOException, NoSuchFieldException, IllegalAccessException {
-        Files.deleteIfExists(TEST_DIR_PATH);
+        Files.deleteIfExists(DIR_PATH);
         TestEnvironmentUtil.setCurrentDirectory(initialDirectory);
     }
 
@@ -33,21 +34,21 @@ public class CdApplicationPublicTest {
     void setUp() throws IOException, NoSuchFieldException, IllegalAccessException {
         cdApplication = new CdApplication();
         initialDirectory = TestEnvironmentUtil.getCurrentDirectory();
-        Files.createDirectory(TEST_DIR_PATH);
+        Files.createDirectory(DIR_PATH);
     }
 
     @Test
     void changeToDirectory_ValidPath_CorrectlyChangesEnvironment() throws NoSuchFieldException,
             IllegalAccessException {
-        assertDoesNotThrow(() -> cdApplication.changeToDirectory(TEST_DIR));
-        assertEquals(TEST_DIR_PATH.toString(), TestEnvironmentUtil.getCurrentDirectory());
+        assertDoesNotThrow(() -> cdApplication.changeToDirectory(DIR));
+        assertEquals(DIR_PATH.toString(), TestEnvironmentUtil.getCurrentDirectory());
     }
 
     @Test
     void changeToDirectory_InvalidPath_CorrectlyChangesEnvironment() throws NoSuchFieldException,
             IllegalAccessException {
-        assertThrows(CdException.class, () -> cdApplication.changeToDirectory(TEST_INVALID_DIR_PATH));
-        assertNotEquals(Paths.get(TEST_INVALID_DIR_PATH).toAbsolutePath().toString(),
+        assertThrows(CdException.class, () -> cdApplication.changeToDirectory(INVALID_DIR_PATH));
+        assertNotEquals(Paths.get(INVALID_DIR_PATH).toAbsolutePath().toString(),
                         TestEnvironmentUtil.getCurrentDirectory());
     }
 }
