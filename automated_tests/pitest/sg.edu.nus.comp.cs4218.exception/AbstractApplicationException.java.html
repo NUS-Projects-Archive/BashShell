@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html;charset=windows-1252">
+    <link rel="stylesheet" type="text/css" href="../style.css">
+</head>
+<body>
+
+
+<h1>AbstractApplicationException.java</h1>
+
+<table class="src">
+
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@5eb974_1'/>
+1
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@5eb974_1'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>package sg.edu.nus.comp.cs4218.exception;</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@5eb974_2'/>
+2
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@5eb974_2'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@5eb974_3'/>
+3
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@5eb974_3'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>import java.util.List;</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@5eb974_4'/>
+4
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@5eb974_4'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>import java.util.stream.Collectors;</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@5eb974_5'/>
+5
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@5eb974_5'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@5eb974_6'/>
+6
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@5eb974_6'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>import sg.edu.nus.comp.cs4218.impl.util.CollectionsUtils;</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@5eb974_7'/>
+7
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@5eb974_7'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>import sg.edu.nus.comp.cs4218.impl.util.StringUtils;</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@5eb974_8'/>
+8
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@5eb974_8'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@5eb974_9'/>
+9
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@5eb974_9'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>public abstract class AbstractApplicationException extends Exception {</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@5eb974_10'/>
+10
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@5eb974_10'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@5eb974_11'/>
+11
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@5eb974_11'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    private static final long serialVersionUID = -6276854591710517685L;</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@5eb974_12'/>
+12
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@5eb974_12'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@5eb974_13'/>
+13
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@5eb974_13'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    public AbstractApplicationException(String message) {</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@5eb974_14'/>
+14
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@5eb974_14'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>        super(message);</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@5eb974_15'/>
+15
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@5eb974_15'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>    }</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@5eb974_16'/>
+16
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@5eb974_16'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@5eb974_17'/>
+17
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@5eb974_17'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    public AbstractApplicationException(String message, Throwable cause) {</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@5eb974_18'/>
+18
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@5eb974_18'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>        super(message, cause);</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@5eb974_19'/>
+19
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@5eb974_19'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>    }</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@5eb974_20'/>
+20
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@5eb974_20'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@5eb974_21'/>
+21
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@5eb974_21'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    public &#60;T extends AbstractApplicationException&#62; AbstractApplicationException(List&#60;T&#62; exceptions) {</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@5eb974_22'/>
+22
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@5eb974_22'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>        this(String.join(StringUtils.STRING_NEWLINE,</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@5eb974_23'/>
+23
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@5eb974_23'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>                CollectionsUtils.listToArray(</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@5eb974_24'/>
+24
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@5eb974_24'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>                        exceptionListToMessageList(exceptions)</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@5eb974_25'/>
+25
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@5eb974_25'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>                )</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@5eb974_26'/>
+26
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@5eb974_26'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>        ));</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@5eb974_27'/>
+27
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@5eb974_27'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>    }</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@5eb974_28'/>
+28
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@5eb974_28'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@5eb974_29'/>
+29
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@5eb974_29'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    private static &#60;T extends Exception&#62; List&#60;String&#62; exceptionListToMessageList(List&#60;T&#62; exceptions) {</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@5eb974_30'/>
+30
+</td>
+<td class='killed'>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@5eb974_30'>1</a>
+<span>
+
+1. exceptionListToMessageList : replaced return value with Collections.emptyList for sg/edu/nus/comp/cs4218/exception/AbstractApplicationException::exceptionListToMessageList &rarr; KILLED<br/>
+
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class='killed'>        return exceptions.stream().map(Throwable::getMessage).collect(Collectors.toList());</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@5eb974_31'/>
+31
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@5eb974_31'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    }</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@5eb974_32'/>
+32
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@5eb974_32'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>}</span></pre></td></tr>
+
+
+
+<tr><td></td><td></td><td><h2>Mutations</h2></td></tr>
+
+
+<tr>
+<td><a href='#org.pitest.mutationtest.report.html.SourceFile@5eb974_30'>30</a></td> 
+<td></td>
+<td>
+
+<a name='grouporg.pitest.mutationtest.report.html.SourceFile@5eb974_30'/> 
+
+<p class='KILLED'><span class='pop'>1.<span><b>1</b><br/><b>Location : </b>exceptionListToMessageList<br/><b>Killed by : </b>sg.edu.nus.comp.cs4218.impl.app.MvApplicationTest.[engine:junit-jupiter]/[class:sg.edu.nus.comp.cs4218.impl.app.MvApplicationTest]/[method:mvFilesToFolder_SrcFileDoNotExist_ThrowsMvException()]</span></span> replaced return value with Collections.emptyList for sg/edu/nus/comp/cs4218/exception/AbstractApplicationException::exceptionListToMessageList &rarr; KILLED</p> 
+</td>
+</tr>
+
+</table>
+
+
+<h2>Active mutators</h2>
+<ul>
+
+<li class='mutator'>CONDITIONALS_BOUNDARY</li>
+
+<li class='mutator'>EMPTY_RETURNS</li>
+
+<li class='mutator'>FALSE_RETURNS</li>
+
+<li class='mutator'>INCREMENTS</li>
+
+<li class='mutator'>INVERT_NEGS</li>
+
+<li class='mutator'>MATH</li>
+
+<li class='mutator'>NEGATE_CONDITIONALS</li>
+
+<li class='mutator'>NULL_RETURNS</li>
+
+<li class='mutator'>PRIMITIVE_RETURNS</li>
+
+<li class='mutator'>TRUE_RETURNS</li>
+
+<li class='mutator'>VOID_METHOD_CALLS</li>
+
+</ul>
+
+<h2>Tests examined</h2>
+<ul>
+<li>sg.edu.nus.comp.cs4218.impl.app.RmApplicationPublicTest.[engine:junit-jupiter]/[class:sg.edu.nus.comp.cs4218.impl.app.RmApplicationPublicTest]/[method:removeTest_RemoveFolderNoFlag_ThrowsException()] (3 ms)</li><li>sg.edu.nus.comp.cs4218.impl.app.RmApplicationPublicIT.[engine:junit-jupiter]/[class:sg.edu.nus.comp.cs4218.impl.app.RmApplicationPublicIT]/[method:run_NonexistentFile_Throws()] (0 ms)</li><li>sg.edu.nus.comp.cs4218.impl.app.MvApplicationTest.[engine:junit-jupiter]/[class:sg.edu.nus.comp.cs4218.impl.app.MvApplicationTest]/[method:mvFilesToFolder_SrcFileDoNotExist_ThrowsMvException()] (3 ms)</li><li>sg.edu.nus.comp.cs4218.impl.app.RmApplicationPublicTest.[engine:junit-jupiter]/[class:sg.edu.nus.comp.cs4218.impl.app.RmApplicationPublicTest]/[method:removeTest_RemoveFolderEmptyFlag_ThrowsException()] (3 ms)</li><li>sg.edu.nus.comp.cs4218.impl.app.RmApplicationTest.[engine:junit-jupiter]/[class:sg.edu.nus.comp.cs4218.impl.app.RmApplicationTest]/[method:remove_DirectoryWithoutFlag_ThrowsRmException()] (3 ms)</li><li>sg.edu.nus.comp.cs4218.impl.app.MkdirApplicationIT.[engine:junit-jupiter]/[class:sg.edu.nus.comp.cs4218.impl.app.MkdirApplicationIT]/[method:run_MissingTopLevel_ThrowsMkdirException()] (1 ms)</li><li>sg.edu.nus.comp.cs4218.impl.app.RmApplicationPublicIT.[engine:junit-jupiter]/[class:sg.edu.nus.comp.cs4218.impl.app.RmApplicationPublicIT]/[method:run_DirectoryWithoutFlag_Throws()] (0 ms)</li><li>sg.edu.nus.comp.cs4218.impl.app.RmApplicationTest.[engine:junit-jupiter]/[class:sg.edu.nus.comp.cs4218.impl.app.RmApplicationTest]/[method:remove_MixExistingAndNonExistentFiles_ThrowsRmExceptionButDeletesExistingFile()] (4 ms)</li><li>sg.edu.nus.comp.cs4218.impl.app.RmApplicationTest.[engine:junit-jupiter]/[class:sg.edu.nus.comp.cs4218.impl.app.RmApplicationTest]/[method:remove_NonEmptyDirectory_ThrowsRmException()] (4 ms)</li><li>sg.edu.nus.comp.cs4218.impl.app.MkdirApplicationIT.[engine:junit-jupiter]/[class:sg.edu.nus.comp.cs4218.impl.app.MkdirApplicationIT]/[method:run_RootDirectory_ThrowsMkdirException()] (2 ms)</li><li>sg.edu.nus.comp.cs4218.impl.app.RmApplicationPublicTest.[engine:junit-jupiter]/[class:sg.edu.nus.comp.cs4218.impl.app.RmApplicationPublicTest]/[method:removeTest_RemoveEmptyFolderNoFlag_ThrowsException()] (3 ms)</li><li>sg.edu.nus.comp.cs4218.impl.app.MkdirApplicationIT.[engine:junit-jupiter]/[class:sg.edu.nus.comp.cs4218.impl.app.MkdirApplicationIT]/[method:run_FolderExists_ThrowsMkdirException()] (1 ms)</li><li>sg.edu.nus.comp.cs4218.impl.app.RmApplicationTest.[engine:junit-jupiter]/[class:sg.edu.nus.comp.cs4218.impl.app.RmApplicationTest]/[method:remove_NonExistentFile_ThrowsRmException()] (5 ms)</li><li>sg.edu.nus.comp.cs4218.impl.app.RmApplicationPublicIT.[engine:junit-jupiter]/[class:sg.edu.nus.comp.cs4218.impl.app.RmApplicationPublicIT]/[method:run_NonemptyDirectoryWithDFlag_Throws()] (0 ms)</li><li>sg.edu.nus.comp.cs4218.impl.app.MvApplicationIT.[engine:junit-jupiter]/[class:sg.edu.nus.comp.cs4218.impl.app.MvApplicationIT]/[method:run_MultipleDoNotExistSrcFile_ThrowsMvException()] (3 ms)</li><li>sg.edu.nus.comp.cs4218.impl.app.RmApplicationIT.[engine:junit-jupiter]/[class:sg.edu.nus.comp.cs4218.impl.app.RmApplicationIT]/[method:run_RemoveNonExistentFile_ThrowsRmException()] (3 ms)</li><li>sg.edu.nus.comp.cs4218.impl.app.MvApplicationTest.[engine:junit-jupiter]/[class:sg.edu.nus.comp.cs4218.impl.app.MvApplicationTest]/[method:mvFilesToFolder_SomeSrcFileDoNotExistsAtEnd_MovesFileAndThrowsMvException()] (6 ms)</li><li>sg.edu.nus.comp.cs4218.impl.app.RmApplicationIT.[engine:junit-jupiter]/[class:sg.edu.nus.comp.cs4218.impl.app.RmApplicationIT]/[method:run_RemoveNonEmptyDirectory_ThrowsRmException()] (4 ms)</li><li>sg.edu.nus.comp.cs4218.impl.app.MvApplicationTest.[engine:junit-jupiter]/[class:sg.edu.nus.comp.cs4218.impl.app.MvApplicationTest]/[method:mvFilesToFolder_SomeSrcFileDoNotExistsAtStart_MovesFileAndThrowsMvException()] (7 ms)</li><li>sg.edu.nus.comp.cs4218.impl.app.RmApplicationIT.[engine:junit-jupiter]/[class:sg.edu.nus.comp.cs4218.impl.app.RmApplicationIT]/[method:run_RemoveDirectoryWithoutFlag_ThrowsRmException()] (6 ms)</li><li>sg.edu.nus.comp.cs4218.impl.app.MvApplicationIT.[engine:junit-jupiter]/[class:sg.edu.nus.comp.cs4218.impl.app.MvApplicationIT]/[method:run_SomeDoNotExistSrcFile_MovesFileAndThrowsMvException()] (6 ms)</li><li>sg.edu.nus.comp.cs4218.impl.app.MvApplicationPublicIT.[engine:junit-jupiter]/[class:sg.edu.nus.comp.cs4218.impl.app.MvApplicationPublicIT]/[method:run_InvalidSrcFileFirst_ThrowsMvException()] (8 ms)</li><li>sg.edu.nus.comp.cs4218.impl.app.MvApplicationPublicIT.[engine:junit-jupiter]/[class:sg.edu.nus.comp.cs4218.impl.app.MvApplicationPublicIT]/[method:run_InvalidSrcFilesAfter_ThrowsMvException()] (8 ms)</li>
+</ul>
+
+<br/>
+
+Report generated by <a href='https://pitest.org'>PIT</a> 1.15.8
+
+</body>
+</html>
