@@ -171,7 +171,7 @@ class LsApplicationHelperIT {
         boolean isSetReadable = cwdPath.toFile().setReadable(false);
         assertTrue(isSetReadable, "Failed to set read permission to false for test source file");
         String result = buildResult(List.of(cwdPath), false, false, false);
-        String expected = "ls: cannot open directory '.': Permission denied" + STRING_NEWLINE;
+        String expected = "ls: cannot open directory '.': Permission denied" + TWO_LINE_SEPARATOR;
         assertEquals(expected, result);
     }
 
