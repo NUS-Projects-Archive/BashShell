@@ -25,14 +25,12 @@ public class PasteApplicationPublicTest {
 
     private static final File DIRECTORY = new File("pasteTestDirectory");
     private static final File NONEXISTENT = new File("paste_nonexistent.txt");
-    private static final File FILE_EMPTY = new File("paste_empty.txt");
     private static final File FILE_1 = new File("paste_1.txt");
     private static final File FILE_2 = new File("paste_2.txt");
     private static final String TEXT_FILE_1 = joinStringsByNewline("A", "B", "C", "D", "E");
     private static final String TEXT_FILE_2 = joinStringsByNewline("1", "2", "3", "4", "5");
 
     private PasteApplication pasteApplication;
-    private String emptyFile;
     private String file1;
     private String file2;
 
@@ -42,7 +40,6 @@ public class PasteApplicationPublicTest {
 
     @BeforeAll
     static void setUpBeforeAll() throws IOException {
-        writeToFileWithText(FILE_EMPTY, null);
         writeToFileWithText(FILE_1, TEXT_FILE_1);
         writeToFileWithText(FILE_2, TEXT_FILE_2);
         DIRECTORY.mkdirs();
@@ -63,14 +60,12 @@ public class PasteApplicationPublicTest {
     @BeforeEach
     void setUp() {
         pasteApplication = new PasteApplication();
-        emptyFile = FILE_EMPTY.getAbsolutePath();
         file1 = FILE_1.getAbsolutePath();
         file2 = FILE_2.getAbsolutePath();
     }
 
     @AfterAll
     static void tearDownAfterAll() {
-        FILE_EMPTY.delete();
         FILE_1.delete();
         FILE_2.delete();
         DIRECTORY.delete();
