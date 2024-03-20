@@ -119,24 +119,14 @@ public class WcApplication implements WcInterface {
                 if (!node.canRead()) {
                     throw new WcException(String.format("'%s': %s", node.getName(), ERR_READING_FILE));
                 }
-                InputStream input = null;
-                try {
-                    input = IOUtils.openInputStream(file);
+
+                try (InputStream input = IOUtils.openInputStream(file)) {
                     long[] count = getCountReport(input);
                     output.add(String.format("%s %s", formatCount(isLines, isWords, isBytes, count), file));
                     addToTotal(count);
                     IOUtils.closeInputStream(input);
-                    input.close();
                 } catch (ShellException | IOException e) {
                     throw new WcException(e.getMessage(), e);
-                } finally {
-                    try {
-                        if (input != null) {
-                            input.close();
-                        }
-                    } catch (IOException e) {
-                        throw new WcException(e.getMessage(), e);
-                    }
                 }
             } catch (WcException e) {
                 errorList.add(e.getMessage());
