@@ -130,6 +130,14 @@ class LsApplicationTest {
         assertEquals(CWD_NON_DIRS[0], actual);
     }
 
+    @Test
+    void listFolderContent_MoreThanOneValidFileNameSpecified_ReturnsFileName() {
+        String actual = assertDoesNotThrow(() -> app.listFolderContent(false, false, DIR_A_NAME, CWD_NON_DIRS[0]));
+        String dirA = StringUtils.joinStringsByNewline(DIR_A_NAME + ":", getDirAContents());
+        String expected = CWD_NON_DIRS[0] + STRING_NEWLINE + STRING_NEWLINE +  dirA;
+        assertEquals(expected, actual);
+    }
+
     /**
      * Tests listFolderContent return all items from current working directory if no folder name is specified and
      * -R is specified. Only for Windows.
