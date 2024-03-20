@@ -101,7 +101,7 @@ public class WcApplicationTest {
         boolean isSetReadable = pathA.toFile().setReadable(false);
         assertTrue(isSetReadable, "Failed to set read permission to false for test");
         WcException result = assertThrowsExactly(WcException.class, () -> app.countFromFiles(false, false, false, fileA));
-        String expected = String.format("cat: '%s': Could not read file", fileAName);
+        String expected = String.format("wc: '%s': Could not read file", fileAName);
         assertEquals(expected, result.getMessage());
     }
 
