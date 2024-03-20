@@ -79,7 +79,7 @@ public class CatApplication implements CatInterface {
                 stdout.write(output.toString().getBytes());
                 stdout.write(STRING_NEWLINE.getBytes());
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
             throw new CatException(ERR_WRITE_STREAM, e);
         }
     }
