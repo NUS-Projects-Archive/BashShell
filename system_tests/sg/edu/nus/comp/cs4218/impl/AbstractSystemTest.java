@@ -21,11 +21,18 @@ public abstract class AbstractSystemTest {
     static String rootDirectory = System.getProperty("user.dir");
     final static String CAT_APP = "cat";
     final static String CD_APP = "cd";
+    final static String CUT_APP = "cut";
     final static String ECHO_APP = "echo";
     final static String EXIT_APP = "exit";
+    final static String GREP_APP = "grep";
     final static String LS_APP = "ls";
     final static String MKDIR_APP = "mkdir";
+    final static String MV_APP = "mv";
+    final static String PASTE_APP = "paste";
     final static String RM_APP = "rm";
+    final static String SORT_APP = "sort";
+    final static String UNIQ_APP = "uniq";
+    final static String WC_APP = "wc";
 
     /**
      * Test {@code ShellImpl::main} using the given inputs.

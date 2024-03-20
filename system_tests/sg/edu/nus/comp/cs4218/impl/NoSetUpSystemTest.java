@@ -32,8 +32,6 @@ public class NoSetUpSystemTest extends AbstractSystemTest {
 
     // TODO: create tests with chaining multiple commands and uses shell features
 
-    // TODO: ';' does not work
-
     @Test
     void main_MkdirDirAndNestedDirAndCdIntoParentDirAndLsAndRmChildDir_RmChildDirSuccessfully() {
         String parentDirName = "parent_dir";
