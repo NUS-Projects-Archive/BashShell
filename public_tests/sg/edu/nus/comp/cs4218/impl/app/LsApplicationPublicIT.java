@@ -70,7 +70,7 @@ public class LsApplicationPublicIT {
     @BeforeEach
     void init() throws IOException {
         lsApplication = new LsApplication();
-        Files.createDirectory(tempPath);
+        Files.createDirectories(tempPath);
     }
 
     @AfterEach
