@@ -28,12 +28,10 @@ public class ShellImpl implements Shell {
      * @param args List of strings arguments, unused.
      */
     public static void main(String... args) {
-        String commandString;
+        String commandString = null;
         Shell shell = new ShellImpl();
-        BufferedReader reader = null;
 
-        try {
-            reader = new BufferedReader(new InputStreamReader(System.in));
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(System.in))) {
 
             // Forever loop to maintain shell until ExitCommand
             while (true) {
@@ -44,9 +42,8 @@ public class ShellImpl implements Shell {
                     try {
                         commandString = reader.readLine();
                     } catch (IOException e) {
-                        System.out.println(e.getMessage());
+                        System.err.println(e.getMessage());
                         System.exit(1); // Streams are closed, terminate process with non-zero exit code
-                        return;
                     }
 
                     // Exit loop if Ctrl+D or EOF is encountered
@@ -62,15 +59,8 @@ public class ShellImpl implements Shell {
                     System.out.println(e.getMessage());
                 }
             }
-        } finally {
-            if (reader != null) {
-                try {
-                    reader.close();
-                } catch (IOException e) {
-                    System.out.println(e.getMessage());
-                    System.exit(1); // Streams are closed, terminate process with non-zero exit code
-                }
-            }
+        } catch (IOException e) {
+            System.err.println(e.getMessage());
         }
     }
 
