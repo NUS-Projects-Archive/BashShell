@@ -3,21 +3,25 @@ package sg.edu.nus.comp.cs4218.impl.app;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
+import static sg.edu.nus.comp.cs4218.test.FileUtils.createNewDirectory;
+import static sg.edu.nus.comp.cs4218.test.FileUtils.createNewFile;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledOnOs;
+import org.junit.jupiter.api.condition.OS;
 import org.junit.jupiter.api.io.TempDir;
 
+import sg.edu.nus.comp.cs4218.exception.CatException;
 import sg.edu.nus.comp.cs4218.exception.ShellException;
 import sg.edu.nus.comp.cs4218.exception.WcException;
 import sg.edu.nus.comp.cs4218.impl.util.IOUtils;
@@ -32,11 +36,11 @@ public class WcApplicationTest {
     private static final String TOTAL_LAST_LINE = " total";
     private static final String ERR_NON_EXIST = "wc: 'nonExistentFile.txt': No such file or directory";
 
-    @TempDir
-    private Path wcTestDir;
-    private String fileA;
-    private String fileB;
     private WcApplication app;
+    private Path pathA;
+    private String fileA;
+    private String fileAName;
+    private String fileB;
 
     private static String appendString(int lineCount, int wordCount, int byteCount, String lastLine) {
         StringBuilder stringBuilder = new StringBuilder();
@@ -57,33 +61,48 @@ public class WcApplicationTest {
     void setUp() throws IOException {
         app = new WcApplication();
 
-        Path pathA = wcTestDir.resolve(FILE_NAME_A);
-        Path pathB = wcTestDir.resolve(FILE_NAME_B);
-
-        fileA = pathA.toString();
-        fileB = pathB.toString();
-
         String contentFileA = "This is a sample text\nTo test Wc Application\n For CS4218\n";
         String contentFileB = "Lorem Ipsum is simply\ndummy text of the printing\nand typesetting industry.\n";
-        Files.write(pathA, contentFileA.getBytes(StandardCharsets.UTF_8));
-        Files.write(pathB, contentFileB.getBytes(StandardCharsets.UTF_8));
+        pathA = createNewFile(FILE_NAME_A, contentFileA);
+        fileA = pathA.toString();
+        fileAName = pathA.toFile().getName();
+        fileB = createNewFile(FILE_NAME_B, contentFileB).toString();
     }
 
     @Test
-    void countFromFiles_NonExistentFile_ReturnsFileNotFoundError() {
-        String result = assertDoesNotThrow(() -> app.countFromFiles(true, true, true, NON_EXISTENT_FILE));
-        assertEquals(ERR_NON_EXIST, result);
+    void countFromFiles_NonExistentFile_ThrowsWcException() {
+        WcException result = assertThrowsExactly(WcException.class, () ->
+                app.countFromFiles(false, false, false, NON_EXISTENT_FILE)
+        );
+        assertEquals(ERR_NON_EXIST, result.getMessage());
     }
 
     @Test
-    void countFromFiles_NonExistentFileAndValidFile_ReturnsValidFileCountsAndError() {
-        String result = assertDoesNotThrow(() -> app.countFromFiles(true, true, true, NON_EXISTENT_FILE, fileA));
-        List<String> expectedList = new ArrayList<>();
-        expectedList.add(appendString(3, 11, 57, String.format(STRING_FORMAT, fileA)));
-        expectedList.add(appendString(3, 11, 57, TOTAL_LAST_LINE));
-        expectedList.add(ERR_NON_EXIST);
-        String expected = String.join(STRING_NEWLINE, expectedList);
-        assertEquals(expected, result);
+    void countFromFiles_NonExistentFileAndValidFile_ThrowsWcException() {
+        WcException result = assertThrowsExactly(WcException.class, () ->
+                app.countFromFiles(false, false, false, NON_EXISTENT_FILE, fileA)
+        );
+        assertEquals(ERR_NON_EXIST, result.getMessage());
+    }
+
+    @Test
+    void countFromFiles_FileGivenAsDirectory_ThrowsWcException(@TempDir Path tempDir) {
+        String dir = createNewDirectory(tempDir, "directory").toString();
+        WcException result = assertThrowsExactly(WcException.class, () ->
+                app.countFromFiles(false, false, false, dir)
+        );
+        String expected = "wc: 'directory': Is a directory";
+        assertEquals(expected, result.getMessage());
+    }
+
+    @Test
+    @DisabledOnOs(value = OS.WINDOWS)
+    void countFromFiles_FileNoPermissionToRead_ThrowsCatException() {
+        boolean isSetReadable = pathA.toFile().setReadable(false);
+        assertTrue(isSetReadable, "Failed to set read permission to false for test");
+        CatException result = assertThrowsExactly(CatException.class, () -> app.countFromFiles(false, false, false, fileA));
+        String expected = String.format("cat: '%s': Could not read file", fileAName);
+        assertEquals(expected, result.getMessage());
     }
 
     @Test

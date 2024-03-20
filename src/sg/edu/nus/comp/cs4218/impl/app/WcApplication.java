@@ -105,39 +105,34 @@ public class WcApplication implements WcInterface {
         if (fileName == null) {
             throw new WcException(ERR_NULL_ARGS);
         }
-        List<String> output = new ArrayList<>();
-        List<String> errorList = new ArrayList<>();
-        for (String file : fileName) {
-            try {
-                File node = IOUtils.resolveFilePath(file).toFile();
-                if (!node.exists()) {
-                    throw new WcException(String.format("'%s': %s", node.getName(), ERR_FILE_NOT_FOUND));
-                }
-                if (node.isDirectory()) {
-                    throw new WcException(String.format("'%s': %s", node.getName(), ERR_IS_DIR));
-                }
-                if (!node.canRead()) {
-                    throw new WcException(String.format("'%s': %s", node.getName(), ERR_READING_FILE));
-                }
 
-                try (InputStream input = IOUtils.openInputStream(file)) {
-                    long[] count = getCountReport(input);
-                    output.add(String.format("%s %s", formatCount(isLines, isWords, isBytes, count), file));
-                    addToTotal(count);
-                    IOUtils.closeInputStream(input);
-                } catch (ShellException | IOException e) {
-                    throw new WcException(e.getMessage(), e);
-                }
-            } catch (WcException e) {
-                errorList.add(e.getMessage());
+        List<String> output = new ArrayList<>();
+        for (String file : fileName) {
+            File node = IOUtils.resolveFilePath(file).toFile();
+            if (!node.exists()) {
+                throw new WcException(String.format("'%s': %s", node.getName(), ERR_FILE_NOT_FOUND));
+            }
+            if (node.isDirectory()) {
+                throw new WcException(String.format("'%s': %s", node.getName(), ERR_IS_DIR));
+            }
+            if (!node.canRead()) {
+                throw new WcException(String.format("'%s': %s", node.getName(), ERR_READING_FILE));
+            }
+
+            try (InputStream input = IOUtils.openInputStream(file)) {
+                long[] count = getCountReport(input);
+                output.add(String.format("%s %s", formatCount(isLines, isWords, isBytes, count), file));
+                addToTotal(count);
+                IOUtils.closeInputStream(input);
+            } catch (ShellException | IOException e) {
+                throw new WcException(e.getMessage(), e);
             }
         }
+
         if (fileName.length > 1) {
             output.add(String.format("%s total", formatCount(isLines, isWords, isBytes, totals)));
         }
-        if (!errorList.isEmpty()) {
-            output.addAll(errorList);
-        }
+
         return String.join(STRING_NEWLINE, output);
     }
 
@@ -179,10 +174,14 @@ public class WcApplication implements WcInterface {
                                         InputStream stdin, String... fileName) throws WcException {
         List<String> output = new ArrayList<>();
         for (String file : fileName) {
-            if (("-").equals(file)) {
-                output.add(countFromStdin(isBytes, isLines, isWords, stdin) + " -");
-            } else {
-                output.add(countFromFiles(isBytes, isLines, isWords, file));
+            try {
+                if (("-").equals(file)) {
+                    output.add(countFromStdin(isBytes, isLines, isWords, stdin) + " -");
+                } else {
+                    output.add(countFromFiles(isBytes, isLines, isWords, file));
+                }
+            } catch (WcException e) {
+                output.add(e.getMessage());
             }
         }
 
