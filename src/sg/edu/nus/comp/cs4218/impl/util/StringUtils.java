@@ -13,7 +13,7 @@ public final class StringUtils {
     public static final String STRING_TAB = "\t";
     public static final String STRING_CURR_DIR = ".";
     public static final String STRING_PARENT_DIR = "..";
-    public static final String STRING_STDIN_OUTPUT = "(standard input)";
+    public static final String STRING_STDIN_OUTPUT = "(standard input)"; // NOPMD
     public static final char CHAR_FILE_SEP = File.separatorChar;
     public static final char CHAR_TAB = '\t';
     public static final char CHAR_SPACE = ' ';
@@ -115,15 +115,41 @@ public final class StringUtils {
     }
 
     /**
-     * Removes trailing instances of given sequence.
+     * Recursively removes trailing instances of given sequence.
+     * Returns the original string if it does not end with the sequence.
      *
      * @param str      String to remove sequence from
      * @param sequence String of sequence to remove
      * @return String of result with trailing sequence removed
      */
     public static String removeTrailing(String str, String sequence) {
-        String result = str.substring(0, str.length() - sequence.length());
-        return str.endsWith(sequence) ? removeTrailing(result, sequence) : str;
+        if (str == null || sequence == null) {
+            return str;
+        }
+
+        final int strLength = str.length();
+        final int seqLength = sequence.length();
+        return str.endsWith(sequence)
+                ? removeTrailing(str.substring(0, strLength - seqLength), sequence)
+                : str;
+    }
+
+    /**
+     * Removes trailing instances of given sequence.
+     * Returns the original string if it does not end with the sequence.
+     *
+     * @param str      String to remove sequence from
+     * @param sequence String of sequence to remove
+     * @return String of result with trailing sequence removed
+     */
+    public static String removeTrailingOnce(String str, String sequence) {
+        if (str == null || sequence == null) {
+            return str;
+        }
+
+        final int strLength = str.length();
+        final int seqLength = sequence.length();
+        return str.endsWith(sequence) ? str.substring(0, strLength - seqLength) : str;
     }
 
 
