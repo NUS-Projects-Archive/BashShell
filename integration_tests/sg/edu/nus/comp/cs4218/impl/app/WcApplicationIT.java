@@ -40,9 +40,7 @@ public class WcApplicationIT {
 
     private WcApplication app;
     private ByteArrayOutputStream output;
-    private Path pathA;
     private String fileA;
-    private String fileAName;
     private String fileB;
 
     private static String appendString(int lineCount, int wordCount, int byteCount, String lastLine) {
@@ -67,9 +65,7 @@ public class WcApplicationIT {
 
         String contentFileA = "This is a sample text\nTo test Wc Application\n For CS4218\n";
         String contentFileB = "Lorem Ipsum is simply\ndummy text of the printing\nand typesetting industry.\n";
-        pathA = createNewFile(FILE_NAME_A, contentFileA);
-        fileA = pathA.toString();
-        fileAName = pathA.toFile().getName();
+        fileA = createNewFile(FILE_NAME_A, contentFileA).toString();
         fileB = createNewFile(FILE_NAME_B, contentFileB).toString();
     }
 
