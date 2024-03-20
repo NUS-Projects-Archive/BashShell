@@ -28,9 +28,14 @@
             <version>5.10.0</version>
         </dependency>
         <dependency>
-          <groupId>com.github.stefanbirkner</groupId>
-          <artifactId>system-lambda</artifactId>
-          <version>1.2.1</version>
+            <groupId>com.github.stefanbirkner</groupId>
+            <artifactId>system-lambda</artifactId>
+            <version>1.2.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.pitest</groupId>
+            <artifactId>pitest-junit5-plugin</artifactId>
+            <version>1.2.1</version>
         </dependency>
     </dependencies>
 
@@ -79,6 +84,19 @@
                         </configuration>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.pitest</groupId>
+                <artifactId>pitest-maven</artifactId>
+                <version>1.15.8</version>
+                <configuration>
+                    <targetClasses>
+                        <param>sg.edu.nus.comp.cs4218.*</param>
+                    </targetClasses>
+                    <targetTests>
+                        <param>sg.edu.nus.comp.cs4218.*</param>
+                    </targetTests>
+                </configuration>
             </plugin>
         </plugins>
     </build>
