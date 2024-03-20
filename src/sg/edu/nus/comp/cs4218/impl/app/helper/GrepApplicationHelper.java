@@ -52,32 +52,30 @@ public final class GrepApplicationHelper {
             throws GrepException {
         boolean isSingleFile = (fileNames.length == 1);
         for (String f : fileNames) {
-            try {
-                String path = convertToAbsolutePath(f);
-                File file = new File(path);
+            String path = convertToAbsolutePath(f);
+            File file = new File(path);
 
-                if (!file.exists()) {
-                    lineResults.add(GREP_STRING + f + ": " + ERR_FILE_NOT_FOUND);
-                    countResults.add(GREP_STRING + f + ": " + ERR_FILE_NOT_FOUND);
-                    continue;
-                }
+            if (!file.exists()) {
+                lineResults.add(GREP_STRING + f + ": " + ERR_FILE_NOT_FOUND);
+                countResults.add(GREP_STRING + f + ": " + ERR_FILE_NOT_FOUND);
+                continue;
+            }
 
-                if (!file.canRead()) {
-                    lineResults.add(GREP_STRING + f + ": " + ERR_NO_PERM);
-                    countResults.add(GREP_STRING + f + ": " + ERR_NO_PERM);
-                    continue;
-                }
+            if (!file.canRead()) {
+                lineResults.add(GREP_STRING + f + ": " + ERR_NO_PERM);
+                countResults.add(GREP_STRING + f + ": " + ERR_NO_PERM);
+                continue;
+            }
 
-                if (file.isDirectory()) { // ignore if it's a directory
-                    lineResults.add(GREP_STRING + f + ": " + IS_DIRECTORY);
-                    countResults.add(GREP_STRING + f + ": " + IS_DIRECTORY);
-                    continue;
-                }
+            if (file.isDirectory()) { // ignore if it's a directory
+                lineResults.add(GREP_STRING + f + ": " + IS_DIRECTORY);
+                countResults.add(GREP_STRING + f + ": " + IS_DIRECTORY);
+                continue;
+            }
 
-                try (BufferedReader bufferedReader = new BufferedReader(new FileReader(path))) {
-                    grepResults(pattern, isCaseInsensitive, lineResults, countResults, isPrefixFileName, isSingleFile,
-                            f, bufferedReader);
-                }
+            try (BufferedReader bufferedReader = new BufferedReader(new FileReader(path))) {
+                grepResults(pattern, isCaseInsensitive, lineResults, countResults, isPrefixFileName, isSingleFile,
+                        f, bufferedReader);
             } catch (PatternSyntaxException pse) {
                 throw new GrepException(ERR_INVALID_REGEX, pse);
             } catch (FileNotFoundException e) {
@@ -185,17 +183,17 @@ public final class GrepApplicationHelper {
                     arg = Arrays.copyOfRange(arg, 1, arg.length);
                     for (char c : arg) {
                         switch (c) {
-                        case CASE_INSEN_IDENT:
-                            grepFlags[CASE_INSEN_IDX] = true;
-                            break;
-                        case COUNT_IDENT:
-                            grepFlags[COUNT_INDEX] = true;
-                            break;
-                        case PREFIX_FN:
-                            grepFlags[PREFIX_FN_IDX] = true;
-                            break;
-                        default:
-                            throw new GrepException(ERR_SYNTAX);
+                            case CASE_INSEN_IDENT:
+                                grepFlags[CASE_INSEN_IDX] = true;
+                                break;
+                            case COUNT_IDENT:
+                                grepFlags[COUNT_INDEX] = true;
+                                break;
+                            case PREFIX_FN:
+                                grepFlags[PREFIX_FN_IDX] = true;
+                                break;
+                            default:
+                                throw new GrepException(ERR_SYNTAX);
                         }
                     }
                 } else { // pattern must come before file names
