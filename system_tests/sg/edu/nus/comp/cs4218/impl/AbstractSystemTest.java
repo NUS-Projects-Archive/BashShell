@@ -52,6 +52,11 @@ public abstract class AbstractSystemTest {
         return res;
     }
 
+    /**
+     * Set up to be done before each test.
+     *
+     * @param tempDir Path of a temp directory for the test
+     */
     @BeforeEach
     void beforeEach(@TempDir(cleanup = ALWAYS) Path tempDir) {
         rootDirectory = tempDir.toAbsolutePath().toString();

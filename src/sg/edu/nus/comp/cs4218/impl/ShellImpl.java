@@ -55,6 +55,8 @@ public class ShellImpl implements Shell {
                     if (!StringUtils.isBlank(commandString)) {
                         shell.parseAndEvaluate(commandString, System.out);
                     }
+                } catch (SecurityException e) { // This is to catch SystemLambda$CheckExitCalled when under test
+                    return;
                 } catch (Exception e) {
                     System.out.println(e.getMessage());
                 }
