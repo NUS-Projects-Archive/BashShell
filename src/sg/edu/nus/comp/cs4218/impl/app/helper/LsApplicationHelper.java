@@ -180,7 +180,6 @@ public final class LsApplicationHelper {
             }
         }
 
-        Collections.sort(result);
         return result;
     }
 

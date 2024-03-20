@@ -109,6 +109,9 @@ class LsApplicationHelperIT {
         Environment.currentDirectory = System.getProperty("user.dir");
     }
 
+    /**
+     * Tests if listCwdContent throws exception when current working directory do not exist.
+     */
     @Test
     void listCwdContent_CurrentDirectoryDoNotExist_ThrowsLsException() {
         Environment.currentDirectory = "doNotExistCwdPath";
@@ -135,6 +138,9 @@ class LsApplicationHelperIT {
         testListCwdContent(expected, true);
     }
 
+    /**
+     * Tests if listCwdContent throws exception when current working directory do not have read permission.
+     */
     @Test
     @DisabledOnOs(OS.WINDOWS)
     void listCwdContent_CurrentDirectoryNoPermissionToRead_ThrowsLsException() {
@@ -157,6 +163,9 @@ class LsApplicationHelperIT {
         deleteFileOrDirectory(unreadableDir);
     }
 
+    /**
+     * Tests if buildResult returns error when path do not exist.
+     */
     @Test
     void buildResult_PathDoNotExist_ReturnsNoPermissionError() {
         Path doNotExistPath = Paths.get(cwdPath + "/doNotExistPath");
@@ -165,6 +174,9 @@ class LsApplicationHelperIT {
         assertEquals(expected, result);
     }
 
+    /**
+     * Tests if buildResult returns error when path do not have read permission.
+     */
     @Test
     @DisabledOnOs(OS.WINDOWS)
     void buildResult_PathNoPermissionToRead_ReturnsNoPermissionError() {

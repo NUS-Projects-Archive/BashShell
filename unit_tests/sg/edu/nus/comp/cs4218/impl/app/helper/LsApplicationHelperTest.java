@@ -3,6 +3,8 @@ package sg.edu.nus.comp.cs4218.impl.app.helper;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
+import static sg.edu.nus.comp.cs4218.impl.app.helper.LsApplicationHelper.formatContents;
+import static sg.edu.nus.comp.cs4218.impl.app.helper.LsApplicationHelper.resolvePaths;
 import static sg.edu.nus.comp.cs4218.test.FileUtils.createNewDirectory;
 
 import java.nio.file.Path;
@@ -16,6 +18,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 import sg.edu.nus.comp.cs4218.Environment;
+import sg.edu.nus.comp.cs4218.exception.InvalidDirectoryLsException;
 import sg.edu.nus.comp.cs4218.impl.util.StringUtils;
 
 // To give a meaningful variable name
@@ -63,7 +66,7 @@ class LsApplicationHelperTest {
         List<Path> contents = Arrays.stream(CWD_NON_DIRS)
                 .map(Paths::get)
                 .collect(Collectors.toList());
-        assertThrowsExactly(NullPointerException.class, () -> LsApplicationHelper.formatContents(contents, null));
+        assertThrowsExactly(NullPointerException.class, () -> formatContents(contents, null));
     }
 
     @Test
@@ -74,7 +77,7 @@ class LsApplicationHelperTest {
                 .map(Paths::get)
                 .collect(Collectors.toList());
         // When
-        String actual = LsApplicationHelper.formatContents(contents, true);
+        String actual = formatContents(contents, true);
 
         // Then
         assertEquals(expected, actual);
@@ -88,7 +91,7 @@ class LsApplicationHelperTest {
                 .map(Paths::get)
                 .collect(Collectors.toList());
         // When
-        String actual = LsApplicationHelper.formatContents(contents, false);
+        String actual = formatContents(contents, false);
 
         // Then
         assertEquals(expected, actual);
@@ -103,9 +106,19 @@ class LsApplicationHelperTest {
         List<Path> expected = List.of(dirAPath);
 
         // When
-        List<Path> actual = assertDoesNotThrow(() -> LsApplicationHelper.resolvePaths(DIR_A_NAME));
+        List<Path> actual = assertDoesNotThrow(() -> resolvePaths(DIR_A_NAME));
 
         // Then
         assertEquals(expected, actual);
+    }
+
+    @Test
+    void resolvePaths_InvalidDirectory_ThrowsInvalidDirectoryLsException() {
+        String invalidDirectory = "invalid_directory\0";
+        InvalidDirectoryLsException result = assertThrowsExactly(InvalidDirectoryLsException.class, () ->
+                resolvePaths(invalidDirectory)
+        );
+        String expected = String.format("ls: cannot access '%s': No such file or directory", invalidDirectory);
+        assertEquals(expected, result.getMessage());
     }
 }
