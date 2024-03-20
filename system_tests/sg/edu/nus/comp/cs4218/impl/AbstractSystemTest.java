@@ -19,6 +19,13 @@ import sg.edu.nus.comp.cs4218.impl.util.StringUtils;
 public abstract class AbstractSystemTest {
 
     static String rootDirectory = System.getProperty("user.dir");
+    final static String CAT_APP = "cat";
+    final static String CD_APP = "cd";
+    final static String ECHO_APP = "echo";
+    final static String EXIT_APP = "exit";
+    final static String LS_APP = "ls";
+    final static String MKDIR_APP = "mkdir";
+    final static String RM_APP = "rm";
 
     /**
      * Test {@code ShellImpl::main} using the given inputs.
@@ -60,6 +67,7 @@ public abstract class AbstractSystemTest {
     @BeforeEach
     void beforeEach(@TempDir(cleanup = ALWAYS) Path tempDir) {
         rootDirectory = tempDir.toAbsolutePath().toString();
+        Environment.currentDirectory = rootDirectory;
     }
 
     /**
