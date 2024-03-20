@@ -18,6 +18,7 @@ import sg.edu.nus.comp.cs4218.exception.CdException;
 import sg.edu.nus.comp.cs4218.testutils.TestEnvironmentUtil;
 import sg.edu.nus.comp.cs4218.testutils.TestStringUtils;
 
+@SuppressWarnings("PMD.ClassNamingConventions")
 class CdApplicationPublicIT {
 
     @TempDir

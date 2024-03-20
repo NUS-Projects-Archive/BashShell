@@ -13,10 +13,15 @@ import java.util.regex.Matcher;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class TestEnvironmentUtil {
+public final class TestEnvironmentUtil {
 
     private static final String CURRENT_DIR_FIELD = "currentDirectory";
     private static Class<?> environmentClass;
+
+    /**
+     * Private constructor to prevent instantiation.
+     */
+    private TestEnvironmentUtil() { /* Does nothing */ }
 
     private static String retrievePackageNameForClassName(String className) {
         try (Stream<Path> filesWalk = Files.walk(Paths.get("src"))) {
@@ -26,10 +31,10 @@ public class TestEnvironmentUtil {
                     .collect(Collectors.toList());
 
             Path path = Paths.get(result.get(0));
-            Optional<String> packageDeclarationLine = Files.lines(path).findFirst();
+            Optional<String> pkgDecLine = Files.lines(path).findFirst(); // Package Declaration Line
 
-            if (packageDeclarationLine.isPresent()) {
-                return packageDeclarationLine.get().replaceAll("package |;", "");
+            if (pkgDecLine.isPresent()) {
+                return pkgDecLine.get().replaceAll("package |;", "");
             }
 
             System.err.println("Package declaration not present in " + className);

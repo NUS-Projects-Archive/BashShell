@@ -10,7 +10,7 @@ import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_INPUT;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NULL_STREAMS;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_SYNTAX;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_STDIN_OUTPUT;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_STDIN_OUT;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -75,7 +75,6 @@ public class GrepApplication implements GrepInterface {
 
         int count = 0;
         StringJoiner stringJoiner = new StringJoiner(STRING_NEWLINE);
-
         try {
             BufferedReader reader = new BufferedReader(new InputStreamReader(stdin));
             String line;
@@ -89,7 +88,7 @@ public class GrepApplication implements GrepInterface {
                 Matcher matcher = compiledPattern.matcher(line);
                 if (matcher.find()) { // match
                     if (isPrefixFileName) {
-                        stringJoiner.add(STRING_STDIN_OUTPUT + ": " + line);
+                        stringJoiner.add(STRING_STDIN_OUT + ": " + line);
                     } else {
                         stringJoiner.add(line);
                     }
@@ -108,7 +107,7 @@ public class GrepApplication implements GrepInterface {
         String results = "";
         if (isCountLines) {
             if (isPrefixFileName) {
-                results = STRING_STDIN_OUTPUT + ": ";
+                results = STRING_STDIN_OUT + ": ";
             }
             results += count + STRING_NEWLINE;
         } else {
