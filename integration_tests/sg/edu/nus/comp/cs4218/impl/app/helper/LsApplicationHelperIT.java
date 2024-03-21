@@ -160,7 +160,7 @@ class LsApplicationHelperIT {
     @DisabledOnOs(OS.WINDOWS)
     void buildResult_SomePathNoPermissionToRead_ReturnsNoPermissionError() {
         // Create a directory that is not readable and change current directory to that
-        Path unreadableDir = assertDoesNotThrow(() -> Files.createTempDirectory("unreadable"));
+        Path unreadableDir = createNewDirectory(cwdPath, "unreadable");
         boolean isSetReadable = unreadableDir.toFile().setReadable(false);
         assertTrue(isSetReadable, "Failed to set read permission to false for test source file");
         String result = buildResult(List.of(cwdPath, unreadableDir), false, false, false);
