@@ -11,6 +11,7 @@ import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -200,6 +201,7 @@ public final class LsApplicationHelper {
             paths.add(resolvePath(directories[i]));
         }
 
+        Collections.sort(paths);
         return paths;
     }
 

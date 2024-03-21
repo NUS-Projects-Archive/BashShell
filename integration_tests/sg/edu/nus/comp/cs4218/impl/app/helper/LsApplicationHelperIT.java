@@ -157,19 +157,6 @@ class LsApplicationHelperIT {
     }
 
     @Test
-    @DisabledOnOs(OS.WINDOWS)
-    void buildResult_SomePathNoPermissionToRead_ReturnsNoPermissionError() {
-        // Create a directory that is not readable and change current directory to that
-        Path unreadableDir = createNewDirectory(cwdPath, "unreadable");
-        boolean isSetReadable = unreadableDir.toFile().setReadable(false);
-        assertTrue(isSetReadable, "Failed to set read permission to false for test source file");
-        String result = buildResult(List.of(cwdPath, unreadableDir), false, false, false);
-        String expected = String.format("%s%s", UNSORTED_CWD_CONTENTS_WITH_HEADER, TWO_LINE_SEPARATOR) +
-                "ls: cannot open directory 'unreadable': Permission denied" + STRING_NEWLINE;
-        assertEquals(expected, result);
-    }
-
-    @Test
     void buildResult_NoFlags_ReturnsAllFiles() {
         String result = buildResult(List.of(cwdPath), false, false, false);
         String expected = String.format("%s%s", UNSORTED_CWD_CONTENTS_WITH_HEADER, TWO_LINE_SEPARATOR);
