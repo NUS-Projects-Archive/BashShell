@@ -96,6 +96,7 @@
                     <targetTests>
                         <param>sg.edu.nus.comp.cs4218.*</param>
                     </targetTests>
+                    <reportsDirectory>automated_tests/pitest</reportsDirectory>
                 </configuration>
             </plugin>
         </plugins>
