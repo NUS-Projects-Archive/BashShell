@@ -3,10 +3,14 @@ package sg.edu.nus.comp.cs4218.impl.util;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.fileSeparator;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.isBlank;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.isNumber;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.multiplyChar;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.removeTrailing;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.removeTrailingOnce;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.tokenize;
 
 import org.junit.jupiter.api.Test;
@@ -16,6 +20,27 @@ import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 public class StringUtilsTest {
+
+    private static final String SINGLE_TRAIL_STR = "stringstr";
+    private static final String MULTI_TRAIL_STR = "stringstrstrstr";
+    private static final String STRING = "string";
+    private static final String SEQUENCE = "str";
+
+    @Test
+    void fileSeparator_WindowsOS_ReturnsExpectedFileSeparator() {
+        System.setProperty("os.name", "Windows 10");
+        String expected = "\\\\";
+        String actual = fileSeparator();
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void fileSeparator_NonWindowsOS_ReturnsExpectedFileSeparator() {
+        System.setProperty("os.name", "Linux");
+        String expected = "\\";
+        String actual = fileSeparator();
+        assertEquals(expected, actual);
+    }
 
     @ParameterizedTest
     @NullSource
@@ -63,4 +88,48 @@ public class StringUtilsTest {
         assertFalse(isNumber(string));
     }
 
+    @Test
+    void isNumber_EmptyString_ReturnsFalse() {
+        assertFalse(isNumber(""));
+    }
+
+    @Test
+    void removeTrailing_NullString_ReturnsString() {
+        assertNull(removeTrailing(null, null));
+    }
+
+    @Test
+    void removeTrailing_NullSequence_ReturnsString() {
+        assertEquals(STRING, removeTrailing(STRING, null));
+    }
+
+    @Test
+    void removeTrailing_SingleTrailing_ReturnsRemovedTrailingString() {
+        assertEquals(STRING, removeTrailing(SINGLE_TRAIL_STR, SEQUENCE));
+    }
+
+    @Test
+    void removeTrailing_MultipleTrailing_ReturnsRemovedTrailingString() {
+        assertEquals(STRING, removeTrailing(MULTI_TRAIL_STR, SEQUENCE));
+    }
+
+    @Test
+    void removeTrailingOnce_NullString_ReturnsString() {
+        assertNull(removeTrailingOnce(null, null));
+    }
+
+    @Test
+    void removeTrailingOnce_NullSequence_ReturnsString() {
+        assertEquals(STRING, removeTrailingOnce(STRING, null));
+    }
+
+    @Test
+    void removeTrailingOnce_SingleTrailing_ReturnsRemovedTrailingString() {
+        assertEquals(STRING, removeTrailingOnce(SINGLE_TRAIL_STR, SEQUENCE));
+    }
+
+    @Test
+    void removeTrailingOnce_MultipleTrailing_ReturnsRemovedOneTrailingString() {
+        assertEquals("stringstrstr", removeTrailingOnce(MULTI_TRAIL_STR, SEQUENCE));
+    }
 }
