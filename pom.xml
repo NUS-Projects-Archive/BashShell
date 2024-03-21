@@ -37,6 +37,24 @@
             <artifactId>pitest-junit5-plugin</artifactId>
             <version>1.2.1</version>
         </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>1.7.21</version>
+        </dependency>
+        <dependency>
+            <groupId>org.evosuite</groupId>
+            <artifactId>evosuite-standalone-runtime</artifactId>
+            <version>1.2.0</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/evosuite-standalone-runtime-1.2.0.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>sg.edu.nus.comp.cs4218</groupId>
+            <artifactId>cs4218_shell_2024</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>

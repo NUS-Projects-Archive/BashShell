@@ -2,10 +2,14 @@ package sg.edu.nus.comp.cs4218.impl.app;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NULL_ARGS;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PushbackInputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -15,10 +19,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
+import sg.edu.nus.comp.cs4218.exception.EchoException;
+import sg.edu.nus.comp.cs4218.exception.TeeException;
 import sg.edu.nus.comp.cs4218.impl.util.IOUtils;
 
 class TeeApplicationTest {
-
+    private static final String TEE_EXCEPTION = "tee: ";
     private static final String FILE_A = "A.txt";
     private static final String FILE_B = "B.txt";
     private static final String EMPTY_FILE = "empty.txt";
@@ -82,5 +88,18 @@ class TeeApplicationTest {
         String expected = CONTENT_FILE_B + CONTENT_FILE_A;
         assertEquals(CONTENT_FILE_A, outputStdOut);
         assertEquals(expected, outputFile);
+    }
+
+    @Test // picked up from evosuite automatic test generation (TeeApplication_ESTest test0)
+    public void teeFromStdIn_FileIsADirectory_ReturnsFileIsADirectory() {
+        String dir = tempDir.toString();
+        String result = assertDoesNotThrow(() -> app.teeFromStdin(false, inputStream, dir));
+        assertEquals(TEE_EXCEPTION + dir + ": Is a directory" + STRING_NEWLINE + CONTENT_FILE_A, result);
+    }
+
+    @Test // picked up from evosuite automatic test generation (TeeApplication_ESTest test3)
+    public void teeFromStdIn_NullFile_ThrowsNullArgsException() {
+        TeeException result = assertThrowsExactly(TeeException.class, () -> app.teeFromStdin(false, inputStream, null));
+        assertEquals(TEE_EXCEPTION + ERR_NULL_ARGS, result.getMessage());
     }
 }
