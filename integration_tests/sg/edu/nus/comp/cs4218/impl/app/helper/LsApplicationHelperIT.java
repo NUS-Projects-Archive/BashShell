@@ -70,18 +70,14 @@ class LsApplicationHelperIT {
     }
 
     /**
-     * Tests if listCwdContent returns expected output given isSortByExt.
+     * Asserts that the output of listCwdContent matches the expected output, when given isSortByExt.
      *
-     * @param expected    Expected output
-     * @param isSortByExt Boolean to indicate if output should be sorted by
-     *                    extension
+     * @param expected    The expected output of listCwdContent
+     * @param isSortByExt A boolean to indicate whether the output should be sorted by extension
      */
-    private void testListCwdContent(String expected, boolean isSortByExt) {
-        // When
-        String actual = assertDoesNotThrow(() -> listCwdContent(isSortByExt));
-
-        // Then
-        assertEquals(expected, actual);
+    private void assertEqualsListCwdContent(String expected, boolean isSortByExt) {
+        String result = assertDoesNotThrow(() -> listCwdContent(isSortByExt));
+        assertEquals(expected, result);
     }
 
     /**
@@ -109,38 +105,24 @@ class LsApplicationHelperIT {
         Environment.currentDirectory = System.getProperty("user.dir");
     }
 
-    /**
-     * Tests if listCwdContent throws exception when current working directory do not exist.
-     */
     @Test
     void listCwdContent_CurrentDirectoryDoNotExist_ThrowsLsException() {
         Environment.currentDirectory = "doNotExistCwdPath";
         assertThrowsExactly(LsException.class, () -> listCwdContent(false));
     }
 
-    /**
-     * Tests if listCwdContent returns unsorted contents when isSortByExt is false.
-     */
     @Test
     void listCwdContent_IsSortByExtIsFalse_ReturnsUnsortedCwdContents() {
-        // Given
         String expected = joinStringsByNewline(UNSORTED_CWD_CONTENTS);
-        testListCwdContent(expected, false);
+        assertEqualsListCwdContent(expected, false);
     }
 
-    /**
-     * Tests if listCwdContent returns sorted contents when isSortByExt is true.
-     */
     @Test
     void listCwdContent_IsSortByExtIsTrue_ReturnsSortedCwdContents() {
-        // Given
         String expected = joinStringsByNewline(SORTED_CWD_CONTENTS_STRING);
-        testListCwdContent(expected, true);
+        assertEqualsListCwdContent(expected, true);
     }
 
-    /**
-     * Tests if listCwdContent throws exception when current working directory do not have read permission.
-     */
     @Test
     @DisabledOnOs(OS.WINDOWS)
     void listCwdContent_CurrentDirectoryNoPermissionToRead_ThrowsLsException() {
@@ -150,22 +132,12 @@ class LsApplicationHelperIT {
         assertTrue(isSetReadable, "Failed to set read permission to false for test source file");
         Environment.currentDirectory = unreadableDir.toString();
 
-        // Given
-        String expected = "ls: cannot open directory '.': Permission denied";
-
-        // When
         LsException result = assertThrowsExactly(LsException.class, () -> listCwdContent(false));
-
-        // Then
+        String expected = "ls: cannot open directory '.': Permission denied";
         assertEquals(expected, result.getMessage());
-
-        // Clean up
         deleteFileOrDirectory(unreadableDir);
     }
 
-    /**
-     * Tests if buildResult returns error when path do not exist.
-     */
     @Test
     void buildResult_PathDoNotExist_ReturnsNoPermissionError() {
         Path doNotExistPath = Paths.get(cwdPath + "/doNotExistPath");
@@ -174,9 +146,6 @@ class LsApplicationHelperIT {
         assertEquals(expected, result);
     }
 
-    /**
-     * Tests if buildResult returns error when path do not have read permission.
-     */
     @Test
     @DisabledOnOs(OS.WINDOWS)
     void buildResult_PathNoPermissionToRead_ReturnsNoPermissionError() {
@@ -187,50 +156,46 @@ class LsApplicationHelperIT {
         assertEquals(expected, result);
     }
 
-    /**
-     * Tests -R flag and checks it returns all the files recursively.
-     */
     @Test
-    void buildResult_IsRecursiveIsTrue_ReturnsAllFiles() {
-        // Given
+    @DisabledOnOs(OS.WINDOWS)
+    void buildResult_SomePathNoPermissionToRead_ReturnsNoPermissionError() {
+        // Create a directory that is not readable and change current directory to that
+        Path unreadableDir = assertDoesNotThrow(() -> Files.createTempDirectory("unreadable"));
+        boolean isSetReadable = unreadableDir.toFile().setReadable(false);
+        assertTrue(isSetReadable, "Failed to set read permission to false for test source file");
+        String result = buildResult(List.of(cwdPath, unreadableDir), false, false, false);
+        String expected = String.format("%s%s%s", UNSORTED_CWD_CONTENTS_WITH_HEADER,
+                "ls: cannot open directory 'unreadable': Permission denied", TWO_LINE_SEPARATOR);
+        assertEquals(expected, result);
+    }
+
+    @Test
+    void buildResult_NoFlags_ReturnsAllFiles() {
+        String result = buildResult(List.of(cwdPath), false, false, false);
+        String expected = String.format("%s%s", UNSORTED_CWD_CONTENTS_WITH_HEADER, TWO_LINE_SEPARATOR);
+        assertEquals(expected, result);
+    }
+
+    @Test
+    void buildResult_IsRecursive_ReturnsAllFiles() {
+        String result = buildResult(List.of(cwdPath), true, false, false);
         String expected = String.format("%s%s%s%s", UNSORTED_CWD_CONTENTS_WITH_HEADER, TWO_LINE_SEPARATOR,
                 UNSORTED_DIR_A_CONTENTS_WITH_HEADER, STRING_NEWLINE);
-
-        // When
-        String actual = buildResult(List.of(cwdPath), true, false, false);
-
-        // Then
-        assertEquals(expected, actual);
+        assertEquals(expected, result);
     }
 
-    /**
-     * Tests if buildResult returns expected output given isSortByExt -X is true.
-     */
     @Test
-    void buildResult_IsSortByExtIsTrue_ReturnsTempDirFilesSortedByExt() {
-        // Given
+    void buildResult_IsSortByExt_ReturnsTempDirFilesSortedByExt() {
+        String result = buildResult(List.of(cwdPath), false, true, false);
         String expected = String.format("%s%s", SORTED_CWD_CONTENTS_STRING_WITH_HEADER, TWO_LINE_SEPARATOR);
-
-        // When
-        String actual = buildResult(List.of(cwdPath), false, true, false);
-
-        // Then
-        assertEquals(expected, actual);
+        assertEquals(expected, result);
     }
 
-    /**
-     * Tests if buildResult returns expected output given isRecursive -R and isSortByExt -X are true.
-     */
     @Test
-    void buildResult_IsRecursiveIsTrueAndIsSortByExtIsTrue_ReturnsAllFilesSortedByExt() {
-        // Given
+    void buildResult_IsRecursiveAndIsSortByExt_ReturnsAllFilesSortedByExt() {
+        String result = buildResult(List.of(cwdPath), true, true, false);
         String expected = String.format("%s%s%s%s", SORTED_CWD_CONTENTS_STRING_WITH_HEADER, TWO_LINE_SEPARATOR,
                 SORTED_DIR_A_CONTENTS_WITH_HEADER, STRING_NEWLINE);
-
-        // When
-        String actual = buildResult(List.of(cwdPath), true, true, false);
-
-        // Then
-        assertEquals(expected, actual);
+        assertEquals(expected, result);
     }
 }

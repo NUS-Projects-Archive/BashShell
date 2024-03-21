@@ -2,6 +2,8 @@ package sg.edu.nus.comp.cs4218.impl.app.helper;
 
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_FILE_SEP;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_CURR_DIR;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.isBlank;
 
 import java.io.File;
 import java.nio.file.Files;
@@ -9,7 +11,6 @@ import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -18,14 +19,14 @@ import sg.edu.nus.comp.cs4218.Environment;
 import sg.edu.nus.comp.cs4218.exception.DirectoryAccessDeniedLsException;
 import sg.edu.nus.comp.cs4218.exception.InvalidDirectoryLsException;
 import sg.edu.nus.comp.cs4218.exception.LsException;
-import sg.edu.nus.comp.cs4218.impl.util.StringUtils;
 
 /**
  * A helper class that provides functionality to list the contents of a directory (ls).
  */
 public final class LsApplicationHelper {
+
     private static final String PATH_CURR_DIR = STRING_CURR_DIR + CHAR_FILE_SEP;
-    private static final String COLON_NEW_LINE = ":" + StringUtils.STRING_NEWLINE;
+    private static final String COLON_NEW_LINE = ":" + STRING_NEWLINE;
 
     private LsApplicationHelper() { /* Does nothing*/ }
 
@@ -74,7 +75,7 @@ public final class LsApplicationHelper {
 
                 final String formatted = formatContents(contents, isSortByExt);
                 final String relativePath = getRelativeToCwd(path).toString();
-                result.append(StringUtils.isBlank(relativePath)
+                result.append(isBlank(relativePath)
                         ? STRING_CURR_DIR : hasFolder
                         ? relativePath : PATH_CURR_DIR + relativePath);
                 result.append(COLON_NEW_LINE);
@@ -82,9 +83,9 @@ public final class LsApplicationHelper {
 
                 if (!formatted.isEmpty()) {
                     // Empty directories should not have an additional new line
-                    result.append(StringUtils.STRING_NEWLINE);
+                    result.append(STRING_NEWLINE);
                 }
-                result.append(StringUtils.STRING_NEWLINE);
+                result.append(STRING_NEWLINE);
 
                 // RECURSE!
                 if (isRecursive) {
@@ -93,15 +94,16 @@ public final class LsApplicationHelper {
             } catch (InvalidDirectoryLsException e) {
                 // If the directory is invalid, print the errors at the top
                 error.append(e.getMessage());
-                error.append(StringUtils.STRING_NEWLINE);
+                error.append(STRING_NEWLINE);
             } catch (DirectoryAccessDeniedLsException e) {
-                // Append the error message to the result normally
                 // Trim the last newline
-                if (result.length() > 0) {
+                boolean endsWithNewline = result.toString().endsWith(STRING_NEWLINE);
+                if (endsWithNewline) {
                     result.deleteCharAt(result.length() - 1);
                 }
+                // Append the error message to the result normally
                 result.append(e.getMessage());
-                result.append(StringUtils.STRING_NEWLINE + StringUtils.STRING_NEWLINE);
+                result.append(STRING_NEWLINE).append(STRING_NEWLINE);
             }
         }
 
@@ -133,7 +135,7 @@ public final class LsApplicationHelper {
 
         for (String fileName : fileNames) {
             result.append(fileName);
-            result.append(StringUtils.STRING_NEWLINE);
+            result.append(STRING_NEWLINE);
         }
 
         return result.toString().trim();
@@ -148,6 +150,7 @@ public final class LsApplicationHelper {
     private static List<Path> getContents(Path directory)
             throws InvalidDirectoryLsException, DirectoryAccessDeniedLsException {
         if (Files.isDirectory(directory)) {
+            // Path is a folder
             if (Files.isReadable(directory)) {
                 // Get contents from directory
                 return getContentsFromReadableDirectory(directory);
