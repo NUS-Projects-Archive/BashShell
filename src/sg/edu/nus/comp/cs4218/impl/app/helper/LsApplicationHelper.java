@@ -183,7 +183,7 @@ public final class LsApplicationHelper {
             }
         }
 
-        // Collections.sort(result);
+        Collections.sort(result);
         return result;
     }
 
@@ -201,7 +201,6 @@ public final class LsApplicationHelper {
             paths.add(resolvePath(directories[i]));
         }
 
-        Collections.sort(paths);
         return paths;
     }
 
