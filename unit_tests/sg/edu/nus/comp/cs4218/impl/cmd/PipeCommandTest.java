@@ -6,11 +6,9 @@ import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 
 import java.io.ByteArrayOutputStream;
-import java.nio.file.Path;
 import java.util.Arrays;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir;
 
 import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
 import sg.edu.nus.comp.cs4218.exception.CatException;
@@ -19,7 +17,7 @@ import sg.edu.nus.comp.cs4218.exception.ShellException;
 public class PipeCommandTest {
 
     @Test
-    void evaluate_InvalidCommand_PrintsErrorMessage() {
+    void evaluate_InvalidCommand_ThrowsShellException() {
         PipeCommand pipeCommand = new PipeCommand(Arrays.asList(
                 new CallCommandStub("lsa"),
                 new CallCommandStub("echo", "hello", "world")
@@ -33,7 +31,7 @@ public class PipeCommandTest {
     }
 
     @Test
-    void evaluate_CommandEncounterError_PrintsErrorMessage(@TempDir Path tempDir) {
+    void evaluate_CommandEncounterError_ThrowsAbstractApplicationException() {
         PipeCommand pipeCommand = new PipeCommand(Arrays.asList(
                 new CallCommandStub("cat", "nonExistFile"),
                 new CallCommandStub("echo", "hello", "world")
