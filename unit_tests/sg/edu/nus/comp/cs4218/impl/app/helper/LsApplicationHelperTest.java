@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 import static sg.edu.nus.comp.cs4218.impl.app.helper.LsApplicationHelper.formatContents;
 import static sg.edu.nus.comp.cs4218.impl.app.helper.LsApplicationHelper.resolvePaths;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_FILE_SEP;
 import static sg.edu.nus.comp.cs4218.test.FileUtils.createNewDirectory;
 
 import java.nio.file.Path;
@@ -57,7 +56,8 @@ class LsApplicationHelperTest {
         }
 
         String cwdPathName = cwdPath.toString();
-        dirAPath = Paths.get(cwdPathName, DIR_A_NAME);
+        // dirAPath = Paths.get(cwdPathName, DIR_A_NAME);
+        dirAPath = createNewDirectory(cwdPath, DIR_A_NAME);
         // Set current working directory to cwdPath
         Environment.currentDirectory = cwdPathName;
     }
@@ -109,7 +109,8 @@ class LsApplicationHelperTest {
 
     @Test
     void resolvePaths_DirectoryStartsWithFileSeparator_ReturnsListOfPath() {
-        List<Path> result = assertDoesNotThrow(() -> resolvePaths(CHAR_FILE_SEP + DIR_A_NAME));
+        // Unix OS considers path starting with '/' as an absolute path
+        List<Path> result = assertDoesNotThrow(() -> resolvePaths(Paths.get(DIR_A_NAME).toString()));
         List<Path> expected = List.of(dirAPath);
         assertEquals(expected, result);
     }
