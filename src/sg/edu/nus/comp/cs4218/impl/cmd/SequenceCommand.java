@@ -73,7 +73,7 @@ public class SequenceCommand implements Command {
     }
 
     @Override
-    public void terminate() { /* Used for now */}
+    public void terminate() { /* Unused for now */}
 
     /**
      * Returns a list of commands.

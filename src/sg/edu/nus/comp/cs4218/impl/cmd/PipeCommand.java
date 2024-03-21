@@ -88,7 +88,7 @@ public class PipeCommand implements Command {
     }
 
     @Override
-    public void terminate() { /* Used for now */}
+    public void terminate() { /* Unused for now */}
 
     /**
      * Returns the list of CallCommand.

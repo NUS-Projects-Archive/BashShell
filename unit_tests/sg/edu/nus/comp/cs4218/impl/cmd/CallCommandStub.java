@@ -13,6 +13,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
+import sg.edu.nus.comp.cs4218.exception.CatException;
 import sg.edu.nus.comp.cs4218.exception.ShellException;
 
 public class CallCommandStub extends CallCommand {
@@ -30,7 +31,7 @@ public class CallCommandStub extends CallCommand {
 
     @Override
     public void evaluate(InputStream stdin, OutputStream stdout)
-            throws AbstractApplicationException, ShellException, FileNotFoundException {
+            throws AbstractApplicationException, ShellException {
         try {
             if (matchArgsListExactly("lsa")) {
                 throw new ShellException("lsa: " + ERR_INVALID_APP);
@@ -43,6 +44,8 @@ public class CallCommandStub extends CallCommand {
                 mockGrep("Line#", stdin, stdout);
             } else if (matchArgsListExactly("grep", "2")) {
                 mockGrep("2", stdin, stdout);
+            } else if (matchArgsListExactly("cat", "nonExistFile")) {
+                throw new CatException("'nonExistFile.txt': No such file or directory");
             } else {
                 throw new RuntimeException("CallCommandStub: case not mocked");
             }
