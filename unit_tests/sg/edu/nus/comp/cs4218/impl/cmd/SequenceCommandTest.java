@@ -1,15 +1,19 @@
 package sg.edu.nus.comp.cs4218.impl.cmd;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_EXISTS;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_SYNTAX;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
+import static sg.edu.nus.comp.cs4218.test.AssertUtils.assertEmptyString;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -146,5 +150,33 @@ public class SequenceCommandTest {
         } catch (FileNotFoundException | AbstractApplicationException | ShellException e) {
             fail(e.getMessage());
         }
+    }
+
+    @Test
+    void write_EmptyMessage_WritesEmptyToOutput() {
+        OutputStream stdout = new ByteArrayOutputStream();
+        SequenceCommand seqCmd = new SequenceCommand(null);
+        assertDoesNotThrow(() -> seqCmd.write(stdout, ""));
+        assertEmptyString(stdout.toString());
+    }
+
+    @Test
+    void write_ValidMessage_WritesToOutput() {
+        OutputStream stdout = new ByteArrayOutputStream();
+        SequenceCommand seqCmd = new SequenceCommand(null);
+        assertDoesNotThrow(() -> seqCmd.write(stdout, "Valid Message"));
+        assertEquals("Valid Message", stdout.toString());
+    }
+
+    @Test
+    void write_FailsToWriteToOutputStream_ThrowsShellException() {
+        SequenceCommand seqCmd = new SequenceCommand(null);
+        ShellException result = assertThrowsExactly(ShellException.class, () -> {
+            OutputStream mockStdout = mock(OutputStream.class);
+            doThrow(new IOException()).when(mockStdout).write(any(byte[].class));
+            seqCmd.write(mockStdout, "Fails to write to output stream message");
+        });
+        String expected = "shell: Could not write to output stream";
+        assertEquals(expected, result.getMessage());
     }
 }

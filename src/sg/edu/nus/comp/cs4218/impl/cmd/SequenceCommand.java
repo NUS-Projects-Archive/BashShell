@@ -1,5 +1,6 @@
 package sg.edu.nus.comp.cs4218.impl.cmd;
 
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_WRITE_STREAM;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 
 import java.io.ByteArrayOutputStream;
@@ -30,11 +31,11 @@ public class SequenceCommand implements Command {
     /**
      * Writes the order-preserved output of a series of sub commands to stdout, including exception messages if any.
      *
-     * @param stdin   An InputStream. The first sub command processing an InputStream will be evaluated with this as its
-     *                initial InputStream.
-     * @param stdout  An OutputStream for the order-preserved output of the sub commands to be written to.
-     * @throws ExitException If ExitException is thrown from any sub-commands. The ExitException is only thrown at the
-     *                       end of execution, even if the exception did not come from the last sub-command.
+     * @param stdin  An InputStream. The first sub command processing an InputStream will be evaluated with this as its
+     *               initial InputStream.
+     * @param stdout An OutputStream for the order-preserved output of the sub commands to be written to.
+     * @throws ExitException  If ExitException is thrown from any sub-commands. The ExitException is only thrown at the
+     *                        end of execution, even if the exception did not come from the last sub-command.
      * @throws ShellException If an I/O exception occurs when writing to stdout.
      */
     @Override
@@ -68,7 +69,7 @@ public class SequenceCommand implements Command {
         try {
             outputStream.write(message.getBytes());
         } catch (IOException e) {
-            throw new ShellException(e.getMessage(), e);
+            throw new ShellException(ERR_WRITE_STREAM, e);
         }
     }
 
@@ -77,7 +78,7 @@ public class SequenceCommand implements Command {
 
     /**
      * Returns a list of commands.
-     * 
+     *
      * @return
      */
     public List<Command> getCommands() {
