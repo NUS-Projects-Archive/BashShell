@@ -128,7 +128,7 @@ public final class LsApplicationHelper {
         if (isSortByExt) {
             fileNames.sort(getFileExtensionComparator());
         } else {
-            Collections.sort(fileNames);
+            fileNames.sort(null); // natural ordering
         }
 
         for (String fileName : fileNames) {
