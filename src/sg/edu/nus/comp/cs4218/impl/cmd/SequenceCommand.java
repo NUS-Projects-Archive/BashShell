@@ -20,6 +20,7 @@ import sg.edu.nus.comp.cs4218.exception.ShellException;
  * Command format: <Command> ; <Command>
  */
 public class SequenceCommand implements Command {
+
     private final List<Command> commands;
 
     public SequenceCommand(List<Command> commands) {
@@ -72,9 +73,7 @@ public class SequenceCommand implements Command {
     }
 
     @Override
-    public void terminate() {
-        // Unused for now
-    }
+    public void terminate() { /* Used for now */}
 
     /**
      * Returns a list of commands.

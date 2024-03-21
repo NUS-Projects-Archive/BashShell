@@ -57,7 +57,6 @@ public class PipeCommand implements Command {
             final CallCommand callCommand = callCommands.get(i);
 
             if (absAppException != null || shellException != null) {
-                callCommand.terminate();
                 continue;
             }
 
@@ -89,9 +88,7 @@ public class PipeCommand implements Command {
     }
 
     @Override
-    public void terminate() {
-        // Unused for now
-    }
+    public void terminate() { /* Used for now */}
 
     /**
      * Returns the list of CallCommand.
