@@ -131,4 +131,15 @@ public class SetUpSystemTest extends AbstractSystemTest {
         String expected = actual.rootDirectory + "$ " + String.format(" %7d %7d %7d", 2, 2, 10);
         assertEquals(expected, actual.out);
     }
+
+    @Test
+    void main_GrepFileAndRedirectToAnotherFileAndCatTheFile_PrintsCorrectGrepStringsStoredInFile() {
+        String outputFileName = "result.txt";
+        SystemTestResults actual = testMainWith(
+                GREP_APP + " abc < " + fileName + " > " + outputFileName + "; " + CAT_APP + " " + outputFileName,
+                EXIT_APP
+        );
+        String expected = actual.rootDirectory + "$ " + "abc\nabc";
+        assertEquals(expected, actual.out);
+    }
 }
