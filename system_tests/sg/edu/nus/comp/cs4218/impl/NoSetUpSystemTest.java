@@ -3,13 +3,35 @@ package sg.edu.nus.comp.cs4218.impl;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_INVALID_APP;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_SYNTAX;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_FILE_SEP;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import sg.edu.nus.comp.cs4218.Environment;
 
 public class NoSetUpSystemTest extends AbstractSystemTest {
+
+    static String[] validQuotes() {
+        return new String[]{
+                " \"`echo Hello`World\"",
+                " \"Hello World\"",
+                " 'Hello World'",
+                " `echo Hello` World",
+        };
+    }
+
+    static String[] invalidQuotes() {
+        return new String[]{
+                " \"`echo Hello World\"",
+                " \"`echo Hel`lo`World\"",
+                " \"`echo Hello`World",
+                " \"\"`echo Hello`World\"",
+        };
+    }
 
     @Test
     void main_Exit_ExitWithCodeZero() {
@@ -63,5 +85,39 @@ public class NoSetUpSystemTest extends AbstractSystemTest {
                 EXIT_APP
         );
         assertFalse(actual.out.contains(childDirName));
+    }
+
+    @ParameterizedTest
+    @MethodSource("validQuotes")
+    void main_ValidQuotingAndCommandSubstitution_PrintsCorrectlyToStdout(String validQuote) {
+        String outputString = "Hello World";
+        SystemTestResults actual = testMainWith(
+                ECHO_APP + validQuote,
+                EXIT_APP
+        );
+        String expected = actual.rootPath("") + outputString;
+        assertEquals(expected, actual.out);
+    }
+
+    @ParameterizedTest
+    @MethodSource("invalidQuotes")
+    void main_InvalidQuotingAndCommandSubstitution_PrintsInvalidSyntax(String invalidQuote) {
+        SystemTestResults actual = testMainWith(
+                ECHO_APP + invalidQuote,
+                EXIT_APP
+        );
+        String expected = String.format("%sshell: %s", actual.rootPath(""), ERR_SYNTAX);
+        assertEquals(expected, actual.out);
+    }
+
+    @Test
+    void main_ValidQuotingAndFailedCommandSubstitution_PrintsInvalidApp() {
+        String invalidApp = "echso";
+        SystemTestResults actual = testMainWith(
+                ECHO_APP + String.format(" `%s Hello`", invalidApp),
+                EXIT_APP
+        );
+        String expected = String.format("%sshell: %s: %s", actual.rootPath(""), invalidApp, ERR_INVALID_APP);
+        assertEquals(expected, actual.out);
     }
 }

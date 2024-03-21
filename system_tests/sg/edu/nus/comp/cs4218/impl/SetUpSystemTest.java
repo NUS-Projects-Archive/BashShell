@@ -6,12 +6,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.io.CleanupMode.ALWAYS;
 import static sg.edu.nus.comp.cs4218.test.FileUtils.createNewDirectory;
 import static sg.edu.nus.comp.cs4218.test.FileUtils.createNewFileInDir;
-import static sg.edu.nus.comp.cs4218.test.FileUtils.deleteFileOrDirectory;
 import static sg.edu.nus.comp.cs4218.testutils.TestStringUtils.CHAR_FILE_SEP;
 
 import java.nio.file.Path;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -35,13 +33,6 @@ public class SetUpSystemTest extends AbstractSystemTest {
         dir = createNewDirectory(tempDir, DIR_NAME);
         nestedFile = createNewFileInDir(dir, "nestedFile.txt", FILE_CONTENT);
         nestedFileName = nestedFile.toFile().getName();
-    }
-
-    @AfterEach
-    void afterEach() {
-        deleteFileOrDirectory(nestedFile);
-        deleteFileOrDirectory(dir);
-        deleteFileOrDirectory(file);
     }
 
     @Test
@@ -96,7 +87,7 @@ public class SetUpSystemTest extends AbstractSystemTest {
                 SORT_APP + " " + fileName,
                 EXIT_APP
         );
-        String expected = actual.rootDirectory + "$ " + "abc\nabc\nline1\nline2\nline3\nline4\nline5";
+        String expected = actual.rootPath("") + "abc\nabc\nline1\nline2\nline3\nline4\nline5";
         assertEquals(expected, actual.out);
     }
 
@@ -107,7 +98,7 @@ public class SetUpSystemTest extends AbstractSystemTest {
                 LS_APP + "; " + CD_APP + " ..; " + LS_APP,
                 EXIT_APP
         );
-        String expected = String.format("%s$ %s%c%s$ \n%s\n%s\n%s", actual.rootDirectory, actual.rootDirectory,
+        String expected = String.format("%s%s%c%s$ \n%s\n%s\n%s", actual.rootPath(""), actual.rootDirectory,
                 CHAR_FILE_SEP, DIR_NAME, nestedFileName, DIR_NAME, fileName);
         assertEquals(expected, actual.out);
     }
@@ -118,7 +109,7 @@ public class SetUpSystemTest extends AbstractSystemTest {
                 PASTE_APP + " " + fileName + " | " + CUT_APP + " -c 1-3",
                 EXIT_APP
         );
-        String expected = actual.rootDirectory + "$ " + "lin\nlin\nlin\nabc\nlin\nabc\nlin\n";
+        String expected = actual.rootPath("") + "lin\nlin\nlin\nabc\nlin\nabc\nlin";
         assertEquals(expected, actual.out);
     }
 
@@ -128,7 +119,7 @@ public class SetUpSystemTest extends AbstractSystemTest {
                 GREP_APP + " abc " + fileName + " | " + WC_APP,
                 EXIT_APP
         );
-        String expected = actual.rootDirectory + "$ " + String.format(" %7d %7d %7d", 2, 2, 10);
+        String expected = String.format("%s %7d %7d %7d", actual.rootPath(""), 2, 2, 10);
         assertEquals(expected, actual.out);
     }
 
@@ -139,7 +130,7 @@ public class SetUpSystemTest extends AbstractSystemTest {
                 GREP_APP + " abc < " + fileName + " > " + outputFileName + "; " + CAT_APP + " " + outputFileName,
                 EXIT_APP
         );
-        String expected = actual.rootDirectory + "$ " + "abc\nabc";
+        String expected = actual.rootPath("") + "abc\nabc";
         assertEquals(expected, actual.out);
     }
 }
