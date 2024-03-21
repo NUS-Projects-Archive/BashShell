@@ -60,7 +60,10 @@ public final class CommandBuilder {
         List<CallCommand> callCmdsForPipe = new LinkedList<>();
         List<String> tokens = new LinkedList<>();
 
-        String commandSubstring = commandString;
+        String commandSubstring = commandString.trim();
+        if (commandSubstring.endsWith(";")) {
+            commandSubstring = commandSubstring.substring(0, commandString.length() - 1);
+        }
         while (!commandSubstring.isEmpty()) {
             commandSubstring = commandSubstring.trim();
             Matcher matcher = ARGUMENT_REGEX.matcher(commandSubstring);
