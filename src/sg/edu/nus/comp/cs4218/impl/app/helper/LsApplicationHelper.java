@@ -125,11 +125,10 @@ public final class LsApplicationHelper {
                 .map(Path::toString)
                 .collect(Collectors.toList());
 
-        // Sort file names
-        Collections.sort(fileNames);
-
         if (isSortByExt) {
             fileNames.sort(getFileExtensionComparator());
+        } else {
+            Collections.sort(fileNames);
         }
 
         for (String fileName : fileNames) {
