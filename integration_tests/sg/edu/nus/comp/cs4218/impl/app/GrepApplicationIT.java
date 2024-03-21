@@ -4,6 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_EMPTY_PATTERN;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_NOT_FOUND;
@@ -11,6 +13,7 @@ import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_INVALID_REGEX;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_INPUT;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_PERM;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_SYNTAX;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_WRITE_STREAM;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_STDIN_OUT;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.joinStringsByNewline;
@@ -19,6 +22,7 @@ import static sg.edu.nus.comp.cs4218.test.FileUtils.deleteFileOrDirectory;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
@@ -39,6 +43,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 import sg.edu.nus.comp.cs4218.Environment;
 import sg.edu.nus.comp.cs4218.exception.GrepException;
+import sg.edu.nus.comp.cs4218.exception.SortException;
 import sg.edu.nus.comp.cs4218.impl.util.CollectionsUtils;
 
 @SuppressWarnings("PMD.ClassNamingConventions")
@@ -111,6 +116,18 @@ class GrepApplicationIT {
 
         // Then
         assertEquals(GREP_STRING + ERR_NO_INPUT, result.getMessage());
+    }
+
+    @Test
+    void run_FailsToWriteToOutputStream_ThrowsGrepException() {
+        String[] args = new String[]{VALID_PAT_SMALL};
+        GrepException result = assertThrowsExactly(GrepException.class, () -> {
+            InputStream mockStdin = new ByteArrayInputStream("".getBytes());
+            OutputStream mockStdout = mock(OutputStream.class);
+            doThrow(new IOException()).when(mockStdout).write(any(byte[].class));
+            app.run(args, mockStdin, mockStdout);
+        });
+        assertEquals(GREP_STRING + ERR_WRITE_STREAM, result.getMessage());
     }
 
     /**
