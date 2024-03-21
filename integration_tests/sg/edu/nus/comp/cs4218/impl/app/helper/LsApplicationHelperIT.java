@@ -164,8 +164,8 @@ class LsApplicationHelperIT {
         boolean isSetReadable = unreadableDir.toFile().setReadable(false);
         assertTrue(isSetReadable, "Failed to set read permission to false for test source file");
         String result = buildResult(List.of(cwdPath, unreadableDir), false, false, false);
-        String expected = "ls: cannot open directory 'unreadable': Permission denied" + STRING_NEWLINE +
-                String.format("%s%s", UNSORTED_CWD_CONTENTS_WITH_HEADER, TWO_LINE_SEPARATOR);
+        String expected = String.format("%s%s", UNSORTED_CWD_CONTENTS_WITH_HEADER, TWO_LINE_SEPARATOR) +
+                "ls: cannot open directory 'unreadable': Permission denied" + STRING_NEWLINE;
         assertEquals(expected, result);
     }
 
