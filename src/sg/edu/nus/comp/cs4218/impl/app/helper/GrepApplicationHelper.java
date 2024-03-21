@@ -183,17 +183,17 @@ public final class GrepApplicationHelper {
                     arg = Arrays.copyOfRange(arg, 1, arg.length);
                     for (char c : arg) {
                         switch (c) {
-                            case CASE_INSEN_IDENT:
-                                grepFlags[CASE_INSEN_IDX] = true;
-                                break;
-                            case COUNT_IDENT:
-                                grepFlags[COUNT_INDEX] = true;
-                                break;
-                            case PREFIX_FN:
-                                grepFlags[PREFIX_FN_IDX] = true;
-                                break;
-                            default:
-                                throw new GrepException(ERR_SYNTAX);
+                        case CASE_INSEN_IDENT:
+                            grepFlags[CASE_INSEN_IDX] = true;
+                            break;
+                        case COUNT_IDENT:
+                            grepFlags[COUNT_INDEX] = true;
+                            break;
+                        case PREFIX_FN:
+                            grepFlags[PREFIX_FN_IDX] = true;
+                            break;
+                        default:
+                            throw new GrepException(ERR_SYNTAX);
                         }
                     }
                 } else { // pattern must come before file names
