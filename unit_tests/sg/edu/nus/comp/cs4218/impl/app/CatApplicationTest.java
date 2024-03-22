@@ -94,7 +94,7 @@ class CatApplicationTest {
 
     @Test
     @DisabledOnOs(value = OS.WINDOWS)
-    void catFiles_FileNoPermissionToRead_ThrowsCatException(@TempDir Path tempDir) {
+    void catFiles_FileNoPermissionToRead_ThrowsCatException() {
         boolean isSetReadable = pathA.toFile().setReadable(false);
         assertTrue(isSetReadable, "Failed to set read permission to false for test");
         CatException result = assertThrowsExactly(CatException.class, () -> app.catFiles(false, fileA));

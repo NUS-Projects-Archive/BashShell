@@ -3,6 +3,8 @@ package sg.edu.nus.comp.cs4218.impl.app;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 import static sg.edu.nus.comp.cs4218.test.FileUtils.createNewFile;
@@ -67,6 +69,18 @@ public class CatApplicationIT {
             app.run(null, mockStdin, null);
         });
         String expected = "cat: OutputStream not provided";
+        assertEquals(expected, result.getMessage());
+    }
+
+    @Test
+    void run_FailsToWriteToOutputStream_ThrowsCatException() {
+        String[] args = new String[0];
+        CatException result = assertThrowsExactly(CatException.class, () -> {
+            OutputStream mockStdout = mock(OutputStream.class);
+            doThrow(new IOException()).when(mockStdout).write(any(byte[].class));
+            app.run(args, mockStdin, mockStdout);
+        });
+        String expected = "cat: IOException";
         assertEquals(expected, result.getMessage());
     }
 

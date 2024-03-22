@@ -1,8 +1,8 @@
 package sg.edu.nus.comp.cs4218.impl.app;
 
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IO_EXCEPTION;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_OSTREAM;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NULL_ARGS;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_WRITE_STREAM;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 
 import java.io.IOException;
@@ -62,7 +62,7 @@ public class EchoApplication implements EchoInterface {
         try {
             stdout.write(result.getBytes());
         } catch (IOException e) {
-            throw new EchoException(ERR_IO_EXCEPTION, e);
+            throw new EchoException(ERR_WRITE_STREAM, e);
         }
     }
 }

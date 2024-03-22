@@ -25,6 +25,7 @@ import sg.edu.nus.comp.cs4218.testutils.TestEnvironmentUtil;
 
 @SuppressWarnings({"PMD.ClassNamingConventions"})
 public class LsApplicationPublicIT {
+
     private static final String TEMP = "temp-ls";
     private static final String FOLDER = "folder";
     private static final String TEXT_IN_FDR = "file_in_folder.txt";
@@ -70,7 +71,7 @@ public class LsApplicationPublicIT {
     @BeforeEach
     void init() throws IOException {
         lsApplication = new LsApplication();
-        Files.createDirectory(tempPath);
+        Files.createDirectories(tempPath);
     }
 
     @AfterEach

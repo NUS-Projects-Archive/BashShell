@@ -1,5 +1,6 @@
 package sg.edu.nus.comp.cs4218.impl.cmd;
 
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_WRITE_STREAM;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 
 import java.io.ByteArrayOutputStream;
@@ -7,7 +8,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.LinkedList;
 import java.util.List;
 
 import sg.edu.nus.comp.cs4218.Command;
@@ -21,6 +21,7 @@ import sg.edu.nus.comp.cs4218.exception.ShellException;
  * Command format: <Command> ; <Command>
  */
 public class SequenceCommand implements Command {
+
     private final List<Command> commands;
 
     public SequenceCommand(List<Command> commands) {
@@ -30,18 +31,17 @@ public class SequenceCommand implements Command {
     /**
      * Writes the order-preserved output of a series of sub commands to stdout, including exception messages if any.
      *
-     * @param stdin   An InputStream. The first sub command processing an InputStream will be evaluated with this as its
-     *                initial InputStream.
-     * @param stdout  An OutputStream for the order-preserved output of the sub commands to be written to.
-     * @throws ExitException If ExitException is thrown from any sub-commands. The ExitException is only thrown at the
-     *                       end of execution, even if the exception did not come from the last sub-command.
+     * @param stdin  An InputStream. The first sub command processing an InputStream will be evaluated with this as its
+     *               initial InputStream.
+     * @param stdout An OutputStream for the order-preserved output of the sub commands to be written to.
+     * @throws ExitException  If ExitException is thrown from any sub-commands. The ExitException is only thrown at the
+     *                        end of execution, even if the exception did not come from the last sub-command.
      * @throws ShellException If an I/O exception occurs when writing to stdout.
      */
     @Override
     public void evaluate(InputStream stdin, OutputStream stdout)
             throws AbstractApplicationException, ShellException, FileNotFoundException {
         ExitException exitException = null;
-        List<String> outputLines = new LinkedList<>();
 
         for (Command command : commands) {
             try {
@@ -50,21 +50,13 @@ public class SequenceCommand implements Command {
 
                 String outputLine = outputStream.toString();
                 if (!outputLine.isEmpty()) {
-                    outputLines.add(outputLine);
+                    write(stdout, outputLine);
                 }
             } catch (ExitException e) {
                 exitException = e;
 
             } catch (AbstractApplicationException | ShellException e) {
-                outputLines.add(e.getMessage() + STRING_NEWLINE);
-            }
-        }
-
-        for (String outputLine : outputLines) {
-            try {
-                stdout.write(outputLine.getBytes());
-            } catch (IOException e) {
-                throw new ShellException(e.getMessage(), e);
+                write(stdout, e.getMessage() + STRING_NEWLINE);
             }
         }
 
@@ -73,14 +65,20 @@ public class SequenceCommand implements Command {
         }
     }
 
-    @Override
-    public void terminate() {
-        // Unused for now
+    public void write(OutputStream outputStream, String message) throws ShellException {
+        try {
+            outputStream.write(message.getBytes());
+        } catch (IOException e) {
+            throw new ShellException(ERR_WRITE_STREAM, e);
+        }
     }
+
+    @Override
+    public void terminate() { /* Unused for now */}
 
     /**
      * Returns a list of commands.
-     * 
+     *
      * @return
      */
     public List<Command> getCommands() {

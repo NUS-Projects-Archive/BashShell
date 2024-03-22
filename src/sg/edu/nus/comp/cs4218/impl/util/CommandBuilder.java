@@ -21,7 +21,7 @@ import sg.edu.nus.comp.cs4218.impl.cmd.SequenceCommand;
 /**
  * CommandBuilder is a utility class to parse and tokenize the provided command string into command(s) and arguments.
  */
-@SuppressWarnings({"PMD.ExcessiveMethodLength", "PMD.ClassNamingConventions"})
+@SuppressWarnings("PMD.ExcessiveMethodLength")
 public final class CommandBuilder {
     /**
      * Regular expression for extracting valid arguments from the command string:
@@ -60,7 +60,10 @@ public final class CommandBuilder {
         List<CallCommand> callCmdsForPipe = new LinkedList<>();
         List<String> tokens = new LinkedList<>();
 
-        String commandSubstring = commandString;
+        String commandSubstring = commandString.trim();
+        if (commandSubstring.endsWith(";")) {
+            commandSubstring = commandSubstring.substring(0, commandString.length() - 1);
+        }
         while (!commandSubstring.isEmpty()) {
             commandSubstring = commandSubstring.trim();
             Matcher matcher = ARGUMENT_REGEX.matcher(commandSubstring);

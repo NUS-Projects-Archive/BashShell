@@ -2,6 +2,7 @@ package sg.edu.nus.comp.cs4218.impl.app;
 
 import static sg.edu.nus.comp.cs4218.impl.app.helper.WcApplicationHelper.formatCount;
 import static sg.edu.nus.comp.cs4218.impl.app.helper.WcApplicationHelper.getCountReport;
+import static sg.edu.nus.comp.cs4218.impl.util.CollectionsUtils.listToArray;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_NOT_FOUND;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IS_DIR;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_ISTREAM;
@@ -23,7 +24,6 @@ import sg.edu.nus.comp.cs4218.exception.InvalidArgsException;
 import sg.edu.nus.comp.cs4218.exception.ShellException;
 import sg.edu.nus.comp.cs4218.exception.WcException;
 import sg.edu.nus.comp.cs4218.impl.parser.WcArgsParser;
-import sg.edu.nus.comp.cs4218.impl.util.CollectionsUtils;
 import sg.edu.nus.comp.cs4218.impl.util.IOUtils;
 
 /**
@@ -70,7 +70,7 @@ public class WcApplication implements WcInterface {
         final Boolean isByteCount = parser.isByteCount();
         final Boolean isLineCount = parser.isLineCount();
         final Boolean isWordCount = parser.isWordCount();
-        final String[] files = CollectionsUtils.listToArray(parser.getFileNames());
+        final String[] files = listToArray(parser.getFileNames());
 
         StringBuilder output = new StringBuilder();
         if (isStdinOnly) {
@@ -105,49 +105,34 @@ public class WcApplication implements WcInterface {
         if (fileName == null) {
             throw new WcException(ERR_NULL_ARGS);
         }
+
         List<String> output = new ArrayList<>();
-        List<String> errorList = new ArrayList<>();
         for (String file : fileName) {
-            try {
-                File node = IOUtils.resolveFilePath(file).toFile();
-                if (!node.exists()) {
-                    throw new WcException(String.format("'%s': %s", node.getName(), ERR_FILE_NOT_FOUND));
-                }
-                if (node.isDirectory()) {
-                    throw new WcException(String.format("'%s': %s", node.getName(), ERR_IS_DIR));
-                }
-                if (!node.canRead()) {
-                    throw new WcException(String.format("'%s': %s", node.getName(), ERR_READING_FILE));
-                }
-                InputStream input = null;
-                try {
-                    input = IOUtils.openInputStream(file);
-                    long[] count = getCountReport(input);
-                    output.add(String.format("%s %s", formatCount(isLines, isWords, isBytes, count), file));
-                    addToTotal(count);
-                    IOUtils.closeInputStream(input);
-                    input.close();
-                } catch (ShellException | IOException e) {
-                    throw new WcException(e.getMessage(), e);
-                } finally {
-                    try {
-                        if (input != null) {
-                            input.close();
-                        }
-                    } catch (IOException e) {
-                        throw new WcException(e.getMessage(), e);
-                    }
-                }
-            } catch (WcException e) {
-                errorList.add(e.getMessage());
+            File node = IOUtils.resolveFilePath(file).toFile();
+            if (!node.exists()) {
+                throw new WcException(String.format("'%s': %s", node.getName(), ERR_FILE_NOT_FOUND));
+            }
+            if (node.isDirectory()) {
+                throw new WcException(String.format("'%s': %s", node.getName(), ERR_IS_DIR));
+            }
+            if (!node.canRead()) {
+                throw new WcException(String.format("'%s': %s", node.getName(), ERR_READING_FILE));
+            }
+
+            try (InputStream input = IOUtils.openInputStream(file)) {
+                long[] count = getCountReport(input);
+                output.add(String.format("%s %s", formatCount(isLines, isWords, isBytes, count), file));
+                addToTotal(count);
+                IOUtils.closeInputStream(input);
+            } catch (ShellException | IOException e) {
+                throw new WcException(e.getMessage(), e);
             }
         }
+
         if (fileName.length > 1) {
             output.add(String.format("%s total", formatCount(isLines, isWords, isBytes, totals)));
         }
-        if (!errorList.isEmpty()) {
-            output.addAll(errorList);
-        }
+
         return String.join(STRING_NEWLINE, output);
     }
 
@@ -189,10 +174,14 @@ public class WcApplication implements WcInterface {
                                         InputStream stdin, String... fileName) throws WcException {
         List<String> output = new ArrayList<>();
         for (String file : fileName) {
-            if (("-").equals(file)) {
-                output.add(countFromStdin(isBytes, isLines, isWords, stdin) + " -");
-            } else {
-                output.add(countFromFiles(isBytes, isLines, isWords, file));
+            try {
+                if (("-").equals(file)) {
+                    output.add(countFromStdin(isBytes, isLines, isWords, stdin) + " -");
+                } else {
+                    output.add(countFromFiles(isBytes, isLines, isWords, file));
+                }
+            } catch (WcException e) {
+                output.add(e.getMessage());
             }
         }
 

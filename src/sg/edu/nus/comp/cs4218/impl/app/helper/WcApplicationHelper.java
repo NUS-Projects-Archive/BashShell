@@ -30,10 +30,8 @@ public final class WcApplicationHelper {
             throw new WcException(ERR_NULL_STREAMS);
         }
         long[] result = new long[3]; // lines, words, bytes
-
-        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
         byte[] data = new byte[1024];
-        int inRead = 0;
+        int inRead;
         boolean inWord = false;
         try {
             while ((inRead = input.read(data, 0, data.length)) != EOF) {
@@ -53,9 +51,7 @@ public final class WcApplicationHelper {
                     }
                 }
                 result[BYTES_INDEX] += inRead;
-                buffer.write(data, 0, inRead);
             }
-            buffer.flush();
             if (inWord) {
                 ++result[WORDS_INDEX]; // To handle last word
             }

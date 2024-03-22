@@ -4,10 +4,13 @@ import static sg.edu.nus.comp.cs4218.impl.app.helper.LsApplicationHelper.buildRe
 import static sg.edu.nus.comp.cs4218.impl.app.helper.LsApplicationHelper.formatContents;
 import static sg.edu.nus.comp.cs4218.impl.app.helper.LsApplicationHelper.listCwdContent;
 import static sg.edu.nus.comp.cs4218.impl.app.helper.LsApplicationHelper.resolvePaths;
+import static sg.edu.nus.comp.cs4218.impl.util.CollectionsUtils.listToArray;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_OSTREAM;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NULL_ARGS;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_WRITE_STREAM;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Path;
@@ -19,8 +22,6 @@ import sg.edu.nus.comp.cs4218.app.LsInterface;
 import sg.edu.nus.comp.cs4218.exception.InvalidArgsException;
 import sg.edu.nus.comp.cs4218.exception.LsException;
 import sg.edu.nus.comp.cs4218.impl.parser.LsArgsParser;
-import sg.edu.nus.comp.cs4218.impl.util.CollectionsUtils;
-import sg.edu.nus.comp.cs4218.impl.util.StringUtils;
 
 /**
  * The ls command lists information about files.
@@ -59,13 +60,13 @@ public class LsApplication implements LsInterface {
 
         final Boolean recursive = parser.isRecursive();
         final Boolean sortByExt = parser.isSortByExt();
-        final String[] directories = CollectionsUtils.listToArray(parser.getDirectories());
+        final String[] directories = listToArray(parser.getDirectories());
         final String result = listFolderContent(recursive, sortByExt, directories);
 
         try {
             stdout.write(result.getBytes());
-            stdout.write(StringUtils.STRING_NEWLINE.getBytes());
-        } catch (Exception e) {
+            stdout.write(STRING_NEWLINE.getBytes());
+        } catch (IOException e) {
             throw new LsException(ERR_WRITE_STREAM, e);
         }
     }
@@ -123,6 +124,6 @@ public class LsApplication implements LsInterface {
         if (output.isEmpty()) {
             return formattedFiles;
         }
-        return formattedFiles + StringUtils.STRING_NEWLINE + StringUtils.STRING_NEWLINE + output;
+        return formattedFiles + STRING_NEWLINE + STRING_NEWLINE + output;
     }
 }

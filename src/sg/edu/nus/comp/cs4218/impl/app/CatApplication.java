@@ -138,7 +138,7 @@ public class CatApplication implements CatInterface {
             throw new CatException(ERR_NULL_STREAMS);
         }
 
-        List<String> output = null;
+        List<String> output;
         try {
             output = prefixLineNumber(isLineNumber, stdin);
         } catch (IOException e) {
@@ -163,7 +163,7 @@ public class CatApplication implements CatInterface {
         List<String> output = new ArrayList<>();
         for (String file : fileName) {
             try {
-                if ("-".equals(file)) {
+                if (("-").equals(file)) {
                     output.add(catStdin(isLineNumber, stdin));
                 } else {
                     output.add(catFiles(isLineNumber, file));
