@@ -2,6 +2,7 @@ package sg.edu.nus.comp.cs4218.impl.app;
 
 import static sg.edu.nus.comp.cs4218.impl.app.helper.WcApplicationHelper.formatCount;
 import static sg.edu.nus.comp.cs4218.impl.app.helper.WcApplicationHelper.getCountReport;
+import static sg.edu.nus.comp.cs4218.impl.util.CollectionsUtils.listToArray;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_NOT_FOUND;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IS_DIR;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_ISTREAM;
@@ -23,7 +24,6 @@ import sg.edu.nus.comp.cs4218.exception.InvalidArgsException;
 import sg.edu.nus.comp.cs4218.exception.ShellException;
 import sg.edu.nus.comp.cs4218.exception.WcException;
 import sg.edu.nus.comp.cs4218.impl.parser.WcArgsParser;
-import sg.edu.nus.comp.cs4218.impl.util.CollectionsUtils;
 import sg.edu.nus.comp.cs4218.impl.util.IOUtils;
 
 /**
@@ -70,7 +70,7 @@ public class WcApplication implements WcInterface {
         final Boolean isByteCount = parser.isByteCount();
         final Boolean isLineCount = parser.isLineCount();
         final Boolean isWordCount = parser.isWordCount();
-        final String[] files = CollectionsUtils.listToArray(parser.getFileNames());
+        final String[] files = listToArray(parser.getFileNames());
 
         StringBuilder output = new StringBuilder();
         if (isStdinOnly) {

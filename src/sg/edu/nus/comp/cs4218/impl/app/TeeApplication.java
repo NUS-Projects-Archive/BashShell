@@ -2,6 +2,7 @@ package sg.edu.nus.comp.cs4218.impl.app;
 
 import static sg.edu.nus.comp.cs4218.impl.app.helper.TeeApplicationHelper.createEmptyFile;
 import static sg.edu.nus.comp.cs4218.impl.app.helper.TeeApplicationHelper.writeToFile;
+import static sg.edu.nus.comp.cs4218.impl.util.CollectionsUtils.listToArray;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_ARGS;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_ISTREAM;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_OSTREAM;
@@ -53,15 +54,15 @@ public class TeeApplication implements TeeInterface {
             throw new TeeException(ERR_NO_OSTREAM);
         }
 
-        TeeArgsParser parser = new TeeArgsParser();
+        final TeeArgsParser parser = new TeeArgsParser();
         try {
             parser.parse(args);
         } catch (InvalidArgsException e) {
             throw new TeeException(e.getMessage(), e);
         }
 
-        boolean isAppend = parser.isAppend();
-        String[] files = CollectionsUtils.listToArray(parser.getFileNames());
+        final boolean isAppend = parser.isAppend();
+        final String[] files = listToArray(parser.getFileNames());
 
         String result = teeFromStdin(isAppend, stdin, files);
         try {
