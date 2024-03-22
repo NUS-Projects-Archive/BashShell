@@ -80,13 +80,10 @@ public class GrepApplication implements GrepInterface {
         StringJoiner stringJoiner = new StringJoiner(STRING_NEWLINE);
         try {
             BufferedReader reader = new BufferedReader(new InputStreamReader(stdin));
+            Pattern compiledPattern = isCaseInsensitive
+                    ? Pattern.compile(pattern, Pattern.CASE_INSENSITIVE)
+                    : Pattern.compile(pattern);
             String line;
-            Pattern compiledPattern;
-            if (isCaseInsensitive) {
-                compiledPattern = Pattern.compile(pattern, Pattern.CASE_INSENSITIVE);
-            } else {
-                compiledPattern = Pattern.compile(pattern);
-            }
             while ((line = reader.readLine()) != null) {
                 Matcher matcher = compiledPattern.matcher(line);
                 if (matcher.find()) { // match
