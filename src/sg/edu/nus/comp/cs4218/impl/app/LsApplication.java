@@ -10,6 +10,7 @@ import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NULL_ARGS;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_WRITE_STREAM;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Path;
@@ -65,7 +66,7 @@ public class LsApplication implements LsInterface {
         try {
             stdout.write(result.getBytes());
             stdout.write(STRING_NEWLINE.getBytes());
-        } catch (Exception e) {
+        } catch (IOException e) {
             throw new LsException(ERR_WRITE_STREAM, e);
         }
     }
