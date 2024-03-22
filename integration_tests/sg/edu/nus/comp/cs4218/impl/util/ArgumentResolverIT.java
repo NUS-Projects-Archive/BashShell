@@ -2,11 +2,11 @@ package sg.edu.nus.comp.cs4218.impl.util;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_SYNTAX;
+import static sg.edu.nus.comp.cs4218.test.FileUtils.createNewDirectory;
+import static sg.edu.nus.comp.cs4218.test.FileUtils.createNewFile;
 
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -26,7 +26,6 @@ import sg.edu.nus.comp.cs4218.exception.ShellException;
 @SuppressWarnings("PMD.ClassNamingConventions")
 public class ArgumentResolverIT {
 
-    private static final String STRING_ECHO = "echo";
     private static final Map<String, List<String>> VALID_QUOTES = new HashMap<>() {{
         put("'\"'", List.of("\""));                     // '"'
         put("'\"\"'", List.of("\"\""));                 // '""'
@@ -48,7 +47,7 @@ public class ArgumentResolverIT {
     }
 
     /**
-     * Quoting unit test case for parsing arguments when all provided arguments are valid.
+     * Quoting test case for parsing arguments when all provided arguments are valid.
      */
     @Test
     void parseArguments_ValidQuotingArgsList_ReturnsEntireParsedArgsList() {
@@ -58,7 +57,7 @@ public class ArgumentResolverIT {
     }
 
     /**
-     * Quoting unit test case for parsing arguments if any of the provided arguments are invalid.
+     * Quoting test case for parsing arguments if any of the provided arguments are invalid.
      */
     @Test
     void parseArguments_InvalidQuotingArgsList_ThrowsShellException() {
@@ -69,9 +68,9 @@ public class ArgumentResolverIT {
     }
 
     /**
-     * Globbing unit test case for parsing globbing arguments when the paths exist.
+     * Globbing test case for parsing globbing arguments when the paths exist.
      *
-     * @param tempDir Temporary directory's path
+     * @param tempDir Temporary directory path set as the current working directory for the test
      */
     @Test
     void parseArguments_GlobbingArgsListExists_ReturnsAllPathsFound(@TempDir Path tempDir) {
@@ -79,19 +78,13 @@ public class ArgumentResolverIT {
         Environment.currentDirectory = tempDir.toString();
 
         // Create directory structure and files
-        Path parent = tempDir.resolve("parent");
-        assertDoesNotThrow(() -> Files.createDirectories(parent));
-
-        Path childOne = parent.resolve("child1");
-        assertDoesNotThrow(() -> Files.createDirectories(childOne));
-
-        Path childTwo = parent.resolve("child2");
-        assertDoesNotThrow(() -> Files.createDirectories(childTwo));
-
-        assertDoesNotThrow(() -> childOne.resolve("file1.txt").toFile().createNewFile());
-        assertDoesNotThrow(() -> childOne.resolve("file2.txt").toFile().createNewFile());
-        assertDoesNotThrow(() -> childTwo.resolve("file3.txt").toFile().createNewFile());
-        assertDoesNotThrow(() -> childTwo.resolve("file4.txt").toFile().createNewFile());
+        Path parent = createNewDirectory(tempDir, "parent");
+        Path child1 = createNewDirectory(parent, "child1");
+        Path child2 = createNewDirectory(parent, "child2");
+        createNewFile(child1, "file1.txt");
+        createNewFile(child1, "file2.txt");
+        createNewFile(child2, "file3.txt");
+        createNewFile(child2, "file4.txt");
 
         List<String> argList = List.of("parent/child1/*", "parent/child2/*");
         List<String> result = assertDoesNotThrow(() -> argumentResolver.parseArguments(argList));
@@ -101,10 +94,10 @@ public class ArgumentResolverIT {
     }
 
     /**
-     * Globbing unit test case for parsing globbing arguments when the paths do not exist.
+     * Globbing test case for parsing globbing arguments when the paths do not exist.
      *
      * @param args    The globbing arguments to be parsed
-     * @param tempDir Temporary directory's path
+     * @param tempDir Temporary directory path set as the current working directory for the test
      */
     @ParameterizedTest
     @ValueSource(strings = {"parent/*", "parent/child/*", "parent/child/grandchild/*"})
@@ -114,5 +107,55 @@ public class ArgumentResolverIT {
         List<String> argList = List.of(args);
         List<String> result = assertDoesNotThrow(() -> argumentResolver.parseArguments(argList));
         assertEquals(argList, result);
+    }
+
+    /**
+     * Globbing test case for parsing globbing arguments when enclosed in single-quotes.
+     * <p>
+     * When enclosed in single quotes, the globbing argument is treated as a literal string,
+     * thus returning the exact string without performing any globbing operations.
+     */
+    @Test
+    void parseArguments_GlobbingCommandInBetweenSingleQuotes_ReturnsGivenArgsListWithoutQuotes() {
+        List<String> argList = List.of("'parent/child/*'");
+        List<String> result = assertDoesNotThrow(() -> argumentResolver.parseArguments(argList));
+        List<String> expected = List.of("parent/child/*");
+        assertEquals(expected, result);
+    }
+
+    /**
+     * Globbing test case for parsing globbing arguments when enclosed in double-quotes.
+     * <p>
+     * When enclosed in double quotes, the globbing argument is treated as a literal string,
+     * thus returning the exact string without performing any globbing operations.
+     */
+    @Test
+    void parseArguments_GlobbingCommandInBetweenDoubleQuotes_ReturnsGivenArgsListWithoutQuotes() {
+        List<String> argList = List.of("\"parent/child/*\"");
+        List<String> result = assertDoesNotThrow(() -> argumentResolver.parseArguments(argList));
+        List<String> expected = List.of("parent/child/*");
+        assertEquals(expected, result);
+    }
+
+    /**
+     * Globbing test case for parsing globbing arguments when enclosed in back-quotes.
+     *
+     * @param tempDir Temporary directory path set as the current working directory for the test
+     */
+    @Test
+    void parseArguments_GlobbingCommandInBetweenBackQuotes_ReturnsGlobbedFiles(@TempDir Path tempDir) {
+        // Set current working directory to the temporary dir
+        Environment.currentDirectory = tempDir.toString();
+
+        // Create directory structure and files
+        Path parent = createNewDirectory(tempDir, "parent");
+        Path child1 = createNewDirectory(parent, "child1");
+        createNewFile(child1, "file1.txt");
+        createNewFile(child1, "file2.txt");
+
+        List<String> argList = List.of("`ls parent/child1/*`");
+        List<String> result = assertDoesNotThrow(() -> argumentResolver.parseArguments(argList));
+        List<String> expected = List.of("file1.txt", "file2.txt");
+        assertEquals(expected, result);
     }
 }
