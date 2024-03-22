@@ -128,13 +128,14 @@ public class BasicFilesSystemTest extends AbstractSystemTest {
     @Test
     void main_GrepFileAndPipeToWc_PrintsCorrectCount() {
         SystemTestResults actual = testMainWith(
-                GREP_APP + " abc " + fileName + " | " + WC_APP,
+                GREP_APP + " abc - " + fileName + " | " + WC_APP,
+                "abcde",
                 EXIT_APP
         );
 
         boolean isWindows = System.getProperty("os.name").startsWith("Windows");
-        int byteCount = isWindows ? 10 : 8;
-        String expected = String.format("%s %7d %7d %7d", actual.rootPath(""), 2, 2, byteCount);
+        int byteCount = isWindows ? 101 : 103;
+        String expected = String.format("%s %7d %7d %7d", actual.rootPath(""), 3, 7, byteCount);
         assertEquals(expected, actual.out);
     }
 
