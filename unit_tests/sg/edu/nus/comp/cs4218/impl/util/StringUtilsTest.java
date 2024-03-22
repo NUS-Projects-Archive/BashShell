@@ -3,6 +3,7 @@ package sg.edu.nus.comp.cs4218.impl.util;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.isBlank;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.isNumber;
@@ -63,4 +64,10 @@ public class StringUtilsTest {
         assertFalse(isNumber(string));
     }
 
+    @Test
+    public void removeTrailing_NullInput_returnsString() {
+        String result = StringUtils.removeTrailing("f-3-", null);
+        assertEquals("f-3-", result);
+        assertNotNull(result);
+    }
 }
