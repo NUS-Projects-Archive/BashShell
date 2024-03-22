@@ -3,12 +3,16 @@ package sg.edu.nus.comp.cs4218.impl;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.junit.jupiter.api.io.CleanupMode.ALWAYS;
 import static sg.edu.nus.comp.cs4218.test.FileUtils.createNewDirectory;
 import static sg.edu.nus.comp.cs4218.test.FileUtils.createNewFileInDir;
 import static sg.edu.nus.comp.cs4218.testutils.TestStringUtils.CHAR_FILE_SEP;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -31,10 +35,9 @@ public class BasicFilesSystemTest extends AbstractSystemTest {
 
         /* Creates the following file structure:
          *
+         * testFile.txt
          * testDir/
-         *     testFile.txt
-         *     testDir/
-         *         nestedFile.txt
+         *     nestedFile.txt
          */
 
         file = createNewFileInDir(tempDir, "testFile.txt", FILE_CONTENT);
@@ -141,5 +144,26 @@ public class BasicFilesSystemTest extends AbstractSystemTest {
         );
         String expected = actual.rootPath("") + "abc\nabc";
         assertEquals(expected, actual.out);
+    }
+
+    @Test
+    void main_UseEchoToTeeToExistingFile_FileHasExistingAndNewContent() {
+        SystemTestResults actual = testMainWith(
+                String.format("%s \"%s\" | %s -a %s", ECHO_APP, "line6", TEE_APP, fileName),
+                EXIT_APP
+        );
+
+        String expected = actual.rootPath("") + "line6";
+        assertEquals(expected, actual.out);
+
+        List<String> expectedContent = List.of(
+                "line1", "line2", "line3", "abc", "line4", "abc", "line5", "line6"
+        );
+        try {
+            List<String> actualContent = Files.readAllLines(file);
+            assertEquals(expectedContent, actualContent);
+        } catch (IOException e) {
+            fail(e);
+        }
     }
 }

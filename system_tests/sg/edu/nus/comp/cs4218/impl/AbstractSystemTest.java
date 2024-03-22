@@ -30,6 +30,7 @@ public abstract class AbstractSystemTest {
     final static String PASTE_APP = "paste";
     final static String RM_APP = "rm";
     final static String SORT_APP = "sort";
+    final static String TEE_APP = "tee";
     final static String UNIQ_APP = "uniq";
     final static String WC_APP = "wc";
 
