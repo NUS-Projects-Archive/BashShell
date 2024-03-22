@@ -131,7 +131,10 @@ public class BasicFilesSystemTest extends AbstractSystemTest {
                 GREP_APP + " abc " + fileName + " | " + WC_APP,
                 EXIT_APP
         );
-        String expected = String.format("%s %7d %7d %7d", actual.rootPath(""), 2, 2, 10);
+
+        boolean isWindows = System.getProperty("os.name").startsWith("Windows");
+        int byteCount = isWindows ? 10 : 8;
+        String expected = String.format("%s %7d %7d %7d", actual.rootPath(""), 2, 2, byteCount);
         assertEquals(expected, actual.out);
     }
 

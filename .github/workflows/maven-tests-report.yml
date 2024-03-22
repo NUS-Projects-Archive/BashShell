@@ -54,7 +54,7 @@ jobs:
         uses: dorny/test-reporter@v1
         if: always()
         with:
-          name: Unit Test Report
+          name: System Test Report
           path: target/surefire-reports/*SystemTest.xml
           reporter: java-junit
           fail-on-error: true
