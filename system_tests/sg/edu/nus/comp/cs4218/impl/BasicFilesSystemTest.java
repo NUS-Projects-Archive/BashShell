@@ -134,7 +134,7 @@ public class BasicFilesSystemTest extends AbstractSystemTest {
         );
 
         boolean isWindows = System.getProperty("os.name").startsWith("Windows");
-        int byteCount = isWindows ? 101 : 103;
+        int byteCount = isWindows ? 101 : 99;
         String expected = String.format("%s %7d %7d %7d", actual.rootPath(""), 3, 7, byteCount);
         assertEquals(expected, actual.out);
     }
