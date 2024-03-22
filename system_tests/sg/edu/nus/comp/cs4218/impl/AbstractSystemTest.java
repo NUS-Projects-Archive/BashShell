@@ -37,7 +37,7 @@ public abstract class AbstractSystemTest {
     static String rootDirectory = System.getProperty("user.dir");
 
     /**
-     * Test {@code ShellImpl::main} using the given inputs.
+     * Tests {@code ShellImpl::main} using the given inputs.
      *
      * @param inputs Strings acting as stdin
      * @return {@code SystemTestResults} of the test
