@@ -34,6 +34,12 @@ public class NoSetUpSystemTest extends AbstractSystemTest {
     }
 
     @Test
+    void main_EOF_ExitWithCodeZero() {
+        SystemTestResults actual = testMainWith("");
+        assertEquals(0, actual.exitCode);
+    }
+
+    @Test
     void main_Exit_ExitWithCodeZero() {
         SystemTestResults actual = testMainWith(EXIT_APP);
         assertEquals(0, actual.exitCode);
@@ -51,8 +57,6 @@ public class NoSetUpSystemTest extends AbstractSystemTest {
                 + "Welcome to CS4218!";
         assertEquals(expectedStdout, actual.out);
     }
-
-    // TODO: create tests with chaining multiple commands and uses shell features
 
     @Test
     void main_MkdirDirAndNestedDirAndCdIntoParentDirAndLsAndRmChildDir_RmChildDirSuccessfully() {

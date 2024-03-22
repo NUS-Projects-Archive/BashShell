@@ -18,7 +18,6 @@ import sg.edu.nus.comp.cs4218.impl.util.StringUtils;
 @SuppressWarnings("PMD.AbstractClassWithoutAbstractMethod")
 public abstract class AbstractSystemTest {
 
-    static String rootDirectory = System.getProperty("user.dir");
     final static String CAT_APP = "cat";
     final static String CD_APP = "cd";
     final static String CUT_APP = "cut";
@@ -33,6 +32,8 @@ public abstract class AbstractSystemTest {
     final static String SORT_APP = "sort";
     final static String UNIQ_APP = "uniq";
     final static String WC_APP = "wc";
+
+    static String rootDirectory = System.getProperty("user.dir");
 
     /**
      * Test {@code ShellImpl::main} using the given inputs.
@@ -87,6 +88,13 @@ public abstract class AbstractSystemTest {
         String rootDirectory;
         int exitCode;
 
+        /**
+         * Get a string representation of a current-working-directory,
+         * where {@code children} represents the folder path from the root directory.
+         *
+         * @param children String representation the folder path from root directory to current-working-directory
+         * @return String representation of a current-working-directory
+         */
         String rootPath(String children) {
             return rootDirectory + children + "$ ";
         }
