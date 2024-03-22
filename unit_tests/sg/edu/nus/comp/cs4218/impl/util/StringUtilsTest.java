@@ -14,6 +14,8 @@ import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.removeTrailingOnce;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.tokenize;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledOnOs;
+import org.junit.jupiter.api.condition.OS;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EmptySource;
 import org.junit.jupiter.params.provider.NullSource;
@@ -27,17 +29,17 @@ public class StringUtilsTest {
     private static final String SEQUENCE = "str";
 
     @Test
+    @EnabledOnOs(OS.WINDOWS)
     void fileSeparator_WindowsOS_ReturnsExpectedFileSeparator() {
-        System.setProperty("os.name", "Windows 10");
         String expected = "\\\\";
         String actual = fileSeparator();
         assertEquals(expected, actual);
     }
 
     @Test
+    @EnabledOnOs(OS.LINUX)
     void fileSeparator_NonWindowsOS_ReturnsExpectedFileSeparator() {
-        System.setProperty("os.name", "Linux");
-        String expected = "\\";
+        String expected = "/";
         String actual = fileSeparator();
         assertEquals(expected, actual);
     }
