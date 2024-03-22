@@ -14,7 +14,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
-public class SetUpSystemTest extends AbstractSystemTest {
+public class BasicFilesSystemTest extends AbstractSystemTest {
     private final static String FILE_CONTENT = "line1\nline2\nline3\nabc\nline4\nabc\nline5\n";
     private final static String DIR_NAME = "testDir";
 
@@ -28,6 +28,15 @@ public class SetUpSystemTest extends AbstractSystemTest {
     @BeforeEach
     void beforeEach(@TempDir(cleanup = ALWAYS) Path tempDir) {
         super.beforeEach(tempDir);
+
+        /* Creates the following file structure:
+         *
+         * testDir/
+         *     testFile.txt
+         *     testDir/
+         *         nestedFile.txt
+         */
+
         file = createNewFileInDir(tempDir, "testFile.txt", FILE_CONTENT);
         fileName = file.toFile().getName();
         dir = createNewDirectory(tempDir, DIR_NAME);
