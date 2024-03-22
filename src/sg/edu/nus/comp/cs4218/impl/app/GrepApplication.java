@@ -43,10 +43,9 @@ public class GrepApplication implements GrepInterface {
     @Override
     public String grepFromFiles(String pattern, Boolean isCaseInsensitive, Boolean isCountLines,
                                 Boolean isPrefixFileName, String... fileNames) throws GrepException {
-        if (fileNames == null || pattern == null) {
+        if (fileNames == null || fileNames.length == 0 || pattern == null) {
             throw new GrepException(ERR_NULL_STREAMS);
         }
-
         if (pattern.isEmpty()) {
             throw new GrepException(ERR_EMPTY_PATTERN);
         }
@@ -70,6 +69,9 @@ public class GrepApplication implements GrepInterface {
     @Override
     public String grepFromStdin(String pattern, Boolean isCaseInsensitive, Boolean isCountLines,
                                 Boolean isPrefixFileName, InputStream stdin) throws GrepException {
+        if (pattern == null) {
+            throw new GrepException(ERR_NULL_STREAMS);
+        }
         if (pattern.isEmpty()) {
             throw new GrepException(ERR_EMPTY_PATTERN);
         }
