@@ -8,14 +8,14 @@
 3. Download evosuite-1.2.0.jar and evosuite-standalone-runtime-1.2.0.jar
    from https://github.com/EvoSuite/evosuite/releases/tag/v1.2.0 to resources/evosuite
 
-4. In terminal, navigate to project directory and execute:
-   java -jar resources/evosuite/evosuite-1.2.0.jar -class <fully qualified class name to test> -projectCP target/classes
+4. In terminal, navigate to automated_tests and execute:
+   java -jar ../resources/evosuite/evosuite-1.2.0.jar -class <fully qualified class name to test> -projectCP ../target/classes
 
    Optional coverage flags may be provided.
 
    For example, to generate tests for TeeApplication.java specifically for branch coverage:
-   java -jar resources/evosuite/evosuite-1.2.0.jar -class sg.edu.nus.comp.cs4218.impl.app.TeeApplication -criterion branch -projectCP
-   target/classes
+   java -jar ../resources/evosuite/evosuite-1.2.0.jar -class sg.edu.nus.comp.cs4218.impl.app.TeeApplication -criterion branch -projectCP
+   ../target/classes
 
 5. Review the test cases before including into test suite. If including in test suite, rename/refactor the generated
    tests with meaningful names. 
