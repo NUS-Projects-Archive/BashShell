@@ -3,6 +3,8 @@ package sg.edu.nus.comp.cs4218.impl.app.helper;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
+import static sg.edu.nus.comp.cs4218.impl.app.helper.LsApplicationHelper.formatContents;
+import static sg.edu.nus.comp.cs4218.impl.app.helper.LsApplicationHelper.resolvePaths;
 import static sg.edu.nus.comp.cs4218.test.FileUtils.createNewDirectory;
 
 import java.nio.file.Path;
@@ -16,6 +18,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 import sg.edu.nus.comp.cs4218.Environment;
+import sg.edu.nus.comp.cs4218.exception.InvalidDirectoryLsException;
 import sg.edu.nus.comp.cs4218.impl.util.StringUtils;
 
 // To give a meaningful variable name
@@ -53,7 +56,8 @@ class LsApplicationHelperTest {
         }
 
         String cwdPathName = cwdPath.toString();
-        dirAPath = Paths.get(cwdPathName, DIR_A_NAME);
+        // dirAPath = Paths.get(cwdPathName, DIR_A_NAME);
+        dirAPath = createNewDirectory(cwdPath, DIR_A_NAME);
         // Set current working directory to cwdPath
         Environment.currentDirectory = cwdPathName;
     }
@@ -63,49 +67,59 @@ class LsApplicationHelperTest {
         List<Path> contents = Arrays.stream(CWD_NON_DIRS)
                 .map(Paths::get)
                 .collect(Collectors.toList());
-        assertThrowsExactly(NullPointerException.class, () -> LsApplicationHelper.formatContents(contents, null));
+        assertThrowsExactly(NullPointerException.class, () -> formatContents(contents, null));
     }
 
     @Test
     void formatContents_IsSortByExtIsTrue_ReturnsSortedFormattedContents() {
-        // Given
-        String expected = StringUtils.joinStringsByNewline(STRING_Z, STRING_ZA, STRING_AZ);
         List<Path> contents = Arrays.stream(CWD_NON_DIRS)
                 .map(Paths::get)
                 .collect(Collectors.toList());
-        // When
-        String actual = LsApplicationHelper.formatContents(contents, true);
-
-        // Then
-        assertEquals(expected, actual);
+        String result = formatContents(contents, true);
+        String expected = StringUtils.joinStringsByNewline(STRING_Z, STRING_ZA, STRING_AZ);
+        assertEquals(expected, result);
     }
 
     @Test
     void formatContents_IsSortByExtIsFalse_ReturnsFormattedContents() {
-        // Given
-        String expected = StringUtils.joinStringsByNewline(STRING_AZ, STRING_Z, STRING_ZA);
         List<Path> contents = Arrays.stream(CWD_NON_DIRS)
                 .map(Paths::get)
                 .collect(Collectors.toList());
-        // When
-        String actual = LsApplicationHelper.formatContents(contents, false);
-
-        // Then
-        assertEquals(expected, actual);
+        String result = formatContents(contents, false);
+        String expected = StringUtils.joinStringsByNewline(STRING_AZ, STRING_Z, STRING_ZA);
+        assertEquals(expected, result);
     }
 
-    /***
-     * Tests if resolvePaths returns a list of paths when given a valid directory.
-     */
+    @Test
+    void resolvePaths_InvalidDirectory_ThrowsInvalidDirectoryLsException() {
+        String invalidDirectory = "invalid_directory\0";
+        InvalidDirectoryLsException result = assertThrowsExactly(InvalidDirectoryLsException.class, () ->
+                resolvePaths(invalidDirectory)
+        );
+        String expected = String.format("ls: cannot access '%s': No such file or directory", invalidDirectory);
+        assertEquals(expected, result.getMessage());
+    }
+
     @Test
     void resolvePaths_ValidDirectory_ReturnsValidListOfPath() {
-        // Given
+        List<Path> result = assertDoesNotThrow(() -> resolvePaths(DIR_A_NAME));
         List<Path> expected = List.of(dirAPath);
+        assertEquals(expected, result);
+    }
 
-        // When
-        List<Path> actual = assertDoesNotThrow(() -> LsApplicationHelper.resolvePaths(DIR_A_NAME));
+    @Test
+    void resolvePaths_DirectoryStartsWithFileSeparator_ReturnsListOfPath() {
+        // Unix OS considers path starting with '/' as an absolute path
+        List<Path> result = assertDoesNotThrow(() -> resolvePaths(Paths.get(DIR_A_NAME).toString()));
+        List<Path> expected = List.of(dirAPath);
+        assertEquals(expected, result);
+    }
 
-        // Then
-        assertEquals(expected, actual);
+    @Test
+    void resolvePaths_DirectoryStartsWithDriveLetter_ReturnsListOfPath() {
+        // dirAPath.toString() will return the absolute path, including the drive letter (e.g., "C:"), which is OS dependent
+        List<Path> result = assertDoesNotThrow(() -> resolvePaths(dirAPath.toString()));
+        List<Path> expected = List.of(dirAPath);
+        assertEquals(expected, result);
     }
 }

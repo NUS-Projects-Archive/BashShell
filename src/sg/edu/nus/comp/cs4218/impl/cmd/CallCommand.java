@@ -78,9 +78,7 @@ public class CallCommand implements Command {
     }
 
     @Override
-    public void terminate() {
-        // Unused for now
-    }
+    public void terminate() { /* Unused for now */}
 
     /**
      * Returns the list of arguments for the command.

@@ -14,6 +14,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import sg.edu.nus.comp.cs4218.exception.ShellException;
 
 class CommandBuilderTest {
+
     private static Stream<String> getNewlineInQuotes() {
         return Stream.of(
                 "'" + STRING_NEWLINE + "'",

@@ -1,5 +1,6 @@
 package sg.edu.nus.comp.cs4218.impl.app;
 
+import static sg.edu.nus.comp.cs4218.impl.util.CollectionsUtils.listToArray;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_ARGS;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NULL_ARGS;
 
@@ -16,7 +17,6 @@ import sg.edu.nus.comp.cs4218.app.RmInterface;
 import sg.edu.nus.comp.cs4218.exception.InvalidArgsException;
 import sg.edu.nus.comp.cs4218.exception.RmException;
 import sg.edu.nus.comp.cs4218.impl.parser.RmArgsParser;
-import sg.edu.nus.comp.cs4218.impl.util.CollectionsUtils;
 
 /**
  * The rm command attempts to remove the non-directory type files specified
@@ -44,7 +44,7 @@ public class RmApplication implements RmInterface {
         }
 
         // Parse argument(s) provided
-        RmArgsParser parser = new RmArgsParser();
+        final RmArgsParser parser = new RmArgsParser();
         try {
             parser.parse(args);
         } catch (InvalidArgsException e) {
@@ -53,7 +53,7 @@ public class RmApplication implements RmInterface {
 
         final boolean isEmptyFolder = parser.isEmptyDirectory();
         final boolean isRecursive = parser.isRecursive();
-        final String[] filesToRemove = CollectionsUtils.listToArray(parser.getFiles());
+        final String[] filesToRemove = listToArray(parser.getFiles());
 
         if (filesToRemove.length == 0) {
             throw new RmException(ERR_NO_ARGS);

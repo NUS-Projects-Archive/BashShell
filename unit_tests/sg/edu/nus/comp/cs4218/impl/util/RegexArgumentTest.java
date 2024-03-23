@@ -2,10 +2,13 @@ package sg.edu.nus.comp.cs4218.impl.util;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -152,12 +155,16 @@ class RegexArgumentTest {
     }
 
     @Test
-    void globFiles_IsRegex_ReturnsGlobbedFiles(@TempDir Path tempDir) {
+    void globFiles_IsRegex_ReturnsSortedGlobbedFiles(@TempDir Path tempDir) {
         // Set current working directory to the temporary dir
         Environment.currentDirectory = tempDir.toString();
 
-        List<String> files = List.of("file1.txt", "file2.txt", "file3.txt", "invalid.txt", "file4.text");
-        List<String> expected = files.subList(0, 3);
+        List<String> files = List.of("file3.txt", "file2.txt", "file1.txt", "invalid.txt", "file4.text");
+        List<String> unsortedSubList = files.subList(0, 3);
+
+        // Sort the sublist
+        List<String> sortedSubList = new ArrayList<>(unsortedSubList);
+        Collections.sort(sortedSubList);
 
         for (String file : files) {
             Path filePath = tempDir.resolve(file);
@@ -166,7 +173,9 @@ class RegexArgumentTest {
 
         String globConditions = "file*.txt";
         appendRegex(globConditions);
-        assertEquals(expected, regexArg.globFiles());
+        List<String> result = regexArg.globFiles();
+        assertEquals(sortedSubList, result);
+        assertNotEquals(unsortedSubList, result);
     }
 
     @Test

@@ -1,5 +1,6 @@
 package sg.edu.nus.comp.cs4218.impl.app;
 
+import static sg.edu.nus.comp.cs4218.impl.util.CollectionsUtils.listToArray;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_EXISTS;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_FOLDERS;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NULL_ARGS;
@@ -18,7 +19,6 @@ import sg.edu.nus.comp.cs4218.app.MkdirInterface;
 import sg.edu.nus.comp.cs4218.exception.InvalidArgsException;
 import sg.edu.nus.comp.cs4218.exception.MkdirException;
 import sg.edu.nus.comp.cs4218.impl.parser.MkdirArgsParser;
-import sg.edu.nus.comp.cs4218.impl.util.CollectionsUtils;
 
 /**
  * The mkdir command creates new folders, if they do not already exist.
@@ -53,7 +53,7 @@ public class MkdirApplication implements MkdirInterface {
         }
 
         final Boolean isCreateParent = parser.isCreateParent();
-        final String[] directories = CollectionsUtils.listToArray(parser.getDirectories());
+        final String[] directories = listToArray(parser.getDirectories());
 
         if (directories.length == 0) {
             throw new MkdirException(ERR_NO_FOLDERS);

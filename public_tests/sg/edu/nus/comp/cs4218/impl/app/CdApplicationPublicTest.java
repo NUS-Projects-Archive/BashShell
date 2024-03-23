@@ -24,17 +24,18 @@ public class CdApplicationPublicTest {
     private static String initialDirectory;
     private CdApplication cdApplication;
 
-    @AfterEach
-    void tearDown() throws IOException, NoSuchFieldException, IllegalAccessException {
-        Files.deleteIfExists(DIR_PATH);
-        TestEnvironmentUtil.setCurrentDirectory(initialDirectory);
-    }
-
     @BeforeEach
     void setUp() throws IOException, NoSuchFieldException, IllegalAccessException {
         cdApplication = new CdApplication();
         initialDirectory = TestEnvironmentUtil.getCurrentDirectory();
-        Files.createDirectory(DIR_PATH);
+        TestEnvironmentUtil.setCurrentDirectory(System.getProperty("user.dir"));
+        Files.createDirectories(DIR_PATH);
+    }
+
+    @AfterEach
+    void tearDown() throws IOException, NoSuchFieldException, IllegalAccessException {
+        Files.deleteIfExists(DIR_PATH);
+        TestEnvironmentUtil.setCurrentDirectory(initialDirectory);
     }
 
     @Test

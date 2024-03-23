@@ -6,8 +6,8 @@ import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
-import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IO_EXCEPTION;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_OSTREAM;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_WRITE_STREAM;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 
 import java.io.ByteArrayOutputStream;
@@ -55,7 +55,7 @@ public class EchoApplicationIT {
         EchoException result = assertThrowsExactly(EchoException.class, () ->
                 app.run(new String[]{"A", "B", "C"}, null, outThrowException)
         );
-        assertEquals(ECHO_EX_MSG + ERR_IO_EXCEPTION, result.getMessage());
+        assertEquals(ECHO_EX_MSG + ERR_WRITE_STREAM, result.getMessage());
     }
 
     @Test

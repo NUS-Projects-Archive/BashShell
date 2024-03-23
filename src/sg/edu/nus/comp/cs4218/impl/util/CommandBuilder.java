@@ -21,7 +21,7 @@ import sg.edu.nus.comp.cs4218.impl.cmd.SequenceCommand;
 /**
  * CommandBuilder is a utility class to parse and tokenize the provided command string into command(s) and arguments.
  */
-@SuppressWarnings({"PMD.ExcessiveMethodLength", "PMD.ClassNamingConventions"})
+@SuppressWarnings("PMD.ExcessiveMethodLength")
 public final class CommandBuilder {
     /**
      * Regular expression for extracting valid arguments from the command string:

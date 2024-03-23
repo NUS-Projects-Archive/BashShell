@@ -3,7 +3,6 @@ package sg.edu.nus.comp.cs4218.impl.util;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.fileSeparator;
@@ -135,11 +134,9 @@ public class StringUtilsTest {
     void removeTrailingOnce_MultipleTrailing_ReturnsRemovedOneTrailingString() {
         assertEquals("stringstrstr", removeTrailingOnce(MULTI_TRAIL_STR, SEQUENCE));
     }
-
+  
     @Test // picked up from evosuite automatic test generation (StringUtils_ESTest test4)
-    public void removeTrailing_NullInput_returnsString() {
-        String result = StringUtils.removeTrailing("f-3-", null);
-        assertEquals("f-3-", result);
-        assertNotNull(result);
+    public void removeTrailing_NullInput_ReturnsString() {
+        assertEquals("f-3-", removeTrailing("f-3-", null));
     }
 }

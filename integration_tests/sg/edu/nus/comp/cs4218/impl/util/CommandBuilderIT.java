@@ -2,6 +2,7 @@ package sg.edu.nus.comp.cs4218.impl.util;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static sg.edu.nus.comp.cs4218.impl.util.CommandBuilder.parseCommand;
 import static sg.edu.nus.comp.cs4218.test.AssertUtils.assertSameType;
 import static sg.edu.nus.comp.cs4218.impl.util.CustomAssertUtils.assertCallCommandListEquals;
 import static sg.edu.nus.comp.cs4218.impl.util.CustomAssertUtils.assertCommandListEquals;
@@ -23,7 +24,7 @@ public class CommandBuilderIT {
     @ParameterizedTest
     @ValueSource(strings = {"AAA BBB CCC", "echo hello world", "ls -a"})
     void parseCommand_CallCommand_ReturnsCorrectCallCommand(String args) {
-        Command cmd = assertDoesNotThrow(() -> CommandBuilder.parseCommand(args, null));
+        Command cmd = assertDoesNotThrow(() -> parseCommand(args, null));
         List<String> expected = List.of(args.split(" "));
         assertSameType(CallCommand.class, cmd);
         assertEquals(expected, ((CallCommand) cmd).getArgsList());
@@ -32,7 +33,7 @@ public class CommandBuilderIT {
     @Test
     void parseCommand_PipeCommand_ReturnsCorrectPipeCommand() {
         String args = "paste ghost.txt | grep Line";
-        Command cmd = assertDoesNotThrow(() -> CommandBuilder.parseCommand(args, null));
+        Command cmd = assertDoesNotThrow(() -> parseCommand(args, null));
         List<CallCommand> expected = List.of(
                 new CallCommand(List.of("paste", "ghost.txt"), null, new ArgumentResolver()),
                 new CallCommand(List.of("grep", "Line"), null, new ArgumentResolver())
@@ -43,8 +44,8 @@ public class CommandBuilderIT {
 
     @Test
     void parseCommand_SequenceCommandOfCallCall_ReturnsCorrectSequenceCommand() {
-        String args = "paste ghost.txt; ls";
-        Command cmd = assertDoesNotThrow(() -> CommandBuilder.parseCommand(args, null));
+        String args = "paste ghost.txt; ls;";
+        Command cmd = assertDoesNotThrow(() -> parseCommand(args, null));
         List<Command> expected = List.of(
                 new CallCommand(List.of("paste", "ghost.txt"), null, new ArgumentResolver()),
                 new CallCommand(List.of("ls"), null, new ArgumentResolver())
@@ -56,7 +57,7 @@ public class CommandBuilderIT {
     @Test
     void parseCommand_SequenceCommandOfPipeCall_ReturnsCorrectSequenceCommand() {
         String args = "paste ghost.txt | grep Line; ls";
-        Command cmd = assertDoesNotThrow(() -> CommandBuilder.parseCommand(args, null));
+        Command cmd = assertDoesNotThrow(() -> parseCommand(args, null));
         List<Command> expected = List.of(
                 new PipeCommand(List.of(
                         new CallCommand(List.of("paste", "ghost.txt"), null, new ArgumentResolver()),
