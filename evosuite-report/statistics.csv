@@ -1,0 +1,4 @@
+TARGET_CLASS,criterion,Coverage,Total_Goals,Covered_Goals
+sg.edu.nus.comp.cs4218.impl.app.TeeApplication,BRANCH,1.0,17,17
+sg.edu.nus.comp.cs4218.impl.app.PasteApplication,BRANCH,0.9607843137254902,51,49
+sg.edu.nus.comp.cs4218.impl.util.StringUtils,BRANCH,0.9310344827586207,29,27

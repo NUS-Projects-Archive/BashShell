@@ -134,4 +134,9 @@ public class StringUtilsTest {
     void removeTrailingOnce_MultipleTrailing_ReturnsRemovedOneTrailingString() {
         assertEquals("stringstrstr", removeTrailingOnce(MULTI_TRAIL_STR, SEQUENCE));
     }
+  
+    @Test // picked up from evosuite automatic test generation (StringUtils_ESTest test4)
+    public void removeTrailing_NullInput_ReturnsString() {
+        assertEquals("f-3-", removeTrailing("f-3-", null));
+    }
 }
