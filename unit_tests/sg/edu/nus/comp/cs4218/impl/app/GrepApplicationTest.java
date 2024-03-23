@@ -3,6 +3,7 @@ package sg.edu.nus.comp.cs4218.impl.app;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
+import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_EMPTY_PATTERN;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_INVALID_REGEX;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NULL_STREAMS;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
@@ -61,6 +62,54 @@ class GrepApplicationTest {
     }
 
     /**
+     * Test to check if grepFromFiles throws GrepException when no files are specified.
+     */
+    @Test
+    void grepFromFile_NullFile_ThrowsGrepException() {
+        GrepException result = assertThrowsExactly(GrepException.class, () ->
+                app.grepFromFiles(PATTERN_BIG_E, false, false, false)
+        );
+        String expected = GREP_STRING + ERR_NULL_STREAMS;
+        assertEquals(expected, result.getMessage());
+    }
+
+    /**
+     * Test to check if grepFromFiles throws GrepException when files are empty.
+     */
+    @Test
+    void grepFromFile_EmptyFile_ThrowsGrepException() {
+        GrepException result = assertThrowsExactly(GrepException.class, () ->
+                app.grepFromFiles(PATTERN_BIG_E, false, false, false, new String[0])
+        );
+        String expected = GREP_STRING + ERR_NULL_STREAMS;
+        assertEquals(expected, result.getMessage());
+    }
+
+    /**
+     * Test to check if grepFromFiles throws GrepException when no pattern is specified.
+     */
+    @Test
+    void grepFromFile_NullPattern_ThrowsGrepException() {
+        GrepException result = assertThrowsExactly(GrepException.class, () ->
+                app.grepFromFiles(null, false, false, false, fileAbsPath)
+        );
+        String expected = GREP_STRING + ERR_NULL_STREAMS;
+        assertEquals(expected, result.getMessage());
+    }
+
+    /**
+     * Test to check if grepFromFiles throws GrepException when pattern is empty.
+     */
+    @Test
+    void grepFromFile_EmptyPattern_ThrowsGrepException() {
+        GrepException result = assertThrowsExactly(GrepException.class, () ->
+                app.grepFromFiles("", false, false, false, fileAbsPath)
+        );
+        String expected = GREP_STRING + ERR_EMPTY_PATTERN;
+        assertEquals(expected, result.getMessage());
+    }
+
+    /**
      * Test case where -i -c -H are specified.
      */
     @Test
@@ -76,7 +125,7 @@ class GrepApplicationTest {
      * Test case where -i is specified only.
      */
     @Test
-    void grepFromFile_isCaseSensitiveIsTrueForOneFile_ReturnsCorrectMatchingLines() {
+    void grepFromFile_IsCaseSensitiveIsTrueForOneFile_ReturnsCorrectMatchingLines() {
         String result = assertDoesNotThrow(() ->
                 app.grepFromFiles(PATTERN_BIG_E, true, false, false, fileName)
         );
@@ -88,7 +137,7 @@ class GrepApplicationTest {
      * Test case where -c is specified.
      */
     @Test
-    void grepFromFile_isCountLinesIsTrueForOneFile_ReturnsCorrectNumberOfMatchingLines() {
+    void grepFromFile_IsCountLinesIsTrueForOneFile_ReturnsCorrectNumberOfMatchingLines() {
         String result = assertDoesNotThrow(() ->
                 app.grepFromFiles(PATTERN_BIG_E, false, true, false, fileAbsPath)
         );
@@ -100,7 +149,7 @@ class GrepApplicationTest {
      * Test case where -H is specified.
      */
     @Test
-    void grepFromFile_isPrefixFileNameIsTrueForOneFile_ReturnsCorrectMatchingLinesWithFileName() {
+    void grepFromFile_IsPrefixFileNameIsTrueForOneFile_ReturnsCorrectMatchingLinesWithFileName() {
         String result = assertDoesNotThrow(() ->
                 app.grepFromFiles(PATTERN_SMALL_E, false, false, true, fileName)
         );
@@ -131,19 +180,31 @@ class GrepApplicationTest {
     }
 
     /**
-     * Test to check if grepFromFiles throws GrepException when no files are specified.
+     * Test to check if grepFromStdin throws GrepException when no pattern is specified.
      */
     @Test
-    void grepFromFile_NoFilesSpecified_ThrowsGrepException() {
+    void grepFromStdin_NullPattern_ThrowsGrepException() {
         GrepException result = assertThrowsExactly(GrepException.class, () ->
-                app.grepFromFiles("", false, false, false, null)
+                app.grepFromStdin(null, false, false, false, stdin)
         );
         String expected = GREP_STRING + ERR_NULL_STREAMS;
         assertEquals(expected, result.getMessage());
     }
 
     /**
-     * Test to check if grepFromFiles throws GrepException when invalid pattern is specified.
+     * Test to check if grepFromStdin throws GrepException when pattern is empty.
+     */
+    @Test
+    void grepFromStdin_EmptyPattern_ThrowsGrepException() {
+        GrepException result = assertThrowsExactly(GrepException.class, () ->
+                app.grepFromStdin("", false, false, false, stdin)
+        );
+        String expected = GREP_STRING + ERR_EMPTY_PATTERN;
+        assertEquals(expected, result.getMessage());
+    }
+
+    /**
+     * Test to check if grepFromStdin throws GrepException when invalid pattern are specified.
      */
     @Test
     void grepFromStdin_InvalidPattern_ThrowsGrepException() {

@@ -12,7 +12,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_SYNTAX;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
+import static sg.edu.nus.comp.cs4218.test.FileUtils.createNewFile;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -21,8 +21,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 
@@ -49,33 +47,15 @@ public class IORedirectionHandlerTest {
     }
 
     @BeforeEach
-    void setUp() throws IOException {
+    void setUp() {
         argResolverMock = mock(ArgumentResolver.class);
         inputStream = new ByteArrayInputStream("origInputStream".getBytes(StandardCharsets.UTF_8));
         outputStream = new ByteArrayOutputStream();
 
-        Path testDir = Files.createTempDirectory("testDir");
-        Path path = testDir.resolve("file.txt");
-        Path pathA = testDir.resolve("A.txt");
-        Path pathB = testDir.resolve("B.txt");
-        Path pathC = testDir.resolve("C.txt");
-
-        file = path.toString();
-        fileA = pathA.toString();
-        fileB = pathB.toString();
-        fileC = pathC.toString();
-
-        String contentFile = "Test";
-        Files.write(path, List.of(contentFile));
-
-        String contentFileA = "Hello";
-        Files.write(pathA, List.of(contentFileA));
-
-        String contentFileB = "Java";
-        Files.write(pathB, List.of(contentFileB));
-
-        String contentFileC = "";
-        Files.write(pathC, List.of(contentFileC));
+        file = createNewFile("file.txt", "Test").toString();
+        fileA = createNewFile("fileA.txt", "Hello").toString();
+        fileB = createNewFile("fileB.txt", "Java").toString();
+        fileC = createNewFile("fileC.txt", "").toString();
     }
 
     @AfterEach
@@ -163,7 +143,7 @@ public class IORedirectionHandlerTest {
         try {
             when(argResolverMock.resolveOneArgument(anyString())).thenReturn(List.of(fileA), List.of(fileB));
             ioRedirHandler.extractRedirOptions();
-            String expected = "Java" + STRING_NEWLINE;
+            String expected = "Java";
             String result = new String(ioRedirHandler.getInputStream().readAllBytes());
             assertEquals(expected, result);
         } catch (IOException | AbstractApplicationException | ShellException e) {
