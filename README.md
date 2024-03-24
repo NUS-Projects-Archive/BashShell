@@ -22,14 +22,17 @@
 13. Click [Apply] to save changes, and then [OK] to exit
 
 
-# Automated Testing Tools
+# Automatic Testing Tools
 
-In our project we used 2 automatic testing tools
+In our project, we used 2 automatic testing tools. We explained in our report how we used these tools to improve the robustness
+of our tests.
 - [Pitest](automated_tests/pitest/README.md)
 - [EvoSuite](automated_tests/evosuite-tests/README.md)
 
 > [!TIP]
 > Click on the hyperlink to see the README of the respective tools
 
-In our report, we explained how we used these tools to improve the robustness
-of our tests.
+Additionally, we included CI/CD workflow to automatically run our tests for PRs and the `main` branch.
+This helps to ensure the integrity of the code and tests. The workflow runs and generate separate reports for
+unit, integration and system tests. This allows us to quickly determine which type of test was failing, hence 
+efficiently pinpointing the possible source of bug.
