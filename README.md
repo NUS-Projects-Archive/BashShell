@@ -1,6 +1,3 @@
-# CS4218codebase
-codebase for CS4218, 23/24 Sem2
-
 # Setup Project Structure
 1. Go to [File] > [Project Structure]... (or press _Ctrl+Alt+Shift+S_)\
    ![Screenshot of File to Project Structure](img/img.png)
@@ -15,7 +12,9 @@ codebase for CS4218, 23/24 Sem2
 9. Under the _Sources_ tab, you should see a list of directories
 10. Mark the following as ![Test](img/img_5.png):
     - integration_tests
-    - unimplemented_tests
+    - public_tests
+    - system_tests
+    - testing_utilities
     - unit_tests
 11. Mark the "resources" directory as ![Test Resources](img/img_6.png)
 12. You should have something that looks like this:\
