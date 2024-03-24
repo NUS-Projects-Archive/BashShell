@@ -20,3 +20,16 @@
 12. You should have something that looks like this:\
     ![Project Settings - Modules](img/img_4.png)
 13. Click [Apply] to save changes, and then [OK] to exit
+
+
+# Automated Testing Tools
+
+In our project we used 2 automatic testing tools
+- [Pitest](automated_tests/pitest/README.md)
+- [EvoSuite](automated_tests/evosuite-tests/README.md)
+
+> [!TIP]
+> Click on the hyperlink to see the README of the respective tools
+
+In our report, we explained how we used these tools to improve the robustness
+of our tests.
