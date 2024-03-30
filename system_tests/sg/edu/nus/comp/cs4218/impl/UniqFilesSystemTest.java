@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 public class UniqFilesSystemTest extends AbstractSystemTest {
-    private final static String LOG_FILE_CONTENT = "[2023-12-23T12:13:13][I] Starting..."
+    private static final String LOG_FILE_CONTENT = "[2023-12-23T12:13:13][I] Starting..."
             + "\n[2023-12-23T12:13:13][I] Attempt load Component A..."
             + "\n[2023-12-23T12:13:13][I] Component A loaded"
             + "\n[2023-12-23T12:13:13][I] Attempt load Component B..."
@@ -52,13 +52,14 @@ public class UniqFilesSystemTest extends AbstractSystemTest {
                         GREP_APP, logFileName, CUT_APP, UNIQ_APP),
                 EXIT_APP
         );
-        String expected = actual.rootPath("")
-                + "Component B is outdated\n"
-                + "Missing file for Component C, creating new file...\n"
-                + "File corrupted, attempt recovery...\n"
-                + "Start-up is taking too long\n"
-                + "File corrupted, attempt recovery...\n"
-                + "Component D is disabled";
+        String expected = String.join("\n",
+                actual.rootPath() + "Component B is outdated",
+                "Missing file for Component C, creating new file...",
+                "File corrupted, attempt recovery...",
+                "Start-up is taking too long",
+                "File corrupted, attempt recovery...",
+                "Component D is disabled"
+        );
         assertEquals(expected, actual.out);
     }
 
@@ -69,13 +70,14 @@ public class UniqFilesSystemTest extends AbstractSystemTest {
                         GREP_APP, logFileName, CUT_APP, UNIQ_APP),
                 EXIT_APP
         );
-        String expected = actual.rootPath("")
-                + "1 Component B is outdated\n"
-                + "3 Missing file for Component C, creating new file...\n"
-                + "3 File corrupted, attempt recovery...\n"
-                + "1 Start-up is taking too long\n"
-                + "2 File corrupted, attempt recovery...\n"
-                + "1 Component D is disabled";
+        String expected = String.join("\n",
+                actual.rootPath() + "1 Component B is outdated",
+                "3 Missing file for Component C, creating new file...",
+                "3 File corrupted, attempt recovery...",
+                "1 Start-up is taking too long",
+                "2 File corrupted, attempt recovery...",
+                "1 Component D is disabled"
+        );
         assertEquals(expected, actual.out);
     }
 

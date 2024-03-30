@@ -6,14 +6,17 @@ import static com.github.stefanbirkner.systemlambda.SystemLambda.tapSystemOutNor
 import static com.github.stefanbirkner.systemlambda.SystemLambda.withTextFromSystemIn;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.io.CleanupMode.ALWAYS;
+import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.removeTrailingOnce;
+import static sg.edu.nus.comp.cs4218.testutils.TestStringUtils.CHAR_FILE_SEP;
 
 import java.nio.file.Path;
+import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.io.TempDir;
 
 import sg.edu.nus.comp.cs4218.Environment;
-import sg.edu.nus.comp.cs4218.impl.util.StringUtils;
 
 @SuppressWarnings("PMD.AbstractClassWithoutAbstractMethod")
 public abstract class AbstractSystemTest {
@@ -62,8 +65,8 @@ public abstract class AbstractSystemTest {
         });
 
         final String extraClosingLine = "\n" + exitingDirectory + "$ ";
-        res.out = StringUtils.removeTrailingOnce(res.out, extraClosingLine);
-        res.err = StringUtils.removeTrailingOnce(res.err, "null\n");
+        res.out = removeTrailingOnce(res.out, extraClosingLine);
+        res.err = removeTrailingOnce(res.err, "null\n");
 
         return res;
     }
@@ -84,20 +87,55 @@ public abstract class AbstractSystemTest {
      * Also holds the "root" directory of the test environment.
      */
     static class SystemTestResults {
+
+        private static final String TERMINATOR = "$ ";
+
         String out;
         String err;
         String rootDirectory;
         int exitCode;
 
         /**
-         * Get a string representation of a current-working-directory,
-         * where {@code children} represents the folder path from the root directory.
+         * Get a string representation of the root directory.
          *
-         * @param children String representation the folder path from root directory to current-working-directory
+         * @return String representation of root directory
+         */
+        String rootPath() {
+            return rootDirectory + TERMINATOR;
+        }
+
+        /**
+         * Get a string representation of a current-working-directory,
+         * where {@code relativePath} represents the folder path from the root directory.
+         *
+         * @param relativePath String representation the folder path from root directory to current-working-directory
          * @return String representation of a current-working-directory
          */
-        String rootPath(String children) {
-            return rootDirectory + children + "$ ";
+        String rootPath(String relativePath) {
+            if (relativePath == null || relativePath.isBlank()) {
+                return rootPath();
+            }
+
+            return rootDirectory + CHAR_FILE_SEP + relativePath + TERMINATOR;
+        }
+
+        /**
+         * Get a string representation of a current-working-directory,
+         * where {@code relativeFolders} represents list of folder "inside" of root directory.
+         * Blank {@code relativeFolders} are ignored.
+         *
+         * @param relativeFolders String of individual folder names, to go from root directory to
+         *                        current-working-directory
+         * @return String representation of a current-working-directory
+         */
+        String rootPath(String... relativeFolders) {
+            String[] folders = Stream.of(relativeFolders)
+                    .map(String::trim)
+                    .filter(((Predicate<String>) String::isBlank).negate())
+                    .toArray(String[]::new);
+            return rootPath(String.join(String.valueOf(CHAR_FILE_SEP), folders));
         }
     }
+
+
 }
