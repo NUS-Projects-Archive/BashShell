@@ -10,6 +10,8 @@ import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.removeTrailingOnce;
 import static sg.edu.nus.comp.cs4218.testutils.TestStringUtils.CHAR_FILE_SEP;
 
 import java.nio.file.Path;
+import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.io.TempDir;
@@ -85,6 +87,9 @@ public abstract class AbstractSystemTest {
      * Also holds the "root" directory of the test environment.
      */
     static class SystemTestResults {
+
+        private static final String TERMINATOR = "$ ";
+
         String out;
         String err;
         String rootDirectory;
@@ -96,7 +101,7 @@ public abstract class AbstractSystemTest {
          * @return String representation of root directory
          */
         String rootPath() {
-            return rootDirectory + "$ ";
+            return rootDirectory + TERMINATOR;
         }
 
         /**
@@ -107,18 +112,30 @@ public abstract class AbstractSystemTest {
          * @return String representation of a current-working-directory
          */
         String rootPath(String relativePath) {
-            return rootDirectory + CHAR_FILE_SEP + relativePath + "$ ";
+            if (relativePath == null || relativePath.isBlank()) {
+                return rootPath();
+            }
+
+            return rootDirectory + CHAR_FILE_SEP + relativePath + TERMINATOR;
         }
 
         /**
          * Get a string representation of a current-working-directory,
-         * where {@code folders} represents list of folder "in"  of root directory.
+         * where {@code relativeFolders} represents list of folder "inside" of root directory.
+         * Blank {@code relativeFolders} are ignored.
          *
-         * @param folders String of individual folder names,to go from root directory to current-working-directory
+         * @param relativeFolders String of individual folder names, to go from root directory to
+         *                        current-working-directory
          * @return String representation of a current-working-directory
          */
-        String rootPath(String... folders) {
-            return rootDirectory + CHAR_FILE_SEP + String.join(String.valueOf(CHAR_FILE_SEP), folders) + "$ ";
+        String rootPath(String... relativeFolders) {
+            String[] folders = Stream.of(relativeFolders)
+                    .map(String::trim)
+                    .filter(((Predicate<String>) String::isBlank).negate())
+                    .toArray(String[]::new);
+            return rootPath(String.join(String.valueOf(CHAR_FILE_SEP), folders));
         }
     }
+
+
 }
