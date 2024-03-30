@@ -100,13 +100,13 @@ public abstract class AbstractSystemTest {
 
         /**
          * Get a string representation of a current-working-directory,
-         * where {@code children} represents the folder path from the root directory.
+         * where {@code relativePath} represents the folder path from the root directory.
          *
-         * @param children String representation the folder path from root directory to current-working-directory
+         * @param relativePath String representation the folder path from root directory to current-working-directory
          * @return String representation of a current-working-directory
          */
-        String rootPath(String children) {
-            return rootDirectory + children + "$ ";
+        String rootPath(String relativePath) {
+            return rootDirectory + relativePath + "$ ";
         }
     }
 }
