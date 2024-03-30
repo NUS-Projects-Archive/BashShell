@@ -52,7 +52,7 @@ public class UniqFilesSystemTest extends AbstractSystemTest {
                         GREP_APP, logFileName, CUT_APP, UNIQ_APP),
                 EXIT_APP
         );
-        String expected = actual.rootPath("")
+        String expected = actual.rootPath()
                 + "Component B is outdated\n"
                 + "Missing file for Component C, creating new file...\n"
                 + "File corrupted, attempt recovery...\n"
@@ -69,7 +69,7 @@ public class UniqFilesSystemTest extends AbstractSystemTest {
                         GREP_APP, logFileName, CUT_APP, UNIQ_APP),
                 EXIT_APP
         );
-        String expected = actual.rootPath("")
+        String expected = actual.rootPath()
                 + "1 Component B is outdated\n"
                 + "3 Missing file for Component C, creating new file...\n"
                 + "3 File corrupted, attempt recovery...\n"

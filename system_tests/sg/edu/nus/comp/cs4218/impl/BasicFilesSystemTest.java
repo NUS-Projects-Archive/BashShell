@@ -99,7 +99,7 @@ public class BasicFilesSystemTest extends AbstractSystemTest {
                 SORT_APP + " " + fileName,
                 EXIT_APP
         );
-        String expected = actual.rootPath("") + "abc\nabc\nline1\nline2\nline3\nline4\nline5";
+        String expected = actual.rootPath() + "abc\nabc\nline1\nline2\nline3\nline4\nline5";
         assertEquals(expected, actual.out);
     }
 
@@ -110,7 +110,7 @@ public class BasicFilesSystemTest extends AbstractSystemTest {
                 LS_APP + "; " + CD_APP + " ..; " + LS_APP,
                 EXIT_APP
         );
-        String expected = String.format("%s%s%c%s$ \n%s\n%s\n%s", actual.rootPath(""), actual.rootDirectory,
+        String expected = String.format("%s%s%c%s$ \n%s\n%s\n%s", actual.rootPath(), actual.rootDirectory,
                 CHAR_FILE_SEP, DIR_NAME, nestedFileName, DIR_NAME, fileName);
         assertEquals(expected, actual.out);
     }
@@ -121,7 +121,7 @@ public class BasicFilesSystemTest extends AbstractSystemTest {
                 PASTE_APP + " " + fileName + " | " + CUT_APP + " -c 1-3",
                 EXIT_APP
         );
-        String expected = actual.rootPath("") + "lin\nlin\nlin\nabc\nlin\nabc\nlin";
+        String expected = actual.rootPath() + "lin\nlin\nlin\nabc\nlin\nabc\nlin";
         assertEquals(expected, actual.out);
     }
 
@@ -133,7 +133,7 @@ public class BasicFilesSystemTest extends AbstractSystemTest {
                 EXIT_APP
         );
 
-        String expected = String.format("%s %7d %7d", actual.rootPath(""), 3, 7);
+        String expected = String.format("%s %7d %7d", actual.rootPath(), 3, 7);
         assertEquals(expected, actual.out);
     }
 
@@ -144,7 +144,7 @@ public class BasicFilesSystemTest extends AbstractSystemTest {
                 GREP_APP + " abc < " + fileName + " > " + outputFileName + "; " + CAT_APP + " " + outputFileName,
                 EXIT_APP
         );
-        String expected = actual.rootPath("") + "abc\nabc";
+        String expected = actual.rootPath() + "abc\nabc";
         assertEquals(expected, actual.out);
     }
 
@@ -155,7 +155,7 @@ public class BasicFilesSystemTest extends AbstractSystemTest {
                 EXIT_APP
         );
 
-        String expected = actual.rootPath("") + "line6";
+        String expected = actual.rootPath() + "line6";
         assertEquals(expected, actual.out);
 
         List<String> expectedContent = List.of(

@@ -90,6 +90,15 @@ public abstract class AbstractSystemTest {
         int exitCode;
 
         /**
+         * Get a string representation of the root directory.
+         *
+         * @return String representation of root directory
+         */
+        String rootPath() {
+            return rootDirectory;
+        }
+
+        /**
          * Get a string representation of a current-working-directory,
          * where {@code children} represents the folder path from the root directory.
          *

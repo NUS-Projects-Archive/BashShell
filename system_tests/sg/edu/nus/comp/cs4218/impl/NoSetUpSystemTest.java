@@ -52,8 +52,8 @@ public class NoSetUpSystemTest extends AbstractSystemTest {
                 CAT_APP + " hello_world.txt",
                 EXIT_APP
         );
-        String expectedStdout = actual.rootPath("")
-                + actual.rootPath("")
+        String expectedStdout = actual.rootPath()
+                + actual.rootPath()
                 + "Welcome to CS4218!";
         assertEquals(expectedStdout, actual.out);
     }
@@ -99,7 +99,7 @@ public class NoSetUpSystemTest extends AbstractSystemTest {
                 ECHO_APP + validQuote,
                 EXIT_APP
         );
-        String expected = actual.rootPath("") + outputString;
+        String expected = actual.rootPath() + outputString;
         assertEquals(expected, actual.out);
     }
 
@@ -110,7 +110,7 @@ public class NoSetUpSystemTest extends AbstractSystemTest {
                 ECHO_APP + invalidQuote,
                 EXIT_APP
         );
-        String expected = String.format("%sshell: %s", actual.rootPath(""), ERR_SYNTAX);
+        String expected = String.format("%sshell: %s", actual.rootPath(), ERR_SYNTAX);
         assertEquals(expected, actual.out);
     }
 
@@ -121,7 +121,7 @@ public class NoSetUpSystemTest extends AbstractSystemTest {
                 ECHO_APP + String.format(" `%s Hello`", invalidApp),
                 EXIT_APP
         );
-        String expected = String.format("%sshell: %s: %s", actual.rootPath(""), invalidApp, ERR_INVALID_APP);
+        String expected = String.format("%sshell: %s: %s", actual.rootPath(), invalidApp, ERR_INVALID_APP);
         assertEquals(expected, actual.out);
     }
 }
