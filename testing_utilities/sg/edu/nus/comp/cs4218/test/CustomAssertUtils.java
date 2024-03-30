@@ -1,4 +1,4 @@
-package sg.edu.nus.comp.cs4218.impl.util;
+package sg.edu.nus.comp.cs4218.test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;

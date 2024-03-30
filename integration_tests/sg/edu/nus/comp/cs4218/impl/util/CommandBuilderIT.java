@@ -4,8 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static sg.edu.nus.comp.cs4218.impl.util.CommandBuilder.parseCommand;
 import static sg.edu.nus.comp.cs4218.test.AssertUtils.assertSameType;
-import static sg.edu.nus.comp.cs4218.impl.util.CustomAssertUtils.assertCallCommandListEquals;
-import static sg.edu.nus.comp.cs4218.impl.util.CustomAssertUtils.assertCommandListEquals;
+import static sg.edu.nus.comp.cs4218.test.CustomAssertUtils.assertCallCommandListEquals;
+import static sg.edu.nus.comp.cs4218.test.CustomAssertUtils.assertCommandListEquals;
 
 import java.util.List;
 
