@@ -94,12 +94,11 @@ public class NoSetUpSystemTest extends AbstractSystemTest {
     @ParameterizedTest
     @MethodSource("validQuotes")
     void main_ValidQuotingAndCommandSubstitution_PrintsCorrectlyToStdout(String validQuote) {
-        String outputString = "Hello World";
         SystemTestResults actual = testMainWith(
                 ECHO_APP + validQuote,
                 EXIT_APP
         );
-        String expected = actual.rootPath() + outputString;
+        String expected = actual.rootPath() + "Hello World";
         assertEquals(expected, actual.out);
     }
 

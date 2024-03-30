@@ -7,7 +7,6 @@ import static org.junit.jupiter.api.Assertions.fail;
 import static org.junit.jupiter.api.io.CleanupMode.ALWAYS;
 import static sg.edu.nus.comp.cs4218.test.FileUtils.createNewDirectory;
 import static sg.edu.nus.comp.cs4218.test.FileUtils.createNewFileInDir;
-import static sg.edu.nus.comp.cs4218.testutils.TestStringUtils.CHAR_FILE_SEP;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -19,14 +18,18 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 public class BasicFilesSystemTest extends AbstractSystemTest {
-    private final static String FILE_CONTENT = "line1\nline2\nline3\nabc\nline4\nabc\nline5\n";
-    private final static String DIR_NAME = "testDir";
+    private static final String FILE_CONTENT = "line1\nline2\nline3\nabc\nline4\nabc\nline5\n";
+    private static final String DIR_NAME = "testDir";
+
+    // String Literals
+    private static final String LIN = "lin";
+    private static final String ABC = "abc";
 
     private static Path file;
     private static Path dir;
     private static Path nestedFile;
-    private static String fileName = "";
-    private static String nestedFileName = "";
+    private static String fileName = "<set during runtime>";
+    private static String nestedFileName = "<set during runtime>";
 
     @Override
     @BeforeEach
@@ -99,7 +102,15 @@ public class BasicFilesSystemTest extends AbstractSystemTest {
                 SORT_APP + " " + fileName,
                 EXIT_APP
         );
-        String expected = actual.rootPath() + "abc\nabc\nline1\nline2\nline3\nline4\nline5";
+        String expected = String.join("\n",
+                actual.rootPath() + ABC,
+                ABC,
+                "line1",
+                "line2",
+                "line3",
+                "line4",
+                "line5"
+        );
         assertEquals(expected, actual.out);
     }
 
@@ -110,8 +121,12 @@ public class BasicFilesSystemTest extends AbstractSystemTest {
                 LS_APP + "; " + CD_APP + " ..; " + LS_APP,
                 EXIT_APP
         );
-        String expected = String.format("%s%s%c%s$ \n%s\n%s\n%s", actual.rootPath(), actual.rootDirectory,
-                CHAR_FILE_SEP, DIR_NAME, nestedFileName, DIR_NAME, fileName);
+        String expected = String.join("\n",
+                actual.rootPath() + actual.rootPath(DIR_NAME),
+                nestedFileName,
+                DIR_NAME,
+                fileName
+        );
         assertEquals(expected, actual.out);
     }
 
@@ -121,7 +136,15 @@ public class BasicFilesSystemTest extends AbstractSystemTest {
                 PASTE_APP + " " + fileName + " | " + CUT_APP + " -c 1-3",
                 EXIT_APP
         );
-        String expected = actual.rootPath() + "lin\nlin\nlin\nabc\nlin\nabc\nlin";
+        String expected = String.join("\n",
+                actual.rootPath() + LIN,
+                LIN,
+                LIN,
+                ABC,
+                LIN,
+                ABC,
+                LIN
+        );
         assertEquals(expected, actual.out);
     }
 
