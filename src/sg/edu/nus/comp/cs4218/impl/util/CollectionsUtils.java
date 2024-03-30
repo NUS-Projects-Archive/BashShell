@@ -16,7 +16,7 @@ public final class CollectionsUtils {
      * @return A {@code String[]} with the values of the given {@code List<String>}
      */
     public static String[] listToArray(List<String> list) {
-        return list.toArray(new String[0]);
+        return list == null ? null : list.toArray(new String[0]);
     }
 
 }
