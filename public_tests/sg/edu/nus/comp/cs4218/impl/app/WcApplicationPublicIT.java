@@ -2,8 +2,8 @@ package sg.edu.nus.comp.cs4218.impl.app;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.joinStringsByNewline;
 import static sg.edu.nus.comp.cs4218.testutils.TestStringUtils.STRING_NEWLINE;
+import static sg.edu.nus.comp.cs4218.testutils.TestStringUtils.joinStringsByNewline;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

@@ -4,8 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.joinStringsByNewline;
 import static sg.edu.nus.comp.cs4218.testutils.TestStringUtils.STRING_NEWLINE;
+import static sg.edu.nus.comp.cs4218.testutils.TestStringUtils.joinStringsByNewline;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -34,10 +34,6 @@ public class PasteApplicationPublicTest {
     private String file1;
     private String file2;
 
-    private void assertEqualsReplacingNewlines(String expected, String actual) {
-        assertEquals(expected.replaceAll("\r\n", "\n"), actual.replaceAll("\r\n", "\n"));
-    }
-
     @BeforeAll
     static void setUpBeforeAll() throws IOException {
         writeToFileWithText(FILE_1, TEXT_FILE_1);
@@ -57,18 +53,22 @@ public class PasteApplicationPublicTest {
         }
     }
 
-    @BeforeEach
-    void setUp() {
-        pasteApplication = new PasteApplication();
-        file1 = FILE_1.getAbsolutePath();
-        file2 = FILE_2.getAbsolutePath();
-    }
-
     @AfterAll
     static void tearDownAfterAll() {
         FILE_1.delete();
         FILE_2.delete();
         DIRECTORY.delete();
+    }
+
+    private void assertEqualsReplacingNewlines(String expected, String actual) {
+        assertEquals(expected.replaceAll("\r\n", "\n"), actual.replaceAll("\r\n", "\n"));
+    }
+
+    @BeforeEach
+    void setUp() {
+        pasteApplication = new PasteApplication();
+        file1 = FILE_1.getAbsolutePath();
+        file2 = FILE_2.getAbsolutePath();
     }
 
     @Test

@@ -5,7 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
+import static sg.edu.nus.comp.cs4218.testutils.TestStringUtils.STRING_NEWLINE;
+import static sg.edu.nus.comp.cs4218.testutils.TestStringUtils.removeTrailing;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -20,7 +21,6 @@ import org.junit.jupiter.api.io.TempDir;
 
 import sg.edu.nus.comp.cs4218.Environment;
 import sg.edu.nus.comp.cs4218.exception.RmException;
-import sg.edu.nus.comp.cs4218.impl.util.StringUtils;
 
 public class RmApplicationTest {
 
@@ -39,7 +39,7 @@ public class RmApplicationTest {
     @BeforeEach
     void setUp(@TempDir(cleanup = CleanupMode.ALWAYS) Path tempDir) throws IOException {
 
-        final String resourceDirectory = StringUtils.removeTrailing(TEST_RESOURCES, "/");
+        final String resourceDirectory = removeTrailing(TEST_RESOURCES, "/");
         testingDirectory = tempDir;
         app = new RmApplication();
 

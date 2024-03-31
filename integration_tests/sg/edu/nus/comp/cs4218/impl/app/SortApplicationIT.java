@@ -6,9 +6,9 @@ import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.joinStringsByNewline;
 import static sg.edu.nus.comp.cs4218.testutils.FileUtils.createNewFile;
+import static sg.edu.nus.comp.cs4218.testutils.TestStringUtils.STRING_NEWLINE;
+import static sg.edu.nus.comp.cs4218.testutils.TestStringUtils.joinStringsByNewline;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

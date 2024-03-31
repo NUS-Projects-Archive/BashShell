@@ -2,8 +2,8 @@ package sg.edu.nus.comp.cs4218.impl.app;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.joinStringsByNewline;
 import static sg.edu.nus.comp.cs4218.testutils.TestStringUtils.STRING_NEWLINE;
+import static sg.edu.nus.comp.cs4218.testutils.TestStringUtils.joinStringsByNewline;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -100,7 +100,8 @@ public class GrepApplicationPublicIT {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         Files.write(createFile("b.txt"), BYTES_A);
         grepApplication.run(toArgs("", "[th] l", "b.txt"), System.in, output);
-        assertArrayEquals(("First line" + STRING_NEWLINE + FOURTH_LINE + STRING_NEWLINE).getBytes(), output.toByteArray());
+        assertArrayEquals(("First line" + STRING_NEWLINE + FOURTH_LINE + STRING_NEWLINE).getBytes(),
+                output.toByteArray());
     }
 
     @Test

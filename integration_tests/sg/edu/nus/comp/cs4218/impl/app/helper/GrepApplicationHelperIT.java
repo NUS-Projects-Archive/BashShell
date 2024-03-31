@@ -10,9 +10,9 @@ import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_NOT_FOUND
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_INVALID_REGEX;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_PERM;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_FILE_SEP;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.joinStringsByNewline;
 import static sg.edu.nus.comp.cs4218.testutils.FileUtils.createNewFileInDir;
 import static sg.edu.nus.comp.cs4218.testutils.FileUtils.deleteFileOrDirectory;
+import static sg.edu.nus.comp.cs4218.testutils.TestStringUtils.joinStringsByNewline;
 
 import java.nio.file.Path;
 import java.util.StringJoiner;
@@ -101,7 +101,8 @@ class GrepApplicationHelperIT {
     void grepResultsFromFile_FileEndsWithFileSeparator_LineResultsReturnsExpectedOutput() {
         String expectedLR = String.join("", OUTPUT_CONTENTS);
         assertDoesNotThrow(() ->
-                grepResultsFromFiles(VALID_PAT_SMALL, false, lineResults, countResults, false, fileOneName + CHAR_FILE_SEP)
+                grepResultsFromFiles(VALID_PAT_SMALL, false, lineResults, countResults, false,
+                        fileOneName + CHAR_FILE_SEP)
         );
         assertEquals(expectedLR, lineResults.toString());
     }

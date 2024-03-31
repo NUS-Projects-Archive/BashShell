@@ -9,8 +9,6 @@ import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.fileSeparator;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.isBlank;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.isNumber;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.multiplyChar;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.removeTrailing;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.removeTrailingOnce;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.tokenize;
 
 import org.junit.jupiter.api.Test;
@@ -93,50 +91,5 @@ public class StringUtilsTest {
     @Test
     void isNumber_EmptyString_ReturnsFalse() {
         assertFalse(isNumber(""));
-    }
-
-    @Test
-    void removeTrailing_NullString_ReturnsString() {
-        assertNull(removeTrailing(null, null));
-    }
-
-    @Test
-    void removeTrailing_NullSequence_ReturnsString() {
-        assertEquals(STRING, removeTrailing(STRING, null));
-    }
-
-    @Test
-    void removeTrailing_SingleTrailing_ReturnsRemovedTrailingString() {
-        assertEquals(STRING, removeTrailing(SINGLE_TRAIL_STR, SEQUENCE));
-    }
-
-    @Test
-    void removeTrailing_MultipleTrailing_ReturnsRemovedTrailingString() {
-        assertEquals(STRING, removeTrailing(MULTI_TRAIL_STR, SEQUENCE));
-    }
-
-    @Test
-    void removeTrailingOnce_NullString_ReturnsString() {
-        assertNull(removeTrailingOnce(null, null));
-    }
-
-    @Test
-    void removeTrailingOnce_NullSequence_ReturnsString() {
-        assertEquals(STRING, removeTrailingOnce(STRING, null));
-    }
-
-    @Test
-    void removeTrailingOnce_SingleTrailing_ReturnsRemovedTrailingString() {
-        assertEquals(STRING, removeTrailingOnce(SINGLE_TRAIL_STR, SEQUENCE));
-    }
-
-    @Test
-    void removeTrailingOnce_MultipleTrailing_ReturnsRemovedOneTrailingString() {
-        assertEquals("stringstrstr", removeTrailingOnce(MULTI_TRAIL_STR, SEQUENCE));
-    }
-  
-    @Test // picked up from evosuite automatic test generation (StringUtils_ESTest test4)
-    public void removeTrailing_NullInput_ReturnsString() {
-        assertEquals("f-3-", removeTrailing("f-3-", null));
     }
 }

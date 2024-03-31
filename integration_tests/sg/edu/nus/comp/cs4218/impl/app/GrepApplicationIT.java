@@ -16,9 +16,9 @@ import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_SYNTAX;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_WRITE_STREAM;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_STDIN_OUT;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.joinStringsByNewline;
 import static sg.edu.nus.comp.cs4218.testutils.FileUtils.createNewFileInDir;
 import static sg.edu.nus.comp.cs4218.testutils.FileUtils.deleteFileOrDirectory;
+import static sg.edu.nus.comp.cs4218.testutils.TestStringUtils.joinStringsByNewline;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

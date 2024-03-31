@@ -6,10 +6,10 @@ import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_ISTREAM;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NULL_STREAMS;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_TAB;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.joinStringsByNewline;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.joinStringsByTab;
 import static sg.edu.nus.comp.cs4218.testutils.FileUtils.createNewFile;
 import static sg.edu.nus.comp.cs4218.testutils.TestStringUtils.STRING_NEWLINE;
+import static sg.edu.nus.comp.cs4218.testutils.TestStringUtils.joinStringsByNewline;
+import static sg.edu.nus.comp.cs4218.testutils.TestStringUtils.joinStringsByTab;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -46,13 +46,15 @@ public class PasteApplicationIT {
 
     @Test
     void run_NullStdin_ThrowsPasteException() {
-        PasteException result = assertThrowsExactly(PasteException.class, () -> app.run(new String[]{fileA}, null, System.out));
+        PasteException result = assertThrowsExactly(PasteException.class, () -> app.run(new String[]{fileA}, null,
+                System.out));
         assertEquals(PASTE_EX_MSG + ERR_NO_ISTREAM, result.getMessage());
     }
 
     @Test
     void run_NullStdout_ThrowsPasteException() {
-        PasteException result = assertThrowsExactly(PasteException.class, () -> app.run(new String[]{fileA}, System.in, null));
+        PasteException result = assertThrowsExactly(PasteException.class, () -> app.run(new String[]{fileA},
+                System.in, null));
         assertEquals(PASTE_EX_MSG + ERR_NULL_STREAMS, result.getMessage());
     }
 

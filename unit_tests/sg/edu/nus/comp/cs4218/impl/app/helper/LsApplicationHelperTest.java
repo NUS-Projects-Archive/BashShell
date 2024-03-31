@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 import static sg.edu.nus.comp.cs4218.impl.app.helper.LsApplicationHelper.formatContents;
 import static sg.edu.nus.comp.cs4218.impl.app.helper.LsApplicationHelper.resolvePaths;
 import static sg.edu.nus.comp.cs4218.testutils.FileUtils.createNewDirectory;
+import static sg.edu.nus.comp.cs4218.testutils.TestStringUtils.joinStringsByNewline;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -19,7 +20,6 @@ import org.junit.jupiter.api.io.TempDir;
 
 import sg.edu.nus.comp.cs4218.Environment;
 import sg.edu.nus.comp.cs4218.exception.InvalidDirectoryLsException;
-import sg.edu.nus.comp.cs4218.impl.util.StringUtils;
 
 // To give a meaningful variable name
 @SuppressWarnings("PMD.LongVariable")
@@ -76,7 +76,7 @@ class LsApplicationHelperTest {
                 .map(Paths::get)
                 .collect(Collectors.toList());
         String result = formatContents(contents, true);
-        String expected = StringUtils.joinStringsByNewline(STRING_Z, STRING_ZA, STRING_AZ);
+        String expected = joinStringsByNewline(STRING_Z, STRING_ZA, STRING_AZ);
         assertEquals(expected, result);
     }
 
@@ -86,7 +86,7 @@ class LsApplicationHelperTest {
                 .map(Paths::get)
                 .collect(Collectors.toList());
         String result = formatContents(contents, false);
-        String expected = StringUtils.joinStringsByNewline(STRING_AZ, STRING_Z, STRING_ZA);
+        String expected = joinStringsByNewline(STRING_AZ, STRING_Z, STRING_ZA);
         assertEquals(expected, result);
     }
 
@@ -117,7 +117,8 @@ class LsApplicationHelperTest {
 
     @Test
     void resolvePaths_DirectoryStartsWithDriveLetter_ReturnsListOfPath() {
-        // dirAPath.toString() will return the absolute path, including the drive letter (e.g., "C:"), which is OS dependent
+        // dirAPath.toString() will return the absolute path, including the drive letter (e.g., "C:"), which is OS
+        // dependent
         List<Path> result = assertDoesNotThrow(() -> resolvePaths(dirAPath.toString()));
         List<Path> expected = List.of(dirAPath);
         assertEquals(expected, result);
