@@ -9,8 +9,8 @@ import static sg.edu.nus.comp.cs4218.impl.app.helper.LsApplicationHelper.listCwd
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_FILE_SEP;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.joinStringsByNewline;
-import static sg.edu.nus.comp.cs4218.test.FileUtils.createNewDirectory;
-import static sg.edu.nus.comp.cs4218.test.FileUtils.deleteFileOrDirectory;
+import static sg.edu.nus.comp.cs4218.testutils.FileUtils.createNewDirectory;
+import static sg.edu.nus.comp.cs4218.testutils.FileUtils.deleteFileOrDirectory;
 
 import java.nio.file.Files;
 import java.nio.file.Path;

@@ -17,7 +17,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import sg.edu.nus.comp.cs4218.exception.UniqException;
-import sg.edu.nus.comp.cs4218.test.AssertUtils;
+import sg.edu.nus.comp.cs4218.testutils.AssertUtils;
 
 class UniqApplicationTest {
 

@@ -6,9 +6,9 @@ import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static sg.edu.nus.comp.cs4218.impl.app.helper.TeeApplicationHelper.createEmptyFile;
 import static sg.edu.nus.comp.cs4218.impl.app.helper.TeeApplicationHelper.writeToFile;
-import static sg.edu.nus.comp.cs4218.test.AssertUtils.assertFileDoNotExists;
-import static sg.edu.nus.comp.cs4218.test.AssertUtils.assertFileExists;
-import static sg.edu.nus.comp.cs4218.test.FileUtils.createNewFile;
+import static sg.edu.nus.comp.cs4218.testutils.AssertUtils.assertFileDoNotExists;
+import static sg.edu.nus.comp.cs4218.testutils.AssertUtils.assertFileExists;
+import static sg.edu.nus.comp.cs4218.testutils.FileUtils.createNewFile;
 import static sg.edu.nus.comp.cs4218.testutils.TestStringUtils.STRING_NEWLINE;
 
 import java.nio.file.Files;

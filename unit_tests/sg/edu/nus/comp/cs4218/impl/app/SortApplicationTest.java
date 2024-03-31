@@ -5,8 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.joinStringsByNewline;
-import static sg.edu.nus.comp.cs4218.test.FileUtils.createNewDirectory;
-import static sg.edu.nus.comp.cs4218.test.FileUtils.createNewFile;
+import static sg.edu.nus.comp.cs4218.testutils.FileUtils.createNewDirectory;
+import static sg.edu.nus.comp.cs4218.testutils.FileUtils.createNewFile;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;

@@ -13,7 +13,7 @@ import static org.mockito.Mockito.spy;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_EXISTS;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_SYNTAX;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
-import static sg.edu.nus.comp.cs4218.test.AssertUtils.assertEmptyString;
+import static sg.edu.nus.comp.cs4218.testutils.AssertUtils.assertEmptyString;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

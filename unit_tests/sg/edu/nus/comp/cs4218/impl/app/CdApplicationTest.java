@@ -7,8 +7,8 @@ import static org.junit.jupiter.api.Assertions.fail;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_FILE_NOT_FOUND;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_IS_NOT_DIR;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_PERM;
-import static sg.edu.nus.comp.cs4218.test.FileUtils.createNewDirectory;
-import static sg.edu.nus.comp.cs4218.test.FileUtils.deleteFileOrDirectory;
+import static sg.edu.nus.comp.cs4218.testutils.FileUtils.createNewDirectory;
+import static sg.edu.nus.comp.cs4218.testutils.FileUtils.deleteFileOrDirectory;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_FILE_SEP;
 
 import java.nio.file.Files;

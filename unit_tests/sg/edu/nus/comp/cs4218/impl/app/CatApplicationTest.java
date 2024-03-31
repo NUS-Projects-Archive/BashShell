@@ -8,9 +8,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
-import static sg.edu.nus.comp.cs4218.test.AssertUtils.assertEmptyString;
-import static sg.edu.nus.comp.cs4218.test.FileUtils.createNewDirectory;
-import static sg.edu.nus.comp.cs4218.test.FileUtils.createNewFile;
+import static sg.edu.nus.comp.cs4218.testutils.AssertUtils.assertEmptyString;
+import static sg.edu.nus.comp.cs4218.testutils.FileUtils.createNewDirectory;
+import static sg.edu.nus.comp.cs4218.testutils.FileUtils.createNewFile;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;

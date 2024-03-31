@@ -11,8 +11,8 @@ import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_INVALID_REGEX;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NO_PERM;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_FILE_SEP;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.joinStringsByNewline;
-import static sg.edu.nus.comp.cs4218.test.FileUtils.createNewFileInDir;
-import static sg.edu.nus.comp.cs4218.test.FileUtils.deleteFileOrDirectory;
+import static sg.edu.nus.comp.cs4218.testutils.FileUtils.createNewFileInDir;
+import static sg.edu.nus.comp.cs4218.testutils.FileUtils.deleteFileOrDirectory;
 
 import java.nio.file.Path;
 import java.util.StringJoiner;

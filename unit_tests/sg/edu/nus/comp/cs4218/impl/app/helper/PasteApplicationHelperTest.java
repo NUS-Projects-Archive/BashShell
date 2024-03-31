@@ -11,8 +11,8 @@ import static sg.edu.nus.comp.cs4218.impl.app.helper.PasteApplicationHelper.merg
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.joinStringsByNewline;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.joinStringsByTab;
-import static sg.edu.nus.comp.cs4218.test.AssertUtils.assertEmptyString;
-import static sg.edu.nus.comp.cs4218.test.FileUtils.createNewFile;
+import static sg.edu.nus.comp.cs4218.testutils.AssertUtils.assertEmptyString;
+import static sg.edu.nus.comp.cs4218.testutils.FileUtils.createNewFile;
 
 import java.nio.file.Path;
 import java.util.ArrayList;

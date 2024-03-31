@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 import static sg.edu.nus.comp.cs4218.impl.app.helper.LsApplicationHelper.formatContents;
 import static sg.edu.nus.comp.cs4218.impl.app.helper.LsApplicationHelper.resolvePaths;
-import static sg.edu.nus.comp.cs4218.test.FileUtils.createNewDirectory;
+import static sg.edu.nus.comp.cs4218.testutils.FileUtils.createNewDirectory;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;

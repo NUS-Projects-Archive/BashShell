@@ -3,7 +3,7 @@ package sg.edu.nus.comp.cs4218.impl.app;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
-import static sg.edu.nus.comp.cs4218.test.AssertUtils.assertFileExists;
+import static sg.edu.nus.comp.cs4218.testutils.AssertUtils.assertFileExists;
 
 import java.io.IOException;
 import java.nio.file.Files;

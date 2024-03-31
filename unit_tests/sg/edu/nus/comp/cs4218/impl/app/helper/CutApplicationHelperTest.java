@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 import static sg.edu.nus.comp.cs4218.impl.app.helper.CutApplicationHelper.cutSelectedPortions;
-import static sg.edu.nus.comp.cs4218.test.AssertUtils.assertSameList;
+import static sg.edu.nus.comp.cs4218.testutils.AssertUtils.assertSameList;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 
 import java.io.ByteArrayInputStream;
