@@ -10,7 +10,7 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static sg.edu.nus.comp.cs4218.impl.app.helper.WcApplicationHelper.formatCount;
 import static sg.edu.nus.comp.cs4218.impl.app.helper.WcApplicationHelper.getCountReport;
-import static sg.edu.nus.comp.cs4218.test.AssertUtils.assertEmptyString;
+import static sg.edu.nus.comp.cs4218.testutils.AssertUtils.assertEmptyString;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;

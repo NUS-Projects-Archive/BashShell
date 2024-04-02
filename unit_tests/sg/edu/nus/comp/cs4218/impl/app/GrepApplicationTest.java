@@ -7,10 +7,10 @@ import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_EMPTY_PATTERN;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_INVALID_REGEX;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NULL_STREAMS;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.joinStringsByNewline;
-import static sg.edu.nus.comp.cs4218.test.FileUtils.createNewFile;
-import static sg.edu.nus.comp.cs4218.test.FileUtils.createNewFileInDir;
-import static sg.edu.nus.comp.cs4218.test.FileUtils.deleteFileOrDirectory;
+import static sg.edu.nus.comp.cs4218.testutils.FileUtils.createNewFile;
+import static sg.edu.nus.comp.cs4218.testutils.FileUtils.createNewFileInDir;
+import static sg.edu.nus.comp.cs4218.testutils.FileUtils.deleteFileOrDirectory;
+import static sg.edu.nus.comp.cs4218.testutils.TestStringUtils.joinStringsByNewline;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;

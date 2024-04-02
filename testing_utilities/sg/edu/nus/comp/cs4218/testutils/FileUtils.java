@@ -1,4 +1,4 @@
-package sg.edu.nus.comp.cs4218.test;
+package sg.edu.nus.comp.cs4218.testutils;
 
 import java.io.IOException;
 import java.nio.file.Files;

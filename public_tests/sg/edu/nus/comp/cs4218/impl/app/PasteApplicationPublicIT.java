@@ -4,24 +4,22 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 import static sg.edu.nus.comp.cs4218.impl.util.CollectionsUtils.listToArray;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_TAB;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.joinStringsByNewline;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.joinStringsByTab;
 import static sg.edu.nus.comp.cs4218.testutils.TestStringUtils.CHAR_FILE_SEP;
 import static sg.edu.nus.comp.cs4218.testutils.TestStringUtils.STRING_NEWLINE;
+import static sg.edu.nus.comp.cs4218.testutils.TestStringUtils.STRING_TAB;
+import static sg.edu.nus.comp.cs4218.testutils.TestStringUtils.joinStringsByNewline;
+import static sg.edu.nus.comp.cs4218.testutils.TestStringUtils.joinStringsByTab;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Deque;
 import java.util.List;
 
@@ -41,6 +39,7 @@ public class PasteApplicationPublicIT {
     private static final String LINE_1 = "Test line 1";
     private static final String LINE_2 = "Test line 2";
     private static final String LINE_3 = "Test line 3";
+    public static final String L1_TO_L3_TAB = joinStringsByTab(LINE_1, LINE_2, LINE_3);
     private static final String LINE_1_DOT_1 = "Test line 1.1";
     private static final String LINE_1_DOT_2 = "Test line 1.2";
     private static final String LINE_1_DOT_3 = "Test line 1.3";
@@ -49,7 +48,6 @@ public class PasteApplicationPublicIT {
     private static final String L1_TO_L3 = joinStringsByNewline(LINE_1, LINE_2, LINE_3);
     private static final String L11_TO_L13 = joinStringsByNewline(LINE_1_DOT_1, LINE_1_DOT_2, LINE_1_DOT_3);
     private static final String L21_TO_L22 = joinStringsByNewline(LINE_2_DOT_1, LINE_2_DOT_2);
-    public static final String L1_TO_L3_TAB = joinStringsByTab(LINE_1, LINE_2, LINE_3);
     private static final String ERR_NO_SUCH_FILE = "paste: '%s': No such file or directory";
     private static final Deque<Path> FILES = new ArrayDeque<>();
     private static Path tempPath;
@@ -57,12 +55,6 @@ public class PasteApplicationPublicIT {
 
     private PasteApplication pasteApplication;
     private ByteArrayOutputStream output;
-
-    @BeforeEach
-    void setUp() {
-        pasteApplication = new PasteApplication();
-        output = new ByteArrayOutputStream();
-    }
 
     @BeforeAll
     static void createTemp() throws NoSuchFieldException, IllegalAccessException, IOException {
@@ -79,6 +71,12 @@ public class PasteApplicationPublicIT {
         }
         Files.deleteIfExists(dirPath);
         Files.deleteIfExists(tempPath);
+    }
+
+    @BeforeEach
+    void setUp() {
+        pasteApplication = new PasteApplication();
+        output = new ByteArrayOutputStream();
     }
 
     private void createFile(String name, String text) throws IOException {

@@ -3,9 +3,9 @@ package sg.edu.nus.comp.cs4218.impl.app;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.joinStringsByNewline;
 import static sg.edu.nus.comp.cs4218.testutils.TestStringUtils.CHAR_FILE_SEP;
 import static sg.edu.nus.comp.cs4218.testutils.TestStringUtils.STRING_NEWLINE;
+import static sg.edu.nus.comp.cs4218.testutils.TestStringUtils.joinStringsByNewline;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -36,7 +36,8 @@ public class CatApplicationPublicIT {
     private static final String DIR = "dir";
     private static final String ERR_IS_DIR = String.format("cat: '%s': Is a directory", DIR);
     private static final String NON_EXIST_FILE = "nonExistFile.txt";
-    private static final String ERR_NO_SUCH_FILE = String.format("cat: '%s': No such file or directory", NON_EXIST_FILE);
+    private static final String ERR_NO_SUCH_FILE = String.format("cat: '%s': No such file or directory",
+            NON_EXIST_FILE);
     private static final String LINE_1 = "Test line 1";
     private static final String LINE_2 = "Test line 2";
     private static final String LINE_3 = "Test line 3";
@@ -49,20 +50,17 @@ public class CatApplicationPublicIT {
     private static final String LINE_2_DOT_1 = "Test line 2.1";
     private static final String LINE_2_DOT_2 = "Test line 2.2";
     private static final String L1_TO_L3 = joinStringsByNewline(LINE_1, LINE_2, LINE_3);
-    private static final String NUMBERED_L1_TO_L3 = joinStringsByNewline(NUMBERED_LINE_1, NUMBERED_LINE_2, NUMBERED_LINE_3);
+    private static final String NUMBERED_L1_TO_L3 = joinStringsByNewline(NUMBERED_LINE_1, NUMBERED_LINE_2,
+            NUMBERED_LINE_3);
     private static final String L11_TO_L13 = joinStringsByNewline(LINE_1_DOT_1, LINE_1_DOT_2, LINE_1_DOT_3);
     private static final String L21_TO_L22 = joinStringsByNewline(LINE_2_DOT_1, LINE_2_DOT_2);
-    private static final String L11_TO_L22 = joinStringsByNewline(LINE_1_DOT_1, LINE_1_DOT_2, LINE_1_DOT_3, LINE_2_DOT_1, LINE_2_DOT_2);
+    private static final String L11_TO_L22 = joinStringsByNewline(LINE_1_DOT_1, LINE_1_DOT_2, LINE_1_DOT_3,
+            LINE_2_DOT_1, LINE_2_DOT_2);
     private static final Deque<Path> FILES = new ArrayDeque<>();
     private static Path tempPath;
     private static Path dirPath;
 
     private CatApplication catApplication;
-
-    @BeforeEach
-    void setUp() {
-        catApplication = new CatApplication();
-    }
 
     @BeforeAll
     static void createTemp() throws IOException, NoSuchFieldException, IllegalAccessException {
@@ -80,6 +78,11 @@ public class CatApplicationPublicIT {
         }
         Files.deleteIfExists(dirPath);
         Files.delete(tempPath);
+    }
+
+    @BeforeEach
+    void setUp() {
+        catApplication = new CatApplication();
     }
 
     private void createFile(String name, String text) throws IOException {
@@ -234,7 +237,8 @@ public class CatApplicationPublicIT {
         String fileName1 = "fileH.txt";
         String fileName2 = "fileI.txt";
         String expectedText =
-                joinStringsByNewline("1 Test line 1.1", "2 Test line 1.2", "3 Test line 1.3", "1 Test line 2.1", "2 Test line 2.2");
+                joinStringsByNewline("1 Test line 1.1", "2 Test line 1.2", "3 Test line 1.3", "1 Test line 2.1", "2 " +
+                        "Test line 2.2");
         assertDoesNotThrow(() -> createFile(fileName1, L11_TO_L13));
         assertDoesNotThrow(() -> createFile(fileName2, L21_TO_L22));
         assertDoesNotThrow(() -> catApplication.run(toArgs("n", fileName1, fileName2), System.in, output));

@@ -5,11 +5,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_TAB;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.joinStringsByNewline;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.joinStringsByTab;
-import static sg.edu.nus.comp.cs4218.test.FileUtils.createNewFile;
+import static sg.edu.nus.comp.cs4218.testutils.FileUtils.createNewFile;
 import static sg.edu.nus.comp.cs4218.testutils.TestStringUtils.STRING_NEWLINE;
+import static sg.edu.nus.comp.cs4218.testutils.TestStringUtils.STRING_TAB;
+import static sg.edu.nus.comp.cs4218.testutils.TestStringUtils.joinStringsByNewline;
+import static sg.edu.nus.comp.cs4218.testutils.TestStringUtils.joinStringsByTab;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -67,7 +67,8 @@ public class PasteApplicationTest {
     }
 
     @Test
-    void mergeStdin_IOExceptionWhenReadingStdin_ThrowsPasteException() { // inspired by evosuite automatic test generation (PasteApplication_ESTest test07)
+    void mergeStdin_IOExceptionWhenReadingStdin_ThrowsPasteException() { // inspired by evosuite automatic test
+        // generation (PasteApplication_ESTest test07)
         PasteException result = assertThrowsExactly(PasteException.class, () -> {
             InputStream mockInputStream = mock(InputStream.class);
             when(mockInputStream.read()).thenThrow(new IOException());
@@ -101,7 +102,8 @@ public class PasteApplicationTest {
     }
 
     @Test
-    void mergeFileAndStdin_IOExceptionWhenReadingStdin_ThrowsPasteException() { // inspired by evosuite automatic test generation (PasteApplication_ESTest test07)
+    void mergeFileAndStdin_IOExceptionWhenReadingStdin_ThrowsPasteException() { // inspired by evosuite automatic
+        // test generation (PasteApplication_ESTest test07)
         PasteException result = assertThrowsExactly(PasteException.class, () -> {
             InputStream mockInputStream = mock(InputStream.class);
             when(mockInputStream.read()).thenThrow(new IOException());
@@ -138,7 +140,8 @@ public class PasteApplicationTest {
     @Test
     void mergeFileAndStdin_NonExistentFileAndStdin_ThrowsFileNotFoundException() {
         try (InputStream inputStream = IOUtils.openInputStream(fileA)) {
-            assertThrowsExactly(PasteException.class, () -> app.mergeFileAndStdin(false, inputStream, NON_EXISTENT_FILE));
+            assertThrowsExactly(PasteException.class, () -> app.mergeFileAndStdin(false, inputStream,
+                    NON_EXISTENT_FILE));
         } catch (IOException | ShellException e) {
             e.printStackTrace();
         }

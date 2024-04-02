@@ -2,7 +2,7 @@ package sg.edu.nus.comp.cs4218.impl;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.io.CleanupMode.ALWAYS;
-import static sg.edu.nus.comp.cs4218.test.FileUtils.createNewFileInDir;
+import static sg.edu.nus.comp.cs4218.testutils.FileUtils.createNewFileInDir;
 
 import java.nio.file.Path;
 

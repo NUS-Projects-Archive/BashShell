@@ -6,8 +6,8 @@ import static com.github.stefanbirkner.systemlambda.SystemLambda.tapSystemOutNor
 import static com.github.stefanbirkner.systemlambda.SystemLambda.withTextFromSystemIn;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.io.CleanupMode.ALWAYS;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.removeTrailingOnce;
 import static sg.edu.nus.comp.cs4218.testutils.TestStringUtils.CHAR_FILE_SEP;
+import static sg.edu.nus.comp.cs4218.testutils.TestStringUtils.removeTrailingOnce;
 
 import java.nio.file.Path;
 import java.util.function.Predicate;

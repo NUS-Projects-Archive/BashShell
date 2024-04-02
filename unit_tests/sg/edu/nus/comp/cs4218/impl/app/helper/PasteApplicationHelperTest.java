@@ -8,11 +8,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static sg.edu.nus.comp.cs4218.impl.app.helper.PasteApplicationHelper.checkPasteFileValidity;
 import static sg.edu.nus.comp.cs4218.impl.app.helper.PasteApplicationHelper.mergeInParallel;
 import static sg.edu.nus.comp.cs4218.impl.app.helper.PasteApplicationHelper.mergeInSerial;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.joinStringsByNewline;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.joinStringsByTab;
-import static sg.edu.nus.comp.cs4218.test.AssertUtils.assertEmptyString;
-import static sg.edu.nus.comp.cs4218.test.FileUtils.createNewFile;
+import static sg.edu.nus.comp.cs4218.testutils.AssertUtils.assertEmptyString;
+import static sg.edu.nus.comp.cs4218.testutils.FileUtils.createNewFile;
+import static sg.edu.nus.comp.cs4218.testutils.TestStringUtils.STRING_NEWLINE;
+import static sg.edu.nus.comp.cs4218.testutils.TestStringUtils.joinStringsByNewline;
+import static sg.edu.nus.comp.cs4218.testutils.TestStringUtils.joinStringsByTab;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -114,7 +114,8 @@ class PasteApplicationHelperTest {
         Path filePath = createNewFile("file.txt", "file content");
         boolean isSetReadable = filePath.toFile().setReadable(false);
         assertTrue(isSetReadable, "Failed to set read permission to false for test source file");
-        PasteException result = assertThrowsExactly(PasteException.class, () -> checkPasteFileValidity(filePath.toString()));
+        PasteException result = assertThrowsExactly(PasteException.class,
+                () -> checkPasteFileValidity(filePath.toString()));
         String expected = String.format("paste: '%s': Could not read file", filePath.toFile().getName());
         assertEquals(expected, result.getMessage());
     }

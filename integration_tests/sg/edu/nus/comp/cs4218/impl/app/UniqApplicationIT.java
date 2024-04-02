@@ -2,12 +2,14 @@ package sg.edu.nus.comp.cs4218.impl.app;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
+import static org.mockito.Mockito.mock;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -45,7 +47,7 @@ public class UniqApplicationIT {
         final String[] args = {TEST_INPUT_FILE};
 
         // Then
-        assertDoesNotThrow(() -> app.run(args, null, outputStream));
+        assertDoesNotThrow(() -> app.run(args, mock(InputStream.class), outputStream));
 
         // Then
         final String expected = STR_HELLO_WORLD + STRING_NEWLINE +
@@ -62,7 +64,7 @@ public class UniqApplicationIT {
         final String[] args = {"-c", TEST_INPUT_FILE};
 
         // Then
-        assertDoesNotThrow(() -> app.run(args, null, outputStream));
+        assertDoesNotThrow(() -> app.run(args, mock(InputStream.class), outputStream));
 
         // Then
         final String expected = "2 Hello World" + STRING_NEWLINE +
@@ -79,7 +81,7 @@ public class UniqApplicationIT {
         final String[] args = {"-d", TEST_INPUT_FILE};
 
         // When
-        assertDoesNotThrow(() -> app.run(args, null, outputStream));
+        assertDoesNotThrow(() -> app.run(args, mock(InputStream.class), outputStream));
 
         // Then
         final String expected = STR_HELLO_WORLD + STRING_NEWLINE +
@@ -93,7 +95,7 @@ public class UniqApplicationIT {
         final String[] args = {"-D", TEST_INPUT_FILE};
 
         // When
-        assertDoesNotThrow(() -> app.run(args, null, outputStream));
+        assertDoesNotThrow(() -> app.run(args, mock(InputStream.class), outputStream));
 
         // Then
         final String expected = STR_HELLO_WORLD + STRING_NEWLINE +
@@ -110,7 +112,7 @@ public class UniqApplicationIT {
         final String[] args = {"-dD", TEST_INPUT_FILE};
 
         // When
-        assertDoesNotThrow(() -> app.run(args, null, outputStream));
+        assertDoesNotThrow(() -> app.run(args, mock(InputStream.class), outputStream));
 
         // Then
         final String expected = STR_HELLO_WORLD + STRING_NEWLINE +
@@ -127,7 +129,7 @@ public class UniqApplicationIT {
         final String expected = "2 Hello World" + STRING_NEWLINE +
                 "2 Alice" + STRING_NEWLINE;
 
-        assertDoesNotThrow(() -> app.run(args, null, outputStream)); // When
+        assertDoesNotThrow(() -> app.run(args, mock(InputStream.class), outputStream)); // When
         assertEquals(expected, outputStream.toString()); // Then
     }
 
@@ -137,7 +139,9 @@ public class UniqApplicationIT {
         final String[] args = {"-cD", TEST_INPUT_FILE};
 
         // When
-        UniqException result = assertThrowsExactly(UniqException.class, () -> app.run(args, null, null));
+        UniqException result = assertThrowsExactly(UniqException.class, () ->
+                app.run(args, mock(InputStream.class), mock(OutputStream.class))
+        );
 
         // Then
         final String expected = "uniq: printing all duplicated lines and repeat counts is meaningless";

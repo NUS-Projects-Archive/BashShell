@@ -8,9 +8,9 @@ import static sg.edu.nus.comp.cs4218.impl.app.helper.LsApplicationHelper.buildRe
 import static sg.edu.nus.comp.cs4218.impl.app.helper.LsApplicationHelper.listCwdContent;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_FILE_SEP;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
-import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.joinStringsByNewline;
-import static sg.edu.nus.comp.cs4218.test.FileUtils.createNewDirectory;
-import static sg.edu.nus.comp.cs4218.test.FileUtils.deleteFileOrDirectory;
+import static sg.edu.nus.comp.cs4218.testutils.FileUtils.createNewDirectory;
+import static sg.edu.nus.comp.cs4218.testutils.FileUtils.deleteFileOrDirectory;
+import static sg.edu.nus.comp.cs4218.testutils.TestStringUtils.joinStringsByNewline;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -41,19 +41,17 @@ class LsApplicationHelperIT {
 
     private static final String[] CWD_NON_DIRS = {STRING_AZ, STRING_ZA, STRING_Z};
     private static final String[] CWD_DIRS = {DIR_A_NAME};
-    private static final String[] DIR_A_NON_DIRS = {"0"};
-
     private static final String UNSORTED_CWD_CONTENTS = joinStringsByNewline(getCwdContents());
     private static final String UNSORTED_CWD_CONTENTS_WITH_HEADER = joinStringsByNewline(".:",
             UNSORTED_CWD_CONTENTS);
+    private static final String[] DIR_A_NON_DIRS = {"0"};
     private static final String UNSORTED_DIR_A_CONTENTS_WITH_HEADER = joinStringsByNewline(
             String.format(".%s%s:", CHAR_FILE_SEP, DIR_A_NAME), getDirAContents());
+    private static final String SORTED_DIR_A_CONTENTS_WITH_HEADER = UNSORTED_DIR_A_CONTENTS_WITH_HEADER;
     private static final String SORTED_CWD_CONTENTS_STRING = joinStringsByNewline("dirA", STRING_Z,
             STRING_ZA, STRING_AZ);
     private static final String SORTED_CWD_CONTENTS_STRING_WITH_HEADER = joinStringsByNewline(".:",
             SORTED_CWD_CONTENTS_STRING);
-    private static final String SORTED_DIR_A_CONTENTS_WITH_HEADER = UNSORTED_DIR_A_CONTENTS_WITH_HEADER;
-
     // Main temporary dir
     @TempDir
     private Path cwdPath;

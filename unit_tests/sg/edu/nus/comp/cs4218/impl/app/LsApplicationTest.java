@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_CURR_DIR;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
+import static sg.edu.nus.comp.cs4218.testutils.TestStringUtils.joinStringsByNewline;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -21,7 +22,6 @@ import org.junit.jupiter.api.condition.OS;
 import org.junit.jupiter.api.io.TempDir;
 
 import sg.edu.nus.comp.cs4218.Environment;
-import sg.edu.nus.comp.cs4218.impl.util.StringUtils;
 
 // To give a meaningful variable name
 @SuppressWarnings("PMD.LongVariable")
@@ -44,13 +44,13 @@ class LsApplicationTest {
         String[] fileList = Stream.concat(Arrays.stream(CWD_NON_DIRS), Arrays.stream(CWD_DIRS))
                 .sorted()
                 .toArray(String[]::new);
-        return StringUtils.joinStringsByNewline(fileList);
+        return joinStringsByNewline(fileList);
     }
 
     private static String getDirAContents() {
         String[] fileList = Arrays.copyOf(DIR_A_NON_DIRS, DIR_A_NON_DIRS.length);
         Arrays.sort(fileList);
-        return StringUtils.joinStringsByNewline(fileList);
+        return joinStringsByNewline(fileList);
     }
 
     /**
@@ -89,8 +89,8 @@ class LsApplicationTest {
     }
 
     private String getCwdContentsRecursively(String slash) {
-        return StringUtils.joinStringsByNewline(".:", getCwdContents()) + STRING_NEWLINE + STRING_NEWLINE +
-                StringUtils.joinStringsByNewline(STRING_CURR_DIR + slash + DIR_A_NAME + ":", getDirAContents());
+        return joinStringsByNewline(".:", getCwdContents()) + STRING_NEWLINE + STRING_NEWLINE +
+                joinStringsByNewline(STRING_CURR_DIR + slash + DIR_A_NAME + ":", getDirAContents());
     }
 
     /**
@@ -102,7 +102,8 @@ class LsApplicationTest {
     }
 
     /**
-     * Tests listFolderContent return current working directory contents in String format when no -X and dir name is specified.
+     * Tests listFolderContent return current working directory contents in String format when no -X and dir name is
+     * specified.
      */
     @Test
     void listFolderContent_NoDirNameSpecifiedAndNotRecursive_ReturnsCwdContent() {
@@ -117,7 +118,7 @@ class LsApplicationTest {
     @Test
     void listFolderContent_OneValidDirNameSpecified_ReturnsDirContent() {
         String actual = assertDoesNotThrow(() -> app.listFolderContent(false, false, DIR_A_NAME));
-        String expected = StringUtils.joinStringsByNewline(DIR_A_NAME + ":", getDirAContents());
+        String expected = joinStringsByNewline(DIR_A_NAME + ":", getDirAContents());
         assertEquals(expected, actual);
     }
 
@@ -133,8 +134,8 @@ class LsApplicationTest {
     @Test
     void listFolderContent_MoreThanOneValidFileNameSpecified_ReturnsFileName() {
         String actual = assertDoesNotThrow(() -> app.listFolderContent(false, false, DIR_A_NAME, CWD_NON_DIRS[0]));
-        String dirA = StringUtils.joinStringsByNewline(DIR_A_NAME + ":", getDirAContents());
-        String expected = CWD_NON_DIRS[0] + STRING_NEWLINE + STRING_NEWLINE +  dirA;
+        String dirA = joinStringsByNewline(DIR_A_NAME + ":", getDirAContents());
+        String expected = CWD_NON_DIRS[0] + STRING_NEWLINE + STRING_NEWLINE + dirA;
         assertEquals(expected, actual);
     }
 

@@ -13,9 +13,10 @@ import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_NULL_ARGS;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_WRITE_STREAM;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.CHAR_FILE_SEP;
 import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_NEWLINE;
-import static sg.edu.nus.comp.cs4218.test.FileUtils.createNewDirectory;
-import static sg.edu.nus.comp.cs4218.test.FileUtils.createNewFile;
-import static sg.edu.nus.comp.cs4218.test.FileUtils.deleteFileOrDirectory;
+import static sg.edu.nus.comp.cs4218.testutils.FileUtils.createNewDirectory;
+import static sg.edu.nus.comp.cs4218.testutils.FileUtils.createNewFile;
+import static sg.edu.nus.comp.cs4218.testutils.FileUtils.deleteFileOrDirectory;
+import static sg.edu.nus.comp.cs4218.testutils.TestStringUtils.joinStringsByNewline;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -44,7 +45,6 @@ import org.mockito.Mockito;
 import sg.edu.nus.comp.cs4218.Environment;
 import sg.edu.nus.comp.cs4218.exception.InvalidDirectoryLsException;
 import sg.edu.nus.comp.cs4218.exception.LsException;
-import sg.edu.nus.comp.cs4218.impl.util.StringUtils;
 
 @SuppressWarnings("PMD.ClassNamingConventions")
 class LsApplicationIT {
@@ -68,19 +68,19 @@ class LsApplicationIT {
         String[] fileList = Stream.concat(Arrays.stream(CWD_NON_DIRS), Arrays.stream(CWD_DIRS))
                 .sorted()
                 .toArray(String[]::new);
-        return StringUtils.joinStringsByNewline(fileList);
+        return joinStringsByNewline(fileList);
     }
 
     private static String getDirAContents() {
-        return StringUtils.joinStringsByNewline(DIR_A_NON_DIRS);
+        return joinStringsByNewline(DIR_A_NON_DIRS);
     }
 
     /**
      * Provides valid arguments and expected output for run_ValidArgs_PrintsCorrectDirectoryContents.
      */
     static Stream<Arguments> validArgs() {
-        String listCwdContents = StringUtils.joinStringsByNewline(".:", getCwdContents()) + STRING_NEWLINE;
-        String listDirAContents = DIR_A_NAME + StringUtils.joinStringsByNewline(":", getDirAContents()) + STRING_NEWLINE;
+        String listCwdContents = joinStringsByNewline(".:", getCwdContents()) + STRING_NEWLINE;
+        String listDirAContents = DIR_A_NAME + joinStringsByNewline(":", getDirAContents()) + STRING_NEWLINE;
         return Stream.of(
                 // Relative paths
                 Arguments.of(new String[]{"."}, listCwdContents),
