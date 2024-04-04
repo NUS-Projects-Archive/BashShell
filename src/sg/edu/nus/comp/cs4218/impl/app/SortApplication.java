@@ -187,16 +187,18 @@ public class SortApplication implements SortInterface {
                     } else {
                         result = chunk1.compareTo(chunk2);
                     }
-                    if (result == 0) {
-                        return temp1.substring(chunk1.length()).compareTo(temp2.substring(chunk2.length()));
+                    if (result != 0) {
+                        return result;
                     }
-                } else {
-                    result = temp1.compareTo(temp2);
+                    return temp1.substring(chunk1.length()).compareTo(temp2.substring(chunk2.length()));
                 }
 
-                return isReverseOrder ? -result : result;
+                return temp1.compareTo(temp2);
             }
         });
+        if (isReverseOrder) {
+            Collections.reverse(input); // Apply reverse order here after sorting
+        }
     }
 
     /**
