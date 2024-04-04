@@ -26,6 +26,7 @@ import sg.edu.nus.comp.cs4218.exception.ShellException;
 class ArgumentResolverTest {
 
     private static final String STRING_ECHO = "echo";
+    private static final String STRING_HELLO = "hello";
     private static final Map<String, List<String>> VALID_QUOTES = new HashMap<>() {{
         put("'\"'", List.of("\""));                     // '"'
         put("'\"\"'", List.of("\"\""));                 // '""'
@@ -150,5 +151,29 @@ class ArgumentResolverTest {
     void resolveArguments_CommandSubstitutionContainsNewline_ThrowsShellException() {
         List<String> argList = List.of(STRING_ECHO, "`echo hello" + System.lineSeparator() + "`");
         assertThrows(ShellException.class, () -> argumentResolver.parseArguments(argList));
+    }
+
+    @Test
+    void removeTrailingLineSeparator_NoLineSeparatorsInInputString_NoChanges() {
+        String result = assertDoesNotThrow(() -> argumentResolver.removeTrailingLineSeparator(STRING_HELLO));
+        assertEquals(STRING_HELLO, result);
+    }
+
+    @Test
+    void removeTrailingLineSeparator_OneTrailingNewLineInInputString_TrailingNewLineRemoved() {
+        String result = assertDoesNotThrow(() -> argumentResolver.removeTrailingLineSeparator(STRING_HELLO + System.lineSeparator()));
+        assertEquals(STRING_HELLO, result);
+    }
+
+    @Test
+    void removeTrailingLineSeparator_MultipleTrailingNewLinesInInputString_TrailingNewLinesRemoved() {
+        String result = assertDoesNotThrow(() -> argumentResolver.removeTrailingLineSeparator(STRING_HELLO + System.lineSeparator() + System.lineSeparator()));
+        assertEquals(STRING_HELLO, result);
+    }
+
+    @Test
+    void removeTrailingLineSeparator_NewLinesNotAtTheEnd_NoChanges() {
+        String result = assertDoesNotThrow(() -> argumentResolver.removeTrailingLineSeparator(STRING_HELLO + System.lineSeparator() + STRING_HELLO));
+        assertEquals(STRING_HELLO + System.lineSeparator() + STRING_HELLO, result);
     }
 }

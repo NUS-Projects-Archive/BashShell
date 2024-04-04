@@ -29,7 +29,7 @@ class ShellImplIT {
      */
     static Stream<Arguments> getValidQuoteContents() {
         return Stream.of(
-                Arguments.of("echo \"`echo testing`\"", String.format("testing %s", System.lineSeparator())),
+                Arguments.of("echo \"`echo testing`\"", String.format("testing%s", System.lineSeparator())),
                 Arguments.of("echo `echo testing`", String.format("testing%s", System.lineSeparator()))
         );
     }

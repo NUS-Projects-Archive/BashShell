@@ -233,8 +233,23 @@ public class ArgumentResolver {
         Command command = CommandBuilder.parseCommand(commandString, getAppRunner());
         command.evaluate(System.in, outputStream);
 
+        String result = removeTrailingLineSeparator(outputStream.toString());
         // replace newlines with spaces
-        return outputStream.toString().replace(STRING_NEWLINE, String.valueOf(CHAR_SPACE));
+        return result.replace(STRING_NEWLINE, String.valueOf(CHAR_SPACE));
+    }
+
+    public String removeTrailingLineSeparator(String str) {
+        String lineSeparator = System.lineSeparator();
+        int length = str.length();
+        int lineSepLength = lineSeparator.length();
+
+        // Find the index of the last character that is not a line separator
+        while (length >= lineSepLength && str.substring(length - lineSepLength, length).equals(lineSeparator)) {
+            length -= lineSepLength;
+        }
+
+        // Return the substring up to the last non-line separator character
+        return str.substring(0, length);
     }
 
     /**

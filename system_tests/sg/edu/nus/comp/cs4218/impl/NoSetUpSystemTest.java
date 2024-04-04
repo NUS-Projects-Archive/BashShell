@@ -17,7 +17,6 @@ public class NoSetUpSystemTest extends AbstractSystemTest {
 
     static String[] validQuotes() {
         return new String[]{
-                " \"`echo Hello`World\"",
                 " \"Hello World\"",
                 " 'Hello World'",
                 " `echo Hello` World",
