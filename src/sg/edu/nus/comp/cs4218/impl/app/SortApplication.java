@@ -168,31 +168,35 @@ public class SortApplication implements SortInterface {
             public int compare(String str1, String str2) {
                 String temp1 = isCaseIndependent && !isFirstWordNumber ? str1.toLowerCase(Locale.ROOT) : str1;
                 String temp2 = isCaseIndependent && !isFirstWordNumber ? str2.toLowerCase(Locale.ROOT) : str2;
+                int result = 0;
 
                 // Extract the first group of numbers if possible.
                 if (isFirstWordNumber && !temp1.isEmpty() && !temp2.isEmpty()) {
                     String chunk1 = getChunk(temp1);//NOPMD
                     String chunk2 = getChunk(temp2);//NOPMD
+                    boolean isChunk1Numeric = !chunk1.isEmpty() && Character.isDigit(chunk1.charAt(0));
+                    boolean isChunk2Numeric = !chunk2.isEmpty() && Character.isDigit(chunk2.charAt(0));
 
-                    // If both chunks can be represented as numbers, sort them numerically.
-                    int result = 0;
-                    if (Character.isDigit(chunk1.charAt(0)) && Character.isDigit(chunk2.charAt(0))) {
+                    if (isChunk1Numeric && !isChunk2Numeric) {
+                        result = 1;
+                    } else if (!isChunk1Numeric && isChunk2Numeric) {
+                        result = -1;
+                    } else if (isChunk1Numeric && isChunk2Numeric) {
+                        // If both chunks can be represented as numbers, sort them numerically.
                         result = new BigInteger(chunk1).compareTo(new BigInteger(chunk2));
                     } else {
                         result = chunk1.compareTo(chunk2);
                     }
-                    if (result != 0) {
-                        return result;
+                    if (result == 0) {
+                        return temp1.substring(chunk1.length()).compareTo(temp2.substring(chunk2.length()));
                     }
-                    return temp1.substring(chunk1.length()).compareTo(temp2.substring(chunk2.length()));
+                } else {
+                    result = temp1.compareTo(temp2);
                 }
 
-                return temp1.compareTo(temp2);
+                return isReverseOrder ? -result : result;
             }
         });
-        if (isReverseOrder) {
-            Collections.reverse(input);
-        }
     }
 
     /**
