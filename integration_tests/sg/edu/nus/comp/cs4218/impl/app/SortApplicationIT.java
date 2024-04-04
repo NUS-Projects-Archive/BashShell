@@ -145,8 +145,8 @@ public class SortApplicationIT {
             String[] args = {"-f", "-n", TEST_INPUT_FILE};
             assertDoesNotThrow(() -> app.run(args, mockStdin, stdout));
             Path expectedFilePath = Paths.get(TEST_RESOURCES + "out-numeric.txt");
-            String expectedFileContent = assertDoesNotThrow(() -> Files.readString(expectedFilePath));
-            assertEquals(expectedFileContent, stdout.toString());
+            String expectedContent = assertDoesNotThrow(() -> Files.readString(expectedFilePath));
+            assertEquals(expectedContent, stdout.toString());
         }
 
         @Test
@@ -154,8 +154,8 @@ public class SortApplicationIT {
             String[] args = {"-fr", "-n", TEST_INPUT_FILE};
             assertDoesNotThrow(() -> app.run(args, mockStdin, stdout));
             Path expectedFilePath = Paths.get(TEST_RESOURCES + "out-numeric-reverse.txt");
-            String expectedFileContent = assertDoesNotThrow(() -> Files.readString(expectedFilePath));
-            assertEquals(expectedFileContent, stdout.toString());
+            String expectedContent = assertDoesNotThrow(() -> Files.readString(expectedFilePath));
+            assertEquals(expectedContent, stdout.toString());
         }
     }
 
