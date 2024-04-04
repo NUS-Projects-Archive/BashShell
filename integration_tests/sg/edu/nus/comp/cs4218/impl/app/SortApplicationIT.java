@@ -15,6 +15,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -25,6 +28,8 @@ import sg.edu.nus.comp.cs4218.exception.SortException;
 @SuppressWarnings("PMD.ClassNamingConventions")
 public class SortApplicationIT {
 
+    private static final String TEST_RESOURCES = "resources/sort/";
+    private static final String TEST_INPUT_FILE = TEST_RESOURCES + "large-text.txt";
     private static final String BIG_A = "A";
     private static final String BIG_B = "B";
     private static final String SMALL_A = "a";
@@ -133,6 +138,24 @@ public class SortApplicationIT {
             assertDoesNotThrow(() -> app.run(args, mockStdin, stdout));
             String expected = joinStringsByNewline(OUT_FIRST_NUM) + STRING_NEWLINE;
             assertEquals(expected, stdout.toString());
+        }
+
+        @Test
+        void run_IsFirstWordNumberAndIsCaseIndependentFlagForLargeTextFile_IsFirstWordNumberTakesPrecedence() {
+            String[] args = {"-f", "-n", TEST_INPUT_FILE};
+            assertDoesNotThrow(() -> app.run(args, mockStdin, stdout));
+            Path expectedFilePath = Paths.get(TEST_RESOURCES + "out-numeric.txt");
+            String expectedFileContent = assertDoesNotThrow(() -> Files.readString(expectedFilePath));
+            assertEquals(expectedFileContent, stdout.toString());
+        }
+
+        @Test
+        void run_IsFirstWordNumberAndIsReverseAndIsCaseIndependentFlagForLargeTextFile_IsFirstWordNumberTakesPrecedence() {
+            String[] args = {"-fr", "-n", TEST_INPUT_FILE};
+            assertDoesNotThrow(() -> app.run(args, mockStdin, stdout));
+            Path expectedFilePath = Paths.get(TEST_RESOURCES + "out-numeric-reverse.txt");
+            String expectedFileContent = assertDoesNotThrow(() -> Files.readString(expectedFilePath));
+            assertEquals(expectedFileContent, stdout.toString());
         }
     }
 
