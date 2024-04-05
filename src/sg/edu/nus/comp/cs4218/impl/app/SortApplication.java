@@ -168,7 +168,6 @@ public class SortApplication implements SortInterface {
             public int compare(String str1, String str2) {
                 String temp1 = isCaseIndependent && !isFirstWordNumber ? str1.toLowerCase(Locale.ROOT) : str1;
                 String temp2 = isCaseIndependent && !isFirstWordNumber ? str2.toLowerCase(Locale.ROOT) : str2;
-                int result = 0;
 
                 // Extract the first group of numbers if possible.
                 if (isFirstWordNumber && !temp1.isEmpty() && !temp2.isEmpty()) {
@@ -177,10 +176,11 @@ public class SortApplication implements SortInterface {
                     boolean isChunk1Numeric = !chunk1.isEmpty() && Character.isDigit(chunk1.charAt(0));
                     boolean isChunk2Numeric = !chunk2.isEmpty() && Character.isDigit(chunk2.charAt(0));
 
+                    int result = 0;
                     if (isChunk1Numeric && !isChunk2Numeric) {
-                        result = 1;
+                        return 1;
                     } else if (!isChunk1Numeric && isChunk2Numeric) {
-                        result = -1;
+                        return -1;
                     } else if (isChunk1Numeric && isChunk2Numeric) {
                         // If both chunks can be represented as numbers, sort them numerically.
                         result = new BigInteger(chunk1).compareTo(new BigInteger(chunk2));
