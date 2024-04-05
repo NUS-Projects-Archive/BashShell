@@ -20,6 +20,7 @@ import java.util.stream.Stream;
 
 import sg.edu.nus.comp.cs4218.Command;
 import sg.edu.nus.comp.cs4218.exception.AbstractApplicationException;
+import sg.edu.nus.comp.cs4218.exception.CatException;
 import sg.edu.nus.comp.cs4218.exception.ShellException;
 
 /**
@@ -238,13 +239,17 @@ public class ArgumentResolver {
         return result.replace(STRING_NEWLINE, String.valueOf(CHAR_SPACE));
     }
 
+    /**
+     * Removes trailing line separators (if any) from the end of a string input and returns the result
+     *
+     * @param str   String input to remove trailing line separators from
+     */
     public String removeTrailingLineSeparator(String str) {
-        String lineSeparator = System.lineSeparator();
         int length = str.length();
-        int lineSepLength = lineSeparator.length();
+        int lineSepLength = STRING_NEWLINE.length();
 
         // Find the index of the last character that is not a line separator
-        while (length >= lineSepLength && str.substring(length - lineSepLength, length).equals(lineSeparator)) {
+        while (length >= lineSepLength && str.substring(length - lineSepLength, length).equals(STRING_NEWLINE)) {
             length -= lineSepLength;
         }
 

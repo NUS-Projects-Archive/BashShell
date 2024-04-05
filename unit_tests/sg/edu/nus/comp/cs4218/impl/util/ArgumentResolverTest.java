@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static sg.edu.nus.comp.cs4218.impl.util.ErrorConstants.ERR_SYNTAX;
+import static sg.edu.nus.comp.cs4218.testutils.TestStringUtils.STRING_NEWLINE;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -149,31 +150,31 @@ class ArgumentResolverTest {
      */
     @Test
     void resolveArguments_CommandSubstitutionContainsNewline_ThrowsShellException() {
-        List<String> argList = List.of(STRING_ECHO, "`echo hello" + System.lineSeparator() + "`");
+        List<String> argList = List.of(STRING_ECHO, "`echo hello" + STRING_NEWLINE + "`");
         assertThrows(ShellException.class, () -> argumentResolver.parseArguments(argList));
     }
 
     @Test
     void removeTrailingLineSeparator_NoLineSeparatorsInInputString_NoChanges() {
-        String result = assertDoesNotThrow(() -> argumentResolver.removeTrailingLineSeparator(STRING_HELLO));
+        String result = argumentResolver.removeTrailingLineSeparator(STRING_HELLO);
         assertEquals(STRING_HELLO, result);
     }
 
     @Test
     void removeTrailingLineSeparator_OneTrailingNewLineInInputString_TrailingNewLineRemoved() {
-        String result = assertDoesNotThrow(() -> argumentResolver.removeTrailingLineSeparator(STRING_HELLO + System.lineSeparator()));
+        String result = argumentResolver.removeTrailingLineSeparator(STRING_HELLO + STRING_NEWLINE);
         assertEquals(STRING_HELLO, result);
     }
 
     @Test
     void removeTrailingLineSeparator_MultipleTrailingNewLinesInInputString_TrailingNewLinesRemoved() {
-        String result = assertDoesNotThrow(() -> argumentResolver.removeTrailingLineSeparator(STRING_HELLO + System.lineSeparator() + System.lineSeparator()));
+        String result = argumentResolver.removeTrailingLineSeparator(STRING_HELLO + STRING_NEWLINE + STRING_NEWLINE);
         assertEquals(STRING_HELLO, result);
     }
 
     @Test
     void removeTrailingLineSeparator_NewLinesNotAtTheEnd_NoChanges() {
-        String result = assertDoesNotThrow(() -> argumentResolver.removeTrailingLineSeparator(STRING_HELLO + System.lineSeparator() + STRING_HELLO));
-        assertEquals(STRING_HELLO + System.lineSeparator() + STRING_HELLO, result);
+        String result = argumentResolver.removeTrailingLineSeparator(STRING_HELLO + STRING_NEWLINE + STRING_HELLO);
+        assertEquals(STRING_HELLO + STRING_NEWLINE + STRING_HELLO, result);
     }
 }
