@@ -120,14 +120,12 @@ public class CutArgsParser extends ArgsParser {
             if (!range.matches("^[0-9-]*$")) {
                 throw new InvalidArgsException(String.format("invalid byte/character position: '%s'", range));
             }
-
             // Check if the range is empty
             if (range.isEmpty()) {
                 throw new InvalidArgsException("byte/character positions are numbered from 1");
             }
-
             // Check if the range is equal to (only) hyphen
-            if ("-".equals(range)) {
+            if (("-").equals(range)) {
                 throw new InvalidArgsException(String.format("invalid range with no endpoint: '%s'", range));
             }
 
@@ -137,8 +135,8 @@ public class CutArgsParser extends ArgsParser {
                     throw new InvalidArgsException(String.format("invalid range format: '%s'", range));
                 }
 
-                int start = Integer.parseInt(parts[0]);
-                int end = Integer.parseInt(parts[1]);
+                long start = parseToLong(parts[0]);
+                long end = parseToLong(parts[1]);
 
                 if (start < 1) {
                     throw new InvalidArgsException("byte/character positions are numbered from 1");
@@ -147,17 +145,36 @@ public class CutArgsParser extends ArgsParser {
                     throw new InvalidArgsException(String.format("invalid decreasing range: '%s'", range));
                 }
 
-                rangeList.add(new int[]{start, end});
+                int startValue = parseLongToInt(start);
+                int endValue = parseLongToInt(end);
+                rangeList.add(new int[]{startValue, endValue});
             } else {
-                int singleValue = Integer.parseInt(range);
-                if (Integer.parseInt(range) < 1) {
+                long value = parseToLong(range);
+                if (value < 1) {
                     throw new InvalidArgsException("byte/character positions are numbered from 1");
                 }
+                int singleValue = parseLongToInt(value);
                 rangeList.add(new int[]{singleValue, singleValue});
             }
         }
         rangeList.sort(Comparator.comparingInt(arr -> arr[0]));
 
         return rangeList;
+    }
+
+    private long parseToLong(String value) throws InvalidArgsException {
+        try {
+            return Long.parseLong(value);
+        } catch (NumberFormatException e) {
+            throw new InvalidArgsException(String.format("byte/character offset '%s' is too large", value), e);
+        }
+    }
+
+    private int parseLongToInt(long value) {
+        long adjustedValue = value;
+        if (adjustedValue > Integer.MAX_VALUE) {
+            adjustedValue = Integer.MAX_VALUE;
+        }
+        return (int) adjustedValue;
     }
 }
