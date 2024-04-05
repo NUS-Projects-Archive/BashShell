@@ -279,9 +279,7 @@ public class CutArgsParserTest {
         List<int[]> actualList = assertDoesNotThrow(() -> parser.getRangeList());
         assertEquals(expected.size(), actualList.size());
         for (int i = 0; i < actualList.size(); i++) {
-            int[] actualSublist = actualList.get(i);
-            int[] expectedSubList = expected.get(i);
-            assertArrayEquals(expectedSubList, actualSublist);
+            assertArrayEquals(expected.get(i), actualList.get(i));
         }
     }
 
@@ -291,9 +289,7 @@ public class CutArgsParserTest {
         List<int[]> actualList = assertDoesNotThrow(() -> parser.getRangeList());
         List<int[]> expected = List.of(new int[]{Integer.MAX_VALUE, Integer.MAX_VALUE});
         for (int i = 0; i < actualList.size(); i++) {
-            int[] actualSublist = actualList.get(i);
-            int[] expectedSubList = expected.get(i);
-            assertArrayEquals(expectedSubList, actualSublist);
+            assertArrayEquals(expected.get(i), actualList.get(i));
         }
     }
 
