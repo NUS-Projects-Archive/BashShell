@@ -25,7 +25,12 @@ jobs:
           cache: maven
 
       - name: Run PMD
+        id: pmd
         uses: pmd/pmd-github-action@v2
         with:
           version: '6.55.0' # Cannot use version 7.0.0 and above
           rulesets: 'PMD.Rules.xml'
+
+      - name: Assert no violations
+        if: steps.pmd.outputs.violations != 0
+        run: exit 1
