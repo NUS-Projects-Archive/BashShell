@@ -1,11 +1,9 @@
-name: Maven Test Reports
+name: PMD
 
 on:
   push:
     branches: ['main']
     tags: ['ms1', 'ms2', 'ms3']
-  pull_request:
-    branches: ['main']
   workflow_dispatch:
 
 jobs:
@@ -27,4 +25,5 @@ jobs:
       - name: Run PMD
         uses: pmd/pmd-github-action@v2
         with:
+          version: '6.55.0'
           rulesets: 'PMD.Rules.xml'
