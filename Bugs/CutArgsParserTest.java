@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import sg.edu.nus.comp.cs4218.exception.InvalidArgsException;
 import sg.edu.nus.comp.cs4218.impl.parser.CutArgsParser;
 
+@SuppressWarnings("PMD.NoPackage")
 public class CutArgsParserTest {
 
     private static final String FLAG_CUT_BY_CHAR = "-c";
