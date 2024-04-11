@@ -21,7 +21,7 @@ jobs:
           distribution: 'adopt'
           cache: maven
 
-      - name: Run PMD
+      - name: Run PMD using custom rules
         id: pmd
         uses: pmd/pmd-github-action@v2
         with:
