@@ -173,10 +173,16 @@ public class SortApplication implements SortInterface {
                 if (isFirstWordNumber && !temp1.isEmpty() && !temp2.isEmpty()) {
                     String chunk1 = getChunk(temp1);//NOPMD
                     String chunk2 = getChunk(temp2);//NOPMD
+                    boolean isChunk1Numeric = !chunk1.isEmpty() && Character.isDigit(chunk1.charAt(0));
+                    boolean isChunk2Numeric = !chunk2.isEmpty() && Character.isDigit(chunk2.charAt(0));
 
-                    // If both chunks can be represented as numbers, sort them numerically.
                     int result = 0;
-                    if (Character.isDigit(chunk1.charAt(0)) && Character.isDigit(chunk2.charAt(0))) {
+                    if (isChunk1Numeric && !isChunk2Numeric) {
+                        return 1;
+                    } else if (!isChunk1Numeric && isChunk2Numeric) {
+                        return -1;
+                    } else if (isChunk1Numeric && isChunk2Numeric) {
+                        // If both chunks can be represented as numbers, sort them numerically.
                         result = new BigInteger(chunk1).compareTo(new BigInteger(chunk2));
                     } else {
                         result = chunk1.compareTo(chunk2);
@@ -191,7 +197,7 @@ public class SortApplication implements SortInterface {
             }
         });
         if (isReverseOrder) {
-            Collections.reverse(input);
+            Collections.reverse(input); // Apply reverse order here after sorting
         }
     }
 

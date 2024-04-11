@@ -29,12 +29,14 @@ class SortApplicationTest {
     private static final String SMALL_A = "a";
     private static final String SMALL_B = "b";
     private static final String SMALL_O = "o";
+    private static final String PLUS = "+";
+    private static final String MINUS = "-";
 
-    private static final String[] CONTENT = {"5", BIG_A, "2", BIG_B, "10", SMALL_O, "1", SMALL_A, "3", SMALL_B};
-    private static final String[] OUT_NO_FLAGS = {"1", "10", "2", "3", "5", BIG_A, BIG_B, SMALL_A, SMALL_B, SMALL_O};
-    private static final String[] OUT_FIRST_NUM = {"1", "2", "3", "5", "10", BIG_A, BIG_B, SMALL_A, SMALL_B, SMALL_O};
-    private static final String[] OUT_REV_ORDER = {SMALL_O, SMALL_B, SMALL_A, BIG_B, BIG_A, "5", "3", "2", "10", "1"};
-    private static final String[] OUT_CASE_IGNORE = {"1", "10", "2", "3", "5", BIG_A, SMALL_A, BIG_B, SMALL_B, SMALL_O};
+    private static final String[] CONTENT = {"5", BIG_A, "2", BIG_B, "10", SMALL_O, "1", SMALL_A, "3", PLUS, SMALL_B, MINUS};
+    private static final String[] OUT_NO_FLAGS = {PLUS, MINUS, "1", "10", "2", "3", "5", BIG_A, BIG_B, SMALL_A, SMALL_B, SMALL_O};
+    private static final String[] OUT_FIRST_NUM = {PLUS, MINUS, BIG_A, BIG_B, SMALL_A, SMALL_B, SMALL_O, "1", "2", "3", "5", "10"};
+    private static final String[] OUT_REV_ORDER = {SMALL_O, SMALL_B, SMALL_A, BIG_B, BIG_A, "5", "3", "2", "10", "1", MINUS, PLUS};
+    private static final String[] OUT_CASE_IGNORE = {PLUS, MINUS, "1", "10", "2", "3", "5", BIG_A, SMALL_A, BIG_B, SMALL_B, SMALL_O};
 
     private SortApplication app;
     private InputStream stdin;
