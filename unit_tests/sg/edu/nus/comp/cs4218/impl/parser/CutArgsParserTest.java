@@ -30,6 +30,7 @@ public class CutArgsParserTest {
     private static final String MULTI_NUM = "1,5";
     private static final String RANGE_OF_NUM = "1-5";
     private static final String MULTI_AND_RANGE = "1,5,10-15";
+    private static final String TOO_LARGE_RANGE = "9223372036854775808"; // 1 value larger than max of Long
     private static final String FILE_ONE = "file1";
     private static final String FILE_TWO = "file2";
     private static final String STDIN = "-";
@@ -239,6 +240,15 @@ public class CutArgsParserTest {
     }
 
     @Test
+    void parse_CutValueTooLarge_ThrowsInvalidArgsException() {
+        InvalidArgsException result = assertThrowsExactly(InvalidArgsException.class, () ->
+                parser.parse(FLAG_CUT_BY_CHAR, TOO_LARGE_RANGE, FILE_ONE)
+        );
+        String expected = String.format("byte/character offset '%s' is too large", TOO_LARGE_RANGE);
+        assertEquals(expected, result.getMessage());
+    }
+
+    @Test
     void isCharPo_ValidFlagAndSyntax_ReturnsTrue() {
         assertDoesNotThrow(() -> parser.parse(FLAG_CUT_BY_CHAR, SINGLE_NUM, FILE_ONE));
         assertTrue(parser.isCharPo());
@@ -269,9 +279,17 @@ public class CutArgsParserTest {
         List<int[]> actualList = assertDoesNotThrow(() -> parser.getRangeList());
         assertEquals(expected.size(), actualList.size());
         for (int i = 0; i < actualList.size(); i++) {
-            int[] actualSublist = actualList.get(i);
-            int[] expectedSubList = expected.get(i);
-            assertArrayEquals(expectedSubList, actualSublist);
+            assertArrayEquals(expected.get(i), actualList.get(i));
+        }
+    }
+
+    @Test
+    void getRangeList_CutValueLargerThanMaxInteger_ReturnsMaxInteger() {
+        assertDoesNotThrow(() -> parser.parse(FLAG_CUT_BY_CHAR, "5294967296", FILE_ONE));
+        List<int[]> actualList = assertDoesNotThrow(() -> parser.getRangeList());
+        List<int[]> expected = List.of(new int[]{Integer.MAX_VALUE, Integer.MAX_VALUE});
+        for (int i = 0; i < actualList.size(); i++) {
+            assertArrayEquals(expected.get(i), actualList.get(i));
         }
     }
 
