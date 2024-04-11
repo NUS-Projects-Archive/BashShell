@@ -22,7 +22,7 @@ import org.junit.jupiter.api.io.TempDir;
 import sg.edu.nus.comp.cs4218.Environment;
 import sg.edu.nus.comp.cs4218.impl.app.SortApplication;
 
-@SuppressWarnings("PMD.ClassNamingConventions")
+@SuppressWarnings({"PMD.ClassNamingConventions", "PMD.NoPackage"})
 public class SortApplicationIT {
 
     private static final String TEST_RESOURCES = "resources/sort/";
