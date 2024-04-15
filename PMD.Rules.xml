@@ -9,6 +9,12 @@
   Last updated 9 January 2021 (Replaced deprecated rulesets with its equivalent)
   </description>
 
+  <configuration>
+    <excludes>
+      <exclude>./automated_tests</exclude>
+    </excludes>
+  </configuration>
+
   <!-- Replacement for deprecated rulesets/java/basic.xml -->
   <rule ref="category/java/errorprone.xml/AvoidBranchingStatementAsLastInLoop" />
   <rule ref="category/java/errorprone.xml/AvoidDecimalLiteralsInBigDecimalConstructor" />
@@ -154,4 +160,3 @@
   <rule ref="category/java/performance.xml/UseStringBufferLength" />
   
 </ruleset>
-
