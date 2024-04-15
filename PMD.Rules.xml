@@ -154,4 +154,3 @@
   <rule ref="category/java/performance.xml/UseStringBufferLength" />
   
 </ruleset>
-
