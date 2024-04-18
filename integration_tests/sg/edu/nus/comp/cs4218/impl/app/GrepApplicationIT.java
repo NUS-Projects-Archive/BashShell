@@ -1,5 +1,6 @@
 package sg.edu.nus.comp.cs4218.impl.app;
 
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
@@ -19,6 +20,7 @@ import static sg.edu.nus.comp.cs4218.impl.util.StringUtils.STRING_STDIN_OUT;
 import static sg.edu.nus.comp.cs4218.testutils.FileUtils.createNewFileInDir;
 import static sg.edu.nus.comp.cs4218.testutils.FileUtils.deleteFileOrDirectory;
 import static sg.edu.nus.comp.cs4218.testutils.TestStringUtils.joinStringsByNewline;
+import static sg.edu.nus.comp.cs4218.testutils.TestStringUtils.removeTrailing;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -26,17 +28,22 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Stream;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledOnOs;
 import org.junit.jupiter.api.condition.OS;
+import org.junit.jupiter.api.io.CleanupMode;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -57,6 +64,9 @@ class GrepApplicationIT {
     private static final String COLON_SPACE = ": ";
     private static final String DASH = "-";
     private static final String INPUT_CONTENTS = joinStringsByNewline("aabb", "x", "ab");
+    private static final String TEST_INPUT_FILE = "c.md";
+    private static final String TEST_OUTPUT_FILE = "expected_c.md";
+    private static final String TEST_RESOURCES = "resources/grep";
     private static final String[] OUTPUT_CONTENTS = {"aabb", "ab"};
 
     @TempDir
@@ -82,12 +92,28 @@ class GrepApplicationIT {
     }
 
     @BeforeEach
-    void setUp() {
+    void setUp(@TempDir(cleanup = CleanupMode.ALWAYS) Path setUpTempDir) throws IOException {
+        tempDir = setUpTempDir;
+        final String resourceDirectory = removeTrailing(TEST_RESOURCES, "/");
+        try (Stream<Path> stream = Files.walk(Paths.get(resourceDirectory))) {
+            stream.forEach(source -> {
+                Path destination = Paths.get(tempDir.toString(),
+                        source.toString().substring(resourceDirectory.length()));
+
+                try {
+                    Files.copy(source, destination, REPLACE_EXISTING);
+                } catch (IOException e) {
+                    throw new RuntimeException("Unable to copy test resources to temp directory.", e);
+                }
+            });
+        }
+
+        // Set CWD to be the test directory
+        Environment.currentDirectory = tempDir.toString();
+
         app = new GrepApplication();
         stdin = new ByteArrayInputStream(INPUT_CONTENTS.getBytes(StandardCharsets.UTF_8));
         stdout = new ByteArrayOutputStream();
-
-        Environment.currentDirectory = tempDir.toFile().getAbsolutePath();
 
         fileOne = createNewFileInDir(tempDir, "tempFile1", INPUT_CONTENTS);
         fileOneAbsPath = fileOne.toAbsolutePath().toString();
@@ -537,6 +563,22 @@ class GrepApplicationIT {
 
             // Then
             assertEquals(expected, stdout.toString());
+        }
+
+        // Disabled as this test case is written for a Hackathon valid filed bug (Issue #220) that is not fixed.
+        @Test
+        @Disabled
+        void run_GetInputFromValidFileNameWithValidDashPattern_ReturnsMatchingLinesFromFile() {
+            // Given
+            String[] args = new String[]{DASH, TEST_INPUT_FILE};
+
+            // When
+            assertDoesNotThrow(() -> app.run(args, mock(InputStream.class), stdout));
+
+            // Then
+            Path expectedFilePath = Paths.get(tempDir.toString(), TEST_OUTPUT_FILE);
+            String expectedContent = assertDoesNotThrow(() -> Files.readString(expectedFilePath));
+            assertEquals(expectedContent, stdout.toString());
         }
     }
 }
